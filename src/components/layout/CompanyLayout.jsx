@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import CompanySidebar from '../common/CompanySidebar'
 import Header from '../common/Header'
+import Footer from '../common/Footer'
 
 const CompanyLayout = () => {
   return (
@@ -12,6 +13,7 @@ const CompanyLayout = () => {
           <Outlet />
         </main>
       </div>
+      <Footer />
     </div>
   )
 }

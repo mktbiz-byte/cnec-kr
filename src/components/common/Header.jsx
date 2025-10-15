@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import Logo from './Logo';
 
 const Header = ({ minimal = false, isAdmin = false, isCompany = false }) => {
   const { user, signOut } = useAuth();
@@ -18,11 +19,7 @@ const Header = ({ minimal = false, isAdmin = false, isCompany = false }) => {
   return (
     <header className="header">
       <div className="container header-container">
-        <div className="logo">
-          <Link to="/">
-            <h1>CNEC</h1>
-          </Link>
-        </div>
+        <Logo type="dark" isAdmin={isAdmin} />
 
         {!minimal && (
           <nav className="main-nav">

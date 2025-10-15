@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import AdminSidebar from '../common/AdminSidebar'
 import Header from '../common/Header'
+import Footer from '../common/Footer'
 
 const AdminLayout = () => {
   return (
@@ -12,6 +13,7 @@ const AdminLayout = () => {
           <Outlet />
         </main>
       </div>
+      <Footer />
     </div>
   )
 }

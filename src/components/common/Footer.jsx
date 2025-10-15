@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -8,7 +9,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="container footer-container">
         <div className="footer-logo">
-          <Link to="/">CNEC</Link>
+          <Logo type="light" />
         </div>
         
         <div className="footer-links">

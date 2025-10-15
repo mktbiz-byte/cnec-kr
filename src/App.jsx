@@ -11,7 +11,11 @@ import AuthLayout from './components/layout/AuthLayout';
 // 페이지
 import HomePage from './pages/home/HomePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import CompanyApprovalPage from './pages/admin/CompanyApprovalPage';
+import CompanyListPage from './pages/admin/CompanyListPage';
+import UserManagementPage from './pages/admin/UserManagementPage';
 import CompanyDashboard from './pages/company/CompanyDashboard';
+import CompanyProfilePage from './pages/company/CompanyProfilePage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -59,8 +63,9 @@ function App() {
         }
       >
         <Route index element={<AdminDashboard />} />
-        <Route path="companies" element={<AdminDashboard />} />
-        <Route path="users" element={<AdminDashboard />} />
+        <Route path="companies" element={<CompanyListPage />} />
+        <Route path="users" element={<UserManagementPage />} />
+        <Route path="approvals" element={<CompanyApprovalPage />} />
       </Route>
       
       {/* 기업 관리자 페이지 */}
@@ -73,7 +78,7 @@ function App() {
         }
       >
         <Route index element={<CompanyDashboard />} />
-        <Route path="profile" element={<CompanyDashboard />} />
+        <Route path="profile" element={<CompanyProfilePage />} />
       </Route>
       
       {/* 이전 경로 리다이렉트 (하위 호환성) */}

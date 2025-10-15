@@ -34,6 +34,14 @@ const AdminSidebar = () => {
               사용자 관리
             </NavLink>
           </li>
+          <li>
+            <NavLink 
+              to="/admin/approvals" 
+              className={({ isActive }) => isActive ? 'active' : ''}
+            >
+              기업 회원 승인
+            </NavLink>
+          </li>
         </ul>
       </nav>
     </aside>

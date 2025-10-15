@@ -1,3 +1,6 @@
+/* 한국식 디자인 테마 임포트 */
+@import './korean-theme.css';
+
 :root {
   --primary-color: #0066cc;
   --secondary-color: #003366;
@@ -876,4 +879,300 @@ button:active {
   .step-item:not(:last-child)::after {
     display: none;
   }
+}
+
+
+
+/* Register Page Step Indicator */
+.step-indicator {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  position: relative;
+  border-bottom: 1px solid var(--medium-gray);
+  padding-bottom: 10px;
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  color: var(--dark-gray);
+  font-weight: 500;
+  position: relative;
+}
+
+.step.active {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.step.completed {
+  color: var(--secondary-color);
+}
+
+.step.active::after {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--primary-color);
+}
+
+.verification-success {
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.verification-success p {
+  margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.form-actions .btn-secondary {
+    flex: 1;
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    border: 1px solid var(--medium-gray);
+}
+
+.form-actions .btn-primary {
+    flex: 1;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.my-4 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.text-green-600 {
+    color: var(--success-color);
+}
+
+
+
+/* Utility Classes from new components */
+.mx-auto { margin-left: auto; margin-right: auto; }
+.p-4 { padding: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mr-2 { margin-right: 0.5rem; }
+.w-full { width: 100%; }
+.overflow-x-auto { overflow-x: auto; }
+
+/* Grid */
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.gap-4 { gap: 1rem; }
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.col-span-2 { grid-column: span 2 / span 2; }
+
+
+/* Buttons */
+.btn-danger {
+  background-color: var(--error-color);
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: .35em .65em;
+  font-size: .75em;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25rem;
+}
+
+.badge-success {
+  background-color: var(--success-color);
+}
+
+/* Text Colors */
+.text-green-600 { color: var(--success-color); }
+.text-yellow-600 { color: var(--warning-color); }
+
+/* Info Item for Dashboard */
+.info-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+.info-item span {
+    display: block;
+}
+.info-item .font-bold {
+    font-weight: 600;
+    color: var(--dark-gray);
+    margin-bottom: 0.25rem;
+}
+
+/* Login Tabs */
+.login-type-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.login-tab {
+  flex: 1;
+  padding: 15px;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  color: var(--dark-gray);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.login-tab.active {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.login-tab:hover {
+    color: var(--primary-color);
+    transform: none; /* Override default button hover */
+}
+
+.login-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--primary-color);
+}
+
+/* Data Table improvements */
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.data-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--light-gray);
+}
+
+
+/* 관리자 및 기업 관리자 페이지 추가 스타일 */
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.filter-box {
+  width: 150px;
+}
+
+.badge-danger {
+  background-color: var(--error-color);
+}
+
+.text-gray-500 {
+  color: var(--dark-gray);
+}
+
+/* 테이블 반응형 스타일 */
+@media (max-width: 768px) {
+  .data-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .data-table th,
+  .data-table td {
+    min-width: 120px;
+  }
+}
+
+/* 관리자 대시보드 통계 카드 개선 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card h3 {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--dark-gray);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--primary-color);
 }
