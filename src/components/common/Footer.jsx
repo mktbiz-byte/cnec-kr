@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="footer">
@@ -20,10 +21,26 @@ const Footer = () => {
           </div>
           
           <div className="footer-section">
+            <h3>서비스</h3>
+            <ul>
+              <li><Link to="/features">주요 기능</Link></li>
+              <li><Link to="/faq">자주 묻는 질문</Link></li>
+            </ul>
+          </div>
+          
+          <div className="footer-section">
             <h3>이용 안내</h3>
             <ul>
               <li><Link to="/terms">이용약관</Link></li>
               <li><Link to="/privacy">개인정보처리방침</Link></li>
+            </ul>
+          </div>
+          
+          <div className="footer-section">
+            <h3>계정</h3>
+            <ul>
+              <li><Link to="/auth/login">로그인</Link></li>
+              <li><Link to="/auth/register">회원가입</Link></li>
             </ul>
           </div>
         </div>
@@ -33,7 +50,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

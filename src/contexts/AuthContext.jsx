@@ -182,14 +182,86 @@ export function AuthProvider({ children }) {
   // 이메일로 로그인
   async function signInWithEmail(email, password) {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      // 테스트 계정 처리
+      if (email === 'admin@cnecbiz.com' && password === 'admin1234') {
+        // 관리자 테스트 계정
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password: 'admin1234'
+        });
+        
+        if (error) {
+          // 계정이 없으면 생성
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password: 'admin1234'
+          });
+          
+          if (signUpError) throw signUpError;
+          
+          // 관리자 계정 정보 생성
+          await supabase.from('corporate_accounts').insert([
+            {
+              auth_user_id: signUpData.user.id,
+              email,
+              company_name: 'CNEC 관리자',
+              representative_name: '관리자',
+              business_registration_number: '0000000000',
+              is_approved: true,
+              is_admin: true
+            }
+          ]);
+          
+          return { success: true, user: signUpData.user, isTestAccount: true };
+        }
+        
+        return { success: true, user: data.user, isTestAccount: true };
+      } 
+      else if (email === 'company@cnecbiz.com' && password === 'company1234') {
+        // 기업 테스트 계정
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password: 'company1234'
+        });
+        
+        if (error) {
+          // 계정이 없으면 생성
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password: 'company1234'
+          });
+          
+          if (signUpError) throw signUpError;
+          
+          // 기업 계정 정보 생성
+          await supabase.from('corporate_accounts').insert([
+            {
+              auth_user_id: signUpData.user.id,
+              email,
+              company_name: '하우파파',
+              representative_name: '박현용',
+              business_registration_number: '5758102253',
+              phone_number: '02-1234-5678',
+              address: '서울특별시 강남구',
+              is_approved: true
+            }
+          ]);
+          
+          return { success: true, user: signUpData.user, isTestAccount: true };
+        }
+        
+        return { success: true, user: data.user, isTestAccount: true };
+      }
+      else {
+        // 일반 로그인
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
       
-      if (error) throw error;
-      
-      // 기업 계정 정보 확인
+      // 테스트 계정이 아닌 경우에만 기업 계정 정보 확인
       const { data: corporateData, error: profileError } = await supabase
         .from('corporate_accounts')
         .select('*')
