@@ -8,11 +8,6 @@ import { Button } from '../../components/common/Button';
 import { Container } from '../../components/common/Container';
 import { Section } from '../../components/common/Section';
 
-// 가상의 이미지 경로 (실제 구현 시 교체 필요)
-import serviceImage1 from '../../assets/images/service-1.jpg';
-import serviceImage2 from '../../assets/images/service-2.jpg';
-import serviceImage3 from '../../assets/images/service-3.jpg';
-
 const ServicesPage = () => {
   // 서비스 데이터
   const services = [
@@ -26,7 +21,6 @@ const ServicesPage = () => {
         '성과 측정 및 분석 리포트 제공',
         '다양한 SNS 플랫폼 지원 (인스타그램, 유튜브, 틱톡 등)'
       ],
-      image: serviceImage1,
       icon: <FaUsers className="h-10 w-10 text-blue-500" />
     },
     {
@@ -39,7 +33,6 @@ const ServicesPage = () => {
         '다국어 콘텐츠 제작 지원',
         '글로벌 시장 진출 컨설팅'
       ],
-      image: serviceImage2,
       icon: <FaGlobe className="h-10 w-10 text-blue-500" />
     },
     {
@@ -52,7 +45,6 @@ const ServicesPage = () => {
         '경쟁사 벤치마킹 분석',
         '마케팅 전략 최적화 제안'
       ],
-      image: serviceImage3,
       icon: <FaChartLine className="h-10 w-10 text-blue-500" />
     }
   ];
