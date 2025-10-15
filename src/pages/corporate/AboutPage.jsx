@@ -8,15 +8,6 @@ import { Button } from '../../components/common/Button';
 import { Container } from '../../components/common/Container';
 import { Section } from '../../components/common/Section';
 
-// 가상의 이미지 경로 (실제 구현 시 교체 필요)
-import aboutImage from '../../assets/images/about-image.jpg';
-import teamMember1 from '../../assets/images/team-1.jpg';
-import teamMember2 from '../../assets/images/team-2.jpg';
-import teamMember3 from '../../assets/images/team-3.jpg';
-import partnerLogo1 from '../../assets/images/partner-1.png';
-import partnerLogo2 from '../../assets/images/partner-2.png';
-import partnerLogo3 from '../../assets/images/partner-3.png';
-
 const AboutPage = () => {
   // 팀 멤버 데이터
   const teamMembers = [
@@ -24,22 +15,19 @@ const AboutPage = () => {
       id: 1,
       name: '김대표',
       position: 'CEO & 창립자',
-      bio: '10년 이상의 마케팅 경력을 바탕으로 CNEC Business를 설립했습니다. 글로벌 시장에서의 풍부한 경험을 통해 기업과 크리에이터를 연결하는 새로운 비즈니스 모델을 구축했습니다.',
-      image: teamMember1
+      bio: '10년 이상의 마케팅 경력을 바탕으로 CNEC Business를 설립했습니다. 글로벌 시장에서의 풍부한 경험을 통해 기업과 크리에이터를 연결하는 새로운 비즈니스 모델을 구축했습니다.'
     },
     {
       id: 2,
       name: '이사업',
       position: '사업 개발 이사',
-      bio: '다양한 산업 분야에서의 비즈니스 개발 경험을 가지고 있으며, CNEC Business의 글로벌 확장을 이끌고 있습니다. 특히 일본과 미국 시장에서의 전문성을 보유하고 있습니다.',
-      image: teamMember2
+      bio: '다양한 산업 분야에서의 비즈니스 개발 경험을 가지고 있으며, CNEC Business의 글로벌 확장을 이끌고 있습니다. 특히 일본과 미국 시장에서의 전문성을 보유하고 있습니다.'
     },
     {
       id: 3,
       name: '박마케팅',
       position: '마케팅 이사',
-      bio: '디지털 마케팅 전문가로서 인플루언서 마케팅 전략 수립 및 실행을 담당하고 있습니다. 데이터 기반의 마케팅 접근법으로 클라이언트의 ROI를 극대화합니다.',
-      image: teamMember3
+      bio: '디지털 마케팅 전문가로서 인플루언서 마케팅 전략 수립 및 실행을 담당하고 있습니다. 데이터 기반의 마케팅 접근법으로 클라이언트의 ROI를 극대화합니다.'
     }
   ];
 
@@ -306,7 +294,7 @@ const AboutPage = () => {
                 <div className="h-64 bg-gray-200">
                   {/* 실제 구현 시 이미지 교체 */}
                   <div className="w-full h-full flex items-center justify-center bg-blue-100">
-                    <span className="text-lg font-bold text-blue-800">{member.name} 사진</span>
+                    <span className="text-xl font-bold text-blue-800">{member.name}</span>
                   </div>
                 </div>
                 <div className="p-6">
@@ -326,24 +314,21 @@ const AboutPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">파트너사</h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              CNEC Business와 함께하는 글로벌 파트너사들입니다.
+              CNEC Business와 함께하는 글로벌 파트너사들을 소개합니다.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item, index) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
               <motion.div 
-                key={index}
-                className="bg-white p-6 rounded-lg shadow-md flex items-center justify-center h-32"
+                key={item}
+                className="bg-white p-8 rounded-lg shadow-md flex items-center justify-center h-32"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
+                transition={{ duration: 0.5, delay: item * 0.1 }}
                 viewport={{ once: true }}
               >
-                {/* 실제 구현 시 로고 이미지 교체 */}
-                <div className="text-center">
-                  <span className="text-lg font-bold text-gray-400">파트너사 {item}</span>
-                </div>
+                <div className="text-xl font-bold text-gray-400">파트너사 로고 {item}</div>
               </motion.div>
             ))}
           </div>
@@ -356,7 +341,7 @@ const AboutPage = () => {
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-6">함께 성장하세요</h2>
             <p className="text-xl mb-8 max-w-3xl mx-auto">
-              CNEC Business와 함께 글로벌 마케팅의 새로운 가능성을 경험하세요.
+              CNEC Business와 함께 효과적인 인플루언서 마케팅으로 브랜드 가치를 높이세요.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -364,7 +349,6 @@ const AboutPage = () => {
                 to="/auth/register" 
                 variant="white"
                 className="text-blue-600 hover:bg-gray-100"
-                size="lg"
               >
                 기업 회원가입
               </Button>
@@ -373,7 +357,6 @@ const AboutPage = () => {
                 to="/contact" 
                 variant="outline"
                 className="border-white text-white hover:bg-white hover:text-blue-600"
-                size="lg"
               >
                 문의하기
               </Button>
