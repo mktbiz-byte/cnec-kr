@@ -175,8 +175,10 @@ export function AuthProvider({ children }) {
   // 로그아웃
   async function signOut() {
     await supabase.auth.signOut();
+    // 상태를 초기화하고 페이지를 새로고침하여 모든 관련 상태를 확실히 초기화합니다.
     setUser(null);
     setUserRole(null);
+    window.location.href = '/auth/login'; // 로그인 페이지로 리디렉션
   }
 
   const value = {
