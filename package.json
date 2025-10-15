@@ -12,9 +12,13 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.75.0",
     "dotenv": "^17.2.3",
+    "i18next": "^23.10.0",
+    "i18next-browser-languagedetector": "^7.2.0",
     "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "react-i18next": "^14.0.5",
     "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
