@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { twMerge } from 'tailwind-merge';
 
 export const Button = ({
   children,
@@ -32,13 +31,13 @@ export const Button = ({
   
   const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
   
-  const mergedClassName = twMerge(
+  const mergedClassName = [
     baseStyles,
     variantStyles[variant],
     sizeStyles[size],
     disabledStyles,
     className
-  );
+  ].filter(Boolean).join(' ');
 
   const Component = as === 'link' ? Link : as;
   
