@@ -1,5 +1,4 @@
 import React from 'react';
-import { twMerge } from 'tailwind-merge';
 
 export const Container = ({ children, className = '', size = 'default', ...props }) => {
   const baseStyles = 'mx-auto px-4 sm:px-6 lg:px-8';
@@ -11,11 +10,11 @@ export const Container = ({ children, className = '', size = 'default', ...props
     full: 'max-w-full',
   };
   
-  const mergedClassName = twMerge(
+  const mergedClassName = [
     baseStyles,
     sizeStyles[size],
     className
-  );
+  ].filter(Boolean).join(' ');
   
   return (
     <div className={mergedClassName} {...props}>
