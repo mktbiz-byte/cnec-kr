@@ -9,7 +9,6 @@ import { Section } from '../../components/common/Section';
 
 // 아이콘 및 이미지
 import { FaChartLine, FaUsers, FaGlobe, FaCheckCircle } from 'react-icons/fa';
-import corporateLogo from '../../assets/images/corporate-logo.png';
 
 const CorporateHomePage = () => {
   return (
@@ -65,11 +64,9 @@ const CorporateHomePage = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <img 
-                src={corporateLogo} 
-                alt="CNEC Business" 
-                className="w-full max-w-md mx-auto"
-              />
+              <div className="w-full max-w-md mx-auto bg-white bg-opacity-10 rounded-lg p-8 flex items-center justify-center">
+                <div className="text-4xl font-bold text-white">CNEC Business</div>
+              </div>
             </motion.div>
           </div>
         </Container>
