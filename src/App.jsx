@@ -46,15 +46,11 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        navigate('/auth/password-reset');
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    // URL의 hash(#) 부분에 type=recovery가 포함되어 있는지 확인합니다.
+    if (window.location.hash.includes('type=recovery')) {
+      // 비밀번호 재설정 페이지로 즉시 이동합니다.
+      navigate('/auth/password-reset', { replace: true });
+    }
   }, [navigate]);
   return (
     <Routes>
