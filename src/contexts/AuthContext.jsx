@@ -31,44 +31,25 @@ export function AuthProvider({ children }) {
     return data.is_admin ? 'admin' : 'company';
   };
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    useEffect(() => {
+    setLoading(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null);
       if (session?.user) {
         const role = await fetchUserRole(session.user.id);
         if (role && role !== 'pending_approval') {
-            setUser(session.user);
-            setUserRole(role);
+          setUserRole(role);
         } else {
-            // 승인 대기 중이거나 역할이 없는 경우 로그아웃 처리
-            await supabase.auth.signOut();
+          setUserRole(null);
         }
-      }
-      setLoading(false);
-    };
-
-    checkUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const role = await fetchUserRole(session.user.id);
-        if (role && role !== 'pending_approval') {
-            setUser(session.user);
-            setUserRole(role);
-        } else {
-            await supabase.auth.signOut();
-            setUser(null);
-            setUserRole(null);
-        }
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
+      } else {
         setUserRole(null);
       }
       setLoading(false);
     });
 
     return () => {
-      authListener.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -169,7 +150,7 @@ export function AuthProvider({ children }) {
   async function signInWithEmail(username, password) {
     try {
         // 관리자용 아이디를 특정 이메일 주소로 매핑
-        const email = `${username}@admin.cnecbiz.com`;
+        const email = username;
 
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 

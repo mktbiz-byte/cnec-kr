@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from './lib/supabase';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 
@@ -18,6 +20,7 @@ import CompanyDashboard from './pages/company/CompanyDashboard';
 import CompanyProfilePage from './pages/company/CompanyProfilePage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
+import PasswordResetPage from './pages/auth/PasswordResetPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // 보호된 라우트 컴포넌트
@@ -40,6 +43,19 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 };
 
 function App() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/auth/password-reset');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
   return (
     <Routes>
       {/* 메인 페이지 */}
@@ -51,6 +67,7 @@ function App() {
       <Route path="/auth" element={<AuthLayout />}>
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="password-reset" element={<PasswordResetPage />} />
       </Route>
       
       {/* 관리자 페이지 */}
