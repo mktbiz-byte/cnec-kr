@@ -103,3 +103,14 @@ export const isValidBusinessNumber = (businessNumber) => {
   
   return checkDigit === parseInt(numbers[9]);
 };
+
+/**
+ * 금액 형식 변환 (1,000,000)
+ * @param {number|string} amount - 변환할 금액
+ * @returns {string} - 형식이 적용된 금액
+ */
+export const formatCurrency = (amount) => {
+  if (amount === null || amount === undefined) return '';
+  
+  return new Intl.NumberFormat('ko-KR').format(amount);
+};
