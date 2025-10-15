@@ -1,0 +1,363 @@
+{
+  "common": {
+    "appName": "CNEC Business",
+    "loading": "載入中...",
+    "error": "發生錯誤",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "create": "創建",
+    "search": "搜索",
+    "filter": "篩選",
+    "apply": "應用",
+    "reset": "重置",
+    "download": "下載",
+    "upload": "上傳",
+    "yes": "是",
+    "no": "否",
+    "back": "返回",
+    "next": "下一步",
+    "submit": "提交",
+    "confirm": "確認",
+    "success": "成功",
+    "failed": "失敗",
+    "required": "此欄位為必填項",
+    "invalidEmail": "無效的電子郵件地址",
+    "passwordMismatch": "密碼不匹配",
+    "passwordTooShort": "密碼必須至少8個字符",
+    "goToMainPage": "前往主頁"
+  },
+  "auth": {
+    "login": "登錄",
+    "logout": "登出",
+    "register": "註冊",
+    "forgotPassword": "忘記密碼",
+    "resetPassword": "重置密碼",
+    "changePassword": "更改密碼",
+    "email": "電子郵件",
+    "password": "密碼",
+    "confirmPassword": "確認密碼",
+    "currentPassword": "當前密碼",
+    "newPassword": "新密碼",
+    "rememberMe": "記住我",
+    "loginSuccess": "登錄成功",
+    "loginFailed": "登錄失敗",
+    "logoutSuccess": "您已登出",
+    "registerSuccess": "註冊成功",
+    "registerFailed": "註冊失敗",
+    "resetPasswordSuccess": "密碼已重置",
+    "resetPasswordFailed": "密碼重置失敗",
+    "changePasswordSuccess": "密碼已更改",
+    "changePasswordFailed": "密碼更改失敗",
+    "adminLogin": "管理員登錄",
+    "companyLogin": "企業登錄"
+  },
+  "corporate": {
+    "home": {
+      "title": "CNEC Business",
+      "subtitle": "網紅營銷解決方案",
+      "description": "CNEC Business 連接企業與網紅，幫助您進行有效的營銷活動。",
+      "getStarted": "開始使用",
+      "learnMore": "了解更多",
+      "features": {
+        "title": "主要功能",
+        "influencerMarketing": {
+          "title": "網紅營銷",
+          "description": "與各種社交媒體平台的網紅合作，提高品牌知名度並有效推廣產品。"
+        },
+        "globalReach": {
+          "title": "全球覆蓋",
+          "description": "通過與日本、美國、韓國和台灣等各國網紅合作，支持全球市場進入。"
+        },
+        "analytics": {
+          "title": "績效分析",
+          "description": "實時分析活動績效，並通過報告驗證營銷效果。"
+        }
+      },
+      "about": {
+        "title": "關於我們",
+        "description": "CNEC 是一家成立於2018年的網紅營銷公司，通過連接企業與網紅提供有效的營銷解決方案。",
+        "vision": "願景",
+        "visionText": "通過數字營銷創新，建立企業和網紅共同成長的生態系統。",
+        "mission": "使命",
+        "missionText": "結合技術和創意，為企業和網紅提供有價值的營銷解決方案。"
+      },
+      "services": {
+        "title": "服務",
+        "influencerMarketing": {
+          "title": "網紅營銷",
+          "description": "匹配適合品牌和產品的網紅，並計劃和執行有效的活動。"
+        },
+        "contentCreation": {
+          "title": "內容創作",
+          "description": "支持創建有效傳達品牌信息的創意內容。"
+        },
+        "globalExpansion": {
+          "title": "全球擴張支持",
+          "description": "利用來自各國的網紅網絡支持全球市場進入。"
+        },
+        "analytics": {
+          "title": "績效分析",
+          "description": "實時分析活動績效並提出優化策略。"
+        }
+      },
+      "contact": {
+        "title": "聯繫我們",
+        "name": "姓名",
+        "email": "電子郵件",
+        "company": "公司",
+        "message": "訊息",
+        "submit": "發送",
+        "success": "您的訊息已成功發送。我們將盡快與您聯繫。",
+        "failed": "訊息發送失敗。請再試一次。"
+      }
+    }
+  },
+  "company": {
+    "dashboard": {
+      "title": "儀表板",
+      "totalCampaigns": "總活動數",
+      "activeCampaigns": "進行中活動",
+      "totalBrands": "註冊品牌數",
+      "totalSpent": "總支出",
+      "recentCampaigns": "最近活動",
+      "noCampaigns": "未找到活動。創建新活動！",
+      "viewAllCampaigns": "查看所有活動",
+      "createNewCampaign": "創建新活動"
+    },
+    "profile": {
+      "title": "公司資料",
+      "companyInfo": "公司信息",
+      "companyName": "公司名稱",
+      "businessNumber": "營業登記號碼",
+      "representative": "代表人",
+      "address": "地址",
+      "phone": "電話",
+      "email": "電子郵件",
+      "taxInfo": "發票信息",
+      "taxEmail": "發票電子郵件",
+      "bankInfo": "銀行帳戶信息",
+      "bankName": "銀行名稱",
+      "accountNumber": "帳號",
+      "accountHolder": "帳戶持有人",
+      "saveSuccess": "公司信息已保存",
+      "saveFailed": "保存公司信息失敗"
+    },
+    "brands": {
+      "title": "品牌管理",
+      "createBrand": "添加品牌",
+      "editBrand": "編輯品牌",
+      "brandName": "品牌名稱",
+      "description": "描述",
+      "website": "網站",
+      "logo": "標誌",
+      "active": "啟用",
+      "inactive": "停用",
+      "saveSuccess": "品牌已保存",
+      "saveFailed": "保存品牌失敗",
+      "deleteConfirm": "您確定要刪除此品牌嗎？",
+      "deleteSuccess": "品牌已刪除",
+      "deleteFailed": "刪除品牌失敗",
+      "noBrands": "未找到品牌。添加新品牌！"
+    },
+    "campaigns": {
+      "title": "活動管理",
+      "createCampaign": "創建活動",
+      "editCampaign": "編輯活動",
+      "campaignName": "活動名稱",
+      "brand": "品牌",
+      "description": "描述",
+      "budget": "預算",
+      "startDate": "開始日期",
+      "endDate": "結束日期",
+      "status": {
+        "title": "狀態",
+        "draft": "草稿",
+        "pending_payment": "待付款",
+        "active": "進行中",
+        "completed": "已完成",
+        "cancelled": "已取消"
+      },
+      "platform": "平台",
+      "targetAudience": "目標受眾",
+      "requirements": "要求",
+      "saveSuccess": "活動已保存",
+      "saveFailed": "保存活動失敗",
+      "deleteConfirm": "您確定要刪除此活動嗎？",
+      "deleteSuccess": "活動已刪除",
+      "deleteFailed": "刪除活動失敗",
+      "noCampaigns": "未找到活動。創建新活動！",
+      "payment": {
+        "title": "付款",
+        "amount": "金額",
+        "tax": "稅金",
+        "total": "總計",
+        "method": {
+          "title": "付款方式",
+          "bank_transfer": "銀行轉賬",
+          "credit_card": "信用卡"
+        },
+        "status": {
+          "title": "付款狀態",
+          "pending": "待處理",
+          "completed": "已完成",
+          "failed": "失敗"
+        },
+        "payNow": "立即付款",
+        "paymentSuccess": "付款完成",
+        "paymentFailed": "付款失敗",
+        "requestInvoice": "申請發票"
+      }
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "管理員儀表板",
+      "totalCompanies": "總公司數",
+      "totalCampaigns": "總活動數",
+      "activeCampaigns": "進行中活動",
+      "pendingInvoices": "待處理發票",
+      "totalRevenue": "總收入",
+      "countryStats": "國家統計",
+      "recentCampaigns": "最近活動",
+      "channelSearch": "頻道搜索",
+      "searchPlaceholder": "輸入YouTube頻道ID或句柄"
+    },
+    "sales": {
+      "title": "銷售報告",
+      "totalRevenue": "總收入",
+      "totalTransactions": "總交易數",
+      "pendingPayments": "待處理付款",
+      "completedPayments": "已完成付款",
+      "filter": {
+        "title": "篩選",
+        "dateRange": {
+          "title": "日期範圍",
+          "all": "所有時間",
+          "today": "今天",
+          "this_week": "本週",
+          "this_month": "本月",
+          "custom": "自定義"
+        },
+        "startDate": "開始日期",
+        "endDate": "結束日期",
+        "status": {
+          "title": "付款狀態",
+          "all": "所有狀態",
+          "pending": "待處理",
+          "completed": "已完成",
+          "failed": "失敗"
+        },
+        "country": {
+          "title": "國家",
+          "all": "所有國家",
+          "jp": "日本",
+          "kr": "韓國",
+          "us": "美國",
+          "tw": "台灣"
+        },
+        "company": {
+          "title": "公司",
+          "all": "所有公司"
+        },
+        "apply": "應用",
+        "reset": "重置"
+      },
+      "transactions": {
+        "title": "交易",
+        "id": "交易ID",
+        "date": "日期",
+        "company": "公司",
+        "campaign": "活動",
+        "country": "國家",
+        "amount": "金額",
+        "method": {
+          "title": "付款方式",
+          "bank_transfer": "銀行轉賬",
+          "credit_card": "信用卡"
+        },
+        "status": {
+          "title": "狀態",
+          "pending": "待處理",
+          "completed": "已完成",
+          "failed": "失敗",
+          "refunded": "已退款"
+        },
+        "noTransactions": "未找到交易。"
+      },
+      "downloadCSV": "下載CSV"
+    },
+    "companies": {
+      "title": "公司管理",
+      "companyName": "公司名稱",
+      "businessNumber": "營業登記號碼",
+      "country": "國家",
+      "status": {
+        "title": "狀態",
+        "active": "啟用",
+        "inactive": "停用",
+        "pending": "待批准"
+      },
+      "registrationDate": "註冊日期",
+      "actions": "操作",
+      "view": "查看",
+      "edit": "編輯",
+      "approve": "批准",
+      "reject": "拒絕",
+      "noCompanies": "未找到公司。"
+    },
+    "approvals": {
+      "title": "公司批准",
+      "pendingApprovals": "待批准",
+      "companyName": "公司名稱",
+      "businessNumber": "營業登記號碼",
+      "country": "國家",
+      "registrationDate": "註冊日期",
+      "actions": "操作",
+      "view": "查看",
+      "approve": "批准",
+      "reject": "拒絕",
+      "approveSuccess": "公司已批准",
+      "approveFailed": "批准公司失敗",
+      "rejectSuccess": "公司已拒絕",
+      "rejectFailed": "拒絕公司失敗",
+      "noPendingApprovals": "沒有待批准的公司。"
+    },
+    "users": {
+      "title": "用戶管理",
+      "email": "電子郵件",
+      "name": "姓名",
+      "role": {
+        "title": "角色",
+        "admin": "管理員",
+        "company": "公司",
+        "user": "用戶"
+      },
+      "status": {
+        "title": "狀態",
+        "active": "啟用",
+        "inactive": "停用"
+      },
+      "lastLogin": "最後登錄",
+      "actions": "操作",
+      "view": "查看",
+      "edit": "編輯",
+      "delete": "刪除",
+      "noUsers": "未找到用戶。"
+    }
+  },
+  "countries": {
+    "jp": "日本",
+    "kr": "韓國",
+    "us": "美國",
+    "tw": "台灣",
+    "unknown": "未知"
+  },
+  "footer": {
+    "copyright": "© 2025 CNEC Business. 版權所有。",
+    "terms": "服務條款",
+    "privacy": "隱私政策",
+    "contact": "聯繫我們"
+  }
+}

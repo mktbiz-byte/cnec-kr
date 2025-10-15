@@ -1,0 +1,363 @@
+{
+  "common": {
+    "appName": "CNEC Business",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "apply": "Apply",
+    "reset": "Reset",
+    "download": "Download",
+    "upload": "Upload",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "success": "Success",
+    "failed": "Failed",
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "goToMainPage": "Go to Main Page"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "changePassword": "Change Password",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "rememberMe": "Remember Me",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "logoutSuccess": "You have been logged out",
+    "registerSuccess": "Registration successful",
+    "registerFailed": "Registration failed",
+    "resetPasswordSuccess": "Password has been reset",
+    "resetPasswordFailed": "Password reset failed",
+    "changePasswordSuccess": "Password has been changed",
+    "changePasswordFailed": "Password change failed",
+    "adminLogin": "Admin Login",
+    "companyLogin": "Company Login"
+  },
+  "corporate": {
+    "home": {
+      "title": "CNEC Business",
+      "subtitle": "Influencer Marketing Solutions",
+      "description": "CNEC Business connects companies with influencers to help you run effective marketing campaigns.",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More",
+      "features": {
+        "title": "Key Features",
+        "influencerMarketing": {
+          "title": "Influencer Marketing",
+          "description": "Collaborate with influencers across various social media platforms to increase brand awareness and effectively promote products."
+        },
+        "globalReach": {
+          "title": "Global Reach",
+          "description": "Support global market entry by collaborating with influencers from various countries including Japan, USA, Korea, and Taiwan."
+        },
+        "analytics": {
+          "title": "Performance Analytics",
+          "description": "Analyze campaign performance in real-time and verify marketing effectiveness through reports."
+        }
+      },
+      "about": {
+        "title": "About Us",
+        "description": "CNEC is an influencer marketing company established in 2018, providing effective marketing solutions by connecting businesses with influencers.",
+        "vision": "Vision",
+        "visionText": "Building an ecosystem where businesses and influencers grow together through digital marketing innovation.",
+        "mission": "Mission",
+        "missionText": "Providing valuable marketing solutions to both businesses and influencers by combining technology and creativity."
+      },
+      "services": {
+        "title": "Services",
+        "influencerMarketing": {
+          "title": "Influencer Marketing",
+          "description": "Match influencers suitable for brands and products, and plan and execute effective campaigns."
+        },
+        "contentCreation": {
+          "title": "Content Creation",
+          "description": "Support the creation of creative content that effectively conveys brand messages."
+        },
+        "globalExpansion": {
+          "title": "Global Expansion Support",
+          "description": "Support global market entry using influencer networks from various countries."
+        },
+        "analytics": {
+          "title": "Performance Analytics",
+          "description": "Analyze campaign performance in real-time and suggest optimization strategies."
+        }
+      },
+      "contact": {
+        "title": "Contact Us",
+        "name": "Name",
+        "email": "Email",
+        "company": "Company",
+        "message": "Message",
+        "submit": "Send",
+        "success": "Your message has been sent successfully. We will contact you soon.",
+        "failed": "Failed to send message. Please try again."
+      }
+    }
+  },
+  "company": {
+    "dashboard": {
+      "title": "Dashboard",
+      "totalCampaigns": "Total Campaigns",
+      "activeCampaigns": "Active Campaigns",
+      "totalBrands": "Registered Brands",
+      "totalSpent": "Total Spent",
+      "recentCampaigns": "Recent Campaigns",
+      "noCampaigns": "No campaigns found. Create a new campaign!",
+      "viewAllCampaigns": "View All Campaigns",
+      "createNewCampaign": "Create New Campaign"
+    },
+    "profile": {
+      "title": "Company Profile",
+      "companyInfo": "Company Information",
+      "companyName": "Company Name",
+      "businessNumber": "Business Registration Number",
+      "representative": "Representative",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "taxInfo": "Tax Invoice Information",
+      "taxEmail": "Tax Invoice Email",
+      "bankInfo": "Bank Account Information",
+      "bankName": "Bank Name",
+      "accountNumber": "Account Number",
+      "accountHolder": "Account Holder",
+      "saveSuccess": "Company information saved",
+      "saveFailed": "Failed to save company information"
+    },
+    "brands": {
+      "title": "Brand Management",
+      "createBrand": "Add Brand",
+      "editBrand": "Edit Brand",
+      "brandName": "Brand Name",
+      "description": "Description",
+      "website": "Website",
+      "logo": "Logo",
+      "active": "Active",
+      "inactive": "Inactive",
+      "saveSuccess": "Brand saved",
+      "saveFailed": "Failed to save brand",
+      "deleteConfirm": "Are you sure you want to delete this brand?",
+      "deleteSuccess": "Brand deleted",
+      "deleteFailed": "Failed to delete brand",
+      "noBrands": "No brands found. Add a new brand!"
+    },
+    "campaigns": {
+      "title": "Campaign Management",
+      "createCampaign": "Create Campaign",
+      "editCampaign": "Edit Campaign",
+      "campaignName": "Campaign Name",
+      "brand": "Brand",
+      "description": "Description",
+      "budget": "Budget",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": {
+        "title": "Status",
+        "draft": "Draft",
+        "pending_payment": "Pending Payment",
+        "active": "Active",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "platform": "Platform",
+      "targetAudience": "Target Audience",
+      "requirements": "Requirements",
+      "saveSuccess": "Campaign saved",
+      "saveFailed": "Failed to save campaign",
+      "deleteConfirm": "Are you sure you want to delete this campaign?",
+      "deleteSuccess": "Campaign deleted",
+      "deleteFailed": "Failed to delete campaign",
+      "noCampaigns": "No campaigns found. Create a new campaign!",
+      "payment": {
+        "title": "Payment",
+        "amount": "Amount",
+        "tax": "Tax",
+        "total": "Total",
+        "method": {
+          "title": "Payment Method",
+          "bank_transfer": "Bank Transfer",
+          "credit_card": "Credit Card"
+        },
+        "status": {
+          "title": "Payment Status",
+          "pending": "Pending",
+          "completed": "Completed",
+          "failed": "Failed"
+        },
+        "payNow": "Pay Now",
+        "paymentSuccess": "Payment completed",
+        "paymentFailed": "Payment failed",
+        "requestInvoice": "Request Tax Invoice"
+      }
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "totalCompanies": "Total Companies",
+      "totalCampaigns": "Total Campaigns",
+      "activeCampaigns": "Active Campaigns",
+      "pendingInvoices": "Pending Invoices",
+      "totalRevenue": "Total Revenue",
+      "countryStats": "Country Statistics",
+      "recentCampaigns": "Recent Campaigns",
+      "channelSearch": "Channel Search",
+      "searchPlaceholder": "Enter YouTube channel ID or handle"
+    },
+    "sales": {
+      "title": "Sales Report",
+      "totalRevenue": "Total Revenue",
+      "totalTransactions": "Total Transactions",
+      "pendingPayments": "Pending Payments",
+      "completedPayments": "Completed Payments",
+      "filter": {
+        "title": "Filter",
+        "dateRange": {
+          "title": "Date Range",
+          "all": "All Time",
+          "today": "Today",
+          "this_week": "This Week",
+          "this_month": "This Month",
+          "custom": "Custom"
+        },
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "status": {
+          "title": "Payment Status",
+          "all": "All Statuses",
+          "pending": "Pending",
+          "completed": "Completed",
+          "failed": "Failed"
+        },
+        "country": {
+          "title": "Country",
+          "all": "All Countries",
+          "jp": "Japan",
+          "kr": "Korea",
+          "us": "USA",
+          "tw": "Taiwan"
+        },
+        "company": {
+          "title": "Company",
+          "all": "All Companies"
+        },
+        "apply": "Apply",
+        "reset": "Reset"
+      },
+      "transactions": {
+        "title": "Transactions",
+        "id": "Transaction ID",
+        "date": "Date",
+        "company": "Company",
+        "campaign": "Campaign",
+        "country": "Country",
+        "amount": "Amount",
+        "method": {
+          "title": "Payment Method",
+          "bank_transfer": "Bank Transfer",
+          "credit_card": "Credit Card"
+        },
+        "status": {
+          "title": "Status",
+          "pending": "Pending",
+          "completed": "Completed",
+          "failed": "Failed",
+          "refunded": "Refunded"
+        },
+        "noTransactions": "No transactions found."
+      },
+      "downloadCSV": "Download CSV"
+    },
+    "companies": {
+      "title": "Company Management",
+      "companyName": "Company Name",
+      "businessNumber": "Business Number",
+      "country": "Country",
+      "status": {
+        "title": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "pending": "Pending Approval"
+      },
+      "registrationDate": "Registration Date",
+      "actions": "Actions",
+      "view": "View",
+      "edit": "Edit",
+      "approve": "Approve",
+      "reject": "Reject",
+      "noCompanies": "No companies found."
+    },
+    "approvals": {
+      "title": "Company Approvals",
+      "pendingApprovals": "Pending Approvals",
+      "companyName": "Company Name",
+      "businessNumber": "Business Number",
+      "country": "Country",
+      "registrationDate": "Registration Date",
+      "actions": "Actions",
+      "view": "View",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approveSuccess": "Company approved",
+      "approveFailed": "Failed to approve company",
+      "rejectSuccess": "Company rejected",
+      "rejectFailed": "Failed to reject company",
+      "noPendingApprovals": "No pending approvals."
+    },
+    "users": {
+      "title": "User Management",
+      "email": "Email",
+      "name": "Name",
+      "role": {
+        "title": "Role",
+        "admin": "Admin",
+        "company": "Company",
+        "user": "User"
+      },
+      "status": {
+        "title": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "lastLogin": "Last Login",
+      "actions": "Actions",
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noUsers": "No users found."
+    }
+  },
+  "countries": {
+    "jp": "Japan",
+    "kr": "Korea",
+    "us": "USA",
+    "tw": "Taiwan",
+    "unknown": "Unknown"
+  },
+  "footer": {
+    "copyright": "© 2025 CNEC Business. All rights reserved.",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "contact": "Contact Us"
+  }
+}

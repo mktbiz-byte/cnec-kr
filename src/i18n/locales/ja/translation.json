@@ -1,0 +1,363 @@
+{
+  "common": {
+    "appName": "CNEC Business",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "search": "検索",
+    "filter": "フィルター",
+    "apply": "適用",
+    "reset": "リセット",
+    "download": "ダウンロード",
+    "upload": "アップロード",
+    "yes": "はい",
+    "no": "いいえ",
+    "back": "戻る",
+    "next": "次へ",
+    "submit": "送信",
+    "confirm": "確認",
+    "success": "成功",
+    "failed": "失敗",
+    "required": "必須項目です",
+    "invalidEmail": "無効なメールアドレスです",
+    "passwordMismatch": "パスワードが一致しません",
+    "passwordTooShort": "パスワードは8文字以上である必要があります",
+    "goToMainPage": "メインページへ"
+  },
+  "auth": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "register": "登録",
+    "forgotPassword": "パスワードをお忘れですか",
+    "resetPassword": "パスワードのリセット",
+    "changePassword": "パスワード変更",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "currentPassword": "現在のパスワード",
+    "newPassword": "新しいパスワード",
+    "rememberMe": "ログイン状態を保持",
+    "loginSuccess": "ログインに成功しました",
+    "loginFailed": "ログインに失敗しました",
+    "logoutSuccess": "ログアウトしました",
+    "registerSuccess": "登録に成功しました",
+    "registerFailed": "登録に失敗しました",
+    "resetPasswordSuccess": "パスワードがリセットされました",
+    "resetPasswordFailed": "パスワードのリセットに失敗しました",
+    "changePasswordSuccess": "パスワードが変更されました",
+    "changePasswordFailed": "パスワードの変更に失敗しました",
+    "adminLogin": "管理者ログイン",
+    "companyLogin": "企業ログイン"
+  },
+  "corporate": {
+    "home": {
+      "title": "CNEC Business",
+      "subtitle": "インフルエンサーマーケティングソリューション",
+      "description": "CNEC Businessは、企業とインフルエンサーを繋ぎ、効果的なマーケティングキャンペーンを実施するお手伝いをします。",
+      "getStarted": "始める",
+      "learnMore": "詳細を見る",
+      "features": {
+        "title": "主な機能",
+        "influencerMarketing": {
+          "title": "インフルエンサーマーケティング",
+          "description": "様々なSNSプラットフォームのインフルエンサーと協力し、ブランド認知度を高め、製品プロモーションを効果的に行うことができます。"
+        },
+        "globalReach": {
+          "title": "グローバル展開",
+          "description": "日本、アメリカ、韓国、台湾など様々な国のインフルエンサーと協力し、グローバル市場への進出をサポートします。"
+        },
+        "analytics": {
+          "title": "パフォーマンス分析",
+          "description": "キャンペーンのパフォーマンスをリアルタイムで分析し、レポートを通じてマーケティング効果を確認できます。"
+        }
+      },
+      "about": {
+        "title": "会社概要",
+        "description": "CNECは2018年に設立されたインフルエンサーマーケティング専門企業で、企業とインフルエンサーを繋ぎ、効果的なマーケティングソリューションを提供しています。",
+        "vision": "ビジョン",
+        "visionText": "デジタルマーケティングの革新を通じて、企業とインフルエンサーが共に成長するエコシステムを構築します。",
+        "mission": "ミッション",
+        "missionText": "技術と創造性を組み合わせて、企業とインフルエンサーの両方に価値あるマーケティングソリューションを提供します。"
+      },
+      "services": {
+        "title": "サービス",
+        "influencerMarketing": {
+          "title": "インフルエンサーマーケティング",
+          "description": "ブランドと製品に適したインフルエンサーをマッチングし、効果的なキャンペーンを企画・実行します。"
+        },
+        "contentCreation": {
+          "title": "コンテンツ制作",
+          "description": "ブランドメッセージを効果的に伝える創造的なコンテンツ制作をサポートします。"
+        },
+        "globalExpansion": {
+          "title": "海外進出支援",
+          "description": "様々な国のインフルエンサーネットワークを活用し、グローバル市場への進出をサポートします。"
+        },
+        "analytics": {
+          "title": "パフォーマンス分析",
+          "description": "キャンペーンのパフォーマンスをリアルタイムで分析し、最適化策を提案します。"
+        }
+      },
+      "contact": {
+        "title": "お問い合わせ",
+        "name": "お名前",
+        "email": "メールアドレス",
+        "company": "会社名",
+        "message": "メッセージ",
+        "submit": "送信",
+        "success": "メッセージが正常に送信されました。すぐにご連絡いたします。",
+        "failed": "メッセージの送信に失敗しました。もう一度お試しください。"
+      }
+    }
+  },
+  "company": {
+    "dashboard": {
+      "title": "ダッシュボード",
+      "totalCampaigns": "総キャンペーン数",
+      "activeCampaigns": "進行中のキャンペーン",
+      "totalBrands": "登録ブランド数",
+      "totalSpent": "総支出",
+      "recentCampaigns": "最近のキャンペーン",
+      "noCampaigns": "キャンペーンがありません。新しいキャンペーンを作成してください！",
+      "viewAllCampaigns": "すべてのキャンペーンを見る",
+      "createNewCampaign": "新しいキャンペーンを作成"
+    },
+    "profile": {
+      "title": "会社情報管理",
+      "companyInfo": "企業情報",
+      "companyName": "会社名",
+      "businessNumber": "事業者登録番号",
+      "representative": "代表者名",
+      "address": "住所",
+      "phone": "電話番号",
+      "email": "メールアドレス",
+      "taxInfo": "請求書情報",
+      "taxEmail": "請求書受信メールアドレス",
+      "bankInfo": "口座情報",
+      "bankName": "銀行名",
+      "accountNumber": "口座番号",
+      "accountHolder": "口座名義",
+      "saveSuccess": "会社情報が保存されました",
+      "saveFailed": "会社情報の保存に失敗しました"
+    },
+    "brands": {
+      "title": "ブランド管理",
+      "createBrand": "ブランド追加",
+      "editBrand": "ブランド編集",
+      "brandName": "ブランド名",
+      "description": "説明",
+      "website": "ウェブサイト",
+      "logo": "ロゴ",
+      "active": "有効",
+      "inactive": "無効",
+      "saveSuccess": "ブランドが保存されました",
+      "saveFailed": "ブランドの保存に失敗しました",
+      "deleteConfirm": "このブランドを削除してもよろしいですか？",
+      "deleteSuccess": "ブランドが削除されました",
+      "deleteFailed": "ブランドの削除に失敗しました",
+      "noBrands": "登録されたブランドがありません。新しいブランドを追加してください！"
+    },
+    "campaigns": {
+      "title": "キャンペーン管理",
+      "createCampaign": "キャンペーン作成",
+      "editCampaign": "キャンペーン編集",
+      "campaignName": "キャンペーン名",
+      "brand": "ブランド",
+      "description": "説明",
+      "budget": "予算",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "status": {
+        "title": "ステータス",
+        "draft": "下書き",
+        "pending_payment": "支払い待ち",
+        "active": "進行中",
+        "completed": "完了",
+        "cancelled": "キャンセル"
+      },
+      "platform": "プラットフォーム",
+      "targetAudience": "ターゲットオーディエンス",
+      "requirements": "要件",
+      "saveSuccess": "キャンペーンが保存されました",
+      "saveFailed": "キャンペーンの保存に失敗しました",
+      "deleteConfirm": "このキャンペーンを削除してもよろしいですか？",
+      "deleteSuccess": "キャンペーンが削除されました",
+      "deleteFailed": "キャンペーンの削除に失敗しました",
+      "noCampaigns": "キャンペーンがありません。新しいキャンペーンを作成してください！",
+      "payment": {
+        "title": "支払い",
+        "amount": "金額",
+        "tax": "税金",
+        "total": "合計",
+        "method": {
+          "title": "支払い方法",
+          "bank_transfer": "銀行振込",
+          "credit_card": "クレジットカード"
+        },
+        "status": {
+          "title": "支払い状況",
+          "pending": "保留中",
+          "completed": "完了",
+          "failed": "失敗"
+        },
+        "payNow": "今すぐ支払う",
+        "paymentSuccess": "支払いが完了しました",
+        "paymentFailed": "支払いに失敗しました",
+        "requestInvoice": "請求書を要求"
+      }
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "管理者ダッシュボード",
+      "totalCompanies": "総企業数",
+      "totalCampaigns": "総キャンペーン数",
+      "activeCampaigns": "進行中のキャンペーン",
+      "pendingInvoices": "保留中の請求書",
+      "totalRevenue": "総収益",
+      "countryStats": "国別統計",
+      "recentCampaigns": "最近のキャンペーン",
+      "channelSearch": "チャンネル検索",
+      "searchPlaceholder": "YouTubeチャンネルIDまたはハンドルを入力してください"
+    },
+    "sales": {
+      "title": "売上レポート",
+      "totalRevenue": "総収益",
+      "totalTransactions": "総取引数",
+      "pendingPayments": "保留中の支払い",
+      "completedPayments": "完了した支払い",
+      "filter": {
+        "title": "フィルター",
+        "dateRange": {
+          "title": "期間",
+          "all": "すべての期間",
+          "today": "今日",
+          "this_week": "今週",
+          "this_month": "今月",
+          "custom": "カスタム"
+        },
+        "startDate": "開始日",
+        "endDate": "終了日",
+        "status": {
+          "title": "支払い状況",
+          "all": "すべての状態",
+          "pending": "保留中",
+          "completed": "完了",
+          "failed": "失敗"
+        },
+        "country": {
+          "title": "国",
+          "all": "すべての国",
+          "jp": "日本",
+          "kr": "韓国",
+          "us": "アメリカ",
+          "tw": "台湾"
+        },
+        "company": {
+          "title": "企業",
+          "all": "すべての企業"
+        },
+        "apply": "適用",
+        "reset": "リセット"
+      },
+      "transactions": {
+        "title": "取引履歴",
+        "id": "取引ID",
+        "date": "取引日時",
+        "company": "企業",
+        "campaign": "キャンペーン",
+        "country": "国",
+        "amount": "金額",
+        "method": {
+          "title": "支払い方法",
+          "bank_transfer": "銀行振込",
+          "credit_card": "クレジットカード"
+        },
+        "status": {
+          "title": "状態",
+          "pending": "保留中",
+          "completed": "完了",
+          "failed": "失敗",
+          "refunded": "返金済み"
+        },
+        "noTransactions": "取引履歴がありません。"
+      },
+      "downloadCSV": "CSVダウンロード"
+    },
+    "companies": {
+      "title": "企業管理",
+      "companyName": "会社名",
+      "businessNumber": "事業者登録番号",
+      "country": "国",
+      "status": {
+        "title": "状態",
+        "active": "有効",
+        "inactive": "無効",
+        "pending": "承認待ち"
+      },
+      "registrationDate": "登録日",
+      "actions": "アクション",
+      "view": "表示",
+      "edit": "編集",
+      "approve": "承認",
+      "reject": "拒否",
+      "noCompanies": "登録された企業がありません。"
+    },
+    "approvals": {
+      "title": "企業承認管理",
+      "pendingApprovals": "承認待ちの企業",
+      "companyName": "会社名",
+      "businessNumber": "事業者登録番号",
+      "country": "国",
+      "registrationDate": "登録日",
+      "actions": "アクション",
+      "view": "表示",
+      "approve": "承認",
+      "reject": "拒否",
+      "approveSuccess": "企業が承認されました",
+      "approveFailed": "企業の承認に失敗しました",
+      "rejectSuccess": "企業が拒否されました",
+      "rejectFailed": "企業の拒否に失敗しました",
+      "noPendingApprovals": "承認待ちの企業がありません。"
+    },
+    "users": {
+      "title": "ユーザー管理",
+      "email": "メールアドレス",
+      "name": "名前",
+      "role": {
+        "title": "役割",
+        "admin": "管理者",
+        "company": "企業",
+        "user": "一般ユーザー"
+      },
+      "status": {
+        "title": "状態",
+        "active": "有効",
+        "inactive": "無効"
+      },
+      "lastLogin": "最終ログイン",
+      "actions": "アクション",
+      "view": "表示",
+      "edit": "編集",
+      "delete": "削除",
+      "noUsers": "登録されたユーザーがありません。"
+    }
+  },
+  "countries": {
+    "jp": "日本",
+    "kr": "韓国",
+    "us": "アメリカ",
+    "tw": "台湾",
+    "unknown": "未指定"
+  },
+  "footer": {
+    "copyright": "© 2025 CNEC Business. All rights reserved.",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "contact": "お問い合わせ"
+  }
+}
