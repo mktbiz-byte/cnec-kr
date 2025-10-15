@@ -22,8 +22,8 @@ import ServicesPage from './pages/corporate/ServicesPage';
 import ContactPage from './pages/corporate/ContactPage';
 
 // 인증 페이지
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 import CompanyLoginPage from './pages/auth/CompanyLoginPage';
