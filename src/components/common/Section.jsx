@@ -1,13 +1,9 @@
 import React from 'react';
-import { twMerge } from 'tailwind-merge';
 
 export const Section = ({ children, className = '', id, ...props }) => {
   const baseStyles = 'w-full';
   
-  const mergedClassName = twMerge(
-    baseStyles,
-    className
-  );
+  const mergedClassName = `${baseStyles} ${className}`.trim();
   
   return (
     <section id={id} className={mergedClassName} {...props}>
