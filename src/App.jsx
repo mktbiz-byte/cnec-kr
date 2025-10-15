@@ -18,6 +18,7 @@ import CompanyListPage from './pages/admin/CompanyListPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import CompanyProfilePage from './pages/company/CompanyProfilePage';
+import ChangePasswordPage from './pages/account/ChangePasswordPage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import PasswordResetPage from './pages/auth/PasswordResetPage';
@@ -92,6 +93,7 @@ function App() {
       >
         <Route index element={<CompanyDashboard />} />
         <Route path="profile" element={<CompanyProfilePage />} />
+        <Route path="change-password" element={<ChangePasswordPage />} />
       </Route>
       
       {/* 이전 경로 리다이렉트 (하위 호환성) */}
