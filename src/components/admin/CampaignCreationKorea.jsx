@@ -21,6 +21,10 @@ const CampaignCreationKorea = () => {
     requirements: '',
     category: 'youtube',  // youtube, instagram, 4week_challenge
     image_url: '',
+    product_name: '',
+    product_description: '',
+    product_link: '',
+    product_detail_file_url: '',
     reward_points: '',
     total_slots: '',
     remaining_slots: '',
@@ -134,6 +138,39 @@ const CampaignCreationKorea = () => {
     }
   }
 
+  // 상품 상세 이미지 업로드
+  const handleProductDetailImageUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingImage(true)
+    setError('')
+
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `product-detail-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `campaign-images/${fileName}`
+
+      const { error: uploadError } = await storage
+        .from('campaign-images')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = storage
+        .from('campaign-images')
+        .getPublicUrl(filePath)
+
+      setCampaignForm(prev => ({ ...prev, product_detail_file_url: publicUrl }))
+      setSuccess('상품 상세 이미지가 업로드되었습니다!')
+    } catch (err) {
+      console.error('상품 상세 이미지 업로드 실패:', err)
+      setError('상품 상세 이미지 업로드에 실패했습니다: ' + err.message)
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
   // 캠페인 저장
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -195,6 +232,11 @@ const CampaignCreationKorea = () => {
       <AdminNavigation />
       
       <div className="max-w-4xl mx-auto p-6">
+        <div className="mb-6">
+          <Button variant="ghost" onClick={() => navigate('/campaigns-manage')}>
+            ← 캠페인 목록으로
+          </Button>
+        </div>
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">
@@ -353,6 +395,74 @@ const CampaignCreationKorea = () => {
                 {campaignForm.image_url && (
                   <img src={campaignForm.image_url} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded" />
                 )}
+              </div>
+
+              {/* 상품 상세 정보 */}
+              <div className="border-t pt-6 mt-6">
+                <h3 className="text-lg font-semibold mb-4">📦 상품 상세 정보</h3>
+                
+                <div className="space-y-4">
+                  {/* 상품명 */}
+                  <div>
+                    <Label htmlFor="product_name">상품명</Label>
+                    <Input
+                      id="product_name"
+                      value={campaignForm.product_name}
+                      onChange={(e) => setCampaignForm(prev => ({ ...prev, product_name: e.target.value }))}
+                      placeholder="예: 에이블씨엔씨 립스틱 #01 코랄핑크"
+                    />
+                  </div>
+
+                  {/* 상품 설명 */}
+                  <div>
+                    <Label htmlFor="product_description">상품 설명</Label>
+                    <Textarea
+                      id="product_description"
+                      value={campaignForm.product_description}
+                      onChange={(e) => setCampaignForm(prev => ({ ...prev, product_description: e.target.value }))}
+                      placeholder="상품의 특징, 성분, 사용법 등을 자세히 입력하세요"
+                      rows={4}
+                    />
+                  </div>
+
+                  {/* 상품 링크 */}
+                  <div>
+                    <Label htmlFor="product_link">상품 링크 (URL)</Label>
+                    <Input
+                      id="product_link"
+                      type="url"
+                      value={campaignForm.product_link}
+                      onChange={(e) => setCampaignForm(prev => ({ ...prev, product_link: e.target.value }))}
+                      placeholder="https://example.com/product"
+                    />
+                    <p className="text-sm text-gray-500 mt-1">크리에이터가 참고할 수 있는 상품 페이지 링크</p>
+                  </div>
+
+                  {/* 상품 상세 페이지 이미지 */}
+                  <div className="border-t pt-4 mt-4">
+                    <Label htmlFor="product_detail_image">상품 상세 페이지 이미지</Label>
+                    <p className="text-sm text-gray-600 mb-2">상품 상세 정보가 담긴 이미지 파일을 업로드하세요 (권장: 10MB 이하)</p>
+                    <Input
+                      id="product_detail_image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProductDetailImageUpload}
+                      disabled={uploadingImage}
+                    />
+                    {uploadingImage && <p className="text-sm text-gray-500 mt-1">업로드 중...</p>}
+                    {campaignForm.product_detail_file_url && (
+                      <div className="mt-4">
+                        <p className="text-sm text-green-600 mb-2">✓ 상품 상세 이미지가 업로드되었습니다</p>
+                        <img 
+                          src={campaignForm.product_detail_file_url} 
+                          alt="상품 상세" 
+                          className="max-w-full h-auto rounded border"
+                          style={{ maxHeight: '500px' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* 상태 */}
