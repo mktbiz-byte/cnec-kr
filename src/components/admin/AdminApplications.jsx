@@ -53,7 +53,7 @@ const AdminApplications = () => {
     }
   }, [selectedCampaign])
 
-  // ESCキーでモーダルを閉じる
+  // ESCキーでモーダルを닫기
   useEffect(() => {
     const handleEscKey = (event) => {
       if (event.key === 'Escape') {
@@ -150,7 +150,7 @@ const AdminApplications = () => {
       console.error('Load applications error:', error)
       setError(language === 'ko' 
         ? '지원자 데이터를 불러올 수 없습니다.'
-        : '応募者データを読み込めません。'
+        : '지원者データを読み込めません。'
       )
     }
   }
@@ -171,7 +171,7 @@ const AdminApplications = () => {
       
       setSuccess(language === 'ko' 
         ? '지원자가 승인되었습니다.'
-        : '応募者が承認されました。'
+        : '지원者が승인されました。'
       )
       setApproveModal(false)
       setSelectedApplication(null)
@@ -188,7 +188,7 @@ const AdminApplications = () => {
       console.error('Approve error:', error)
       setError(language === 'ko' 
         ? '승인 처리에 실패했습니다.'
-        : '承認処理に失敗しました。'
+        : '승인処理に실패했습니다。'
       )
     }
   }
@@ -210,11 +210,11 @@ const AdminApplications = () => {
       setSuccess(isApprovedCancellation
         ? (language === 'ko' 
             ? '크리에이터 확정이 취소되었습니다.'
-            : 'クリエイター確定がキャンセルされました。'
+            : '크리에이터確定が취소されました。'
           )
         : (language === 'ko' 
             ? '지원자가 거절되었습니다.'
-            : '応募者が拒否されました。'
+            : '지원者が拒否されました。'
           )
       )
       setRejectModal(false)
@@ -226,7 +226,7 @@ const AdminApplications = () => {
       console.error('Reject error:', error)
       setError(language === 'ko' 
         ? '거절 처리에 실패했습니다.'
-        : '拒否処理に失敗しました。'
+        : '拒否処理に실패했습니다。'
       )
     }
   }
@@ -249,13 +249,13 @@ const AdminApplications = () => {
       [language === 'ko' ? '유튜브' : 'YouTube']: app.youtube_url || '',
       [language === 'ko' ? '유튜브 구독자' : 'YouTube 登録者']: app.youtube_subscribers || 0,
       [language === 'ko' ? '상태' : 'ステータス']: getStatusText(app.status),
-      [language === 'ko' ? '신청일' : '応募日']: new Date(app.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP'),
-      [language === 'ko' ? '관리자 메모' : '管理者メモ']: app.admin_notes || ''
+      [language === 'ko' ? '신청일' : '지원日']: new Date(app.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP'),
+      [language === 'ko' ? '관리자 메모' : '관리자メモ']: app.admin_notes || ''
     }))
     
     const worksheet = XLSX.utils.json_to_sheet(excelData)
     const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ko' ? '지원자 목록' : '応募者リスト')
+    XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ko' ? '지원자 목록' : '지원者リスト')
     
     const fileName = `${campaign?.title || 'campaign'}_applications_${new Date().toISOString().split('T')[0]}.xlsx`
     XLSX.writeFile(workbook, fileName)
@@ -275,7 +275,7 @@ const AdminApplications = () => {
       [language === 'ko' ? '주소' : '住所']: app.address || '',
       [language === 'ko' ? '우편번호' : '郵便番号']: app.postal_code || '',
       [language === 'ko' ? '배송 메모' : '配送メモ']: app.shipping_notes || '',
-      [language === 'ko' ? '승인일' : '承認日']: app.approved_at ? new Date(app.approved_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP') : ''
+      [language === 'ko' ? '승인일' : '승인日']: app.approved_at ? new Date(app.approved_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP') : ''
     }))
     
     const worksheet = XLSX.utils.json_to_sheet(shippingData)
@@ -289,12 +289,12 @@ const AdminApplications = () => {
   const getStatusText = (status) => {
     const statusMap = {
       pending: language === 'ko' ? '검토중' : '審査中',
-      approved: language === 'ko' ? '승인됨' : '承認済み',
+      approved: language === 'ko' ? '승인됨' : '승인됨',
       rejected: language === 'ko' ? '거절됨' : '拒否',
-      content_uploaded: language === 'ko' ? '컨텐츠 업로드됨' : 'コンテンツアップロード済み',
-      points_requested: language === 'ko' ? '포인트 요청됨' : 'ポイント要請済み',
-      completed: language === 'ko' ? '완료' : '完了',
-      cancelled: language === 'ko' ? '취소됨' : 'キャンセル済み'
+      content_uploaded: language === 'ko' ? '컨텐츠 업로드됨' : 'コンテンツ업로드済み',
+      points_requested: language === 'ko' ? '포인트 요청됨' : '포인트要請済み',
+      completed: language === 'ko' ? '완료' : '완료',
+      cancelled: language === 'ko' ? '취소됨' : '취소済み'
     }
     return statusMap[status] || status
   }
@@ -339,7 +339,7 @@ const AdminApplications = () => {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">{language === 'ko' ? '로딩 중...' : '読み込み中...'}</p>
+          <p className="text-gray-600">{language === 'ko' ? '로딩 중...' : '로딩 중...'}</p>
         </div>
       </div>
     )
@@ -364,10 +364,10 @@ const AdminApplications = () => {
         {/* 헤더 */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            {language === 'ko' ? '캠페인 지원자 관리' : 'キャンペーン応募者管理'}
+            {language === 'ko' ? '캠페인 지원자 관리' : 'キャンペーン지원者管理'}
           </h1>
           <p className="text-gray-600">
-            {language === 'ko' ? '캠페인별 지원자를 관리하고 승인/거절을 처리하세요' : 'キャンペーン別応募者を管理し、承認・拒否を処理してください'}
+            {language === 'ko' ? '캠페인별 지원자를 관리하고 승인/거절을 처리하세요' : 'キャンペーン別지원者を管理し、승인・拒否を処理してください'}
           </p>
         </div>
 
@@ -395,7 +395,7 @@ const AdminApplications = () => {
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline" className="flex items-center space-x-1">
                     <Users className="h-3 w-3" />
-                    <span>{filteredApplications.length} {language === 'ko' ? '명' : '人'}</span>
+                    <span>{filteredApplications.length} {language === 'ko' ? '명' : '명'}</span>
                   </Badge>
                 </div>
               </div>
@@ -408,7 +408,7 @@ const AdminApplications = () => {
                   className="flex items-center space-x-2"
                 >
                   <Download className="h-4 w-4" />
-                  <span>{language === 'ko' ? '지원자 엑셀 다운로드' : '応募者Excel ダウンロード'}</span>
+                  <span>{language === 'ko' ? '지원자 엑셀 다운로드' : '지원者Excel 다운로드'}</span>
                 </Button>
                 
                 <Button
@@ -418,7 +418,7 @@ const AdminApplications = () => {
                   className="flex items-center space-x-2"
                 >
                   <Package className="h-4 w-4" />
-                  <span>{language === 'ko' ? '배송정보 다운로드' : '配送情報ダウンロード'}</span>
+                  <span>{language === 'ko' ? '배송정보 다운로드' : '配送情報다운로드'}</span>
                 </Button>
               </div>
             </div>
@@ -438,10 +438,10 @@ const AdminApplications = () => {
                   <SelectContent>
                     <SelectItem value="all">{language === 'ko' ? '전체' : '全て'}</SelectItem>
                     <SelectItem value="pending">{language === 'ko' ? '검토중' : '審査中'}</SelectItem>
-                    <SelectItem value="approved">{language === 'ko' ? '승인됨' : '承認済み'}</SelectItem>
+                    <SelectItem value="approved">{language === 'ko' ? '승인됨' : '승인됨'}</SelectItem>
                     <SelectItem value="rejected">{language === 'ko' ? '거절됨' : '拒否'}</SelectItem>
-                    <SelectItem value="content_uploaded">{language === 'ko' ? '컨텐츠 업로드됨' : 'コンテンツアップロード済み'}</SelectItem>
-                    <SelectItem value="completed">{language === 'ko' ? '완료' : '完了'}</SelectItem>
+                    <SelectItem value="content_uploaded">{language === 'ko' ? '컨텐츠 업로드됨' : 'コンテンツ업로드済み'}</SelectItem>
+                    <SelectItem value="completed">{language === 'ko' ? '완료' : '완료'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -449,7 +449,7 @@ const AdminApplications = () => {
               <div className="flex items-center space-x-2 flex-1">
                 <Search className="h-4 w-4 text-gray-500" />
                 <Input
-                  placeholder={language === 'ko' ? '이름 또는 이메일로 검색...' : '名前またはメールで検索...'}
+                  placeholder={language === 'ko' ? '이름 또는 이메일로 검색...' : '名前またはメールで검색...'}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="max-w-sm"
@@ -463,7 +463,7 @@ const AdminApplications = () => {
         <Card className="shadow-lg border-0">
           <CardHeader>
             <CardTitle>
-              {language === 'ko' ? '지원자 목록' : '応募者リスト'}
+              {language === 'ko' ? '지원자 목록' : '지원者リスト'}
             </CardTitle>
             <CardDescription>
               {selectedCampaign && campaigns.find(c => c.id.toString() === selectedCampaign)?.title}
@@ -474,12 +474,12 @@ const AdminApplications = () => {
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">👥</div>
                 <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                  {language === 'ko' ? '지원자가 없습니다' : '応募者はいません'}
+                  {language === 'ko' ? '지원자가 없습니다' : '지원者はいません'}
                 </h3>
                 <p className="text-gray-500">
                   {language === 'ko' 
                     ? '아직 이 캠페인에 지원한 사용자가 없습니다.'
-                    : 'まだこのキャンペーンに応募したユーザーはいません。'
+                    : 'まだこのキャンペーンに지원したユーザーはいません。'
                   }
                 </p>
               </div>
@@ -493,7 +493,7 @@ const AdminApplications = () => {
                       <TableHead>{language === 'ko' ? '피부타입' : '肌タイプ'}</TableHead>
                       <TableHead>{language === 'ko' ? 'SNS' : 'SNS'}</TableHead>
                       <TableHead>{language === 'ko' ? '상태' : 'ステータス'}</TableHead>
-                      <TableHead>{language === 'ko' ? '신청일' : '応募日'}</TableHead>
+                      <TableHead>{language === 'ko' ? '신청일' : '지원日'}</TableHead>
                       <TableHead>{language === 'ko' ? '액션' : 'アクション'}</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -589,7 +589,7 @@ const AdminApplications = () => {
                                 }}
                                 className="border-red-300 text-red-600 hover:bg-red-50"
                               >
-                                {language === 'ko' ? '취소' : 'キャンセル'}
+                                {language === 'ko' ? '취소' : '취소'}
                               </Button>
                             )}
                           </div>
@@ -608,7 +608,7 @@ const AdminApplications = () => {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {language === 'ko' ? '지원자 상세 정보' : '応募者詳細情報'}
+                {language === 'ko' ? '지원자 상세 정보' : '지원者상세情報'}
               </DialogTitle>
             </DialogHeader>
             
@@ -669,7 +669,7 @@ const AdminApplications = () => {
                           className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
-                          {language === 'ko' ? '프로필 보기' : 'プロフィール表示'}
+                          {language === 'ko' ? '프로필 보기' : '프로필표시'}
                         </a>
                       </div>
                     )}
@@ -687,7 +687,7 @@ const AdminApplications = () => {
                           className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
-                          {language === 'ko' ? '프로필 보기' : 'プロフィール表示'}
+                          {language === 'ko' ? '프로필 보기' : '프로필표시'}
                         </a>
                       </div>
                     )}
@@ -705,7 +705,7 @@ const AdminApplications = () => {
                           className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
-                          {language === 'ko' ? '채널 보기' : 'チャンネル表示'}
+                          {language === 'ko' ? '채널 보기' : 'チャンネル표시'}
                         </a>
                       </div>
                     )}
@@ -733,7 +733,7 @@ const AdminApplications = () => {
                 {selectedApplication.admin_notes && (
                   <div>
                     <h3 className="text-lg font-semibold mb-2">
-                      {language === 'ko' ? '관리자 메모' : '管理者メモ'}
+                      {language === 'ko' ? '관리자 메모' : '관리자メモ'}
                     </h3>
                     <div className="p-4 bg-yellow-50 rounded-lg">
                       <p>{selectedApplication.admin_notes}</p>
@@ -764,7 +764,7 @@ const AdminApplications = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">
-                    {language === 'ko' ? '지원자 승인' : '応募者承認'}
+                    {language === 'ko' ? '지원자 승인' : '지원者승인'}
                   </h2>
                   <button
                     onClick={() => setApproveModal(false)}
@@ -777,7 +777,7 @@ const AdminApplications = () => {
                 <p className="text-gray-600 mb-6">
                   {language === 'ko' 
                     ? '지원자를 승인하고 필요한 링크를 제공하세요.'
-                    : '応募者を承認し、必要なリンクを提供してください。'
+                    : '지원者を승인し、必要なリンクを提供してください。'
                   }
                 </p>
                 
@@ -810,14 +810,14 @@ const AdminApplications = () => {
                   
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      {language === 'ko' ? '관리자 메모' : '管理者メモ'}
+                      {language === 'ko' ? '관리자 메모' : '관리자メモ'}
                     </label>
                     <textarea
                       value={approvalData.notes}
                       onChange={(e) => setApprovalData(prev => ({ ...prev, notes: e.target.value }))}
                       placeholder={language === 'ko' 
                         ? '승인과 함께 전달할 메시지를 입력하세요...'
-                        : '承認と一緒に伝えるメッセージを入力してください...'
+                        : '승인と一緒に伝えるメッセージを入力してください...'
                       }
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -830,14 +830,14 @@ const AdminApplications = () => {
                     onClick={() => setApproveModal(false)}
                     className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                   >
-                    {language === 'ko' ? '취소' : 'キャンセル'}
+                    {language === 'ko' ? '취소' : '취소'}
                   </button>
                   <button
                     onClick={handleApprove}
                     className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center"
                   >
                     <Check className="h-4 w-4 mr-2" />
-                    {language === 'ko' ? '승인' : '承認'}
+                    {language === 'ko' ? '승인' : '승인'}
                   </button>
                 </div>
               </div>
@@ -851,15 +851,15 @@ const AdminApplications = () => {
             <DialogHeader>
               <DialogTitle>
                 {selectedApplication?.status === 'approved' 
-                  ? (language === 'ko' ? '크리에이터 확정 취소' : 'クリエイター確定キャンセル')
-                  : (language === 'ko' ? '지원자 거절' : '応募者拒否')
+                  ? (language === 'ko' ? '크리에이터 확정 취소' : '크리에이터確定취소')
+                  : (language === 'ko' ? '지원자 거절' : '지원者拒否')
                 }
               </DialogTitle>
               <DialogDescription>
                 {selectedApplication?.status === 'approved'
                   ? (language === 'ko' 
                       ? '확정된 크리에이터를 취소하는 사유를 입력해주세요.'
-                      : '確定されたクリエイターをキャンセルする理由を入力してください。'
+                      : '確定された크리에이터を취소する理由を入力してください。'
                     )
                   : (language === 'ko' 
                       ? '거절 사유를 입력해주세요.'
@@ -882,7 +882,7 @@ const AdminApplications = () => {
             
             <div className="flex justify-end space-x-3 pt-6 border-t">
               <Button variant="outline" onClick={() => setRejectModal(false)}>
-                {language === 'ko' ? '취소' : 'キャンセル'}
+                {language === 'ko' ? '취소' : '취소'}
               </Button>
               <Button 
                 variant="destructive" 
@@ -893,7 +893,7 @@ const AdminApplications = () => {
               >
                 <X className="h-4 w-4 mr-2" />
                 {selectedApplication?.status === 'approved'
-                  ? (language === 'ko' ? '취소' : 'キャンセル')
+                  ? (language === 'ko' ? '취소' : '취소')
                   : (language === 'ko' ? '거절' : '拒否')
                 }
               </Button>

@@ -66,7 +66,7 @@ const SNSUploadFinalReport = () => {
       }
       
       if (!applicationsData) {
-        setError('SNSアップロードデータの読み込みに失敗しました。')
+        setError('SNS 업로드データの読み込みに실패했습니다。')
         return
       }
       
@@ -101,7 +101,7 @@ const SNSUploadFinalReport = () => {
       
     } catch (error) {
       console.error('SNS 업로드 데이터 로드 오류:', error)
-      setError('データの読み込み中にエラーが発生しました。')
+      setError('データの로딩 중に오류가 발생했습니다。')
     } finally {
       setLoading(false)
     }
@@ -153,7 +153,7 @@ const SNSUploadFinalReport = () => {
   }
 
   const exportToExcel = () => {
-    const headers = ['名前', 'Instagram URL', 'TikTok URL', 'YouTube URL', 'その他 URL', '備考', 'アップロード日']
+    const headers = ['名前', 'Instagram URL', 'TikTok URL', 'YouTube URL', 'その他 URL', '備考', '업로드日']
     const rows = applications.map(app => {
       const profile = userProfiles[app.user_id]
       const videoLinks = app.video_links || {}
@@ -181,7 +181,7 @@ const SNSUploadFinalReport = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">SNSアップロードデータを読み込み中...</p>
+          <p className="text-gray-600">SNS 업로드データを로딩 중...</p>
         </div>
       </div>
     )
@@ -194,7 +194,7 @@ const SNSUploadFinalReport = () => {
         <h3 className="text-lg font-semibold text-gray-600 mb-2">キャンペーンが見つかりません</h3>
         <Button onClick={() => navigate('/campaigns-manage')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          キャンペーン一覧に戻る
+          キャンペーン목록に돌아가기
         </Button>
       </div>
     )
@@ -209,7 +209,7 @@ const SNSUploadFinalReport = () => {
           <div>
             <Button variant="outline" onClick={() => navigate('/campaigns-manage')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              キャンペーン一覧に戻る
+              キャンペーン목록に돌아가기
             </Button>
           </div>
           <div className="flex space-x-2">
@@ -229,9 +229,9 @@ const SNSUploadFinalReport = () => {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
-                <CardTitle className="text-3xl mb-2">全キャンペーンSNSアップロード</CardTitle>
+                <CardTitle className="text-3xl mb-2">全キャンペーンSNS 업로드</CardTitle>
                 <CardDescription className="text-xl text-purple-600 font-medium">
-                  SNSアップロード最終報告書
+                  SNS 업로드最終報告書
                 </CardDescription>
               </div>
             </div>
@@ -244,7 +244,7 @@ const SNSUploadFinalReport = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">完了クリエイター</p>
+                  <p className="text-sm font-medium text-gray-600">완료크리에이터</p>
                   <p className="text-3xl font-bold text-blue-600">{applications.length}</p>
                 </div>
                 <Users className="h-8 w-8 text-blue-600" />
@@ -256,7 +256,7 @@ const SNSUploadFinalReport = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">総アップロード数</p>
+                  <p className="text-sm font-medium text-gray-600">総업로드数</p>
                   <p className="text-3xl font-bold text-green-600">{reportData.totalUploads}</p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-green-600" />
@@ -270,7 +270,7 @@ const SNSUploadFinalReport = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <BarChart3 className="h-5 w-5" />
-              <span>プラットフォーム別アップロード統計</span>
+              <span>プラットフォーム別업로드統計</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -341,9 +341,9 @@ const SNSUploadFinalReport = () => {
         {/* Uploaded Content List */}
         <Card>
           <CardHeader>
-            <CardTitle>アップロード済みコンテンツ一覧</CardTitle>
+            <CardTitle>업로드済みコンテンツ목록</CardTitle>
             <CardDescription>
-              クリエイターがアップロードしたSNSコンテンツの詳細
+              크리에이터が업로드したSNSコンテンツの상세
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -358,12 +358,12 @@ const SNSUploadFinalReport = () => {
                       <div>
                         <h3 className="text-lg font-semibold">{profile?.name || 'N/A'}</h3>
                         <p className="text-sm text-gray-600">
-                          アップロード日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ja-JP') : 'N/A'}
+                          업로드日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ja-JP') : 'N/A'}
                         </p>
                       </div>
                       <Badge className="bg-blue-100 text-blue-800">
                         <CheckCircle className="h-3 w-3 mr-1" />
-                        完了
+                        완료
                       </Badge>
                     </div>
                     
@@ -454,8 +454,8 @@ const SNSUploadFinalReport = () => {
               {applications.length === 0 && (
                 <div className="text-center py-8">
                   <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-600 mb-2">アップロードされたコンテンツがありません</h3>
-                  <p className="text-gray-500">まだSNSにアップロードされたコンテンツがありません。</p>
+                  <h3 className="text-lg font-semibold text-gray-600 mb-2">업로드されたコンテンツがありません</h3>
+                  <p className="text-gray-500">まだSNSに업로드されたコンテンツがありません。</p>
                 </div>
               )}
             </div>
@@ -472,7 +472,7 @@ const SNSUploadFinalReport = () => {
         <div>
           <Button variant="outline" onClick={() => navigate('/campaigns-manage')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            キャンペーン一覧に戻る
+            キャンペーン목록に돌아가기
           </Button>
         </div>
         <div className="flex space-x-2">
@@ -494,7 +494,7 @@ const SNSUploadFinalReport = () => {
             <div>
               <CardTitle className="text-3xl mb-2">{campaign.title}</CardTitle>
               <CardDescription className="text-xl text-purple-600 font-medium">
-                {campaign.brand} - SNSアップロード最終報告書
+                {campaign.brand} - SNS 업로드最終報告書
               </CardDescription>
               <div className="flex items-center space-x-4 mt-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
@@ -503,7 +503,7 @@ const SNSUploadFinalReport = () => {
                 </div>
                 <div className="flex items-center space-x-1">
                   <Activity className="h-4 w-4" />
-                  <span>SNSアップロード完了</span>
+                  <span>SNS 업로드완료</span>
                 </div>
               </div>
             </div>
@@ -511,7 +511,7 @@ const SNSUploadFinalReport = () => {
               <div className="text-3xl font-bold text-green-600">
                 {formatCurrency(applications.length * campaign.reward_amount)}
               </div>
-              <div className="text-sm text-gray-600">総支払報酬</div>
+              <div className="text-sm text-gray-600">総支払보상</div>
             </div>
           </div>
         </CardHeader>
@@ -523,7 +523,7 @@ const SNSUploadFinalReport = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">完了クリエイター</p>
+                <p className="text-sm font-medium text-gray-600">완료크리에이터</p>
                 <p className="text-3xl font-bold text-blue-600">{applications.length}</p>
               </div>
               <Users className="h-8 w-8 text-blue-600" />
@@ -535,7 +535,7 @@ const SNSUploadFinalReport = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">総アップロード数</p>
+                <p className="text-sm font-medium text-gray-600">総업로드数</p>
                 <p className="text-3xl font-bold text-green-600">{reportData.totalUploads}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-600" />
@@ -547,7 +547,7 @@ const SNSUploadFinalReport = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">総支払報酬</p>
+                <p className="text-sm font-medium text-gray-600">総支払보상</p>
                 <p className="text-3xl font-bold text-purple-600">{formatCurrency(applications.length * campaign.reward_amount)}</p>
               </div>
               <DollarSign className="h-8 w-8 text-purple-600" />
@@ -573,7 +573,7 @@ const SNSUploadFinalReport = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <BarChart3 className="h-5 w-5" />
-            <span>プラットフォーム別アップロード統計</span>
+            <span>プラットフォーム別업로드統計</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -644,9 +644,9 @@ const SNSUploadFinalReport = () => {
       {/* Uploaded Content List */}
       <Card>
         <CardHeader>
-          <CardTitle>アップロード済みコンテンツ一覧</CardTitle>
+          <CardTitle>업로드済みコンテンツ목록</CardTitle>
           <CardDescription>
-            クリエイターがアップロードしたSNSコンテンツの詳細
+            크리에이터が업로드したSNSコンテンツの상세
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -661,12 +661,12 @@ const SNSUploadFinalReport = () => {
                     <div>
                       <h3 className="text-lg font-semibold">{profile?.name || 'N/A'}</h3>
                       <p className="text-sm text-gray-600">
-                        アップロード日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ja-JP') : 'N/A'}
+                        업로드日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ja-JP') : 'N/A'}
                       </p>
                     </div>
                     <Badge className="bg-blue-100 text-blue-800">
                       <CheckCircle className="h-3 w-3 mr-1" />
-                      完了
+                      완료
                     </Badge>
                   </div>
                   
@@ -757,8 +757,8 @@ const SNSUploadFinalReport = () => {
             {applications.length === 0 && (
               <div className="text-center py-8">
                 <Play className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">アップロード済みコンテンツがありません</h3>
-                <p className="text-gray-500">まだクリエイターからの動画アップロードがありません。</p>
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">업로드済みコンテンツがありません</h3>
+                <p className="text-gray-500">まだ크리에이터からの動画업로드がありません。</p>
               </div>
             )}
           </div>
@@ -771,7 +771,7 @@ const SNSUploadFinalReport = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-green-800">
               <Award className="h-5 w-5" />
-              <span>キャンペーン完了サマリー</span>
+              <span>キャンペーン완료サマリー</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -780,7 +780,7 @@ const SNSUploadFinalReport = () => {
                 <h4 className="font-medium mb-3">成果指標</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>参加クリエイター数:</span>
+                    <span>参加크리에이터数:</span>
                     <span className="font-medium">{applications.length}名</span>
                   </div>
                   <div className="flex justify-between">
@@ -788,11 +788,11 @@ const SNSUploadFinalReport = () => {
                     <span className="font-medium">{reportData.totalUploads}本</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>総支払報酬:</span>
+                    <span>総支払보상:</span>
                     <span className="font-medium">{formatCurrency(applications.length * campaign.reward_amount)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>完了率:</span>
+                    <span>완료率:</span>
                     <span className="font-medium text-green-600">100%</span>
                   </div>
                 </div>

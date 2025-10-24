@@ -53,22 +53,22 @@ const AdminDashboardSimple = () => {
       admin: '관리자'
     },
     ja: {
-      title: 'CNEC 管理者ダッシュボード',
+      title: 'CNEC 관리자대시보드',
       totalCampaigns: '総キャンペーン',
       activeCampaigns: 'アクティブキャンペーン',
       totalApplications: '総申請書',
       totalUsers: '登録ユーザー',
-      totalRewards: '総報酬金',
+      totalRewards: '総보상金',
       pendingApplications: '待機申請書',
-      campaignManagement: 'キャンペーン管理',
+      campaignManagement: '캠페인 관리',
       applicationManagement: '申請書管理',
-      userApproval: 'ユーザー承認',
-      withdrawalManagement: '出金管理',
-      emailTemplates: 'メールテンプレート',
-      logout: 'ログアウト',
-      loading: 'データを読み込み中...',
-      error: 'データの読み込みに失敗しました。',
-      admin: '管理者'
+      userApproval: '사용자 승인',
+      withdrawalManagement: '출금 관리',
+      emailTemplates: '이메일 템플릿',
+      logout: '로그아웃',
+      loading: 'データを로딩 중...',
+      error: 'データの読み込みに실패했습니다。',
+      admin: '관리자'
     }
   }
 
@@ -227,7 +227,7 @@ const AdminDashboardSimple = () => {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalCampaigns}</div>
               <p className="text-xs text-muted-foreground">
-                {t.activeCampaigns}: {stats.activeCampaigns}{language === 'ko' ? '개' : '件'}
+                {t.activeCampaigns}: {stats.activeCampaigns}{language === 'ko' ? '개' : '건'}
               </p>
             </CardContent>
           </Card>
@@ -240,7 +240,7 @@ const AdminDashboardSimple = () => {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalApplications}</div>
               <p className="text-xs text-muted-foreground">
-                {t.pendingApplications}: {stats.pendingApplications}{language === 'ko' ? '개' : '件'}
+                {t.pendingApplications}: {stats.pendingApplications}{language === 'ko' ? '개' : '건'}
               </p>
             </CardContent>
           </Card>
@@ -253,7 +253,7 @@ const AdminDashboardSimple = () => {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalUsers}</div>
               <p className="text-xs text-muted-foreground">
-                {language === 'ko' ? '활성 크리에이터' : 'アクティブクリエイター'}
+                {language === 'ko' ? '활성 크리에이터' : 'アクティブ크리에이터'}
               </p>
             </CardContent>
           </Card>
@@ -264,9 +264,9 @@ const AdminDashboardSimple = () => {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">¥{stats.totalRewards.toLocaleString()}</div>
+              <div className="text-2xl font-bold">₩{stats.totalRewards.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                {language === 'ko' ? '지급 완료/예정' : '支払完了/予定'}
+                {language === 'ko' ? '지급 완료/예정' : '支払완료/予定'}
               </p>
             </CardContent>
           </Card>
@@ -281,13 +281,13 @@ const AdminDashboardSimple = () => {
                 <span>{t.campaignManagement}</span>
               </CardTitle>
               <CardDescription>
-                {language === 'ko' ? '캠페인 생성, 수정, 삭제 및 상태 관리' : 'キャンペーンの作成、編集、削除、ステータス管理'}
+                {language === 'ko' ? '캠페인 생성, 수정, 삭제 및 상태 관리' : 'キャンペーンの作成、편집、삭제、ステータス管理'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link to="/campaigns-manage">
                 <Button className="w-full">
-                  {language === 'ko' ? '캠페인 관리하기' : 'キャンペーン管理'}
+                  {language === 'ko' ? '캠페인 관리하기' : '캠페인 관리'}
                 </Button>
               </Link>
             </CardContent>
@@ -300,7 +300,7 @@ const AdminDashboardSimple = () => {
                 <span>{t.applicationManagement}</span>
               </CardTitle>
               <CardDescription>
-                {language === 'ko' ? '크리에이터 신청서 검토 및 승인/거절' : 'クリエイター申請書の審査と承認/拒否'}
+                {language === 'ko' ? '크리에이터 신청서 검토 및 승인/거절' : '크리에이터申請書の審査と승인/拒否'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -319,7 +319,7 @@ const AdminDashboardSimple = () => {
                 <span>{t.withdrawalManagement}</span>
               </CardTitle>
               <CardDescription>
-                {language === 'ko' ? '크리에이터 출금 요청 처리 및 관리' : 'クリエイター出金リクエストの処理と管理'}
+                {language === 'ko' ? '크리에이터 출금 요청 처리 및 관리' : '크리에이터출금リクエストの処理と管理'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -338,13 +338,13 @@ const AdminDashboardSimple = () => {
                 <span>{t.userApproval}</span>
               </CardTitle>
               <CardDescription>
-                {language === 'ko' ? '신규 가입자 승인 및 사용자 관리' : '新規登録者の承認とユーザー管理'}
+                {language === 'ko' ? '신규 가입자 승인 및 사용자 관리' : '新規登録者の승인とユーザー管理'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link to="/user-approval">
                 <Button className="w-full" variant="outline">
-                  {language === 'ko' ? '사용자 승인하기' : 'ユーザー承認'}
+                  {language === 'ko' ? '사용자 승인하기' : '사용자 승인'}
                 </Button>
               </Link>
             </CardContent>
@@ -357,12 +357,12 @@ const AdminDashboardSimple = () => {
                 <span>{language === 'ko' ? '통계 및 분석' : '統計と分析'}</span>
               </CardTitle>
               <CardDescription>
-                {language === 'ko' ? '플랫폼 성과 분석 및 리포트' : 'プラットフォーム成果分析とレポート'}
+                {language === 'ko' ? '플랫폼 성과 분석 및 리포트' : 'プラットフォーム成果分析と보고서'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button className="w-full" variant="outline" disabled>
-                {language === 'ko' ? '통계 보기 (준비중)' : '統計表示（準備中）'}
+                {language === 'ko' ? '통계 보기 (준비중)' : '統計표시（準備中）'}
               </Button>
             </CardContent>
           </Card>
@@ -374,7 +374,7 @@ const AdminDashboardSimple = () => {
                 <span>{t.emailTemplates}</span>
               </CardTitle>
               <CardDescription>
-                {language === 'ko' ? '자동 발송 이메일 템플릿 관리' : '自動送信メールテンプレート管理'}
+                {language === 'ko' ? '자동 발송 이메일 템플릿 관리' : '自動전송이메일 템플릿管理'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -390,15 +390,15 @@ const AdminDashboardSimple = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Settings className="h-5 w-5 text-gray-600" />
-                <span>{language === 'ko' ? '시스템 설정' : 'システム設定'}</span>
+                <span>{language === 'ko' ? '시스템 설정' : 'システム설정'}</span>
               </CardTitle>
               <CardDescription>
-                {language === 'ko' ? '플랫폼 설정 및 관리자 도구' : 'プラットフォーム設定と管理者ツール'}
+                {language === 'ko' ? '플랫폼 설정 및 관리자 도구' : 'プラットフォーム설정と관리자ツール'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button className="w-full" variant="outline" disabled>
-                {language === 'ko' ? '설정 관리 (준비중)' : '設定管理（準備中）'}
+                {language === 'ko' ? '설정 관리 (준비중)' : '설정管理（準備中）'}
               </Button>
             </CardContent>
           </Card>

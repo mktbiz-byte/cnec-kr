@@ -102,65 +102,65 @@ const UserApprovalManagerEnhanced = () => {
       }
     },
     ja: {
-      title: 'ユーザー承認管理',
-      subtitle: '登録ユーザーを承認・管理します',
+      title: '사용자 승인管理',
+      subtitle: '登録ユーザーを승인・管理します',
       totalUsers: '総ユーザー数',
-      pendingUsers: '承認待ち',
-      approvedUsers: '承認済み',
+      pendingUsers: '승인待ち',
+      approvedUsers: '승인됨',
       rejectedUsers: '拒否',
-      adminUsers: '管理者',
+      adminUsers: '관리자',
       vipUsers: 'VIPユーザー',
       managerUsers: 'マネージャー',
       withdrawalRequests: '退会申請',
       filterByStatus: 'ステータス別フィルター',
       filterByRole: '役割別フィルター',
-      searchPlaceholder: '名前、メールで検索...',
+      searchPlaceholder: '名前、メールで검색...',
       allStatuses: '全てのステータス',
       allRoles: '全ての役割',
-      pending: '承認待ち',
-      approved: '承認済み',
+      pending: '승인待ち',
+      approved: '승인됨',
       rejected: '拒否',
       user: '一般ユーザー',
       vip: 'VIPユーザー',
       manager: 'マネージャー',
-      admin: '管理者',
-      viewDetails: '詳細表示',
-      approve: '承認',
+      admin: '관리자',
+      viewDetails: '상세표시',
+      approve: '승인',
       reject: '拒否',
       changeRole: '権限変更',
-      addPoints: 'ポイント追加',
-      subtractPoints: 'ポイント減算',
-      viewWithdrawals: '退会申請表示',
-      refresh: '更新',
-      joinDate: '登録日',
+      addPoints: '포인트추가',
+      subtractPoints: '포인트減算',
+      viewWithdrawals: '退会申請표시',
+      refresh: '업데이트',
+      joinDate: '등록일',
       lastLogin: '最終ログイン',
-      points: 'ポイント',
+      points: '포인트',
       status: 'ステータス',
       role: '権限',
       actions: '操作',
-      userDetails: 'ユーザー詳細',
+      userDetails: 'ユーザー상세',
       roleChange: '権限変更',
-      pointManagement: 'ポイント管理',
+      pointManagement: '포인트管理',
       withdrawalManagement: '退会申請管理',
       selectNewRole: '新しい権限を選択',
-      pointAmount: 'ポイント数',
-      description: '説明',
+      pointAmount: '포인트数',
+      description: '설명',
       reason: '理由',
-      save: '保存',
-      cancel: 'キャンセル',
-      close: '閉じる',
-      confirm: '確認',
+      save: '저장',
+      cancel: '취소',
+      close: '닫기',
+      confirm: '확인',
       processing: '処理中...',
       noUsers: 'ユーザーがいません',
       noWithdrawals: '退会申請がありません',
       messages: {
-        approved: 'ユーザーが承認されました。',
+        approved: 'ユーザーが승인されました。',
         rejected: 'ユーザーが拒否されました。',
         roleChanged: 'ユーザー権限が変更されました。',
-        pointsAdded: 'ポイントが追加されました。',
-        pointsSubtracted: 'ポイントが減算されました。',
+        pointsAdded: '포인트が추가されました。',
+        pointsSubtracted: '포인트が減算されました。',
         withdrawalProcessed: '退会申請が処理されました。',
-        error: 'エラーが発生しました。'
+        error: '오류가 발생했습니다。'
       }
     }
   }
@@ -283,14 +283,14 @@ const UserApprovalManagerEnhanced = () => {
       
       const amount = parseInt(pointAmount)
       if (isNaN(amount) || amount <= 0) {
-        setError(language === 'ko' ? '유효한 포인트 수량을 입력해주세요.' : '有効なポイント数を入力してください。')
+        setError(language === 'ko' ? '유효한 포인트 수량을 입력해주세요.' : '有効な포인트数を入力してください。')
         return
       }
       
       const finalAmount = isAdd ? amount : -amount
       const description = pointDescription || (isAdd ? 
-        (language === 'ko' ? '관리자 포인트 추가' : '管理者ポイント追加') : 
-        (language === 'ko' ? '관리자 포인트 차감' : '管理者ポイント減算'))
+        (language === 'ko' ? '관리자 포인트 추가' : '관리자포인트추가') : 
+        (language === 'ko' ? '관리자 포인트 차감' : '관리자포인트減算'))
       
       // 포인트 거래 기록 직접 삽입
       const { error: transactionError } = await supabase
@@ -324,7 +324,7 @@ const UserApprovalManagerEnhanced = () => {
       setTimeout(() => setSuccess(''), 3000)
     } catch (error) {
       console.error('포인트 관리 오류:', error)
-      setError(language === 'ko' ? '포인트 처리 중 오류가 발생했습니다.' : 'ポイント処理中にエラーが発生しました。')
+      setError(language === 'ko' ? '포인트 처리 중 오류가 발생했습니다.' : '포인트処理中に오류가 발생했습니다。')
       setTimeout(() => setError(''), 3000)
     } finally {
       setProcessing(false)

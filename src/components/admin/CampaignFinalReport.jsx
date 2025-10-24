@@ -79,7 +79,7 @@ const CampaignFinalReport = () => {
       
     } catch (error) {
       console.error('Load data error:', error)
-      setError('データの読み込みに失敗しました。')
+      setError('データの読み込みに실패했습니다。')
     } finally {
       setLoading(false)
     }
@@ -179,7 +179,7 @@ const CampaignFinalReport = () => {
     const reportContent = `
 キャンペーン最終報告書
 
-キャンペーン名: ${campaign?.title}
+캠페인명: ${campaign?.title}
 ブランド: ${campaign?.brand}
 期間: ${new Date(campaign?.start_date).toLocaleDateString('ja-JP')} - ${new Date(campaign?.end_date).toLocaleDateString('ja-JP')}
 
@@ -215,7 +215,7 @@ YouTube: ${reportData.videoStats.youtube}개
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">レポートを生成中...</p>
+          <p className="text-gray-600">보고서を生成中...</p>
         </div>
       </div>
     )
@@ -228,7 +228,7 @@ YouTube: ${reportData.videoStats.youtube}개
         <h3 className="text-lg font-semibold text-gray-600 mb-2">キャンペーンが見つかりません</h3>
         <Button onClick={() => navigate('/campaigns-manage')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          キャンペーン一覧に戻る
+          キャンペーン목록に돌아가기
         </Button>
       </div>
     )
@@ -243,13 +243,13 @@ YouTube: ${reportData.videoStats.youtube}개
         <div>
           <Button variant="outline" onClick={() => navigate('/campaigns-manage')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            キャンペーン一覧に戻る
+            キャンペーン목록に돌아가기
           </Button>
         </div>
         <div className="flex space-x-2">
           <Button onClick={exportReport} variant="outline">
             <Download className="h-4 w-4 mr-2" />
-            レポート出力
+            보고서出力
           </Button>
           <Button onClick={() => window.print()}>
             <FileText className="h-4 w-4 mr-2" />
@@ -282,7 +282,7 @@ YouTube: ${reportData.videoStats.youtube}개
               <div className="text-3xl font-bold text-green-600">
                 {formatCurrency(campaign.reward_amount)}
               </div>
-              <div className="text-sm text-gray-600">単価報酬</div>
+              <div className="text-sm text-gray-600">単価보상</div>
             </div>
           </div>
         </CardHeader>
@@ -294,7 +294,7 @@ YouTube: ${reportData.videoStats.youtube}개
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">総応募者数</p>
+                <p className="text-sm font-medium text-gray-600">総지원者数</p>
                 <p className="text-3xl font-bold text-blue-600">{reportData.totalApplications}</p>
               </div>
               <Users className="h-8 w-8 text-blue-600" />
@@ -306,7 +306,7 @@ YouTube: ${reportData.videoStats.youtube}개
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">完了クリエイター</p>
+                <p className="text-sm font-medium text-gray-600">완료크리에이터</p>
                 <p className="text-3xl font-bold text-green-600">{reportData.completedCreators}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -318,7 +318,7 @@ YouTube: ${reportData.videoStats.youtube}개
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">総支払報酬</p>
+                <p className="text-sm font-medium text-gray-600">総支払보상</p>
                 <p className="text-3xl font-bold text-purple-600">{formatCurrency(reportData.totalReward)}</p>
               </div>
               <DollarSign className="h-8 w-8 text-purple-600" />
@@ -330,7 +330,7 @@ YouTube: ${reportData.videoStats.youtube}개
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">完了率</p>
+                <p className="text-sm font-medium text-gray-600">완료率</p>
                 <p className="text-3xl font-bold text-orange-600">{reportData.performance.completionRate}%</p>
               </div>
               <TrendingUp className="h-8 w-8 text-orange-600" />
@@ -343,7 +343,7 @@ YouTube: ${reportData.videoStats.youtube}개
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">概要</TabsTrigger>
-          <TabsTrigger value="creators">クリエイター</TabsTrigger>
+          <TabsTrigger value="creators">크리에이터</TabsTrigger>
           <TabsTrigger value="content">コンテンツ</TabsTrigger>
           <TabsTrigger value="analytics">分析</TabsTrigger>
         </TabsList>
@@ -360,11 +360,11 @@ YouTube: ${reportData.videoStats.youtube}개
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">承認率</span>
+                  <span className="text-sm text-gray-600">승인率</span>
                   <span className="font-bold">{reportData.performance.conversionRate}%</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">完了率</span>
+                  <span className="text-sm text-gray-600">완료率</span>
                   <span className="font-bold">{reportData.performance.completionRate}%</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -484,9 +484,9 @@ YouTube: ${reportData.videoStats.youtube}개
         <TabsContent value="creators" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>完了クリエイター一覧</CardTitle>
+              <CardTitle>완료크리에이터목록</CardTitle>
               <CardDescription>
-                キャンペーンを完了したクリエイターの詳細情報
+                キャンペーンを완료した크리에이터の상세情報
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -553,8 +553,8 @@ YouTube: ${reportData.videoStats.youtube}개
                 {completedApplications.length === 0 && (
                   <div className="text-center py-8">
                     <CheckCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-600 mb-2">完了クリエイターがいません</h3>
-                    <p className="text-gray-500">まだキャンペーンを完了したクリエイターがいません。</p>
+                    <h3 className="text-lg font-semibold text-gray-600 mb-2">완료크리에이터がいません</h3>
+                    <p className="text-gray-500">まだキャンペーンを완료した크리에이터がいません。</p>
                   </div>
                 )}
               </div>
@@ -565,9 +565,9 @@ YouTube: ${reportData.videoStats.youtube}개
         <TabsContent value="content" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>アップロード済みコンテンツ</CardTitle>
+              <CardTitle>업로드済みコンテンツ</CardTitle>
               <CardDescription>
-                クリエイターがアップロードした動画コンテンツ一覧
+                크리에이터が업로드した動画コンテンツ목록
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -586,7 +586,7 @@ YouTube: ${reportData.videoStats.youtube}개
                         <h3 className="text-lg font-semibold">{profile?.name || 'N/A'}</h3>
                         <Badge className="bg-blue-100 text-blue-800">
                           <Activity className="h-3 w-3 mr-1" />
-                          完了
+                          완료
                         </Badge>
                       </div>
                       
@@ -676,8 +676,8 @@ YouTube: ${reportData.videoStats.youtube}개
                 {completedApplications.filter(app => app.video_links && Object.values(app.video_links).some(link => link && link !== app.video_links?.notes)).length === 0 && (
                   <div className="text-center py-8">
                     <Play className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-600 mb-2">アップロード済みコンテンツがありません</h3>
-                    <p className="text-gray-500">まだクリエイターからの動画アップロードがありません。</p>
+                    <h3 className="text-lg font-semibold text-gray-600 mb-2">업로드済みコンテンツがありません</h3>
+                    <p className="text-gray-500">まだ크리에이터からの動画업로드がありません。</p>
                   </div>
                 )}
               </div>
@@ -708,7 +708,7 @@ YouTube: ${reportData.videoStats.youtube}개
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">参加クリエイター数</span>
+                  <span className="text-sm text-gray-600">参加크리에이터数</span>
                   <span className="font-bold text-purple-600">{reportData.completedCreators}名</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -752,7 +752,7 @@ YouTube: ${reportData.videoStats.youtube}개
                 <div className="p-3 bg-purple-50 rounded-lg">
                   <p className="text-sm font-medium text-purple-800">次回改善点</p>
                   <p className="text-sm text-purple-700">
-                    完了率{reportData.performance.completionRate}%は
+                    완료率{reportData.performance.completionRate}%は
                     {parseFloat(reportData.performance.completionRate) > 80 ? '優秀' : '改善の余地があります'}。
                     {parseFloat(reportData.performance.completionRate) <= 80 && 'フォローアップの強化を推奨します。'}
                   </p>

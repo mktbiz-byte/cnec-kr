@@ -23,17 +23,17 @@ const SystemSettings = () => {
     smtpUser: '',
     smtpPass: '',
     fromEmail: '',
-    fromName: 'CNEC Japan',
+    fromName: 'CNEC Korea',
     replyToEmail: '',
     testEmail: ''
   })
 
   // SEO 설정
   const [seoSettings, setSeoSettings] = useState({
-    siteName: 'CNEC Japan',
-    siteDescription: 'K-Beauty × クリエイター配信プラットフォーム',
-    siteKeywords: 'K-Beauty, クリエイター, 配信, プラットフォーム, 韓国コスメ',
-    ogTitle: 'CNEC Japan - K-Beauty × クリエイター配信プラットフォーム',
+    siteName: 'CNEC Korea',
+    siteDescription: 'K-Beauty × 크리에이터配信プラットフォーム',
+    siteKeywords: 'K-Beauty, 크리에이터, 配信, プラットフォーム, 韓国コスメ',
+    ogTitle: 'CNEC Korea - K-Beauty × 크리에이터配信プラットフォーム',
     ogDescription: '韓国コスメブランドの最新キャンペーンに参加して、あなたの影響力を収益化しましょう',
     ogImage: '',
     twitterCard: 'summary_large_image',
@@ -44,7 +44,7 @@ const SystemSettings = () => {
     googleAnalyticsId: '',
     googleTagManagerId: '',
     facebookPixelId: '',
-    metaAuthor: 'CNEC Japan',
+    metaAuthor: 'CNEC Korea',
     metaViewport: 'width=device-width, initial-scale=1.0',
     metaCharset: 'UTF-8',
     favicon: '/favicon.ico',
@@ -106,32 +106,32 @@ const SystemSettings = () => {
       import: '가져오기'
     },
     ja: {
-      title: 'システム設定',
-      subtitle: 'SEO、メール、サイト全般の設定を管理します',
-      emailSettings: 'メール設定',
-      smtpSettings: 'SMTPサーバー設定',
-      emailGeneral: '一般メール設定',
+      title: 'システム설정',
+      subtitle: 'SEO、メール、サイト全般の설정を管理します',
+      emailSettings: 'メール설정',
+      smtpSettings: 'SMTPサーバー설정',
+      emailGeneral: '一般メール설정',
       testEmail: 'テストメール',
       smtpHost: 'SMTPホスト',
       smtpPort: 'SMTPポート',
       smtpSecure: 'SSL/TLS使用',
       smtpUser: 'SMTPユーザー名',
       smtpPass: 'SMTPパスワード',
-      fromEmail: '送信者メール',
-      fromName: '送信者名',
+      fromEmail: '전송者メール',
+      fromName: '전송者名',
       replyToEmail: '返信先メール',
       testEmailAddress: 'テストメールアドレス',
-      sendTestEmail: 'テストメール送信',
-      seoSettings: 'SEO設定',
-      basicSeo: '基本SEO設定',
-      socialMedia: 'ソーシャルメディア設定',
-      analytics: '分析ツール設定',
-      technical: '技術的設定',
+      sendTestEmail: 'テストメール전송',
+      seoSettings: 'SEO설정',
+      basicSeo: '基本SEO설정',
+      socialMedia: 'ソーシャルメディア설정',
+      analytics: '分析ツール설정',
+      technical: '技術的설정',
       siteName: 'サイト名',
-      siteDescription: 'サイト説明',
+      siteDescription: 'サイト설명',
       siteKeywords: 'サイトキーワード',
       ogTitle: 'Open Graphタイトル',
-      ogDescription: 'Open Graph説明',
+      ogDescription: 'Open Graph설명',
       ogImage: 'Open Graph画像URL',
       twitterCard: 'Twitterカードタイプ',
       twitterSite: 'Twitterサイトアカウント',
@@ -142,16 +142,16 @@ const SystemSettings = () => {
       googleTagManagerId: 'Google Tag Manager ID',
       facebookPixelId: 'Facebook Pixel ID',
       metaAuthor: '作成者',
-      metaViewport: 'Viewport設定',
+      metaViewport: 'Viewport설정',
       metaCharset: '文字エンコーディング',
       favicon: 'Favicon URL',
       appleTouchIcon: 'Apple Touch Icon URL',
-      save: '保存',
-      cancel: 'キャンセル',
-      loading: '読み込み中...',
-      saving: '保存中...',
-      error: 'エラーが発生しました。',
-      success: '設定が正常に保存されました。',
+      save: '저장',
+      cancel: '취소',
+      loading: '로딩 중...',
+      saving: '저장中...',
+      error: '오류가 발생했습니다。',
+      success: '설정が正常に저장されました。',
       preview: 'プレビュー',
       reset: 'リセット',
       export: 'エクスポート',
@@ -248,18 +248,18 @@ const SystemSettings = () => {
       // 테스트 이메일 내용 생성
       const testEmailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">CNEC Japan - 테스트 이메일</h2>
+          <h2 style="color: #333;">CNEC Korea - 테스트 이메일</h2>
           <p>안녕하세요!</p>
-          <p>이 이메일은 CNEC Japan 시스템의 SMTP 설정이 올바르게 구성되었는지 확인하기 위한 테스트 이메일입니다.</p>
+          <p>이 이메일은 CNEC Korea 시스템의 SMTP 설정이 올바르게 구성되었는지 확인하기 위한 테스트 이메일입니다.</p>
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #28a745; margin-top: 0;">✅ 이메일 발송 성공!</h3>
             <p>SMTP 설정이 올바르게 구성되어 이메일이 정상적으로 발송되었습니다.</p>
           </div>
           <p><strong>발송 시간:</strong> ${new Date().toLocaleString('ko-KR')}</p>
-          <p><strong>발송자:</strong> ${emailSettings.fromName || 'CNEC Japan'}</p>
+          <p><strong>발송자:</strong> ${emailSettings.fromName || 'CNEC Korea'}</p>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
           <p style="color: #666; font-size: 12px;">
-            이 이메일은 CNEC Japan 관리자 시스템에서 자동으로 발송되었습니다.<br>
+            이 이메일은 CNEC Korea 관리자 시스템에서 자동으로 발송되었습니다.<br>
             문의사항이 있으시면 ${emailSettings.replyToEmail || 'support@cnec.jp'}로 연락해주세요.
           </p>
         </div>
@@ -291,7 +291,7 @@ const SystemSettings = () => {
             replyEmail: emailSettings.replyToEmail
           },
           testEmail: emailSettings.testEmail,
-          subject: 'CNEC Japan - Gmail 테스트 이메일',
+          subject: 'CNEC Korea - Gmail 테스트 이메일',
           message: testEmailHtml
         })
       })
@@ -330,10 +330,10 @@ Gmail 일일 한도: 500통/일, 시간당 100통/시간`)
   const resetSettings = () => {
     if (confirm('모든 설정을 초기값으로 되돌리시겠습니까?')) {
       setSeoSettings({
-        siteName: 'CNEC Japan',
-        siteDescription: 'K-Beauty × クリエイター配信プラットフォーム',
-        siteKeywords: 'K-Beauty, クリエイター, 配信, プラットフォーム, 韓国コスメ',
-        ogTitle: 'CNEC Japan - K-Beauty × クリエイター配信プラットフォーム',
+        siteName: 'CNEC Korea',
+        siteDescription: 'K-Beauty × 크리에이터配信プラットフォーム',
+        siteKeywords: 'K-Beauty, 크리에이터, 配信, プラットフォーム, 韓国コスメ',
+        ogTitle: 'CNEC Korea - K-Beauty × 크리에이터配信プラットフォーム',
         ogDescription: '韓国コスメブランドの最新キャンペーンに参加して、あなたの影響力を収益化しましょう',
         ogImage: '',
         twitterCard: 'summary_large_image',
@@ -344,7 +344,7 @@ Gmail 일일 한도: 500통/일, 시간당 100통/시간`)
         googleAnalyticsId: '',
         googleTagManagerId: '',
         facebookPixelId: '',
-        metaAuthor: 'CNEC Japan',
+        metaAuthor: 'CNEC Korea',
         metaViewport: 'width=device-width, initial-scale=1.0',
         metaCharset: 'UTF-8',
         favicon: '/favicon.ico',
@@ -558,7 +558,7 @@ Gmail 일일 한도: 500통/일, 시간당 100통/시간`)
                       type="text"
                       value={emailSettings.fromName}
                       onChange={(e) => handleEmailInputChange('fromName', e.target.value)}
-                      placeholder="CNEC Japan"
+                      placeholder="CNEC Korea"
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>

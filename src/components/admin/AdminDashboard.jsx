@@ -76,7 +76,7 @@ const AdminDashboard = () => {
       console.error('Load dashboard data error:', error)
       setError(language === 'ko' 
         ? '대시보드 데이터를 불러올 수 없습니다.'
-        : 'ダッシュボードデータを読み込めません。'
+        : '대시보드データを読み込めません。'
       )
     } finally {
       setLoading(false)
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
   const getStatusBadge = (status) => {
     const statusStyles = {
       pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: language === 'ko' ? '검토중' : '審査中' },
-      approved: { bg: 'bg-green-100', text: 'text-green-800', label: language === 'ko' ? '승인됨' : '承認済み' },
+      approved: { bg: 'bg-green-100', text: 'text-green-800', label: language === 'ko' ? '승인됨' : '승인됨' },
       rejected: { bg: 'bg-red-100', text: 'text-red-800', label: language === 'ko' ? '거절됨' : '拒否' },
       active: { bg: 'bg-blue-100', text: 'text-blue-800', label: language === 'ko' ? '활성' : 'アクティブ' },
       inactive: { bg: 'bg-gray-100', text: 'text-gray-800', label: language === 'ko' ? '비활성' : '非アクティブ' },
@@ -124,7 +124,7 @@ const AdminDashboard = () => {
   ]
 
   const statusData = [
-    { name: language === 'ko' ? '승인됨' : '承認済み', value: 45, color: '#10B981' },
+    { name: language === 'ko' ? '승인됨' : '승인됨', value: 45, color: '#10B981' },
     { name: language === 'ko' ? '검토중' : '審査中', value: 30, color: '#F59E0B' },
     { name: language === 'ko' ? '거절됨' : '拒否', value: 25, color: '#EF4444' }
   ]
@@ -148,21 +148,21 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <h1 className="text-xl font-bold text-gray-800">
-                CNEC Japan {language === 'ko' ? '관리자' : '管理者'}
+                CNEC Korea {language === 'ko' ? '관리자' : '관리자'}
               </h1>
               
               <nav className="hidden md:flex space-x-6">
                 <Link to="/dashboard" className="text-purple-600 font-medium">
-                  {language === 'ko' ? '대시보드' : 'ダッシュボード'}
+                  {language === 'ko' ? '대시보드' : '대시보드'}
                 </Link>
                 <Link to="/campaigns-manage" className="text-gray-600 hover:text-gray-800">
-                  {language === 'ko' ? '캠페인 관리' : 'キャンペーン管理'}
+                  {language === 'ko' ? '캠페인 관리' : '캠페인 관리'}
                 </Link>
                 <Link to="/user-approval" className="text-gray-600 hover:text-gray-800">
                   {language === 'ko' ? '사용자 관리' : 'ユーザー管理'}
                 </Link>
                 <Link to="/applications-manage" className="text-gray-600 hover:text-gray-800">
-                  {language === 'ko' ? '신청 관리' : '応募管理'}
+                  {language === 'ko' ? '신청 관리' : '지원 관리'}
                 </Link>
               </nav>
             </div>
@@ -235,7 +235,7 @@ const AdminDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {language === 'ko' ? '총 신청' : '総応募'}
+                    {language === 'ko' ? '총 신청' : '総지원'}
                   </p>
                   <p className="text-3xl font-bold text-gray-800">{stats.totalApplications}</p>
                 </div>
@@ -275,7 +275,7 @@ const AdminDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {language === 'ko' ? '총 보상액' : '総報酬額'}
+                    {language === 'ko' ? '총 보상액' : '総보상額'}
                   </p>
                   <p className="text-2xl font-bold text-gray-800">{formatCurrency(stats.totalRewards)}</p>
                 </div>
@@ -298,7 +298,7 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle>{language === 'ko' ? '월별 트렌드' : '月別トレンド'}</CardTitle>
               <CardDescription>
-                {language === 'ko' ? '캠페인 및 신청 수 추이' : 'キャンペーンと応募数の推移'}
+                {language === 'ko' ? '캠페인 및 신청 수 추이' : 'キャンペーンと지원数の推移'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -318,9 +318,9 @@ const AdminDashboard = () => {
           {/* 신청 상태 분포 */}
           <Card className="shadow-lg border-0">
             <CardHeader>
-              <CardTitle>{language === 'ko' ? '신청 상태 분포' : '応募状態分布'}</CardTitle>
+              <CardTitle>{language === 'ko' ? '신청 상태 분포' : '지원状態分布'}</CardTitle>
               <CardDescription>
-                {language === 'ko' ? '현재 신청들의 상태별 분포' : '現在の応募の状態別分布'}
+                {language === 'ko' ? '현재 신청들의 상태별 분포' : '現在の지원の状態別分布'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -392,7 +392,7 @@ const AdminDashboard = () => {
           <Card className="shadow-lg border-0">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>{language === 'ko' ? '최근 신청' : '最近の応募'}</CardTitle>
+                <CardTitle>{language === 'ko' ? '최근 신청' : '最近の지원'}</CardTitle>
                 <Link to="/applications-manage">
                   <Button variant="outline" size="sm">
                     <Eye className="h-4 w-4 mr-2" />
@@ -405,7 +405,7 @@ const AdminDashboard = () => {
               <div className="space-y-4">
                 {recentApplications.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    {language === 'ko' ? '신청이 없습니다' : '応募はありません'}
+                    {language === 'ko' ? '신청이 없습니다' : '지원はありません'}
                   </div>
                 ) : (
                   recentApplications.map((application) => (
@@ -447,7 +447,7 @@ const AdminDashboard = () => {
                 <Link to="/applications-manage?status=pending">
                   <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center">
                     <FileText className="h-6 w-6 mb-2" />
-                    {language === 'ko' ? '대기 신청' : '待機応募'}
+                    {language === 'ko' ? '대기 신청' : '待機지원'}
                   </Button>
                 </Link>
                 
@@ -461,7 +461,7 @@ const AdminDashboard = () => {
                 <Link to="/system-settings">
                   <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center">
                     <Settings className="h-6 w-6 mb-2" />
-                    {language === 'ko' ? '설정' : '設定'}
+                    {language === 'ko' ? '설정' : '설정'}
                   </Button>
                 </Link>
               </div>

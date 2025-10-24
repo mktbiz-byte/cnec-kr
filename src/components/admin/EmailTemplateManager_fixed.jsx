@@ -68,32 +68,32 @@ const EmailTemplateManager = () => {
         // 기본 템플릿 설정
         setTemplates({
           welcome: { 
-            subject: 'CNEC Japan에 오신 것을 환영합니다!', 
-            content: '안녕하세요 {{name}}님,\n\nCNEC Japan 플랫폼에 가입해주셔서 감사합니다.\n\n앞으로 다양한 캠페인에 참여하여 수익을 창출해보세요!\n\n감사합니다.\nCNEC Japan 팀' 
+            subject: 'CNEC Korea에 오신 것을 환영합니다!', 
+            content: '안녕하세요 {{name}}님,\n\nCNEC Korea 플랫폼에 가입해주셔서 감사합니다.\n\n앞으로 다양한 캠페인에 참여하여 수익을 창출해보세요!\n\n감사합니다.\nCNEC Korea 팀' 
           },
           campaign_approved: { 
             subject: '캠페인 승인 완료 - {{campaign_title}}', 
-            content: '축하합니다 {{name}}님!\n\n{{campaign_title}} 캠페인에 선정되셨습니다.\n\n자세한 가이드는 별도로 전달드리겠습니다.\n\n감사합니다.\nCNEC Japan 팀' 
+            content: '축하합니다 {{name}}님!\n\n{{campaign_title}} 캠페인에 선정되셨습니다.\n\n자세한 가이드는 별도로 전달드리겠습니다.\n\n감사합니다.\nCNEC Korea 팀' 
           },
           guide_links: { 
             subject: '캠페인 가이드 및 자료 제공 - {{campaign_title}}', 
-            content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 진행을 위한 자료를 제공드립니다.\n\n구글 드라이브: {{google_drive_url}}\n구글 슬라이드: {{google_slides_url}}\n\n가이드를 참고하여 캠페인을 진행해주세요.\n\n감사합니다.\nCNEC Japan 팀' 
+            content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 진행을 위한 자료를 제공드립니다.\n\n구글 드라이브: {{google_drive_url}}\n구글 슬라이드: {{google_slides_url}}\n\n가이드를 참고하여 캠페인을 진행해주세요.\n\n감사합니다.\nCNEC Korea 팀' 
           },
           deadline_3days: { 
             subject: '캠페인 마감 3일 전 알림 - {{campaign_title}}', 
-            content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 3일 남았습니다.\n\n마감일: {{deadline}}\n\n빠른 시일 내에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Japan 팀' 
+            content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 3일 남았습니다.\n\n마감일: {{deadline}}\n\n빠른 시일 내에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Korea 팀' 
           },
           deadline_1day: { 
             subject: '캠페인 마감 1일 전 최종 알림 - {{campaign_title}}', 
-            content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 내일입니다!\n\n마감일: {{deadline}}\n\n반드시 오늘 안에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Japan 팀' 
+            content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 내일입니다!\n\n마감일: {{deadline}}\n\n반드시 오늘 안에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Korea 팀' 
           },
           point_approved: { 
             subject: '포인트 승인 완료 알림', 
-            content: '안녕하세요 {{name}}님,\n\n요청하신 포인트가 승인되었습니다.\n\n승인 포인트: {{points}}P\n현재 잔액: {{balance}}P\n\n감사합니다.\nCNEC Japan 팀' 
+            content: '안녕하세요 {{name}}님,\n\n요청하신 포인트가 승인되었습니다.\n\n승인 포인트: {{points}}P\n현재 잔액: {{balance}}P\n\n감사합니다.\nCNEC Korea 팀' 
           },
           payment_completed: { 
             subject: '출금 완료 알림', 
-            content: '안녕하세요 {{name}}님,\n\n요청하신 출금이 완료되었습니다.\n\n출금 금액: {{amount}}원\n처리일: {{date}}\n\n감사합니다.\nCNEC Japan 팀' 
+            content: '안녕하세요 {{name}}님,\n\n요청하신 출금이 완료되었습니다.\n\n출금 금액: {{amount}}원\n처리일: {{date}}\n\n감사합니다.\nCNEC Korea 팀' 
           }
         })
       }
@@ -161,32 +161,32 @@ const EmailTemplateManager = () => {
       // 기본값으로 리셋
       const defaultTemplates = {
         welcome: { 
-          subject: 'CNEC Japan에 오신 것을 환영합니다!', 
-          content: '안녕하세요 {{name}}님,\n\nCNEC Japan 플랫폼에 가입해주셔서 감사합니다.\n\n앞으로 다양한 캠페인에 참여하여 수익을 창출해보세요!\n\n감사합니다.\nCNEC Japan 팀' 
+          subject: 'CNEC Korea에 오신 것을 환영합니다!', 
+          content: '안녕하세요 {{name}}님,\n\nCNEC Korea 플랫폼에 가입해주셔서 감사합니다.\n\n앞으로 다양한 캠페인에 참여하여 수익을 창출해보세요!\n\n감사합니다.\nCNEC Korea 팀' 
         },
         campaign_approved: { 
           subject: '캠페인 승인 완료 - {{campaign_title}}', 
-          content: '축하합니다 {{name}}님!\n\n{{campaign_title}} 캠페인에 선정되셨습니다.\n\n자세한 가이드는 별도로 전달드리겠습니다.\n\n감사합니다.\nCNEC Japan 팀' 
+          content: '축하합니다 {{name}}님!\n\n{{campaign_title}} 캠페인에 선정되셨습니다.\n\n자세한 가이드는 별도로 전달드리겠습니다.\n\n감사합니다.\nCNEC Korea 팀' 
         },
         guide_links: { 
           subject: '캠페인 가이드 및 자료 제공 - {{campaign_title}}', 
-          content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 진행을 위한 자료를 제공드립니다.\n\n구글 드라이브: {{google_drive_url}}\n구글 슬라이드: {{google_slides_url}}\n\n가이드를 참고하여 캠페인을 진행해주세요.\n\n감사합니다.\nCNEC Japan 팀' 
+          content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 진행을 위한 자료를 제공드립니다.\n\n구글 드라이브: {{google_drive_url}}\n구글 슬라이드: {{google_slides_url}}\n\n가이드를 참고하여 캠페인을 진행해주세요.\n\n감사합니다.\nCNEC Korea 팀' 
         },
         deadline_3days: { 
           subject: '캠페인 마감 3일 전 알림 - {{campaign_title}}', 
-          content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 3일 남았습니다.\n\n마감일: {{deadline}}\n\n빠른 시일 내에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Japan 팀' 
+          content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 3일 남았습니다.\n\n마감일: {{deadline}}\n\n빠른 시일 내에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Korea 팀' 
         },
         deadline_1day: { 
           subject: '캠페인 마감 1일 전 최종 알림 - {{campaign_title}}', 
-          content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 내일입니다!\n\n마감일: {{deadline}}\n\n반드시 오늘 안에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Japan 팀' 
+          content: '안녕하세요 {{name}}님,\n\n{{campaign_title}} 캠페인 마감이 내일입니다!\n\n마감일: {{deadline}}\n\n반드시 오늘 안에 완료해주시기 바랍니다.\n\n감사합니다.\nCNEC Korea 팀' 
         },
         point_approved: { 
           subject: '포인트 승인 완료 알림', 
-          content: '안녕하세요 {{name}}님,\n\n요청하신 포인트가 승인되었습니다.\n\n승인 포인트: {{points}}P\n현재 잔액: {{balance}}P\n\n감사합니다.\nCNEC Japan 팀' 
+          content: '안녕하세요 {{name}}님,\n\n요청하신 포인트가 승인되었습니다.\n\n승인 포인트: {{points}}P\n현재 잔액: {{balance}}P\n\n감사합니다.\nCNEC Korea 팀' 
         },
         payment_completed: { 
           subject: '출금 완료 알림', 
-          content: '안녕하세요 {{name}}님,\n\n요청하신 출금이 완료되었습니다.\n\n출금 금액: {{amount}}원\n처리일: {{date}}\n\n감사합니다.\nCNEC Japan 팀' 
+          content: '안녕하세요 {{name}}님,\n\n요청하신 출금이 완료되었습니다.\n\n출금 금액: {{amount}}원\n처리일: {{date}}\n\n감사합니다.\nCNEC Korea 팀' 
         }
       }
       

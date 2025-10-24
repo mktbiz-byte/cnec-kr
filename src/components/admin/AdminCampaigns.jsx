@@ -182,7 +182,7 @@ const AdminCampaigns = () => {
         await database.campaigns.update(editingCampaign.id, campaignData)
         setSuccess(language === 'ko' 
           ? '캠페인이 성공적으로 업데이트되었습니다.'
-          : 'キャンペーンが正常に更新されました。'
+          : 'キャンペーンが正常に업데이트されました。'
         )
       } else {
         // 새 캠페인 생성
@@ -202,7 +202,7 @@ const AdminCampaigns = () => {
       console.error('Save campaign error:', error)
       setError(language === 'ko' 
         ? '캠페인 저장에 실패했습니다.'
-        : 'キャンペーンの保存に失敗しました。'
+        : 'キャンペーンの저장に실패했습니다。'
       )
     } finally {
       setSaving(false)
@@ -212,7 +212,7 @@ const AdminCampaigns = () => {
   const handleDelete = async (campaignId) => {
     if (!confirm(language === 'ko' 
       ? '정말로 이 캠페인을 삭제하시겠습니까?'
-      : '本当にこのキャンペーンを削除しますか？'
+      : '本当にこのキャンペーンを삭제しますか？'
     )) {
       return
     }
@@ -221,7 +221,7 @@ const AdminCampaigns = () => {
       await database.campaigns.delete(campaignId)
       setSuccess(language === 'ko' 
         ? '캠페인이 삭제되었습니다.'
-        : 'キャンペーンが削除されました。'
+        : 'キャンペーンが삭제されました。'
       )
       loadCampaigns()
       
@@ -230,7 +230,7 @@ const AdminCampaigns = () => {
       console.error('Delete campaign error:', error)
       setError(language === 'ko' 
         ? '캠페인 삭제에 실패했습니다.'
-        : 'キャンペーンの削除に失敗しました。'
+        : 'キャンペーンの삭제に실패했습니다。'
       )
     }
   }
@@ -251,7 +251,7 @@ const AdminCampaigns = () => {
       active: { bg: 'bg-green-100', text: 'text-green-800', label: language === 'ko' ? '활성' : 'アクティブ' },
       inactive: { bg: 'bg-gray-100', text: 'text-gray-800', label: language === 'ko' ? '비활성' : '非アクティブ' },
       draft: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: language === 'ko' ? '초안' : '下書き' },
-      completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: language === 'ko' ? '완료' : '完了' }
+      completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: language === 'ko' ? '완료' : '완료' }
     }
     
     const style = statusStyles[status] || statusStyles.draft
@@ -296,11 +296,11 @@ const AdminCampaigns = () => {
                 className="text-gray-600 hover:text-gray-800"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {language === 'ko' ? '대시보드로' : 'ダッシュボードへ'}
+                {language === 'ko' ? '대시보드로' : '대시보드へ'}
               </Button>
               
               <h1 className="text-xl font-bold text-gray-800">
-                {language === 'ko' ? '캠페인 관리' : 'キャンペーン管理'}
+                {language === 'ko' ? '캠페인 관리' : '캠페인 관리'}
               </h1>
             </div>
             
@@ -356,7 +356,7 @@ const AdminCampaigns = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder={language === 'ko' ? '캠페인 제목이나 브랜드로 검색...' : 'キャンペーンタイトルやブランドで検索...'}
+                    placeholder={language === 'ko' ? '캠페인 제목이나 브랜드로 검색...' : '캠페인 제목やブランドで검색...'}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -375,7 +375,7 @@ const AdminCampaigns = () => {
                     <SelectItem value="active">{language === 'ko' ? '활성' : 'アクティブ'}</SelectItem>
                     <SelectItem value="inactive">{language === 'ko' ? '비활성' : '非アクティブ'}</SelectItem>
                     <SelectItem value="draft">{language === 'ko' ? '초안' : '下書き'}</SelectItem>
-                    <SelectItem value="completed">{language === 'ko' ? '완료' : '完了'}</SelectItem>
+                    <SelectItem value="completed">{language === 'ko' ? '완료' : '완료'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -476,14 +476,14 @@ const AdminCampaigns = () => {
             <DialogHeader>
               <DialogTitle>
                 {editingCampaign 
-                  ? (language === 'ko' ? '캠페인 편집' : 'キャンペーン編集')
-                  : (language === 'ko' ? '새 캠페인 생성' : '新キャンペーン作成')
+                  ? (language === 'ko' ? '캠페인 편집' : 'キャンペーン편집')
+                  : (language === 'ko' ? '새 캠페인 생성' : '新캠페인 생성')
                 }
               </DialogTitle>
               <DialogDescription>
                 {language === 'ko' 
                   ? '캠페인 정보를 입력하고 저장하세요.'
-                  : 'キャンペーン情報を入力して保存してください。'
+                  : 'キャンペーン情報を入力して저장してください。'
                 }
               </DialogDescription>
             </DialogHeader>
@@ -498,14 +498,14 @@ const AdminCampaigns = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="title">
-                      {language === 'ko' ? '캠페인 제목' : 'キャンペーンタイトル'} *
+                      {language === 'ko' ? '캠페인 제목' : '캠페인 제목'} *
                     </Label>
                     <Input
                       id="title"
                       name="title"
                       value={formData.title}
                       onChange={handleInputChange}
-                      placeholder={language === 'ko' ? '캠페인 제목을 입력하세요' : 'キャンペーンタイトルを入力してください'}
+                      placeholder={language === 'ko' ? '캠페인 제목을 입력하세요' : '캠페인 제목を入力してください'}
                     />
                   </div>
                   
@@ -525,14 +525,14 @@ const AdminCampaigns = () => {
                 
                 <div className="space-y-2">
                   <Label htmlFor="description">
-                    {language === 'ko' ? '캠페인 설명' : 'キャンペーン説明'}
+                    {language === 'ko' ? '캠페인 설명' : 'キャンペーン설명'}
                   </Label>
                   <Textarea
                     id="description"
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    placeholder={language === 'ko' ? '캠페인에 대한 자세한 설명을 입력하세요' : 'キャンペーンの詳細説明を入力してください'}
+                    placeholder={language === 'ko' ? '캠페인에 대한 자세한 설명을 입력하세요' : 'キャンペーンの상세설명を入力してください'}
                     rows={3}
                   />
                 </div>
@@ -540,7 +540,7 @@ const AdminCampaigns = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="reward_amount">
-                      {language === 'ko' ? '보상 금액 (¥)' : '報酬金額 (¥)'} *
+                      {language === 'ko' ? '보상 금액 (₩)' : '보상金額 (₩)'} *
                     </Label>
                     <Input
                       id="reward_amount"
@@ -565,7 +565,7 @@ const AdminCampaigns = () => {
                         <SelectItem value="draft">{language === 'ko' ? '초안' : '下書き'}</SelectItem>
                         <SelectItem value="active">{language === 'ko' ? '활성' : 'アクティブ'}</SelectItem>
                         <SelectItem value="inactive">{language === 'ko' ? '비활성' : '非アクティブ'}</SelectItem>
-                        <SelectItem value="completed">{language === 'ko' ? '완료' : '完了'}</SelectItem>
+                        <SelectItem value="completed">{language === 'ko' ? '완료' : '완료'}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -601,7 +601,7 @@ const AdminCampaigns = () => {
                   </h3>
                   <Button type="button" variant="outline" onClick={addQuestion}>
                     <Plus className="h-4 w-4 mr-2" />
-                    {language === 'ko' ? '질문 추가' : '質問追加'}
+                    {language === 'ko' ? '질문 추가' : '質問추가'}
                   </Button>
                 </div>
                 
@@ -663,7 +663,7 @@ const AdminCampaigns = () => {
                   onClick={() => setEditModalOpen(false)}
                   disabled={saving}
                 >
-                  {language === 'ko' ? '취소' : 'キャンセル'}
+                  {language === 'ko' ? '취소' : '취소'}
                 </Button>
                 <Button
                   onClick={handleSave}
@@ -676,7 +676,7 @@ const AdminCampaigns = () => {
                     <Save className="h-4 w-4 mr-2" />
                   )}
                   {editingCampaign 
-                    ? (language === 'ko' ? '업데이트' : '更新')
+                    ? (language === 'ko' ? '업데이트' : '업데이트')
                     : (language === 'ko' ? '생성' : '作成')
                   }
                 </Button>

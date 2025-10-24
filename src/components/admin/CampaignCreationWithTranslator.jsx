@@ -131,7 +131,7 @@ const CampaignCreationWithTranslator = () => {
     // 파일 형식 체크
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
-      setError('JPG、PNG、WEBP形式の画像のみアップロード可能です。')
+      setError('JPG、PNG、WEBP形式の画像のみ업로드可能です。')
       return
     }
 
@@ -149,14 +149,14 @@ const CampaignCreationWithTranslator = () => {
           ...prev,
           image_url: result.url
         }))
-        setSuccess('画像が正常にアップロードされました！')
+        setSuccess('画像が正常に업로드されました！')
         setTimeout(() => setSuccess(''), 3000)
       } else {
-        throw new Error(result.error || '画像のアップロードに失敗しました。')
+        throw new Error(result.error || '画像の업로드に실패했습니다。')
       }
     } catch (error) {
       console.error('Image upload error:', error)
-      setError(error.message || '画像のアップロード中にエラーが発生しました。')
+      setError(error.message || '画像の업로드中に오류가 발생했습니다。')
     } finally {
       setUploadingImage(false)
     }
@@ -435,7 +435,7 @@ const CampaignCreationWithTranslator = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {uploadingImage && (
-                    <p className="text-sm text-blue-600">画像をアップロード中...</p>
+                    <p className="text-sm text-blue-600">画像を업로드中...</p>
                   )}
                   {campaignForm.image_url && (
                     <div className="mt-2">
@@ -444,7 +444,7 @@ const CampaignCreationWithTranslator = () => {
                         alt="Campaign preview" 
                         className="h-32 w-auto object-cover rounded border"
                       />
-                      <p className="text-xs text-gray-500 mt-1">画像が正常にアップロードされました</p>
+                      <p className="text-xs text-gray-500 mt-1">画像が正常に업로드されました</p>
                     </div>
                   )}
                   <p className="text-xs text-gray-500">最大ファイルサイズ: 5MB. 形式: JPG, PNG, WEBP</p>

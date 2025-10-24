@@ -85,7 +85,7 @@ const ConfirmedCreatorsReport = () => {
       
     } catch (error) {
       console.error('Load data error:', error)
-      setError('データの読み込みに失敗しました。')
+      setError('データの読み込みに실패했습니다。')
     } finally {
       setLoading(false)
     }
@@ -101,13 +101,13 @@ const ConfirmedCreatorsReport = () => {
         shipped_at: trackingNum ? new Date().toISOString() : null
       })
       
-      setSuccess('配送情報を更新しました。')
+      setSuccess('配送情報を업데이트しました。')
       setTrackingModal(false)
       loadData()
       
     } catch (error) {
       console.error('Tracking update error:', error)
-      setError('配送情報の更新に失敗しました。')
+      setError('配送情報の업데이트に실패했습니다。')
     } finally {
       setProcessing(false)
     }
@@ -127,7 +127,7 @@ const ConfirmedCreatorsReport = () => {
   }
 
   const exportToExcel = () => {
-    const headers = ['名前', 'Instagram', 'TikTok', 'YouTube', '郵便番号', '住所', '配送番号', '配送状況', '承認日']
+    const headers = ['名前', 'Instagram', 'TikTok', 'YouTube', '郵便番号', '住所', '配送番号', '配送状況', '승인日']
     const rows = applications.map(app => {
       const profile = userProfiles[app.user_id]
       return [
@@ -160,7 +160,7 @@ const ConfirmedCreatorsReport = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">確定クリエイターデータを読み込み中...</p>
+          <p className="text-gray-600">확정 크리에이터データを로딩 중...</p>
         </div>
       </div>
     )
@@ -173,7 +173,7 @@ const ConfirmedCreatorsReport = () => {
         <h3 className="text-lg font-semibold text-gray-600 mb-2">キャンペーンが見つかりません</h3>
         <Button onClick={() => navigate('/campaigns-manage')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          キャンペーン一覧に戻る
+          キャンペーン목록に돌아가기
         </Button>
       </div>
     )
@@ -188,7 +188,7 @@ const ConfirmedCreatorsReport = () => {
           <div>
             <Button variant="outline" onClick={() => navigate('/campaigns-manage')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              キャンペーン一覧に戻る
+              キャンペーン목록に돌아가기
             </Button>
           </div>
           <div className="flex space-x-2">
@@ -201,9 +201,9 @@ const ConfirmedCreatorsReport = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">全キャンペーン確定クリエイター</CardTitle>
+            <CardTitle className="text-2xl">全キャンペーン확정 크리에이터</CardTitle>
             <CardDescription className="text-lg mt-2 text-purple-600">
-              全キャンペーンの確定クリエイター管理
+              全キャンペーンの확정 크리에이터管理
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -211,7 +211,7 @@ const ConfirmedCreatorsReport = () => {
               <div className="flex items-center space-x-2">
                 <Users className="h-5 w-5 text-green-500" />
                 <span className="text-sm">
-                  <strong>確定クリエイター:</strong> {applications.length}名
+                  <strong>확정 크리에이터:</strong> {applications.length}名
                 </span>
               </div>
               <div className="flex items-center space-x-2">
@@ -285,7 +285,7 @@ const ConfirmedCreatorsReport = () => {
                         onClick={() => openTrackingModal(application)}
                       >
                         <Edit className="h-4 w-4 mr-2" />
-                        {application.tracking_number ? '配送情報編集' : '配送番号入力'}
+                        {application.tracking_number ? '配送情報편집' : '配送番号入力'}
                       </Button>
                     </div>
                   </div>
@@ -300,8 +300,8 @@ const ConfirmedCreatorsReport = () => {
             <CardContent className="pt-6">
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">確定クリエイターがいません</h3>
-                <p className="text-gray-500">まだ承認されたクリエイターがいません。</p>
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">확정 크리에이터がいません</h3>
+                <p className="text-gray-500">まだ승인された크리에이터がいません。</p>
               </div>
             </CardContent>
           </Card>
@@ -313,7 +313,7 @@ const ConfirmedCreatorsReport = () => {
             <DialogHeader>
               <DialogTitle>配送情報管理</DialogTitle>
               <DialogDescription>
-                確定クリエイターへの商品発送情報を入力してください。
+                확정 크리에이터への商品発送情報を入力してください。
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -332,14 +332,14 @@ const ConfirmedCreatorsReport = () => {
             </div>
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setTrackingModal(false)}>
-                キャンセル
+                취소
               </Button>
               <Button 
                 onClick={() => handleTrackingUpdate(selectedApplication?.id, trackingNumber)}
                 disabled={processing}
               >
                 {processing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                保存
+                저장
               </Button>
             </div>
           </DialogContent>
@@ -355,7 +355,7 @@ const ConfirmedCreatorsReport = () => {
         <div>
           <Button variant="outline" onClick={() => navigate('/campaigns-manage')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            キャンペーン一覧に戻る
+            キャンペーン목록に돌아가기
           </Button>
         </div>
         <div className="flex space-x-2">
@@ -373,14 +373,14 @@ const ConfirmedCreatorsReport = () => {
             <div>
               <CardTitle className="text-2xl">{campaign.title}</CardTitle>
               <CardDescription className="text-lg mt-2 text-purple-600">
-                {campaign.brand} - 確定クリエイター管理
+                {campaign.brand} - 확정 크리에이터管理
               </CardDescription>
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-green-600">
                 {formatCurrency(campaign.reward_amount)}
               </div>
-              <div className="text-sm text-gray-600">単価報酬</div>
+              <div className="text-sm text-gray-600">単価보상</div>
             </div>
           </div>
         </CardHeader>
@@ -389,7 +389,7 @@ const ConfirmedCreatorsReport = () => {
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-green-500" />
               <span className="text-sm">
-                <strong>確定クリエイター:</strong> {applications.length}名
+                <strong>확정 크리에이터:</strong> {applications.length}名
               </span>
             </div>
             <div className="flex items-center space-x-2">
@@ -407,7 +407,7 @@ const ConfirmedCreatorsReport = () => {
             <div className="flex items-center space-x-2">
               <DollarSign className="h-5 w-5 text-purple-500" />
               <span className="text-sm">
-                <strong>総報酬:</strong> {formatCurrency(applications.length * campaign.reward_amount)}
+                <strong>総보상:</strong> {formatCurrency(applications.length * campaign.reward_amount)}
               </span>
             </div>
           </div>
@@ -551,7 +551,7 @@ const ConfirmedCreatorsReport = () => {
                       onClick={() => openTrackingModal(application)}
                     >
                       <Edit className="h-4 w-4 mr-2" />
-                      {application.tracking_number ? '配送情報編集' : '配送番号入力'}
+                      {application.tracking_number ? '配送情報편집' : '配送番号入力'}
                     </Button>
                   </div>
                 </div>
@@ -566,8 +566,8 @@ const ConfirmedCreatorsReport = () => {
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">確定クリエイターがいません</h3>
-              <p className="text-gray-500">まだ承認されたクリエイターがいません。</p>
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">확정 크리에이터がいません</h3>
+              <p className="text-gray-500">まだ승인された크리에이터がいません。</p>
             </div>
           </CardContent>
         </Card>
@@ -637,13 +637,13 @@ const ConfirmedCreatorsReport = () => {
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                保存
+                저장
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setTrackingModal(false)}
               >
-                キャンセル
+                취소
               </Button>
             </div>
           </div>

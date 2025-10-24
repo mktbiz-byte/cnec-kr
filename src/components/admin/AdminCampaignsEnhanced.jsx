@@ -98,7 +98,7 @@ const AdminCampaignsEnhanced = () => {
       if (!campaignForm.title || !campaignForm.brand || !campaignForm.description) {
         setError(language === 'ko' 
           ? '제목, 브랜드, 설명을 모두 입력해주세요.'
-          : 'タイトル、ブランド、説明をすべて入力してください。'
+          : 'タイトル、ブランド、설명をすべて入力してください。'
         )
         setProcessing(false)
         return
@@ -108,7 +108,7 @@ const AdminCampaignsEnhanced = () => {
       if (!campaignForm.start_date || !campaignForm.end_date || !campaignForm.application_deadline) {
         setError(language === 'ko' 
           ? '시작일, 종료일, 신청 마감일을 모두 입력해주세요.'
-          : '開始日、終了日、応募締切日をすべて入力してください。'
+          : '시작일、종료日、지원締切日をすべて入力してください。'
         )
         setProcessing(false)
         return
@@ -122,7 +122,7 @@ const AdminCampaignsEnhanced = () => {
       if (deadlineDate >= startDate) {
         setError(language === 'ko' 
           ? '신청 마감일은 시작일보다 이전이어야 합니다.'
-          : '応募締切日は開始日より前である必要があります。'
+          : '지원締切日は시작일より前である必要があります。'
         )
         setProcessing(false)
         return
@@ -131,7 +131,7 @@ const AdminCampaignsEnhanced = () => {
       if (startDate >= endDate) {
         setError(language === 'ko' 
           ? '시작일은 종료일보다 이전이어야 합니다.'
-          : '開始日は終了日より前である必要があります。'
+          : '시작일は종료日より前である必要があります。'
         )
         setProcessing(false)
         return
@@ -163,7 +163,7 @@ const AdminCampaignsEnhanced = () => {
       console.error('Create campaign error:', error)
       setError(language === 'ko' 
         ? '캠페인 생성에 실패했습니다.'
-        : 'キャンペーンの作成に失敗しました。'
+        : 'キャンペーンの作成に실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -181,7 +181,7 @@ const AdminCampaignsEnhanced = () => {
       if (!campaignForm.title || !campaignForm.brand || !campaignForm.description) {
         setError(language === 'ko' 
           ? '제목, 브랜드, 설명을 모두 입력해주세요.'
-          : 'タイトル、ブランド、説明をすべて入力してください。'
+          : 'タイトル、ブランド、설명をすべて入力してください。'
         )
         setProcessing(false)
         return
@@ -191,7 +191,7 @@ const AdminCampaignsEnhanced = () => {
       if (!campaignForm.start_date || !campaignForm.end_date || !campaignForm.application_deadline) {
         setError(language === 'ko' 
           ? '시작일, 종료일, 신청 마감일을 모두 입력해주세요.'
-          : '開始日、終了日、応募締切日をすべて入力してください。'
+          : '시작일、종료日、지원締切日をすべて入力してください。'
         )
         setProcessing(false)
         return
@@ -205,7 +205,7 @@ const AdminCampaignsEnhanced = () => {
       if (deadlineDate >= startDate) {
         setError(language === 'ko' 
           ? '신청 마감일은 시작일보다 이전이어야 합니다.'
-          : '応募締切日は開始日より前である必要があります。'
+          : '지원締切日は시작일より前である必要があります。'
         )
         setProcessing(false)
         return
@@ -214,7 +214,7 @@ const AdminCampaignsEnhanced = () => {
       if (startDate >= endDate) {
         setError(language === 'ko' 
           ? '시작일은 종료일보다 이전이어야 합니다.'
-          : '開始日は終了日より前である必要があります。'
+          : '시작일は종료日より前である必要があります。'
         )
         setProcessing(false)
         return
@@ -234,7 +234,7 @@ const AdminCampaignsEnhanced = () => {
       
       setSuccess(language === 'ko' 
         ? '캠페인이 업데이트되었습니다.'
-        : 'キャンペーンが更新されました。'
+        : 'キャンペーンが업데이트されました。'
       )
       setEditModal(false)
       resetForm()
@@ -246,7 +246,7 @@ const AdminCampaignsEnhanced = () => {
       console.error('Update campaign error:', error)
       setError(language === 'ko' 
         ? '캠페인 업데이트에 실패했습니다.'
-        : 'キャンペーンの更新に失敗しました。'
+        : 'キャンペーンの업데이트に실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -275,7 +275,7 @@ const AdminCampaignsEnhanced = () => {
       
       setSuccess(language === 'ko' 
         ? '캠페인이 취소되었습니다.'
-        : 'キャンペーンがキャンセルされました。'
+        : 'キャンペーンが취소されました。'
       )
       setCancelModal(false)
       setCancelReason('')
@@ -287,7 +287,7 @@ const AdminCampaignsEnhanced = () => {
       console.error('Cancel campaign error:', error)
       setError(language === 'ko' 
         ? '캠페인 취소에 실패했습니다.'
-        : 'キャンペーンのキャンセルに失敗しました。'
+        : 'キャンペーンの취소に실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -302,13 +302,13 @@ const AdminCampaignsEnhanced = () => {
         'ID': campaign.id,
         'タイトル': campaign.title,
         'ブランド': campaign.brand,
-        '報酬金額': campaign.reward_amount,
+        '보상金額': campaign.reward_amount,
         '最大参加者': campaign.max_participants,
         '状態': campaign.status,
-        '開始日': campaign.start_date,
-        '終了日': campaign.end_date,
-        '応募締切': campaign.application_deadline,
-        '作成日': new Date(campaign.created_at).toLocaleDateString('ja-JP'),
+        '시작일': campaign.start_date,
+        '종료日': campaign.end_date,
+        '지원締切': campaign.application_deadline,
+        '생성일': new Date(campaign.created_at).toLocaleDateString('ja-JP'),
         'カテゴリー': campaign.category || '',
         'ターゲット': campaign.target_audience || ''
       }))
@@ -331,14 +331,14 @@ const AdminCampaignsEnhanced = () => {
       
       setSuccess(language === 'ko' 
         ? 'Excel 파일이 다운로드되었습니다.'
-        : 'Excelファイルがダウンロードされました。'
+        : 'Excelファイルが다운로드されました。'
       )
       
     } catch (error) {
       console.error('Export error:', error)
       setError(language === 'ko' 
         ? 'Excel 내보내기에 실패했습니다.'
-        : 'Excelエクスポートに失敗しました。'
+        : 'Excelエクスポートに실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -354,10 +354,10 @@ const AdminCampaignsEnhanced = () => {
       const data = campaignApplications.map(app => ({
         'ID': app.id,
         'ユーザーID': app.user_id,
-        'キャンペーンタイトル': app.campaigns?.title || '',
+        '캠페인 제목': app.campaigns?.title || '',
         '状態': app.status,
-        '応募日': new Date(app.created_at).toLocaleDateString('ja-JP'),
-        '更新日': new Date(app.updated_at).toLocaleDateString('ja-JP'),
+        '지원日': new Date(app.created_at).toLocaleDateString('ja-JP'),
+        '업데이트日': new Date(app.updated_at).toLocaleDateString('ja-JP'),
         'SNS Instagram': app.sns_urls?.instagram || '',
         'SNS TikTok': app.sns_urls?.tiktok || '',
         'SNS YouTube': app.sns_urls?.youtube || '',
@@ -383,14 +383,14 @@ const AdminCampaignsEnhanced = () => {
       
       setSuccess(language === 'ko' 
         ? '신청자 Excel 파일이 다운로드되었습니다.'
-        : '応募者Excelファイルがダウンロードされました。'
+        : '지원者Excelファイルが다운로드されました。'
       )
       
     } catch (error) {
       console.error('Export applications error:', error)
       setError(language === 'ko' 
         ? '신청자 Excel 내보내기에 실패했습니다.'
-        : '応募者Excelエクスポートに失敗しました。'
+        : '지원者Excelエクスポートに실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -432,7 +432,7 @@ const AdminCampaignsEnhanced = () => {
           'TikTokフォロワー': profile?.tiktok_followers || '',
           'YouTube': profile?.youtube_url || '',
           'YouTubeフォロワー': profile?.youtube_followers || '',
-          '応募日': new Date(app.created_at).toLocaleDateString('ja-JP'),
+          '지원日': new Date(app.created_at).toLocaleDateString('ja-JP'),
           '状態': app.status
         }
       })
@@ -456,14 +456,14 @@ const AdminCampaignsEnhanced = () => {
       
       setSuccess(language === 'ko' 
         ? '확정 크리에이터 배송 정보 Excel 파일이 다운로드되었습니다.'
-        : '確定クリエイター配送情報Excelファイルがダウンロードされました。'
+        : '확정 크리에이터配送情報Excelファイルが다운로드されました。'
       )
       
     } catch (error) {
       console.error('Export confirmed creators error:', error)
       setError(language === 'ko' 
         ? '확정 크리에이터 Excel 내보내기에 실패했습니다.'
-        : '確定クリエイターExcelエクスポートに失敗しました。'
+        : '확정 크리에이터Excelエクスポートに실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -519,8 +519,8 @@ const AdminCampaignsEnhanced = () => {
       draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: language === 'ko' ? '초안' : '下書き' },
       active: { bg: 'bg-green-100', text: 'text-green-800', label: language === 'ko' ? '활성' : 'アクティブ' },
       paused: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: language === 'ko' ? '일시정지' : '一時停止' },
-      completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: language === 'ko' ? '완료' : '完了' },
-      cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: language === 'ko' ? '취소됨' : 'キャンセル' }
+      completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: language === 'ko' ? '완료' : '완료' },
+      cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: language === 'ko' ? '취소됨' : '취소' }
     }
     
     const style = statusStyles[status] || statusStyles.draft
@@ -570,12 +570,12 @@ const AdminCampaignsEnhanced = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            {language === 'ko' ? '캠페인 관리' : 'キャンペーン管理'}
+            {language === 'ko' ? '캠페인 관리' : '캠페인 관리'}
           </h1>
           <p className="text-gray-600">
             {language === 'ko' 
               ? '캠페인을 생성, 수정, 취소하고 신청자를 관리합니다.'
-              : 'キャンペーンの作成、編集、キャンセル、応募者管理を行います。'
+              : 'キャンペーンの作成、편집、취소、지원者管理を行います。'
             }
           </p>
         </div>
@@ -601,7 +601,7 @@ const AdminCampaignsEnhanced = () => {
             disabled={loading}
           >
             <RefreshCw className="h-4 w-4 mr-2" />
-            {language === 'ko' ? '새로고침' : '更新'}
+            {language === 'ko' ? '새로고침' : '업데이트'}
           </Button>
         </div>
       </div>
@@ -639,23 +639,23 @@ const AdminCampaignsEnhanced = () => {
                   <SelectItem value="draft">{language === 'ko' ? '초안' : '下書き'}</SelectItem>
                   <SelectItem value="active">{language === 'ko' ? '활성' : 'アクティブ'}</SelectItem>
                   <SelectItem value="paused">{language === 'ko' ? '일시정지' : '一時停止'}</SelectItem>
-                  <SelectItem value="completed">{language === 'ko' ? '완료' : '完了'}</SelectItem>
-                  <SelectItem value="cancelled">{language === 'ko' ? '취소됨' : 'キャンセル'}</SelectItem>
+                  <SelectItem value="completed">{language === 'ko' ? '완료' : '완료'}</SelectItem>
+                  <SelectItem value="cancelled">{language === 'ko' ? '취소됨' : '취소'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ko' ? '검색' : '検索'}</Label>
+              <Label>{language === 'ko' ? '검색' : '검색'}</Label>
               <Input
-                placeholder={language === 'ko' ? '캠페인명 또는 브랜드 검색' : 'キャンペーン名またはブランド検索'}
+                placeholder={language === 'ko' ? '캠페인명 또는 브랜드 검색' : '캠페인명またはブランド검색'}
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
               />
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ko' ? '시작일' : '開始日'}</Label>
+              <Label>{language === 'ko' ? '시작일' : '시작일'}</Label>
               <Input
                 type="date"
                 value={filters.dateFrom}
@@ -664,7 +664,7 @@ const AdminCampaignsEnhanced = () => {
             </div>
             
             <div className="space-y-2">
-              <Label>{language === 'ko' ? '종료일' : '終了日'}</Label>
+              <Label>{language === 'ko' ? '종료일' : '종료日'}</Label>
               <Input
                 type="date"
                 value={filters.dateTo}
@@ -722,24 +722,24 @@ const AdminCampaignsEnhanced = () => {
                       <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
                         <div className="space-y-1">
                           <p>
-                            {language === 'ko' ? '보상:' : '報酬:'} {formatCurrency(campaign.reward_amount)}
+                            {language === 'ko' ? '보상:' : '보상:'} {formatCurrency(campaign.reward_amount)}
                           </p>
                           <p>
                             {language === 'ko' ? '최대 참가자:' : '最大参加者:'} {campaign.max_participants}
                           </p>
                           <p>
-                            {language === 'ko' ? '신청자:' : '応募者:'} {campaignApplications.length}
+                            {language === 'ko' ? '신청자:' : '지원者:'} {campaignApplications.length}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <p>
-                            {language === 'ko' ? '승인됨:' : '承認済み:'} {approvedCount}
+                            {language === 'ko' ? '승인됨:' : '승인됨:'} {approvedCount}
                           </p>
                           <p>
-                            {language === 'ko' ? '완료됨:' : '完了:'} {completedCount}
+                            {language === 'ko' ? '완료됨:' : '완료:'} {completedCount}
                           </p>
                           <p>
-                            {language === 'ko' ? '생성일:' : '作成日:'} {formatDate(campaign.created_at)}
+                            {language === 'ko' ? '생성일:' : '생성일:'} {formatDate(campaign.created_at)}
                           </p>
                         </div>
                       </div>
@@ -756,7 +756,7 @@ const AdminCampaignsEnhanced = () => {
                       onClick={() => openEditModal(campaign)}
                     >
                       <Edit className="h-4 w-4 mr-1" />
-                      {language === 'ko' ? '편집' : '編集'}
+                      {language === 'ko' ? '편집' : '편집'}
                     </Button>
                     
                     <Button
@@ -768,7 +768,7 @@ const AdminCampaignsEnhanced = () => {
                       }}
                     >
                       <Users className="h-4 w-4 mr-1" />
-                      {language === 'ko' ? '신청자' : '応募者'} ({campaignApplications.length})
+                      {language === 'ko' ? '신청자' : '지원者'} ({campaignApplications.length})
                     </Button>
                     
                     <Button
@@ -778,7 +778,7 @@ const AdminCampaignsEnhanced = () => {
                       disabled={processing}
                     >
                       <Download className="h-4 w-4 mr-1" />
-                      {language === 'ko' ? '신청자 Excel' : '応募者Excel'}
+                      {language === 'ko' ? '신청자 Excel' : '지원者Excel'}
                     </Button>
                     
                     <Button
@@ -825,7 +825,7 @@ const AdminCampaignsEnhanced = () => {
                         }}
                       >
                         <X className="h-4 w-4 mr-1" />
-                        {language === 'ko' ? '취소' : 'キャンセル'}
+                        {language === 'ko' ? '취소' : '취소'}
                       </Button>
                     )}
                   </div>
@@ -841,7 +841,7 @@ const AdminCampaignsEnhanced = () => {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {language === 'ko' ? '새 캠페인 생성' : '新規キャンペーン作成'}
+              {language === 'ko' ? '새 캠페인 생성' : '新規캠페인 생성'}
             </DialogTitle>
             <DialogDescription>
               {language === 'ko' 
@@ -853,12 +853,12 @@ const AdminCampaignsEnhanced = () => {
           <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="title">{language === 'ko' ? '캠페인 제목' : 'キャンペーンタイトル'}</Label>
+                <Label htmlFor="title">{language === 'ko' ? '캠페인 제목' : '캠페인 제목'}</Label>
                 <Input
                   id="title"
                   value={campaignForm.title}
                   onChange={(e) => setCampaignForm(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder={language === 'ko' ? '캠페인 제목을 입력하세요' : 'キャンペーンタイトルを入力してください'}
+                  placeholder={language === 'ko' ? '캠페인 제목을 입력하세요' : '캠페인 제목を入力してください'}
                 />
               </div>
               
@@ -874,30 +874,30 @@ const AdminCampaignsEnhanced = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="description">{language === 'ko' ? '캠페인 설명' : 'キャンペーン説明'}</Label>
+              <Label htmlFor="description">{language === 'ko' ? '캠페인 설명' : 'キャンペーン설명'}</Label>
               <Textarea
                 id="description"
                 value={campaignForm.description}
                 onChange={(e) => setCampaignForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder={language === 'ko' ? '캠페인에 대한 자세한 설명을 입력하세요' : 'キャンペーンの詳細説明を入力してください'}
+                placeholder={language === 'ko' ? '캠페인에 대한 자세한 설명을 입력하세요' : 'キャンペーンの상세설명を入力してください'}
                 rows={3}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="requirements">{language === 'ko' ? '참가 요건' : '参加要件'}</Label>
+              <Label htmlFor="requirements">{language === 'ko' ? '참가 요건' : '参加要건'}</Label>
               <Textarea
                 id="requirements"
                 value={campaignForm.requirements}
                 onChange={(e) => setCampaignForm(prev => ({ ...prev, requirements: e.target.value }))}
-                placeholder={language === 'ko' ? '참가자가 충족해야 할 요건을 입력하세요' : '参加者が満たすべき要件を入力してください'}
+                placeholder={language === 'ko' ? '참가자가 충족해야 할 요건을 입력하세요' : '参加者が満たすべき要건を入力してください'}
                 rows={3}
               />
             </div>
             
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="reward_amount">{language === 'ko' ? '보상 금액 (JPY)' : '報酬金額 (JPY)'}</Label>
+                <Label htmlFor="reward_amount">{language === 'ko' ? '보상 금액 (JPY)' : '보상金額 (JPY)'}</Label>
                 <Input
                   id="reward_amount"
                   type="number"
@@ -923,7 +923,7 @@ const AdminCampaignsEnhanced = () => {
             
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="start_date">{language === 'ko' ? '시작일' : '開始日'}</Label>
+                <Label htmlFor="start_date">{language === 'ko' ? '시작일' : '시작일'}</Label>
                 <Input
                   id="start_date"
                   type="date"
@@ -933,7 +933,7 @@ const AdminCampaignsEnhanced = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="end_date">{language === 'ko' ? '종료일' : '終了日'}</Label>
+                <Label htmlFor="end_date">{language === 'ko' ? '종료일' : '종료日'}</Label>
                 <Input
                   id="end_date"
                   type="date"
@@ -943,7 +943,7 @@ const AdminCampaignsEnhanced = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="application_deadline">{language === 'ko' ? '신청 마감일' : '応募締切日'}</Label>
+                <Label htmlFor="application_deadline">{language === 'ko' ? '신청 마감일' : '지원締切日'}</Label>
                 <Input
                   id="application_deadline"
                   type="date"
@@ -1010,7 +1010,7 @@ const AdminCampaignsEnhanced = () => {
                 id="special_instructions"
                 value={campaignForm.special_instructions}
                 onChange={(e) => setCampaignForm(prev => ({ ...prev, special_instructions: e.target.value }))}
-                placeholder={language === 'ko' ? '크리에이터에게 전달할 특별한 지시사항이 있다면 입력하세요' : 'クリエイターに伝える特別な指示事項があれば入力してください'}
+                placeholder={language === 'ko' ? '크리에이터에게 전달할 특별한 지시사항이 있다면 입력하세요' : '크리에이터に伝える特別な指示事項があれば入力してください'}
                 rows={3}
               />
             </div>
@@ -1026,7 +1026,7 @@ const AdminCampaignsEnhanced = () => {
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                {language === 'ko' ? '캠페인 생성' : 'キャンペーン作成'}
+                {language === 'ko' ? '캠페인 생성' : '캠페인 생성'}
               </Button>
               <Button
                 variant="outline"
@@ -1035,7 +1035,7 @@ const AdminCampaignsEnhanced = () => {
                   resetForm()
                 }}
               >
-                {language === 'ko' ? '취소' : 'キャンセル'}
+                {language === 'ko' ? '취소' : '취소'}
               </Button>
             </div>
           </div>
@@ -1047,12 +1047,12 @@ const AdminCampaignsEnhanced = () => {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {language === 'ko' ? '캠페인 편집' : 'キャンペーン編集'}
+              {language === 'ko' ? '캠페인 편집' : 'キャンペーン편집'}
             </DialogTitle>
             <DialogDescription>
               {language === 'ko' 
                 ? '캠페인 정보를 수정하세요.'
-                : 'キャンペーン情報を編集してください。'
+                : 'キャンペーン情報を편집してください。'
               }
             </DialogDescription>
           </DialogHeader>
@@ -1060,12 +1060,12 @@ const AdminCampaignsEnhanced = () => {
             {/* 편집 폼 내용은 생성 폼과 동일하므로 생략 */}
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit_title">{language === 'ko' ? '캠페인 제목' : 'キャンペーンタイトル'}</Label>
+                <Label htmlFor="edit_title">{language === 'ko' ? '캠페인 제목' : '캠페인 제목'}</Label>
                 <Input
                   id="edit_title"
                   value={campaignForm.title}
                   onChange={(e) => setCampaignForm(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder={language === 'ko' ? '캠페인 제목을 입력하세요' : 'キャンペーンタイトルを入力してください'}
+                  placeholder={language === 'ko' ? '캠페인 제목을 입력하세요' : '캠페인 제목を入力してください'}
                 />
               </div>
               
@@ -1093,7 +1093,7 @@ const AdminCampaignsEnhanced = () => {
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                {language === 'ko' ? '변경사항 저장' : '変更を保存'}
+                {language === 'ko' ? '변경사항 저장' : '変更を저장'}
               </Button>
               <Button
                 variant="outline"
@@ -1102,7 +1102,7 @@ const AdminCampaignsEnhanced = () => {
                   resetForm()
                 }}
               >
-                {language === 'ko' ? '취소' : 'キャンセル'}
+                {language === 'ko' ? '취소' : '취소'}
               </Button>
             </div>
           </div>
@@ -1114,12 +1114,12 @@ const AdminCampaignsEnhanced = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {language === 'ko' ? '캠페인 취소' : 'キャンペーンキャンセル'}
+              {language === 'ko' ? '캠페인 취소' : 'キャンペーン취소'}
             </DialogTitle>
             <DialogDescription>
               {language === 'ko' 
                 ? '캠페인을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
-                : 'キャンペーンをキャンセルしますか？この操作は元に戻せません。'
+                : 'キャンペーンを취소しますか？この操作は元に戻せません。'
               }
             </DialogDescription>
           </DialogHeader>
@@ -1133,13 +1133,13 @@ const AdminCampaignsEnhanced = () => {
             
             <div className="space-y-2">
               <Label htmlFor="cancelReason">
-                {language === 'ko' ? '취소 사유' : 'キャンセル理由'}
+                {language === 'ko' ? '취소 사유' : '취소理由'}
               </Label>
               <Textarea
                 id="cancelReason"
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                placeholder={language === 'ko' ? '취소 사유를 입력하세요' : 'キャンセル理由を入力してください'}
+                placeholder={language === 'ko' ? '취소 사유를 입력하세요' : '취소理由を入力してください'}
                 rows={3}
               />
             </div>
@@ -1156,7 +1156,7 @@ const AdminCampaignsEnhanced = () => {
                 ) : (
                   <X className="h-4 w-4 mr-2" />
                 )}
-                {language === 'ko' ? '캠페인 취소' : 'キャンペーンキャンセル'}
+                {language === 'ko' ? '캠페인 취소' : 'キャンペーン취소'}
               </Button>
               <Button
                 variant="outline"
@@ -1165,7 +1165,7 @@ const AdminCampaignsEnhanced = () => {
                   setCancelReason('')
                 }}
               >
-                {language === 'ko' ? '돌아가기' : '戻る'}
+                {language === 'ko' ? '돌아가기' : '돌아가기'}
               </Button>
             </div>
           </div>

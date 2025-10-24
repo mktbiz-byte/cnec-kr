@@ -41,21 +41,21 @@ const AdminHeader = ({ title, subtitle }) => {
       snsUploads: 'SNS 업로드'
     },
     ja: {
-      adminDashboard: 'CNEC 管理者ダッシュボード',
+      adminDashboard: 'CNEC 관리자대시보드',
       language: '言語',
       korean: '한국어',
       japanese: '日本語',
-      backToSite: 'サイトに戻る',
-      logout: 'ログアウト',
+      backToSite: 'サイトに돌아가기',
+      logout: '로그아웃',
       menu: 'メニュー',
-      dashboard: 'ダッシュボード',
-      campaigns: 'キャンペーン管理',
-      applications: '応募管理',
-      users: 'ユーザー承認',
-      withdrawals: '出金管理',
-      emailTemplates: 'メールテンプレート',
-      confirmedCreators: '確定クリエイター',
-      snsUploads: 'SNSアップロード'
+      dashboard: '대시보드',
+      campaigns: '캠페인 관리',
+      applications: '지원 관리',
+      users: '사용자 승인',
+      withdrawals: '출금 관리',
+      emailTemplates: '이메일 템플릿',
+      confirmedCreators: '확정 크리에이터',
+      snsUploads: 'SNS 업로드'
     }
   }
 

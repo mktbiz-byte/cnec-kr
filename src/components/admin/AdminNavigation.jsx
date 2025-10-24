@@ -34,16 +34,16 @@ const AdminNavigation = () => {
       settings: '시스템 설정'
     },
     ja: {
-      dashboard: 'ダッシュボード',
-      campaigns: 'キャンペーン管理',
+      dashboard: '대시보드',
+      campaigns: '캠페인 관리',
       applications: '申請書管理',
-      confirmedCreators: '確定クリエイター',
-      snsUploads: 'SNSアップロード',
-      users: 'ユーザー承認',
-      withdrawals: '出金管理',
-      emailTemplates: 'メールテンプレート',
+      confirmedCreators: '확정 크리에이터',
+      snsUploads: 'SNS 업로드',
+      users: '사용자 승인',
+      withdrawals: '출금 관리',
+      emailTemplates: '이메일 템플릿',
       statistics: '統計分析',
-      settings: 'システム設定'
+      settings: 'システム설정'
     }
   }
 

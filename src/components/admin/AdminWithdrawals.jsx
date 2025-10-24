@@ -110,28 +110,28 @@ const AdminWithdrawals = () => {
       emailSendFailed: '메일 발송에 실패했습니다'
     },
     ja: {
-      title: '出金管理',
-      subtitle: 'ユーザーの出金リクエストを管理します',
-      withdrawalRequests: '出金リクエスト',
+      title: '출금 관리',
+      subtitle: 'ユーザーの출금リクエストを管理します',
+      withdrawalRequests: '출금リクエスト',
       bankTransfers: '銀行振込',
       totalRequests: '総リクエスト',
       pending: '待機中',
-      approved: '承認済み',
+      approved: '승인됨',
       rejected: '拒否済み',
-      completed: '完了済み',
+      completed: '완료済み',
       statusFilter: 'ステータス別フィルター',
       allStatuses: 'すべてのステータス',
-      search: '検索',
-      searchPlaceholder: 'ユーザー名、メールで検索...',
-      refresh: '更新',
+      search: '검색',
+      searchPlaceholder: 'ユーザー名、メールで검색...',
+      refresh: '업데이트',
       export: 'Excel エクスポート',
-      viewDetails: '詳細を見る',
+      viewDetails: '상세を見る',
       process: '処理する',
-      approve: '承認',
+      approve: '승인',
       reject: '拒否',
-      complete: '完了',
-      bulkApprove: '選択項目を承認',
-      bulkComplete: '選択項目を完了',
+      complete: '완료',
+      bulkApprove: '選択項目を승인',
+      bulkComplete: '選択項目を완료',
       selectAll: '全て選択',
       selected: '個選択中',
       rejectWithReason: '拒否理由選択',
@@ -139,10 +139,10 @@ const AdminWithdrawals = () => {
       selectReason: '理由を選択してください',
       customReason: '直接入力',
       customReasonPlaceholder: '拒否理由を直接入力してください...',
-      sendRejectEmail: '拒否メール送信',
-      cancel: 'キャンセル',
-      emailSent: '拒否メールが送信されました',
-      emailSendFailed: 'メール送信に失敗しました'
+      sendRejectEmail: '拒否メール전송',
+      cancel: '취소',
+      emailSent: '拒否メールが전송されました',
+      emailSendFailed: 'メール전송に실패했습니다'
     }
   }
 
@@ -747,7 +747,7 @@ const AdminWithdrawals = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          ¥{withdrawal.amount?.toLocaleString()}
+                          ₩{withdrawal.amount?.toLocaleString()}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -862,7 +862,7 @@ const AdminWithdrawals = () => {
                   <strong>사용자:</strong> {rejectForm.userName} ({rejectForm.userEmail})
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>출금 금액:</strong> ¥{rejectForm.amount?.toLocaleString()}
+                  <strong>출금 금액:</strong> ₩{rejectForm.amount?.toLocaleString()}
                 </p>
               </div>
 

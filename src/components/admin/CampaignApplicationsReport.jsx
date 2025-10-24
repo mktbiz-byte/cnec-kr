@@ -77,7 +77,7 @@ const CampaignApplicationsReport = () => {
       
     } catch (error) {
       console.error('Load data error:', error)
-      setError('データの読み込みに失敗しました。')
+      setError('データの読み込みに실패했습니다。')
     } finally {
       setLoading(false)
     }
@@ -93,12 +93,12 @@ const CampaignApplicationsReport = () => {
         reviewed_at: new Date().toISOString()
       })
       
-      setSuccess(`ステータスを「${getStatusText(newStatus)}」に更新しました。`)
+      setSuccess(`ステータスを「${getStatusText(newStatus)}」に업데이트しました。`)
       loadData()
       
     } catch (error) {
       console.error('Status update error:', error)
-      setError('ステータスの更新に失敗しました。')
+      setError('ステータスの업데이트に실패했습니다。')
     } finally {
       setProcessing(false)
     }
@@ -114,13 +114,13 @@ const CampaignApplicationsReport = () => {
         drive_shared_at: new Date().toISOString()
       })
       
-      setSuccess('Google Drive リンクを更新しました。')
+      setSuccess('Google Drive リンクを업데이트しました。')
       setDriveModal(false)
       loadData()
       
     } catch (error) {
       console.error('Drive links update error:', error)
-      setError('Google Drive リンクの更新に失敗しました。')
+      setError('Google Drive リンクの업데이트に실패했습니다。')
     } finally {
       setProcessing(false)
     }
@@ -138,9 +138,9 @@ const CampaignApplicationsReport = () => {
   const getStatusBadge = (status) => {
     const statusConfig = {
       pending: { color: 'bg-yellow-100 text-yellow-800', text: '審査中' },
-      approved: { color: 'bg-green-100 text-green-800', text: '承認済み' },
-      rejected: { color: 'bg-red-100 text-red-800', text: '却下' },
-      completed: { color: 'bg-blue-100 text-blue-800', text: '完了' }
+      approved: { color: 'bg-green-100 text-green-800', text: '승인됨' },
+      rejected: { color: 'bg-red-100 text-red-800', text: '거부됨' },
+      completed: { color: 'bg-blue-100 text-blue-800', text: '완료' }
     }
     
     const config = statusConfig[status] || statusConfig.pending
@@ -150,9 +150,9 @@ const CampaignApplicationsReport = () => {
   const getStatusText = (status) => {
     const statusTexts = {
       pending: '審査中',
-      approved: '承認済み',
-      rejected: '却下',
-      completed: '完了'
+      approved: '승인됨',
+      rejected: '거부됨',
+      completed: '완료'
     }
     return statusTexts[status] || '審査中'
   }
@@ -166,7 +166,7 @@ const CampaignApplicationsReport = () => {
 
   const exportToExcel = () => {
     // Excel 내보내기 기능 (간단한 CSV 형태)
-    const headers = ['名前', 'メール', '年齢', '肌タイプ', 'Instagram', 'TikTok', 'YouTube', 'ステータス', '応募日']
+    const headers = ['名前', 'メール', '年齢', '肌タイプ', 'Instagram', 'TikTok', 'YouTube', 'ステータス', '지원日']
     const rows = filteredApplications.map(app => {
       const profile = userProfiles[app.user_id]
       return [
@@ -200,7 +200,7 @@ const CampaignApplicationsReport = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">応募者データを読み込み中...</p>
+          <p className="text-gray-600">지원者データを로딩 중...</p>
         </div>
       </div>
     )
@@ -213,7 +213,7 @@ const CampaignApplicationsReport = () => {
         <h3 className="text-lg font-semibold text-gray-600 mb-2">キャンペーンが見つかりません</h3>
         <Button onClick={() => navigate('/campaigns-manage')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          キャンペーン一覧に戻る
+          キャンペーン목록に돌아가기
         </Button>
       </div>
     )
@@ -226,7 +226,7 @@ const CampaignApplicationsReport = () => {
         <div>
           <Button variant="outline" onClick={() => navigate('/campaigns-manage')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            キャンペーン一覧に戻る
+            キャンペーン목록に돌아가기
           </Button>
         </div>
         <div className="flex space-x-2">
@@ -251,7 +251,7 @@ const CampaignApplicationsReport = () => {
               <div className="text-2xl font-bold text-green-600">
                 {formatCurrency(campaign.reward_amount)}
               </div>
-              <div className="text-sm text-gray-600">報酬</div>
+              <div className="text-sm text-gray-600">보상</div>
             </div>
           </div>
         </CardHeader>
@@ -260,13 +260,13 @@ const CampaignApplicationsReport = () => {
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-gray-500" />
               <span className="text-sm">
-                <strong>応募者:</strong> {applications.length}名
+                <strong>지원者:</strong> {applications.length}名
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
               <span className="text-sm">
-                <strong>承認済み:</strong> {applications.filter(app => app.status === 'approved').length}名
+                <strong>승인됨:</strong> {applications.filter(app => app.status === 'approved').length}名
               </span>
             </div>
             <div className="flex items-center space-x-2">
@@ -297,9 +297,9 @@ const CampaignApplicationsReport = () => {
               <SelectContent>
                 <SelectItem value="all">全て ({applications.length})</SelectItem>
                 <SelectItem value="pending">審査中 ({applications.filter(app => app.status === 'pending').length})</SelectItem>
-                <SelectItem value="approved">承認済み ({applications.filter(app => app.status === 'approved').length})</SelectItem>
-                <SelectItem value="rejected">却下 ({applications.filter(app => app.status === 'rejected').length})</SelectItem>
-                <SelectItem value="completed">完了 ({applications.filter(app => app.status === 'completed').length})</SelectItem>
+                <SelectItem value="approved">승인됨 ({applications.filter(app => app.status === 'approved').length})</SelectItem>
+                <SelectItem value="rejected">거부됨 ({applications.filter(app => app.status === 'rejected').length})</SelectItem>
+                <SelectItem value="completed">완료 ({applications.filter(app => app.status === 'completed').length})</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -386,7 +386,7 @@ const CampaignApplicationsReport = () => {
                       }}
                     >
                       <Eye className="h-4 w-4 mr-2" />
-                      詳細
+                      상세
                     </Button>
                     
                     {application.status === 'pending' && (
@@ -398,7 +398,7 @@ const CampaignApplicationsReport = () => {
                           className="bg-green-600 hover:bg-green-700"
                         >
                           <Check className="h-4 w-4 mr-2" />
-                          承認
+                          승인
                         </Button>
                         <Button
                           variant="outline"
@@ -407,7 +407,7 @@ const CampaignApplicationsReport = () => {
                           disabled={processing}
                         >
                           <X className="h-4 w-4 mr-2" />
-                          却下
+                          거부됨
                         </Button>
                       </>
                     )}
@@ -435,11 +435,11 @@ const CampaignApplicationsReport = () => {
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">応募者がいません</h3>
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">지원者がいません</h3>
               <p className="text-gray-500">
                 {statusFilter === 'all' 
-                  ? 'このキャンペーンにはまだ応募者がいません'
-                  : `「${getStatusText(statusFilter)}」の応募者がいません`
+                  ? 'このキャンペーンにはまだ지원者がいません'
+                  : `「${getStatusText(statusFilter)}」の지원者がいません`
                 }
               </p>
             </div>
@@ -451,9 +451,9 @@ const CampaignApplicationsReport = () => {
       <Dialog open={detailModal} onOpenChange={setDetailModal}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>応募詳細</DialogTitle>
+            <DialogTitle>지원상세</DialogTitle>
             <DialogDescription>
-              応募者の詳細情報を確認してください
+              지원者の상세情報を확인してください
             </DialogDescription>
           </DialogHeader>
           {selectedApplication && (
@@ -462,7 +462,7 @@ const CampaignApplicationsReport = () => {
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="basic">基本情報</TabsTrigger>
                   <TabsTrigger value="sns">SNS情報</TabsTrigger>
-                  <TabsTrigger value="application">応募内容</TabsTrigger>
+                  <TabsTrigger value="application">지원内容</TabsTrigger>
                   <TabsTrigger value="questions">質問回答</TabsTrigger>
                 </TabsList>
                 
@@ -556,7 +556,7 @@ const CampaignApplicationsReport = () => {
                 <TabsContent value="application" className="space-y-4">
                   <div className="space-y-4">
                     <div>
-                      <Label>応募動機</Label>
+                      <Label>지원動機</Label>
                       <p className="mt-2 p-3 bg-gray-50 rounded-lg">{selectedApplication.motivation || 'N/A'}</p>
                     </div>
                     <div>
@@ -601,7 +601,7 @@ const CampaignApplicationsReport = () => {
           <DialogHeader>
             <DialogTitle>Google Drive 管理</DialogTitle>
             <DialogDescription>
-              承認されたクリエイターに共有するGoogle DriveとSlidesのリンクを設定してください
+              승인された크리에이터に共有するGoogle DriveとSlidesのリンクを설정してください
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -653,13 +653,13 @@ const CampaignApplicationsReport = () => {
                 ) : (
                   <Check className="h-4 w-4 mr-2" />
                 )}
-                リンクを保存
+                リンクを저장
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setDriveModal(false)}
               >
-                キャンセル
+                취소
               </Button>
             </div>
           </div>

@@ -56,27 +56,27 @@ const ApplicationsReportSimple = () => {
       subtitle: 'すべてのキャンペーン申請書を管理します',
       totalApplications: '総申請書',
       pendingApplications: '待機中',
-      approvedApplications: '承認済み',
+      approvedApplications: '승인됨',
       rejectedApplications: '拒否済み',
       filterByCampaign: 'キャンペーン別フィルター',
       filterByStatus: 'ステータス別フィルター',
       allCampaigns: 'すべてのキャンペーン',
       allStatuses: 'すべてのステータス',
       pending: '待機中',
-      approved: '承認済み',
+      approved: '승인됨',
       rejected: '拒否済み',
-      completed: '完了済み',
-      viewDetails: '詳細表示',
-      approve: '承認',
+      completed: '완료済み',
+      viewDetails: '상세표시',
+      approve: '승인',
       reject: '拒否',
-      backToDashboard: 'ダッシュボードに戻る',
-      loading: 'データを読み込み中...',
-      error: 'データの読み込みに失敗しました。',
+      backToDashboard: '대시보드に돌아가기',
+      loading: 'データを로딩 중...',
+      error: 'データの読み込みに실패했습니다。',
       noApplications: '申請書がありません。',
-      applicationDetails: '申請書詳細情報',
+      applicationDetails: '申請書상세情報',
       campaignInfo: 'キャンペーン情報',
       applicantInfo: '申請者情報',
-      close: '閉じる'
+      close: '닫기'
     }
   }
 
@@ -113,7 +113,7 @@ const ApplicationsReportSimple = () => {
       
     } catch (error) {
       console.error('Load data error:', error)
-      setError('データの読み込みに失敗しました。')
+      setError('データの読み込みに실패했습니다。')
     } finally {
       setLoading(false)
     }
@@ -134,7 +134,7 @@ const ApplicationsReportSimple = () => {
       
     } catch (error) {
       console.error('Virtual selection error:', error)
-      setError('仮選択の更新に失敗しました。')
+      setError('仮選択の업데이트に실패했습니다。')
     } finally {
       setProcessing(false)
     }
@@ -156,7 +156,7 @@ const ApplicationsReportSimple = () => {
       
     } catch (error) {
       console.error('Final confirmation error:', error)
-      setError('最終確定に失敗しました。')
+      setError('最終確定に실패했습니다。')
     } finally {
       setProcessing(false)
     }
@@ -169,9 +169,9 @@ const ApplicationsReportSimple = () => {
     
     const statusConfig = {
       pending: { color: 'bg-yellow-100 text-yellow-800', text: '審査中' },
-      approved: { color: 'bg-green-100 text-green-800', text: '承認済み' },
-      rejected: { color: 'bg-red-100 text-red-800', text: '却下' },
-      completed: { color: 'bg-blue-100 text-blue-800', text: '完了' }
+      approved: { color: 'bg-green-100 text-green-800', text: '승인됨' },
+      rejected: { color: 'bg-red-100 text-red-800', text: '거부됨' },
+      completed: { color: 'bg-blue-100 text-blue-800', text: '완료' }
     }
     
     const config = statusConfig[status] || statusConfig.pending
@@ -186,7 +186,7 @@ const ApplicationsReportSimple = () => {
   }
 
   const exportToExcel = () => {
-    const headers = ['名前', '年齢', '肌タイプ', 'Instagram', 'TikTok', 'YouTube', 'ステータス', '応募日']
+    const headers = ['名前', '年齢', '肌タイプ', 'Instagram', 'TikTok', 'YouTube', 'ステータス', '지원日']
     const rows = filteredApplications.map(app => {
       const profile = userProfiles[app.user_id]
       return [
@@ -196,7 +196,7 @@ const ApplicationsReportSimple = () => {
         profile?.instagram_url || 'N/A',
         profile?.tiktok_url || 'N/A',
         profile?.youtube_url || 'N/A',
-        app.virtual_selected ? '仮選択' : (app.status === 'approved' ? '承認済み' : '審査中'),
+        app.virtual_selected ? '仮選択' : (app.status === 'approved' ? '승인됨' : '審査中'),
         new Date(app.created_at).toLocaleDateString('ja-JP')
       ]
     })
@@ -238,7 +238,7 @@ const ApplicationsReportSimple = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">応募者データを読み込み中...</p>
+          <p className="text-gray-600">지원者データを로딩 중...</p>
         </div>
       </div>
     )
@@ -251,8 +251,8 @@ const ApplicationsReportSimple = () => {
         {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">キャンペーン応募管理</h1>
-          <p className="text-gray-600">全てのキャンペーン応募を管理します</p>
+          <h1 className="text-2xl font-bold text-gray-800">キャンペーン지원 관리</h1>
+          <p className="text-gray-600">全てのキャンペーン지원を管理します</p>
         </div>
         <div className="flex space-x-2">
           <Button onClick={exportToExcel} variant="outline">
@@ -265,14 +265,14 @@ const ApplicationsReportSimple = () => {
       {/* Summary Stats */}
       <Card>
         <CardHeader>
-          <CardTitle>応募統計</CardTitle>
+          <CardTitle>지원統計</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-4 gap-4">
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-gray-500" />
               <span className="text-sm">
-                <strong>総応募者:</strong> {filteredApplications.length}名
+                <strong>総지원者:</strong> {filteredApplications.length}名
               </span>
             </div>
             <div className="flex items-center space-x-2">
@@ -284,13 +284,13 @@ const ApplicationsReportSimple = () => {
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
               <span className="text-sm">
-                <strong>承認済み:</strong> {filteredApplications.filter(app => app.status === 'approved').length}名
+                <strong>승인됨:</strong> {filteredApplications.filter(app => app.status === 'approved').length}名
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <FileText className="h-5 w-5 text-blue-500" />
               <span className="text-sm">
-                <strong>キャンペーン数:</strong> {campaigns.length}件
+                <strong>キャンペーン数:</strong> {campaigns.length}건
               </span>
             </div>
           </div>
@@ -329,7 +329,7 @@ const ApplicationsReportSimple = () => {
                 size="sm"
                 onClick={() => setStatusFilter('approved')}
               >
-                承認済み ({applications.filter(app => app.status === 'approved').length})
+                승인됨 ({applications.filter(app => app.status === 'approved').length})
               </Button>
             </div>
             
@@ -396,7 +396,7 @@ const ApplicationsReportSimple = () => {
                         </Badge>
                         {campaign?.reward_amount && (
                           <span className="text-sm text-green-600 font-medium">
-                            ¥{campaign.reward_amount.toLocaleString()}
+                            ₩{campaign.reward_amount.toLocaleString()}
                           </span>
                         )}
                       </div>
@@ -410,7 +410,7 @@ const ApplicationsReportSimple = () => {
                         <span className="font-medium">肌タイプ:</span> {application.user_profiles?.skin_type || 'N/A'}
                       </div>
                       <div>
-                        <span className="font-medium">応募日:</span> {new Date(application.created_at).toLocaleDateString('ja-JP')}
+                        <span className="font-medium">지원日:</span> {new Date(application.created_at).toLocaleDateString('ja-JP')}
                       </div>
                     </div>
                     
@@ -473,7 +473,7 @@ const ApplicationsReportSimple = () => {
                       }}
                     >
                       <Eye className="h-4 w-4 mr-2" />
-                      詳細
+                      상세
                     </Button>
                     
                     {application.status === 'pending' && !application.virtual_selected && (
@@ -523,11 +523,11 @@ const ApplicationsReportSimple = () => {
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">応募者がいません</h3>
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">지원者がいません</h3>
               <p className="text-gray-500">
                 {statusFilter === 'all' 
-                  ? 'このキャンペーンにはまだ応募者がいません'
-                  : `フィルター条件に該当する応募者がいません`
+                  ? 'このキャンペーンにはまだ지원者がいません'
+                  : `フィルター条건に該当する지원者がいません`
                 }
               </p>
             </div>
@@ -539,9 +539,9 @@ const ApplicationsReportSimple = () => {
       <Dialog open={detailModal} onOpenChange={setDetailModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>応募者詳細</DialogTitle>
+            <DialogTitle>지원者상세</DialogTitle>
             <DialogDescription>
-              応募者の詳細情報を確認してください
+              지원者の상세情報を확인してください
             </DialogDescription>
           </DialogHeader>
           {selectedApplication && (
@@ -560,7 +560,7 @@ const ApplicationsReportSimple = () => {
                   <p>{userProfiles[selectedApplication.user_id]?.skin_type || 'N/A'}</p>
                 </div>
                 <div>
-                  <span className="font-medium">応募日:</span>
+                  <span className="font-medium">지원日:</span>
                   <p>{new Date(selectedApplication.created_at).toLocaleDateString('ja-JP')}</p>
                 </div>
               </div>

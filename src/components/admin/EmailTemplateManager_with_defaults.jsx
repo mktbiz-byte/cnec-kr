@@ -16,64 +16,64 @@ const EmailTemplateManager = () => {
   const defaultTemplates = [
     {
       id: 'welcome',
-      name: language === 'ja' ? '会員登録完了メール' : '회원가입 완료 메일',
-      subject: language === 'ja' ? 'CNEC Japan へようこそ！' : 'CNEC Japan에 오신 것을 환영합니다!',
+      name: language === 'ja' ? '会員登録완료メール' : '회원가입 완료 메일',
+      subject: language === 'ja' ? 'CNEC Korea へようこそ！' : 'CNEC Korea에 오신 것을 환영합니다!',
       content: language === 'ja' ? 
         `こんにちは {{name}} さん、
 
-CNEC Japan へのご登録ありがとうございます！
+CNEC Korea へのご登録ありがとうございます！
 
 あなたのアカウントが正常に作成されました。
 これからK-Beautyブランドの最新キャンペーンに参加して、あなたの影響力を収益化しましょう。
 
 ご質問がございましたら、いつでもお気軽にお問い合わせください。
 
-CNEC Japan チーム` :
+CNEC Korea チーム` :
         `안녕하세요 {{name}}님,
 
-CNEC Japan에 가입해주셔서 감사합니다!
+CNEC Korea에 가입해주셔서 감사합니다!
 
 계정이 성공적으로 생성되었습니다.
 이제 K-Beauty 브랜드의 최신 캠페인에 참여하여 여러분의 영향력을 수익화해보세요.
 
 궁금한 점이 있으시면 언제든지 문의해주세요.
 
-CNEC Japan 팀`,
+CNEC Korea 팀`,
       variables: ['name', 'email'],
       category: 'user'
     },
     {
       id: 'campaign_approved',
-      name: language === 'ja' ? 'キャンペーン承認通知' : '캠페인 승인 알림',
+      name: language === 'ja' ? 'キャンペーン승인通知' : '캠페인 승인 알림',
       subject: language === 'ja' ? '🎉 キャンペーンに選ばれました！' : '🎉 캠페인에 선정되셨습니다!',
       content: language === 'ja' ? 
         `おめでとうございます {{name}} さん！
 
 「{{campaign_title}}」キャンペーンに選ばれました！
 
-キャンペーン詳細:
+キャンペーン상세:
 - ブランド: {{brand_name}}
-- 報酬: ¥{{reward_amount}}
+- 보상: ₩{{reward_amount}}
 - 締切: {{deadline}}
 
 次のステップ:
-1. 添付のガイドラインをご確認ください
+1. 添付のガイドラインをご확인ください
 2. コンテンツ制作を開始してください
-3. 期限内に投稿を完了してください
+3. 期限内に投稿を완료してください
 
 ガイドライン: {{guidelines_url}}
-アップロードフォルダ: {{upload_folder}}
+업로드フォルダ: {{upload_folder}}
 
 頑張ってください！
 
-CNEC Japan チーム` :
+CNEC Korea チーム` :
         `축하합니다 {{name}}님!
 
 「{{campaign_title}}」 캠페인에 선정되셨습니다!
 
 캠페인 상세정보:
 - 브랜드: {{brand_name}}
-- 보상금: ¥{{reward_amount}}
+- 보상금: ₩{{reward_amount}}
 - 마감일: {{deadline}}
 
 다음 단계:
@@ -86,26 +86,26 @@ CNEC Japan チーム` :
 
 화이팅!
 
-CNEC Japan 팀`,
+CNEC Korea 팀`,
       variables: ['name', 'campaign_title', 'brand_name', 'reward_amount', 'deadline', 'guidelines_url', 'upload_folder'],
       category: 'campaign'
     },
     {
       id: 'campaign_rejected',
       name: language === 'ja' ? 'キャンペーン不採用通知' : '캠페인 불합격 알림',
-      subject: language === 'ja' ? 'キャンペーン選考結果について' : '캠페인 선정 결과 안내',
+      subject: language === 'ja' ? 'キャンペーン선발結果について' : '캠페인 선정 결과 안내',
       content: language === 'ja' ? 
         `{{name}} さん、
 
-「{{campaign_title}}」キャンペーンにご応募いただき、ありがとうございました。
+「{{campaign_title}}」キャンペーンにご지원いただき、ありがとうございました。
 
-慎重に検討させていただきましたが、今回は他の応募者を選ばせていただくことになりました。
+慎重に検討させていただきましたが、今回は他の지원者を選ばせていただくことになりました。
 
-今回はご期待に添えず申し訳ございませんが、今後も新しいキャンペーンを随時公開予定ですので、ぜひまたご応募ください。
+今回はご期待に添えず申し訳ございませんが、今後も新しいキャンペーンを随時公開予定ですので、ぜひまたご지원ください。
 
 あなたのクリエイティブな活動を応援しています。
 
-CNEC Japan チーム` :
+CNEC Korea チーム` :
         `{{name}}님,
 
 「{{campaign_title}}」 캠페인에 지원해주셔서 감사합니다.
@@ -116,35 +116,35 @@ CNEC Japan チーム` :
 
 여러분의 창의적인 활동을 응원합니다.
 
-CNEC Japan 팀`,
+CNEC Korea 팀`,
       variables: ['name', 'campaign_title'],
       category: 'campaign'
     },
     {
       id: 'withdrawal_approved',
-      name: language === 'ja' ? '出金承認通知' : '출금 승인 알림',
-      subject: language === 'ja' ? '💰 出金申請が承認されました' : '💰 출금 신청이 승인되었습니다',
+      name: language === 'ja' ? '출금승인通知' : '출금 승인 알림',
+      subject: language === 'ja' ? '💰 출금申請が승인されました' : '💰 출금 신청이 승인되었습니다',
       content: language === 'ja' ? 
         `{{name}} さん、
 
-出金申請が承認されました！
+출금申請が승인されました！
 
-出金詳細:
-- 金額: ¥{{amount}}
+출금상세:
+- 金額: ₩{{amount}}
 - 振込先: {{bank_info}}
 - 処理日: {{process_date}}
 
-通常、承認後 3-5営業日以内にお客様の口座に振り込まれます。
+通常、승인後 3-5営業日以内にお客様の口座に振り込まれます。
 
 ご不明な点がございましたら、お気軽にお問い合わせください。
 
-CNEC Japan チーム` :
+CNEC Korea チーム` :
         `{{name}}님,
 
 출금 신청이 승인되었습니다!
 
 출금 상세정보:
-- 금액: ¥{{amount}}
+- 금액: ₩{{amount}}
 - 입금 계좌: {{bank_info}}
 - 처리일: {{process_date}}
 
@@ -152,7 +152,7 @@ CNEC Japan チーム` :
 
 궁금한 점이 있으시면 언제든지 문의해주세요.
 
-CNEC Japan 팀`,
+CNEC Korea 팀`,
       variables: ['name', 'amount', 'bank_info', 'process_date'],
       category: 'financial'
     },
@@ -168,14 +168,14 @@ CNEC Japan 팀`,
 締切: {{deadline}}
 残り時間: {{time_remaining}}
 
-まだ投稿を完了していない場合は、お早めに投稿をお願いいたします。
+まだ投稿を완료していない場合は、お早めに投稿をお願いいたします。
 
-投稿要件:
+投稿要건:
 {{requirements}}
 
 ご質問がございましたら、お気軽にお問い合わせください。
 
-CNEC Japan チーム` :
+CNEC Korea チーム` :
         `{{name}}님,
 
 「{{campaign_title}}」 캠페인의 마감이 임박했습니다.
@@ -190,7 +190,7 @@ CNEC Japan チーム` :
 
 궁금한 점이 있으시면 언제든지 문의해주세요.
 
-CNEC Japan 팀`,
+CNEC Korea 팀`,
       variables: ['name', 'campaign_title', 'deadline', 'time_remaining', 'requirements'],
       category: 'reminder'
     }
@@ -226,18 +226,18 @@ CNEC Japan 팀`,
       }
     },
     ja: {
-      title: 'メールテンプレート管理',
-      description: 'システムで使用されるメールテンプレートを管理します。',
-      templateList: 'テンプレート一覧',
-      editTemplate: 'テンプレート編集',
+      title: '이메일 템플릿管理',
+      description: 'システムで使用される이메일 템플릿を管理します。',
+      templateList: 'テンプレート목록',
+      editTemplate: 'テンプレート편집',
       templateName: 'テンプレート名',
-      subject: '件名',
+      subject: '건名',
       content: '内容',
       variables: '使用可能な変数',
       category: 'カテゴリ',
-      save: '保存',
-      cancel: 'キャンセル',
-      edit: '編集',
+      save: '저장',
+      cancel: '취소',
+      edit: '편집',
       preview: 'プレビュー',
       reset: 'デフォルトに戻す',
       categories: {
@@ -247,8 +247,8 @@ CNEC Japan 팀`,
         reminder: 'リマインダー'
       },
       messages: {
-        saved: 'テンプレートが保存されました。',
-        error: '保存中にエラーが発生しました。',
+        saved: 'テンプレートが저장されました。',
+        error: '저장中に오류가 발생했습니다。',
         reset: 'デフォルト値に戻されました。'
       }
     }

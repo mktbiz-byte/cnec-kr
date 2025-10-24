@@ -110,7 +110,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
       
       setSuccess(language === 'ko' 
         ? '크리에이터 자료가 저장되었습니다.'
-        : 'クリエイター資料が保存されました。'
+        : '크리에이터資料が저장されました。'
       )
       
       await loadMaterials()
@@ -121,7 +121,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
       console.error('Save materials error:', error)
       setError(language === 'ko' 
         ? '자료 저장 중 오류가 발생했습니다.'
-        : '資料保存中にエラーが発生しました。'
+        : '資料저장中に오류가 발생했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -172,17 +172,17 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">
-            {language === 'ko' ? '크리에이터 자료 관리' : 'クリエイター資料管理'}
+            {language === 'ko' ? '크리에이터 자료 관리' : '크리에이터資料管理'}
           </h3>
           <p className="text-sm text-gray-600">
             {language === 'ko' 
               ? '승인된 크리에이터에게 개별 Google Drive/Slides 링크를 제공하세요.'
-              : '承認されたクリエイターに個別のGoogle Drive/Slidesリンクを提供してください。'
+              : '승인された크리에이터に個別のGoogle Drive/Slidesリンクを提供してください。'
             }
           </p>
         </div>
         <Badge variant="outline">
-          {language === 'ko' ? `승인된 크리에이터: ${approvedCreators.length}명` : `承認済み: ${approvedCreators.length}人`}
+          {language === 'ko' ? `승인된 크리에이터: ${approvedCreators.length}명` : `승인됨: ${approvedCreators.length}명`}
         </Badge>
       </div>
 
@@ -208,7 +208,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
               <p className="text-gray-600">
                 {language === 'ko' 
                   ? '승인된 크리에이터가 없습니다.'
-                  : '承認されたクリエイターがいません。'
+                  : '승인された크리에이터がいません。'
                 }
               </p>
             </CardContent>
@@ -283,7 +283,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
                       )}
                       {material.additional_notes && (
                         <div className="text-sm text-gray-600 mt-2">
-                          <strong>{language === 'ko' ? '추가 메모:' : '追加メモ:'}</strong> {material.additional_notes}
+                          <strong>{language === 'ko' ? '추가 메모:' : '추가メモ:'}</strong> {material.additional_notes}
                         </div>
                       )}
                     </div>
@@ -300,14 +300,14 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {language === 'ko' ? '크리에이터 자료 관리' : 'クリエイター資料管理'}
+              {language === 'ko' ? '크리에이터 자료 관리' : '크리에이터資料管理'}
             </DialogTitle>
             <DialogDescription>
               {selectedCreator && (
                 <>
                   {language === 'ko' 
                     ? `${selectedCreator.name}님에게 제공할 자료 링크를 설정하세요.`
-                    : `${selectedCreator.name}さんに提供する資料リンクを設定してください。`
+                    : `${selectedCreator.name}さんに提供する資料リンクを설정してください。`
                   }
                 </>
               )}
@@ -320,14 +320,14 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
               <AlertDescription>
                 {language === 'ko' 
                   ? '각 크리에이터마다 고유한 Google Drive 폴더와 Slides 가이드를 제공하세요. 캠페인별, 크리에이터별로 모두 다른 자료가 필요합니다.'
-                  : '各クリエイターに固有のGoogle DriveフォルダーとSlidesガイドを提供してください。キャンペーン別、クリエイター別にすべて異なる資料が必要です。'
+                  : '各크리에이터に固有のGoogle DriveフォルダーとSlidesガイドを提供してください。キャンペーン別、크리에이터別にすべて異なる資料が必要です。'
                 }
               </AlertDescription>
             </Alert>
             
             <div className="bg-gray-50 p-4 rounded-lg">
               <h4 className="font-medium mb-2">
-                {language === 'ko' ? '크리에이터 정보' : 'クリエイター情報'}
+                {language === 'ko' ? '크리에이터 정보' : '크리에이터情報'}
               </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
@@ -353,7 +353,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
               <div className="space-y-2">
                 <Label htmlFor="google_drive_url" className="text-base font-medium">
                   <Folder className="h-5 w-5 inline mr-2 text-blue-600" />
-                  {language === 'ko' ? '전용 Google Drive 업로드 폴더' : '専用Google Driveアップロードフォルダー'}
+                  {language === 'ko' ? '전용 Google Drive 업로드 폴더' : '専用Google Drive업로드フォルダー'}
                 </Label>
                 <Input
                   id="google_drive_url"
@@ -365,7 +365,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
                 <p className="text-xs text-gray-600">
                   {language === 'ko' 
                     ? '이 크리에이터가 촬영한 영상과 이미지를 업로드할 전용 폴더 링크'
-                    : 'このクリエイターが撮影した動画と画像をアップロードする専用フォルダーリンク'
+                    : 'この크리에이터が撮影した動画と画像を업로드する専用フォルダーリンク'
                   }
                 </p>
               </div>
@@ -385,7 +385,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
                 <p className="text-xs text-gray-600">
                   {language === 'ko' 
                     ? '이 크리에이터만을 위한 맞춤형 촬영 가이드라인 및 지시사항'
-                    : 'このクリエイター専用のカスタム撮影ガイドラインと指示事項'
+                    : 'この크리에이터専用のカスタム撮影ガイドラインと指示事項'
                   }
                 </p>
               </div>
@@ -400,7 +400,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
                   onChange={(e) => setMaterialForm(prev => ({ ...prev, additional_notes: e.target.value }))}
                   placeholder={language === 'ko' 
                     ? '이 크리에이터에게만 적용되는 특별한 요청사항이나 주의사항을 입력하세요...'
-                    : 'このクリエイターにのみ適用される特別なリクエストや注意事項を入力してください...'
+                    : 'この크리에이터にのみ適用される特別なリクエストや注意事項を入力してください...'
                   }
                   className="w-full h-24 p-3 border rounded-md resize-none"
                 />
@@ -412,9 +412,9 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
                 {language === 'ko' ? '⚠️ 중요 안내' : '⚠️ 重要なお知らせ'}
               </h5>
               <ul className="text-sm text-yellow-700 space-y-1">
-                <li>• {language === 'ko' ? '각 크리에이터마다 고유한 Drive 폴더를 생성하세요' : '各クリエイターに固有のDriveフォルダーを作成してください'}</li>
-                <li>• {language === 'ko' ? '가이드라인은 크리에이터의 SNS 특성에 맞게 개별 작성하세요' : 'ガイドラインはクリエイターのSNS特性に合わせて個別に作成してください'}</li>
-                <li>• {language === 'ko' ? '링크는 해당 크리에이터만 접근 가능하도록 권한을 설정하세요' : 'リンクは該当クリエイターのみアクセス可能になるよう権限を設定してください'}</li>
+                <li>• {language === 'ko' ? '각 크리에이터마다 고유한 Drive 폴더를 생성하세요' : '各크리에이터に固有のDriveフォルダーを作成してください'}</li>
+                <li>• {language === 'ko' ? '가이드라인은 크리에이터의 SNS 특성에 맞게 개별 작성하세요' : 'ガイドラインは크리에이터のSNS特性に合わせて個別に作成してください'}</li>
+                <li>• {language === 'ko' ? '링크는 해당 크리에이터만 접근 가능하도록 권한을 설정하세요' : 'リンクは該当크리에이터のみアクセス可能になるよう権限を설정してください'}</li>
               </ul>
             </div>
             
@@ -429,7 +429,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                {language === 'ko' ? '저장' : '保存'}
+                {language === 'ko' ? '저장' : '저장'}
               </Button>
               <Button
                 variant="outline"
@@ -439,7 +439,7 @@ const CreatorMaterialsManager = ({ campaignId, applications }) => {
                 }}
               >
                 <X className="h-4 w-4 mr-2" />
-                {language === 'ko' ? '취소' : 'キャンセル'}
+                {language === 'ko' ? '취소' : '취소'}
               </Button>
             </div>
           </div>

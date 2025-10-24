@@ -125,7 +125,7 @@ const AdminCompanyAccess = () => {
       console.error('Create company error:', error)
       setError(language === 'ko' 
         ? '회사 생성에 실패했습니다.'
-        : '会社の作成に失敗しました。'
+        : '会社の作成に실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -169,7 +169,7 @@ const AdminCompanyAccess = () => {
       console.error('Create access token error:', error)
       setError(language === 'ko' 
         ? '액세스 토큰 생성에 실패했습니다.'
-        : 'アクセストークンの作成に失敗しました。'
+        : 'アクセストークンの作成に실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -205,7 +205,7 @@ const AdminCompanyAccess = () => {
       console.error('Toggle token status error:', error)
       setError(language === 'ko' 
         ? '토큰 상태 변경에 실패했습니다.'
-        : 'トークン状態の変更に失敗しました。'
+        : 'トークン状態の変更に실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -215,7 +215,7 @@ const AdminCompanyAccess = () => {
   const handleDeleteToken = async (tokenId) => {
     if (!confirm(language === 'ko' 
       ? '정말로 이 토큰을 삭제하시겠습니까?'
-      : '本当にこのトークンを削除しますか？'
+      : '本当にこのトークンを삭제しますか？'
     )) return
     
     try {
@@ -231,7 +231,7 @@ const AdminCompanyAccess = () => {
       
       setSuccess(language === 'ko' 
         ? '토큰이 삭제되었습니다.'
-        : 'トークンが削除されました。'
+        : 'トークンが삭제されました。'
       )
       
       // 데이터 새로고침
@@ -241,7 +241,7 @@ const AdminCompanyAccess = () => {
       console.error('Delete token error:', error)
       setError(language === 'ko' 
         ? '토큰 삭제에 실패했습니다.'
-        : 'トークンの削除に失敗しました。'
+        : 'トークンの삭제に실패했습니다。'
       )
     } finally {
       setProcessing(false)
@@ -268,7 +268,7 @@ const AdminCompanyAccess = () => {
       console.error('Copy to clipboard error:', error)
       setError(language === 'ko' 
         ? '클립보드 복사에 실패했습니다.'
-        : 'クリップボードへのコピーに失敗しました。'
+        : 'クリップボードへのコピーに실패했습니다。'
       )
     }
   }
@@ -358,7 +358,7 @@ const AdminCompanyAccess = () => {
           <p className="text-gray-600">
             {language === 'ko' 
               ? '회사별 리포트 액세스 토큰을 관리합니다.'
-              : '会社別レポートアクセストークンを管理します。'
+              : '会社別보고서アクセストークンを管理します。'
             }
           </p>
         </div>
@@ -369,7 +369,7 @@ const AdminCompanyAccess = () => {
             onClick={() => setCreateCompanyModal(true)}
           >
             <Building className="h-4 w-4 mr-2" />
-            {language === 'ko' ? '회사 추가' : '会社追加'}
+            {language === 'ko' ? '회사 추가' : '会社추가'}
           </Button>
           <Button
             onClick={() => setCreateTokenModal(true)}
@@ -383,7 +383,7 @@ const AdminCompanyAccess = () => {
             disabled={loading}
           >
             <RefreshCw className="h-4 w-4 mr-2" />
-            {language === 'ko' ? '새로고침' : '更新'}
+            {language === 'ko' ? '새로고침' : '업데이트'}
           </Button>
         </div>
       </div>
@@ -408,9 +408,9 @@ const AdminCompanyAccess = () => {
         <CardContent className="pt-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>{language === 'ko' ? '검색' : '検索'}</Label>
+              <Label>{language === 'ko' ? '검색' : '검색'}</Label>
               <Input
-                placeholder={language === 'ko' ? '회사명 또는 설명 검색' : '会社名または説明検索'}
+                placeholder={language === 'ko' ? '회사명 또는 설명 검색' : '会社名または설명검색'}
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
               />
@@ -442,12 +442,12 @@ const AdminCompanyAccess = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Key className="h-5 w-5" />
-            <span>{language === 'ko' ? '액세스 토큰 목록' : 'アクセストークン一覧'}</span>
+            <span>{language === 'ko' ? '액세스 토큰 목록' : 'アクセストークン목록'}</span>
           </CardTitle>
           <CardDescription>
             {language === 'ko' 
               ? '회사별 리포트 액세스를 위한 토큰을 관리합니다.'
-              : '会社別レポートアクセス用のトークンを管理します。'
+              : '会社別보고서アクセス用のトークンを管理します。'
             }
           </CardDescription>
         </CardHeader>
@@ -488,10 +488,10 @@ const AdminCompanyAccess = () => {
                         </div>
                         <div className="text-sm text-gray-600 space-y-1">
                           <p>
-                            {language === 'ko' ? '설명:' : '説明:'} {token.description || 'N/A'}
+                            {language === 'ko' ? '설명:' : '설명:'} {token.description || 'N/A'}
                           </p>
                           <p>
-                            {language === 'ko' ? '생성일:' : '作成日:'} {formatDate(token.created_at)}
+                            {language === 'ko' ? '생성일:' : '생성일:'} {formatDate(token.created_at)}
                           </p>
                           {token.expires_at && (
                             <p>
@@ -529,7 +529,7 @@ const AdminCompanyAccess = () => {
                           onClick={() => window.open(generateReportUrl(token.company_id, token.token), '_blank')}
                         >
                           <ExternalLink className="h-4 w-4 mr-1" />
-                          {language === 'ko' ? '리포트 보기' : 'レポート表示'}
+                          {language === 'ko' ? '리포트 보기' : '보고서표시'}
                         </Button>
                         
                         <Button
@@ -567,7 +567,7 @@ const AdminCompanyAccess = () => {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {language === 'ko' ? '새 회사 추가' : '新規会社追加'}
+              {language === 'ko' ? '새 회사 추가' : '新規会社추가'}
             </DialogTitle>
             <DialogDescription>
               {language === 'ko' 
@@ -633,12 +633,12 @@ const AdminCompanyAccess = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="company_description">{language === 'ko' ? '설명' : '説明'}</Label>
+              <Label htmlFor="company_description">{language === 'ko' ? '설명' : '설명'}</Label>
               <Textarea
                 id="company_description"
                 value={companyForm.description}
                 onChange={(e) => setCompanyForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder={language === 'ko' ? '회사에 대한 간단한 설명' : '会社についての簡単な説明'}
+                placeholder={language === 'ko' ? '회사에 대한 간단한 설명' : '会社についての簡単な설명'}
                 rows={3}
               />
             </div>
@@ -663,7 +663,7 @@ const AdminCompanyAccess = () => {
                   resetCompanyForm()
                 }}
               >
-                {language === 'ko' ? '취소' : 'キャンセル'}
+                {language === 'ko' ? '취소' : '취소'}
               </Button>
             </div>
           </div>
@@ -680,7 +680,7 @@ const AdminCompanyAccess = () => {
             <DialogDescription>
               {language === 'ko' 
                 ? '회사별 리포트 액세스를 위한 토큰을 생성합니다.'
-                : '会社別レポートアクセス用のトークンを作成します。'
+                : '会社別보고서アクセス用のトークンを作成します。'
               }
             </DialogDescription>
           </DialogHeader>
@@ -705,12 +705,12 @@ const AdminCompanyAccess = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="token_description">{language === 'ko' ? '설명' : '説明'}</Label>
+              <Label htmlFor="token_description">{language === 'ko' ? '설명' : '설명'}</Label>
               <Input
                 id="token_description"
                 value={tokenForm.description}
                 onChange={(e) => setTokenForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder={language === 'ko' ? '토큰 용도 설명' : 'トークン用途説明'}
+                placeholder={language === 'ko' ? '토큰 용도 설명' : 'トークン用途설명'}
               />
             </div>
             
@@ -744,7 +744,7 @@ const AdminCompanyAccess = () => {
                   resetTokenForm()
                 }}
               >
-                {language === 'ko' ? '취소' : 'キャンセル'}
+                {language === 'ko' ? '취소' : '취소'}
               </Button>
             </div>
           </div>
