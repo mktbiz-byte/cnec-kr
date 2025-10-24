@@ -170,13 +170,13 @@ const HomePageExactReplica = () => {
                 <a href="#campaigns">캠페인</a>
               </Badge>
               <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer">
-                <a href="#about">서비스紹介</a>
+                <a href="#about">서비스소개</a>
               </Badge>
               <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer">
                 <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">포트폴리오</a>
               </Badge>
               <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer">
-                <a href="#guide">参加方法</a>
+                <a href="#guide">참가방법</a>
               </Badge>
               {user ? (
                 <>
@@ -216,13 +216,13 @@ const HomePageExactReplica = () => {
                   <a href="#campaigns">캠페인</a>
                 </Badge>
                 <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer w-fit">
-                  <a href="#about">서비스紹介</a>
+                  <a href="#about">서비스소개</a>
                 </Badge>
                 <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer w-fit">
                   <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">포트폴리오</a>
                 </Badge>
                 <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer w-fit">
-                  <a href="#guide">参加方法</a>
+                  <a href="#guide">참가방법</a>
                 </Badge>
                 {user ? (
                   <>
@@ -256,10 +256,10 @@ const HomePageExactReplica = () => {
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             K-Beauty × 숏폼 영상
             <br />
-            <span className="text-yellow-300">専門플랫폼</span>
+            <span className="text-yellow-300">전문플랫폼</span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-4xl mx-auto">
-            韓国화장품브랜드와크리에이터를繋ぐ新しい마케팅플랫폼。
+            韓国화장품브랜드와크리에이터를연결ぐ새로운しい마케팅플랫폼。
             당신의 창의성을 수익화하세요!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -270,7 +270,7 @@ const HomePageExactReplica = () => {
             >
               <Link to="/signup">
                 <Users className="h-5 w-5 mr-2" />
-                크리에이터登録
+                크리에이터등록
               </Link>
             </Button>
             <Button 
@@ -279,7 +279,7 @@ const HomePageExactReplica = () => {
             >
               <a href="#campaigns" className="flex items-center">
                 <Eye className="h-5 w-5 mr-2" />
-                캠페인를見
+                캠페인를보기
               </a>
             </Button>
           </div>
@@ -294,25 +294,25 @@ const HomePageExactReplica = () => {
               <div className="text-5xl font-bold text-purple-600 mb-2">
                 {stats.totalCampaigns}
               </div>
-              <div className="text-gray-600 font-medium">総캠페인数</div>
+              <div className="text-gray-600 font-medium">총캠페인수</div>
             </div>
             <div className="text-center">
               <div className="text-5xl font-bold text-blue-600 mb-2">
                 {stats.totalCreators.toLocaleString()}+
               </div>
-              <div className="text-gray-600 font-medium">登録크리에이터数</div>
+              <div className="text-gray-600 font-medium">등록크리에이터수</div>
             </div>
             <div className="text-center">
               <div className="text-5xl font-bold text-green-600 mb-2">
                 {stats.totalApplications}
               </div>
-              <div className="text-gray-600 font-medium">総応募数</div>
+              <div className="text-gray-600 font-medium">총응모수</div>
             </div>
             <div className="text-center">
               <div className="text-5xl font-bold text-red-600 mb-2">
                 {formatCurrency(stats.totalRewards)}
               </div>
-              <div className="text-gray-600 font-medium">総報酬額</div>
+              <div className="text-gray-600 font-medium">총보상액</div>
             </div>
           </div>
         </div>
@@ -322,24 +322,24 @@ const HomePageExactReplica = () => {
       <section id="campaigns" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">現在모집 중의캠페인</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">현재모집 중의캠페인</h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              韓国화장품브랜드의最新캠페인에参加하고、당신의影響力를収益化합시다
+              韓国화장품브랜드의최신캠페인에참가하고、당신의영향력를수익화합시다
             </p>
           </div>
 
           {loading ? (
             <div className="text-center py-12">
               <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-              <p className="text-gray-600">캠페인를読込中...</p>
+              <p className="text-gray-600">캠페인를로딩중...</p>
             </div>
           ) : campaigns.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">📋</div>
               <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                現在모집 중의캠페인없습니다
+                현재모집 중의캠페인없습니다
               </h3>
-              <p className="text-gray-500">新しい캠페인가開始되는까지기다려주세요。</p>
+              <p className="text-gray-500">새로운しい캠페인가開始되는까지기다려주세요。</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -405,7 +405,7 @@ const HomePageExactReplica = () => {
                         <div className="text-2xl font-bold text-purple-600">
                           {formatCurrency(campaign.reward_amount)}
                         </div>
-                        <div className="text-sm text-gray-500">報酬</div>
+                        <div className="text-sm text-gray-500">보상</div>
                       </div>
                       <Button className="bg-gray-800 text-white hover:bg-gray-900">
                         자세히 보기
@@ -434,9 +434,9 @@ const HomePageExactReplica = () => {
               <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Target className="h-10 w-10 text-purple-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">타겟特化</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">타겟특화</h3>
               <p className="text-gray-600 leading-relaxed">
-                K-Beauty에特化한마케팅에서効果的프로모션를実現
+                K-Beauty에특화한마케팅에서효과적프로모션를실현
               </p>
             </div>
             
@@ -444,9 +444,9 @@ const HomePageExactReplica = () => {
               <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Play className="h-10 w-10 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">숏폼動画重視</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">숏폼영상중시</h3>
               <p className="text-gray-600 leading-relaxed">
-                TikTok、Instagram Reelsど숏폼動画플랫폼에最適化
+                TikTok、Instagram Reels등숏폼영상플랫폼에최적화
               </p>
             </div>
             
@@ -454,9 +454,9 @@ const HomePageExactReplica = () => {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shield className="h-10 w-10 text-green-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">安心의지원</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">안심의지원</h3>
               <p className="text-gray-600 leading-relaxed">
-                브랜드와크리에이터双方를지원하기充実한서비스
+                브랜드와크리에이터쌍방를지원하기충실한서비스
               </p>
             </div>
           </div>
@@ -471,7 +471,7 @@ const HomePageExactReplica = () => {
               <div className="text-6xl mb-6">🎬</div>
               <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC포트폴리오</h2>
               <p className="text-gray-600 text-lg">
-                지금까지의캠페인実績와成功事例를ご覧해주세요
+                지금까지의캠페인실적와성공사례를보기해주세요
               </p>
             </div>
             
@@ -490,22 +490,22 @@ const HomePageExactReplica = () => {
                     </div>
                     
                     <p className="text-gray-600 mb-6 leading-relaxed">
-                      実際의캠페인動画와成功事例、크리에이터의인터뷰ど、
-                      CNEC의魅力的콘텐츠를YouTube에서ご覧받으실 수 있습니다。
+                      실제의캠페인영상와성공사례、크리에이터의인터뷰등、
+                      CNEC의매력적콘텐츠를YouTube에서보기받으실 수 있습니다。
                     </p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                       <div className="bg-red-50 rounded-lg p-4">
-                        <div className="text-red-600 font-semibold">캠페인実績</div>
-                        <div className="text-gray-700 text-sm">成功事例動画</div>
+                        <div className="text-red-600 font-semibold">캠페인실적</div>
+                        <div className="text-gray-700 text-sm">성공사례영상</div>
                       </div>
                       <div className="bg-blue-50 rounded-lg p-4">
-                        <div className="text-blue-600 font-semibold">크리에이터紹介</div>
-                        <div className="text-gray-700 text-sm">인터뷰動画</div>
+                        <div className="text-blue-600 font-semibold">크리에이터소개</div>
+                        <div className="text-gray-700 text-sm">인터뷰영상</div>
                       </div>
                       <div className="bg-green-50 rounded-lg p-4">
-                        <div className="text-green-600 font-semibold">브랜드紹介</div>
-                        <div className="text-gray-700 text-sm">商品리뷰</div>
+                        <div className="text-green-600 font-semibold">브랜드소개</div>
+                        <div className="text-gray-700 text-sm">상품리뷰</div>
                       </div>
                     </div>
                     
@@ -514,7 +514,7 @@ const HomePageExactReplica = () => {
                       onClick={() => window.open('https://www.youtube.com/@CNEC_JP', '_blank')}
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      포트폴리오를見
+                      포트폴리오를보기
                     </Button>
                   </div>
                 </div>
@@ -523,19 +523,19 @@ const HomePageExactReplica = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 pt-8 border-t">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-red-600 mb-1">500+</div>
-                    <div className="text-gray-600 text-sm">成功캠페인</div>
+                    <div className="text-gray-600 text-sm">성공캠페인</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600 mb-1">5,000+</div>
-                    <div className="text-gray-600 text-sm">参加크리에이터</div>
+                    <div className="text-gray-600 text-sm">참가크리에이터</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-600 mb-1">50M+</div>
-                    <div className="text-gray-600 text-sm">総再生回数</div>
+                    <div className="text-gray-600 text-sm">총재생회수</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-purple-600 mb-1">98%</div>
-                    <div className="text-gray-600 text-sm">満足度</div>
+                    <div className="text-gray-600 text-sm">만족도</div>
                   </div>
                 </div>
               </CardContent>
@@ -548,9 +548,9 @@ const HomePageExactReplica = () => {
       <section id="guide" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC캠페인参加方法</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC캠페인참가방법</h2>
             <p className="text-gray-600 text-lg">
-              簡単6단계에서캠페인에参加할 수 있습니다
+              간단6단계에서캠페인에참가할 수 있습니다
             </p>
           </div>
           
@@ -559,20 +559,20 @@ const HomePageExactReplica = () => {
               {[
                 {
                   step: 1,
-                  title: '会員登録',
-                  description: 'Google계정에서簡単登録',
+                  title: '회원등록',
+                  description: 'Google계정에서간단등록',
                   icon: <User className="h-8 w-8" />
                 },
                 {
                   step: 2,
-                  title: '프로필完成',
-                  description: 'SNS계정와詳細情報를登録',
+                  title: '프로필완성',
+                  description: 'SNS계정와상세정보를등록',
                   icon: <Star className="h-8 w-8" />
                 },
                 {
                   step: 3,
-                  title: '캠페인応募',
-                  description: '興味의あ캠페인에応募',
+                  title: '캠페인응모',
+                  description: '흥미의캠페인에응모',
                   icon: <Target className="h-8 w-8" />
                 }
               ].map((item) => (
@@ -593,20 +593,20 @@ const HomePageExactReplica = () => {
               {[
                 {
                   step: 4,
-                  title: '審査 · 確定',
-                  description: '브랜드에 의한審査와参加確定',
+                  title: '심사 · 확정',
+                  description: '브랜드에 의한심사와참가확정',
                   icon: <CheckCircle className="h-8 w-8" />
                 },
                 {
                   step: 5,
-                  title: '콘텐츠制作',
-                  description: '가이드라인에沿動画制作',
+                  title: '콘텐츠제작',
+                  description: '가이드라인에따라영상제작',
                   icon: <Play className="h-8 w-8" />
                 },
                 {
                   step: 6,
-                  title: '報酬受取',
-                  description: '포인트獲得와日本의銀行口座로送金',
+                  title: '보상受取',
+                  description: '포인트획득와한국의은행계좌로송금',
                   icon: <DollarSign className="h-8 w-8" />
                 }
               ].map((item) => (
@@ -644,7 +644,7 @@ const HomePageExactReplica = () => {
               <h4 className="font-semibold mb-4">서비스</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><a href="#campaigns" className="hover:text-white transition-colors">캠페인</a></li>
-                <li><a href="#about" className="hover:text-white transition-colors">서비스紹介</a></li>
+                <li><a href="#about" className="hover:text-white transition-colors">서비스소개</a></li>
                 <li><a href="#portfolio" className="hover:text-white transition-colors">포트폴리오</a></li>
               </ul>
             </div>
@@ -652,7 +652,7 @@ const HomePageExactReplica = () => {
             <div>
               <h4 className="font-semibold mb-4">지원</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#guide" className="hover:text-white transition-colors">参加方法</a></li>
+                <li><a href="#guide" className="hover:text-white transition-colors">참가방법</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">자주 묻는 질문</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">문의하기</a></li>
               </ul>
@@ -688,7 +688,7 @@ const HomePageExactReplica = () => {
           {selectedCampaign && (
             <div className="space-y-6">
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2">캠페인詳細</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">캠페인상세</h4>
                 <p className="text-gray-600">{selectedCampaign.description}</p>
               </div>
               
@@ -719,7 +719,7 @@ const HomePageExactReplica = () => {
               </div>
               
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2">報酬</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">보상</h4>
                 <p className="text-3xl font-bold text-purple-600">
                   {formatCurrency(selectedCampaign.reward_amount)}
                 </p>
