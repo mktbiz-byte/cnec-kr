@@ -11,7 +11,7 @@ import LoginPageExactReplica from './components/LoginPageExactReplica';
 import SignupPageExactReplica from './components/SignupPageExactReplica';
 import CampaignApplicationPage from './components/CampaignApplicationPage';
 import CompanyReportNew from './components/CompanyReportNew';
-import MyPageKorea from './components/MyPageKorea';
+import MyPageKoreaEnhanced from './components/MyPageKoreaEnhanced';
 import ProfileSettings from './components/ProfileSettings';
 import AuthCallbackSafe from './components/AuthCallbackSafe';
 
@@ -64,7 +64,7 @@ const AppContent = () => {
         
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/mypage" element={<MyPageKorea />} />
+        <Route path="/mypage" element={<MyPageKoreaEnhanced />} />
         <Route path="/profile" element={<ProfileSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
