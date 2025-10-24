@@ -160,7 +160,7 @@ const HomePageExactReplica = () => {
           <div className="flex items-center justify-between">
             {/* 로고 */}
             <Link to="/" className="flex items-center">
-              <img src={cnecLogo} alt="CNEC Korea" className="h-20" />
+              <img src={cnecLogo} alt="CNEC Korea" className="h-16" />
             </Link>
             
             {/* 데스크톱 네비게이션 메뉴 */}
