@@ -19,7 +19,7 @@ import AuthCallbackSafe from './components/AuthCallbackSafe';
 import AdminDashboardSimple from './components/admin/AdminDashboardSimple';
 import AdminCampaignsWithQuestions from './components/admin/AdminCampaignsWithQuestions';
 import CampaignCreationKorea from './components/admin/CampaignCreationKorea';
-import CNECPlusPage from './components/CNECPlusPage'
+import CNECPlusPageEnhanced from './components/CNECPlusPageEnhanced'
 import ApplicationsReportSimple from './components/admin/ApplicationsReportSimple_final';
 import AdminConfirmedCreators from './components/admin/AdminConfirmedCreators';
 import ConfirmedCreatorsNew from './components/admin/ConfirmedCreatorsNew';
@@ -59,7 +59,8 @@ const AppContent = () => {
         {/* 인증 관련 */}
         <Route path="/login" element={<LoginPageExactReplica />} />
         <Route path="/signup" element={<SignupPageExactReplica />} />
-        <Route path="/cnecplus" element={<CNECPlusPage />} />
+        <Route path="/cnecplus" element={<CNECPlusPageEnhanced />} />
+        <Route path="/cnec-plus" element={<CNECPlusPageEnhanced />} />
         <Route path="/auth/callback" element={<AuthCallbackSafe />} />
         
         {/* 사용자 페이지 */}

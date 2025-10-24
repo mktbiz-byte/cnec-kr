@@ -251,20 +251,32 @@ const HomePageExactReplica = () => {
         </div>
       </header>
 
-      {/* Hero Section - 참조 사이트와 정확히 일치하는 그라데이션 */}
+      {/* Hero Section - PDF 개선안 반영 */}
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500"></div>
         <div className="relative container mx-auto px-4 text-center text-white">
+          {/* 로고 섹션 */}
+          <div className="mb-8">
+            <div className="flex items-center justify-center space-x-3 mb-3">
+              <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center">
+                <span className="text-3xl">C</span>
+              </div>
+              <h1 className="text-4xl font-bold">CNEC Korea</h1>
+            </div>
+            <p className="text-lg opacity-90">K-뷰티와 크리에이터를 연결합니다</p>
+          </div>
+
+          {/* 메인 타이틀 */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            K-Beauty × 숏폼 영상
+            K-Beauty 크리에이터와 함께
             <br />
-            <span className="text-yellow-300">전문플랫폼</span>
+            <span className="text-yellow-300">성장하는</span> 플랫폼
           </h1>
-          <p className="text-xl md:text-2xl mb-4 opacity-90 max-w-4xl mx-auto">
-            집에서 부업하는 크리에이터 플랫폼
-          </p>
-          <p className="text-lg md:text-xl mb-8 opacity-90 max-w-3xl mx-auto">
-            ✨ 빠른 포인트 지급 (10만 포인트 = 10만원) | 🎬 숏폼 영상 특화 | 💰 간편한 출금
+          
+          {/* 서브 타이틀 */}
+          <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-4xl mx-auto">
+            뷰티 크리에이터를 육성하고 양성하며,<br />
+            브랜드와 함께 성장하는 전문 파트너십 플랫폼
           </p>
           
           {/* 메인 영상 */}
@@ -280,41 +292,44 @@ const HomePageExactReplica = () => {
               ></iframe>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          
-          {/* CNEC Plus 지원 버튼 */}
-          <div className="mb-8 text-center">
-            <a
-              href="/cnecplus"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition shadow-xl"
-            >
-              <span className="text-2xl">👑</span>
-              CNEC Plus 프리미엄 크리에이터 지원하기
-              <span>→</span>
-            </a>
-            <p className="text-gray-200 text-sm mt-3">
-              더 높은 지원금과 비공개 프리미엄 캠페인 접근 권한
-            </p>
-          </div>
+          {/* CTA 버튼 */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               size="lg" 
-              className="bg-purple-600 text-white hover:bg-purple-700 border-2 border-purple-400"
+              className="bg-white text-purple-600 hover:bg-gray-100 font-bold text-lg px-8 py-6"
               asChild
             >
               <Link to="/signup">
-                <Users className="h-5 w-5 mr-2" />
-                크리에이터등록
+                크리에이터 등록하기
               </Link>
             </Button>
             <Button 
               size="lg" 
-              className="bg-orange-500 text-white hover:bg-orange-600"
+              className="bg-purple-700 text-white hover:bg-purple-800 font-bold text-lg px-8 py-6"
             >
-              <a href="#campaigns" className="flex items-center">
-                <Eye className="h-5 w-5 mr-2" />
-                캠페인를보기
+              <a href="#programs">
+                프로그램 알아보기
               </a>
             </Button>
+          </div>
+
+          {/* 핵심 가치 제안 (3가지) */}
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+              <div className="text-5xl mb-4">🎓</div>
+              <h3 className="text-xl font-bold mb-2">체계적인 교육</h3>
+              <p className="text-sm opacity-90">뷰티 콘텐츠 제작 노하우 전수</p>
+            </div>
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+              <div className="text-5xl mb-4">🤝</div>
+              <h3 className="text-xl font-bold mb-2">브랜드 파트너십</h3>
+              <p className="text-sm opacity-90">100+ 뷰티 브랜드와 직접 협업</p>
+            </div>
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+              <div className="text-5xl mb-4">✅</div>
+              <h3 className="text-xl font-bold mb-2">성장 지원</h3>
+              <p className="text-sm opacity-90">유튜브 채널 육성 프로그램</p>
+            </div>
           </div>
         </div>
       </section>
@@ -498,45 +513,282 @@ const HomePageExactReplica = () => {
         </div>
       </section>
 
-      {/* About Section - 참조 사이트와 정확히 일치 */}
+      {/* About Section - PDF 개선안 반영: 4개 카드 그리드 */}
       <section id="about" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC Korea이란</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              한국 화장품 브랜드와 크리에이터를 연결하는 전문 플랫폼
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC Korea란?</h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              K-뷰티 크리에이터를 육성하고 양성하는 전문 플랫폼입니다.<br />
+              브랜드와 크리에이터가 함께 성장하며, 지속 가능한 파트너십을 구축합니다.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Target className="h-10 w-10 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">타겟특화</h3>
-              <p className="text-gray-600 leading-relaxed">
-                K-Beauty에특화한마케팅에서효과적프로모션를실현
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Play className="h-10 w-10 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">숏폼영상중시</h3>
-              <p className="text-gray-600 leading-relaxed">
-                TikTok, Instagram Reels등숏폼영상플랫폼에최적화
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Shield className="h-10 w-10 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">안심의지원</h3>
-              <p className="text-gray-600 leading-relaxed">
-                브랜드와크리에이터쌍방를지원하기충실한서비스
-              </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {/* Feature 1: 크리에이터 육성 */}
+            <Card className="hover:shadow-xl transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">🎓</span>
+                </div>
+                <CardTitle className="text-center text-xl">크리에이터 육성</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-center mb-4">
+                  체계적인 교육 프로그램과 멘토링을 통해 초보 크리에이터도 전문가로 성장할 수 있도록 지원합니다.
+                </p>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li className="flex items-start">
+                    <span className="text-purple-600 mr-2">✓</span>
+                    <span>콘텐츠 제작 교육</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 mr-2">✓</span>
+                    <span>1:1 멘토링</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 mr-2">✓</span>
+                    <span>성공 사례 공유</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Feature 2: 브랜드 파트너십 */}
+            <Card className="hover:shadow-xl transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">🤝</span>
+                </div>
+                <CardTitle className="text-center text-xl">브랜드 파트너십</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-center mb-4">
+                  100개 이상의 K-뷰티 브랜드와 직접 협업하며, 크리에이터에게 다양한 기회를 제공합니다.
+                </p>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2">✓</span>
+                    <span>브랜드 직접 매칭</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2">✓</span>
+                    <span>장기 계약 기회</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2">✓</span>
+                    <span>독점 캠페인 참여</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Feature 3: 성장 지원 시스템 */}
+            <Card className="hover:shadow-xl transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">✅</span>
+                </div>
+                <CardTitle className="text-center text-xl">성장 지원 시스템</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-center mb-4">
+                  유튜브 채널 육성부터 숏폼 크리에이터 프로그램까지, 단계별 성장을 체계적으로 지원합니다.
+                </p>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-2">✓</span>
+                    <span>유튜브 육성 프로그램</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-2">✓</span>
+                    <span>숏폼 크리에이터 혜택</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-2">✓</span>
+                    <span>포인트 추가 지급</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Feature 4: 숏폼 콘텐츠 전문 */}
+            <Card className="hover:shadow-xl transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">📱</span>
+                </div>
+                <CardTitle className="text-center text-xl">숏폼 콘텐츠 전문</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-center mb-4">
+                  TikTok, Instagram Reels, YouTube Shorts 등 숏폼 플랫폼에 최적화된 콘텐츠 제작을 지원합니다.
+                </p>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li className="flex items-start">
+                    <span className="text-orange-600 mr-2">✓</span>
+                    <span>숏폼 트렌드 분석</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-orange-600 mr-2">✓</span>
+                    <span>편집 가이드 제공</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-orange-600 mr-2">✓</span>
+                    <span>바이럴 전략 공유</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* 크리에이터 성장 프로그램 섹션 */}
+      <section id="growth-programs" className="py-16 bg-gradient-to-br from-purple-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">크리에이터 성장 프로그램</h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              단계별 성장 경로를 통해 초보부터 전문 크리에이터까지<br />
+              CNEC와 함께 성장하세요
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+            {/* 일반 캠페인 */}
+            <Card className="hover:shadow-xl transition-shadow bg-white">
+              <CardHeader>
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">🚀</span>
+                </div>
+                <CardTitle className="text-center text-xl">일반 캠페인</CardTitle>
+                <p className="text-center text-sm text-gray-600">누구나 시작할 수 있어요</p>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-1">✓</span>
+                    <span className="text-gray-700">가입 후 바로 참여 가능</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-1">✓</span>
+                    <span className="text-gray-700">다양한 브랜드 캠페인</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-1">✓</span>
+                    <span className="text-gray-700">제품 제공 + 포인트 지급</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-1">✓</span>
+                    <span className="text-gray-700">경험 쳐서 성장 가능</span>
+                  </li>
+                </ul>
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => navigate('/campaigns')}
+                >
+                  캠페인 보기
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* 숏폼 크리에이터 */}
+            <Card className="hover:shadow-xl transition-shadow bg-gradient-to-br from-purple-50 to-white border-2 border-purple-300">
+              <CardHeader>
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">⭐</span>
+                </div>
+                <CardTitle className="text-center text-xl text-purple-600">숏폼 크리에이터</CardTitle>
+                <p className="text-center text-sm text-gray-600">활동 실적으로 승격</p>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-gray-700"><strong>20-50% 추가 보상</strong></span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-gray-700">캠페인 우선 배정</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-gray-700">브랜드 협업 기회</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-gray-700">전담 매니저 배정</span>
+                  </li>
+                </ul>
+                <Button 
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={() => navigate('/cnec-plus')}
+                >
+                  상세 보기
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* 유튜브 육성 */}
+            <Card className="hover:shadow-xl transition-shadow bg-gradient-to-br from-red-50 to-white border-2 border-red-300">
+              <CardHeader>
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">🏆</span>
+                </div>
+                <CardTitle className="text-center text-xl text-red-600">유튜브 육성</CardTitle>
+                <p className="text-center text-sm text-gray-600">최고 등급 프로그램</p>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">✓</span>
+                    <span className="text-gray-700"><strong>100만P 지원</strong></span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">✓</span>
+                    <span className="text-gray-700">제품비 100% 지원</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">✓</span>
+                    <span className="text-gray-700">1:1 멘토링 + 교육</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-1">✓</span>
+                    <span className="text-gray-700">채널 성장 전략 지원</span>
+                  </li>
+                </ul>
+                <Button 
+                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => navigate('/cnec-plus')}
+                >
+                  상세 보기
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* CTA 섹션 */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">지금 바로 CNEC Plus에 도전하세요!</h3>
+            <p className="text-gray-600 mb-6">
+              일반 캠페인 5회 이상 참여 시 숏폼 크리에이터로 승격 가능합니다.<br />
+              뷰티 전문 유튜버를 꾸꾸신다면 유튜브 육성 프로그램에 지원하세요!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3"
+                onClick={() => navigate('/cnec-plus')}
+              >
+                CNEC Plus 상세보기
+              </Button>
+              <Button 
+                variant="outline"
+                className="border-2 border-purple-600 text-purple-600 hover:bg-purple-50 px-8 py-3"
+                onClick={() => navigate('/campaigns')}
+              >
+                일반 캠페인 보기
+              </Button>
             </div>
           </div>
         </div>

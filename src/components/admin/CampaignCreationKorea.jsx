@@ -31,8 +31,14 @@ const CampaignCreationKorea = () => {
       instagram: false,
       youtube: true,
       tiktok: false
-    }
+    },
+    question1: '',
+    question2: '',
+    question3: '',
+    question4: ''
   })
+
+  const [questionCount, setQuestionCount] = useState(1)
 
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
@@ -69,6 +75,14 @@ const CampaignCreationKorea = () => {
           ...data,
           target_platforms: data.target_platforms || { instagram: true, youtube: false, tiktok: false }
         })
+        
+        // 질문 개수 계산
+        let count = 0
+        if (data.question1) count = 1
+        if (data.question2) count = 2
+        if (data.question3) count = 3
+        if (data.question4) count = 4
+        setQuestionCount(count || 1)
       }
     } catch (err) {
       console.error('캠페인 데이터 로드 실패:', err)
@@ -334,6 +348,82 @@ const CampaignCreationKorea = () => {
                     <SelectItem value="draft">임시저장</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* 질문 섹션 */}
+              <div className="border-t pt-6 mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <Label className="text-lg font-semibold">지원자 질문 (선택사항)</Label>
+                  {questionCount < 4 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuestionCount(prev => Math.min(prev + 1, 4))}
+                    >
+                      + 질문 추가
+                    </Button>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500 mb-4">지원자에게 물어볼 질문을 최대 4개까지 추가할 수 있습니다.</p>
+                
+                <div className="space-y-4">
+                  {/* 질문 1 */}
+                  {questionCount >= 1 && (
+                    <div>
+                      <Label htmlFor="question1">질문 1</Label>
+                      <Textarea
+                        id="question1"
+                        value={campaignForm.question1}
+                        onChange={(e) => setCampaignForm(prev => ({ ...prev, question1: e.target.value }))}
+                        placeholder="예: 본인의 피부 타입과 주요 피부 고민을 알려주세요."
+                        rows={2}
+                      />
+                    </div>
+                  )}
+
+                  {/* 질문 2 */}
+                  {questionCount >= 2 && (
+                    <div>
+                      <Label htmlFor="question2">질문 2</Label>
+                      <Textarea
+                        id="question2"
+                        value={campaignForm.question2}
+                        onChange={(e) => setCampaignForm(prev => ({ ...prev, question2: e.target.value }))}
+                        placeholder="예: 평소 사용하는 스킨케어 제품을 알려주세요."
+                        rows={2}
+                      />
+                    </div>
+                  )}
+
+                  {/* 질문 3 */}
+                  {questionCount >= 3 && (
+                    <div>
+                      <Label htmlFor="question3">질문 3</Label>
+                      <Textarea
+                        id="question3"
+                        value={campaignForm.question3}
+                        onChange={(e) => setCampaignForm(prev => ({ ...prev, question3: e.target.value }))}
+                        placeholder="예: 이 캠페인에 지원한 이유를 알려주세요."
+                        rows={2}
+                      />
+                    </div>
+                  )}
+
+                  {/* 질문 4 */}
+                  {questionCount >= 4 && (
+                    <div>
+                      <Label htmlFor="question4">질문 4</Label>
+                      <Textarea
+                        id="question4"
+                        value={campaignForm.question4}
+                        onChange={(e) => setCampaignForm(prev => ({ ...prev, question4: e.target.value }))}
+                        placeholder="예: 콘텐츠 제작 시 중점적으로 다루고 싶은 부분이 있나요?"
+                        rows={2}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* 에러/성공 메시지 */}
