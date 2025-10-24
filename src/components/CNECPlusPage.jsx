@@ -117,7 +117,7 @@ const CNECPlusPage = () => {
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <img src={cnecLogo} alt="CNEC Korea" className="h-10" />
+            <img src={cnecLogo} alt="CNEC Korea" className="h-16" />
           </Link>
           <Link 
             to="/" 
