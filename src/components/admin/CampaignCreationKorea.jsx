@@ -142,11 +142,22 @@ const CampaignCreationKorea = () => {
     setSuccess('')
 
     try {
+      // question1-4를 questions JSONB 배열로 변환
+      const questions = [
+        campaignForm.question1,
+        campaignForm.question2,
+        campaignForm.question3,
+        campaignForm.question4
+      ].filter(q => q && q.trim() !== '').map(q => ({ question: q }))
+
+      const { question1, question2, question3, question4, target_platforms, ...restForm } = campaignForm
+
       const campaignData = {
-        ...campaignForm,
+        ...restForm,
         reward_points: parseInt(campaignForm.reward_points) || 0,
         total_slots: parseInt(campaignForm.total_slots) || 0,
-        remaining_slots: parseInt(campaignForm.remaining_slots) || parseInt(campaignForm.total_slots) || 0
+        remaining_slots: parseInt(campaignForm.remaining_slots) || parseInt(campaignForm.total_slots) || 0,
+        questions: questions.length > 0 ? questions : null
       }
 
       if (editId) {
