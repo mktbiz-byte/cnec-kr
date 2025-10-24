@@ -35,7 +35,7 @@ const LoginPageExactReplica = () => {
     e.preventDefault()
     
     if (!formData.email || !formData.password) {
-      setError('メールアドレスとパスワードを入力してください。')
+      setError('이메일と비밀번호を入力してください。')
       return
     }
 
@@ -53,7 +53,7 @@ const LoginPageExactReplica = () => {
       // 에러 메시지 번역
       let errorMessage = error.message
       if (error.message.includes('Invalid login credentials')) {
-        errorMessage = 'メールアドレスまたはパスワードが正しくありません。'
+        errorMessage = '이메일또는비밀번호が正しくありません。'
       } else if (error.message.includes('Email not confirmed')) {
         errorMessage = 'メール認証が必要です。メールを確認してください。'
       }
@@ -73,7 +73,7 @@ const LoginPageExactReplica = () => {
       // 구글 로그인은 리다이렉트되므로 여기서 navigate 하지 않음
     } catch (error) {
       console.error('Google login error:', error)
-      setError('Googleログインに失敗しました。再度お試しください。')
+      setError('Google로그인に失敗しました。再度お試しください。')
       setIsLoading(false)
     }
   }
@@ -89,7 +89,7 @@ const LoginPageExactReplica = () => {
             className="text-gray-600 hover:text-gray-800 bg-green-100 border-green-300 hover:bg-green-200"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            ホームに戻る
+            홈으로 돌아가기
           </Button>
         </div>
 
@@ -98,10 +98,10 @@ const LoginPageExactReplica = () => {
           <CardHeader className="text-center pb-6">
             <div className="text-4xl mb-4">🎬</div>
             <CardTitle className="text-2xl font-bold text-gray-800">
-              ログイン
+              로그인
             </CardTitle>
             <CardDescription className="text-gray-600">
-              CNEC Japanアカウントでログインしてください
+              CNEC Japanアカウントで로그인してください
             </CardDescription>
           </CardHeader>
           
@@ -123,7 +123,7 @@ const LoginPageExactReplica = () => {
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
               )}
-              Googleでログイン
+              Googleで로그인
             </Button>
 
             {/* 구분선 - 참조 사이트와 동일 */}
@@ -133,7 +133,7 @@ const LoginPageExactReplica = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-white px-2 text-orange-500 font-medium">
-                  または
+                  또는
                 </span>
               </div>
             </div>
@@ -142,7 +142,7 @@ const LoginPageExactReplica = () => {
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-orange-600 font-medium">
-                  メールアドレス
+                  이메일
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
@@ -150,7 +150,7 @@ const LoginPageExactReplica = () => {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="メールアドレスを入力してください"
+                    placeholder="이메일を入力してください"
                     value={formData.email}
                     onChange={handleInputChange}
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
@@ -161,7 +161,7 @@ const LoginPageExactReplica = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-green-600 font-medium">
-                  パスワード
+                  비밀번호
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
@@ -169,7 +169,7 @@ const LoginPageExactReplica = () => {
                     id="password"
                     name="password"
                     type="password"
-                    placeholder="パスワードを入力してください"
+                    placeholder="비밀번호を入力してください"
                     value={formData.password}
                     onChange={handleInputChange}
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
@@ -193,14 +193,14 @@ const LoginPageExactReplica = () => {
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : null}
-                ログイン
+                로그인
               </Button>
             </form>
 
             {/* 회원가입 링크 - 참조 사이트와 동일 */}
             <div className="text-center text-sm">
               <span className="text-gray-600">
-                アカウントをお持ちでないですか？
+                계정이 없으신가요?
               </span>{' '}
               <Link to="/signup" className="text-red-600 hover:text-red-700 font-medium underline">
                 新規登録

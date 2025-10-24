@@ -42,11 +42,11 @@ const SignupPageExactReplica = () => {
     }
 
     if (formData.password.length < 6) {
-      return 'パスワードは6文字以上である必要があります。'
+      return '비밀번호は6文字以上である必要があります。'
     }
 
     if (formData.password !== formData.confirmPassword) {
-      return 'パスワードが一致しません。'
+      return '비밀번호が一致しません。'
     }
 
     return null
@@ -72,11 +72,11 @@ const SignupPageExactReplica = () => {
       console.error('Signup error:', error)
       
       if (error.message.includes('already registered')) {
-        setError('すでに登録されているメールアドレスです。')
+        setError('すでに가입されている이메일です。')
       } else if (error.message.includes('weak password')) {
-        setError('パスワードが弱すぎます。より強いパスワードを使用してください。')
+        setError('비밀번호が弱すぎます。より強い비밀번호を使用してください。')
       } else {
-        setError('会員登録中にエラーが発生しました。再度お試しください。')
+        setError('회원가입中にエラーが発生しました。再度お試しください。')
       }
     } finally {
       setLoading(false)
@@ -91,7 +91,7 @@ const SignupPageExactReplica = () => {
       await signInWithGoogle()
     } catch (error) {
       console.error('Google signup error:', error)
-      setError('Google会員登録中にエラーが発生しました。')
+      setError('Google회원가입中にエラーが発生しました。')
     } finally {
       setLoading(false)
     }
@@ -106,20 +106,20 @@ const SignupPageExactReplica = () => {
             メール確認が必要です
           </h2>
           <p className="text-gray-600 mb-6">
-            会員登録が完了しました！メールを確認してアカウントを有効化してください。
+            회원가입が完了しました！メールを確認してアカウントを有効化してください。
           </p>
           <div className="space-y-3">
             <button 
               onClick={() => navigate('/login')} 
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition-colors"
             >
-              ログインページへ
+              로그인ページへ
             </button>
             <button 
               onClick={() => navigate('/')} 
               className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-md transition-colors"
             >
-              ホームに戻る
+              홈으로 돌아가기
             </button>
           </div>
         </div>
@@ -138,7 +138,7 @@ const SignupPageExactReplica = () => {
             className="text-gray-600 hover:text-gray-800 bg-green-100 border-green-300 hover:bg-green-200"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            ホームに戻る
+            홈으로 돌아가기
           </Button>
         </div>
 
@@ -146,10 +146,10 @@ const SignupPageExactReplica = () => {
           <CardHeader className="text-center pb-6">
             <div className="text-4xl mb-4">🎬</div>
             <CardTitle className="text-2xl font-bold text-gray-800">
-              会員登録
+              회원가입
             </CardTitle>
             <CardDescription className="text-gray-600">
-              CNEC Japanに登録してキャンペーンに参加しましょう
+              CNEC Korea에 가입하고 캠페인에 참여하세요
             </CardDescription>
           </CardHeader>
           
@@ -168,7 +168,7 @@ const SignupPageExactReplica = () => {
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Googleで会員登録
+              Googleで회원가입
             </Button>
 
             {/* 구분선 - 참조 사이트와 동일 */}
@@ -178,7 +178,7 @@ const SignupPageExactReplica = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-white px-2 text-orange-500 font-medium">
-                  または
+                  또는
                 </span>
               </div>
             </div>
@@ -187,7 +187,7 @@ const SignupPageExactReplica = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-purple-600 font-medium">
-                  名前
+                  이름
                 </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
@@ -197,7 +197,7 @@ const SignupPageExactReplica = () => {
                     type="text"
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="名前を入力してください"
+                    placeholder="이름を入力してください"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
@@ -206,7 +206,7 @@ const SignupPageExactReplica = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-orange-600 font-medium">
-                  メールアドレス
+                  이메일
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
@@ -216,7 +216,7 @@ const SignupPageExactReplica = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="メールアドレスを入力してください"
+                    placeholder="이메일を入力してください"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
@@ -225,7 +225,7 @@ const SignupPageExactReplica = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-green-600 font-medium">
-                  パスワード
+                  비밀번호
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
@@ -235,7 +235,7 @@ const SignupPageExactReplica = () => {
                     type="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="パスワードを入力してください"
+                    placeholder="비밀번호を入力してください"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
@@ -244,7 +244,7 @@ const SignupPageExactReplica = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-blue-600 font-medium">
-                  パスワード確認
+                  비밀번호確認
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
@@ -254,7 +254,7 @@ const SignupPageExactReplica = () => {
                     type="password"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    placeholder="パスワードを再入力してください"
+                    placeholder="비밀번호を再入力してください"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
@@ -276,17 +276,17 @@ const SignupPageExactReplica = () => {
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : null}
-                会員登録
+                회원가입
               </Button>
             </form>
 
             {/* 로그인 링크 - 참조 사이트와 동일 */}
             <div className="text-center text-sm">
               <span className="text-gray-600">
-                すでにアカウントをお持ちですか？
+                이미 계정이 있으신가요?
               </span>{' '}
               <Link to="/login" className="text-red-600 hover:text-red-700 font-medium underline">
-                ログイン
+                로그인
               </Link>
             </div>
           </CardContent>
