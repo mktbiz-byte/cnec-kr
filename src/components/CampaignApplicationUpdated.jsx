@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { useLanguage } from '../contexts/LanguageContext'
 import { database } from '../lib/supabase'
 
 
@@ -10,7 +9,6 @@ const CampaignApplicationUpdated = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { language } = useLanguage()
 
   // URL에서 campaign_id 파라미터 가져오기 (두 가지 방법 모두 지원)
   const campaignId = id || searchParams.get('campaign_id')
@@ -105,72 +103,17 @@ const CampaignApplicationUpdated = () => {
       postalCodeRequired: '우편번호는 필수입니다',
       addressRequired: '주소는 필수입니다',
       phoneRequired: '연락처는 필수입니다',
-      instagramRequired: '인스타그램 URL은 필수입니다'
-    },
-    ja: {
-      title: 'キャンペーン応募',
-      backToCampaigns: 'キャンペーン一覧へ',
-      campaignInfo: 'キャンペーン情報',
-      applicationForm: '応募フォーム',
-      personalInfo: '個人情報',
-      contactInfo: '連絡先・配送情報',
-      snsInfo: 'SNS情報',
-      questions: '質問回答',
-      additionalInfo: '追加情報',
-      submit: '応募する',
-      submitting: '応募中...',
-      alreadyApplied: '既に応募済みのキャンペーンです',
-      applicationSuccess: 'キャンペーン応募が完了しました！',
-      requiredField: '必須項目',
-      optionalField: '任意項目',
-      reward: '報酬金',
-      participants: '募集人数',
-      deadline: '応募締切',
-      period: 'キャンペーン期間',
-      requirements: '参加条件',
-      description: 'キャンペーン説明',
-      brand: 'ブランド',
-      category: 'カテゴリ',
-      profileIncomplete: 'プロフィールを先に完成させてください',
-      goToProfile: 'プロフィール設定',
-      campaignNotFound: 'キャンペーンが見つかりません',
-      loginRequired: 'ログインが必要です',
+      instagramRequired: '인스타그램 URL은 필수입니다',
+      portraitRightsRequired: '초상권 사용 동의가 필요합니다',
       
-      // 폼 필드
-      name: '名前',
-      email: 'メール',
-      age: '年齢',
-      skinType: '肌タイプ',
-      postalCode: '郵便番号',
-      address: '住所',
-      phoneNumber: '電話番号',
-      instagramUrl: 'Instagram URL',
-      youtubeUrl: 'YouTube URL',
-      tiktokUrl: 'TikTok URL',
-      
-      // 플레이스홀더
-      postalCodePlaceholder: '例: 123-4567',
-      addressPlaceholder: '詳細住所を入力してください',
-      phoneNumberPlaceholder: '例: 090-1234-5678',
-      instagramPlaceholder: 'https://instagram.com/username',
-      youtubePlaceholder: 'https://youtube.com/@username',
-      tiktokPlaceholder: 'https://tiktok.com/@username',
-      
-      // 검증 메시지
-      postalCodeRequired: '郵便番号は必須です',
-      addressRequired: '住所は必須です',
-      phoneRequired: '電話番号は必須です',
-      instagramRequired: 'Instagram URLは必須です',
-      portraitRightsRequired: '肖像権の使用許諾への同意が必要です',
-      
-      // 肖像権使用許諾
-      portraitRightsTitle: '肖像権使用許諾について',
-      portraitRightsConsent: '本キャンペーンにおいて制作する動画コンテンツに含まれる私の肖像（顔、姿、音声を含む）について、ブランド及びCNECプラットフォームが、マーケティング、プロモーション、商業目的で使用することを、コンテンツ提出日から1年間許諾します。当該コンテンツは、ソーシャルメディア、ウェブサイト、広告、販促資料等、様々なメディアチャネルで使用される可能性があることを理解しています。',
-      portraitRightsConsentShort: '動画コンテンツの肖像権を1年間使用することに同意します'
+      // 초상권 사용 동의
+      portraitRightsTitle: '초상권 사용 동의',
+      portraitRightsConsent: '본 캠페인에서 제작하는 영상 콘텐츠에 포함된 본인의 초상(얼굴, 모습, 음성 포함)에 대해, 브랜드 및 CNEC 플랫폼이 마케팅, 프로모션, 상업적 목적으로 콘텐츠 제출일로부터 1년간 사용하는 것에 동의합니다. 해당 콘텐츠는 소셜미디어, 웹사이트, 광고, 판촉 자료 등 다양한 미디어 채널에서 사용될 수 있음을 이해합니다.',
+      portraitRightsConsentShort: '영상 콘텐츠의 초상권을 1년간 사용하는 것에 동의합니다'
     }
   }
 
-  const t = texts[language] || texts.ko
+  const t = texts.ko
 
   useEffect(() => {
     if (!user) {
@@ -367,12 +310,12 @@ const CampaignApplicationUpdated = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return ''
-    return new Date(dateString).toLocaleDateString(language === 'ja' ? 'ja-JP' : 'ko-KR')
+    return new Date(dateString).toLocaleDateString('ko-KR')
   }
 
   const formatCurrency = (amount) => {
-    if (!amount) return '¥0'
-    return `¥${amount.toLocaleString()}`
+    if (!amount) return '₩0'
+    return `₩${amount.toLocaleString()}`
   }
 
   if (loading) {

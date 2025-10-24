@@ -1,23 +1,16 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LanguageProvider } from './contexts/LanguageContext';
 import emailScheduler from './lib/emailScheduler';
 import './App.css';
 
-// 모든 페이지 컴포넌트 import
-import HomePageExactReplica from './components/HomePageExactReplica';
-import LoginPageExactReplica from './components/LoginPageExactReplica';
-import SignupPageExactReplica from './components/SignupPageExactReplica';
+// 페이지 컴포넌트
+import HomePage from './components/HomePage';
+import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage';
 import CampaignApplicationPage from './components/CampaignApplicationPage';
-// import CompanyReport from './components/CompanyReport';
-// import CompanyReport from './components/CompanyReport_fixed';
-import CompanyReport_multilingual from './components/admin/CompanyReport_multilingual';
 import CompanyReportNew from './components/CompanyReportNew';
-import MyPageWithWithdrawal from './components/MyPageWithWithdrawal';
-import PayPalWithdrawal from './components/PayPalWithdrawal';
-import JapanWithdrawalRequest from './components/JapanWithdrawalRequest';
-import ProfileManagement from './components/ProfileManagement';
+import MyPageKorea from './components/MyPageKorea';
 import ProfileSettings from './components/ProfileSettings';
 import AuthCallbackSafe from './components/AuthCallbackSafe';
 
@@ -25,15 +18,8 @@ import AuthCallbackSafe from './components/AuthCallbackSafe';
 import AdminDashboardSimple from './components/admin/AdminDashboardSimple';
 import AdminCampaignsWithQuestions from './components/admin/AdminCampaignsWithQuestions';
 import CampaignCreationWithTranslator from './components/admin/CampaignCreationWithTranslator';
-// import ApplicationsReportSimple from './components/admin/ApplicationsReportSimple';
-// import ApplicationsReportSimple from './components/admin/ApplicationsReportSimple_fixed_detail';
-// import ApplicationsReportSimple from './components/admin/ApplicationsReportSimple_fixed_detail_improved';
 import ApplicationsReportSimple from './components/admin/ApplicationsReportSimple_final';
-// import ConfirmedCreatorsReport from './components/admin/ConfirmedCreatorsReport';
-// import SNSUploadFinalReport from './components/admin/SNSUploadFinalReport';
-import ConfirmedCreatorsReport_multilingual from './components/admin/ConfirmedCreatorsReport_multilingual';
 import AdminConfirmedCreators from './components/admin/AdminConfirmedCreators';
-import SNSUploadFinalReport_multilingual from './components/admin/SNSUploadFinalReport_multilingual';
 import ConfirmedCreatorsNew from './components/admin/ConfirmedCreatorsNew';
 import SNSUploadNew from './components/admin/SNSUploadNew';
 import CampaignReportEnhanced from './components/admin/CampaignReportEnhanced';
@@ -43,14 +29,11 @@ import AdminWithdrawals from './components/admin/AdminWithdrawals';
 import SystemSettings from './components/admin/SystemSettings';
 import EmailSettings from './components/admin/EmailSettings';
 
-// 테스트용 관리자 로그인 컴포넌트
+// 관리자 로그인
 import SecretAdminLogin from './components/SecretAdminLogin';
 import TestAdminLogin from './components/TestAdminLogin';
 import CampaignApplicationUpdated from './components/CampaignApplicationUpdated';
 import ProtectedRoute from './components/ProtectedRoute';
-
-// 다국어 지원 초기화
-import i18n from './lib/i18n';
 
 const AppContent = () => {
   const { user } = useAuth();
@@ -69,22 +52,21 @@ const AppContent = () => {
     <div className="App">
       <Routes>
         {/* 메인 페이지 */}
-        <Route path="/" element={<HomePageExactReplica />} />
+        <Route path="/" element={<HomePage />} />
         
         {/* 인증 관련 */}
-        <Route path="/login" element={<LoginPageExactReplica />} />
-        <Route path="/signup" element={<SignupPageExactReplica />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/auth/callback" element={<AuthCallbackSafe />} />
         
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/mypage" element={<MyPageWithWithdrawal />} />
+        <Route path="/mypage" element={<MyPageKorea />} />
         <Route path="/profile" element={<ProfileSettings />} />
-        <Route path="/paypal-withdrawal" element={<PayPalWithdrawal />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         
-        {/* 관리자 페이지 - 보안을 위해 /admin/ 경로 제거 */}
+        {/* 관리자 페이지 */}
         <Route path="/secret-admin-login" element={<SecretAdminLogin />} />
         <Route path="/test-admin-login" element={<TestAdminLogin />} />
         <Route path="/dashboard" element={<ProtectedRoute requireAdmin={true}><AdminDashboardSimple /></ProtectedRoute>} />
@@ -98,7 +80,6 @@ const AppContent = () => {
         <Route path="/sns-uploads/:campaignId" element={<ProtectedRoute requireAdmin={true}><SNSUploadNew /></ProtectedRoute>} />
         <Route path="/campaign-report/:campaignId" element={<ProtectedRoute requireAdmin={true}><CampaignReportEnhanced /></ProtectedRoute>} />
         <Route path="/email-templates" element={<ProtectedRoute requireAdmin={true}><EmailTemplateManager /></ProtectedRoute>} />
-        <Route path="/users-manage" element={<ProtectedRoute requireAdmin={true}><UserApprovalManagerEnhanced /></ProtectedRoute>} />
         <Route path="/user-approval" element={<ProtectedRoute requireAdmin={true}><UserApprovalManagerEnhanced /></ProtectedRoute>} />
         <Route path="/withdrawals-manage" element={<ProtectedRoute requireAdmin={true}><AdminWithdrawals /></ProtectedRoute>} />
         <Route path="/system-settings" element={<ProtectedRoute requireAdmin={true}><SystemSettings /></ProtectedRoute>} />
@@ -108,16 +89,15 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
+function App() {
   return (
     <Router>
       <AuthProvider>
-        <LanguageProvider>
-          <AppContent />
-        </LanguageProvider>
+        <AppContent />
       </AuthProvider>
     </Router>
   );
-};
+}
 
 export default App;
+
