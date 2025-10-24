@@ -281,6 +281,21 @@ const HomePageExactReplica = () => {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          
+          {/* CNEC Plus 지원 버튼 */}
+          <div className="mb-8 text-center">
+            <a
+              href="/cnecplus"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition shadow-xl"
+            >
+              <span className="text-2xl">👑</span>
+              CNEC Plus 프리미엄 크리에이터 지원하기
+              <span>→</span>
+            </a>
+            <p className="text-gray-200 text-sm mt-3">
+              더 높은 지원금과 비공개 프리미엄 캠페인 접근 권한
+            </p>
+          </div>
             <Button 
               size="lg" 
               className="bg-purple-600 text-white hover:bg-purple-700 border-2 border-purple-400"
