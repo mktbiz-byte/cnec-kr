@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import cnecLogo from '../assets/cnec-logo-horizontal.png'
+import cnecLogo from '../assets/cnec-logo-clean.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { database } from '../lib/supabase'
