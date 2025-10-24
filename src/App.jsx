@@ -18,7 +18,7 @@ import AuthCallbackSafe from './components/AuthCallbackSafe';
 // 관리자 컴포넌트
 import AdminDashboardSimple from './components/admin/AdminDashboardSimple';
 import AdminCampaignsWithQuestions from './components/admin/AdminCampaignsWithQuestions';
-import CampaignCreationWithTranslator from './components/admin/CampaignCreationWithTranslator';
+import CampaignCreationKorea from './components/admin/CampaignCreationKorea';
 import ApplicationsReportSimple from './components/admin/ApplicationsReportSimple_final';
 import AdminConfirmedCreators from './components/admin/AdminConfirmedCreators';
 import ConfirmedCreatorsNew from './components/admin/ConfirmedCreatorsNew';
@@ -72,7 +72,7 @@ const AppContent = () => {
         <Route path="/test-admin-login" element={<TestAdminLogin />} />
         <Route path="/dashboard" element={<ProtectedRoute requireAdmin={true}><AdminDashboardSimple /></ProtectedRoute>} />
         <Route path="/campaigns-manage" element={<ProtectedRoute requireAdmin={true}><AdminCampaignsWithQuestions /></ProtectedRoute>} />
-        <Route path="/campaign-create" element={<ProtectedRoute requireAdmin={true}><CampaignCreationWithTranslator /></ProtectedRoute>} />
+        <Route path="/campaign-create" element={<ProtectedRoute requireAdmin={true}><CampaignCreationKorea /></ProtectedRoute>} />
         <Route path="/applications-manage" element={<ProtectedRoute requireAdmin={true}><ApplicationsReportSimple /></ProtectedRoute>} />
         <Route path="/applications-report" element={<ProtectedRoute requireAdmin={true}><ApplicationsReportSimple /></ProtectedRoute>} />
         <Route path="/confirmed-creators" element={<ProtectedRoute requireAdmin={true}><AdminConfirmedCreators /></ProtectedRoute>} />

@@ -15,7 +15,7 @@ const CampaignCreationWithTranslator = () => {
     brand: '',
     description: '',
     requirements: '',
-    category: 'beauty',
+    category: 'youtube',  // youtube, instagram, 4week_challenge
     image_url: '',
     reward_amount: '',
     max_participants: '',
@@ -53,11 +53,7 @@ const CampaignCreationWithTranslator = () => {
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imageFile, setImageFile] = useState(null)
 
-  // 번역기 상태
-  const [koreanText, setKoreanText] = useState('')
-  const [japaneseText, setJapaneseText] = useState('')
-  const [isTranslating, setIsTranslating] = useState(false)
-  const [translationError, setTranslationError] = useState('')
+
 
   // 번역 함수
   const translateText = async (text) => {
@@ -83,11 +79,11 @@ const CampaignCreationWithTranslator = () => {
           messages: [
             {
               role: 'system',
-              content: '당신은 한국어를 자연스러운 일본어로 번역하는 전문 번역가입니다. 마케팅 문구나 캠페인 내용을 번역할 때는 일본 현지 감각에 맞게 자연스럽게 번역해주세요.'
+              content: '당신은 한국어를 자연스러운 번역하는 전문 번역가입니다. 마케팅 문구나 캠페인 내용을 번역할 때는 일본 현지 감각에 맞게 자연스럽게 번역해주세요.'
             },
             {
               role: 'user',
-              content: `다음 한국어 텍스트를 자연스러운 일본어로 번역해주세요:\n\n${text}`
+              content: `다음 한국어 텍스트를 자연스러운 번역해주세요:\n\n${text}`
             }
           ],
           max_tokens: 1000,
@@ -318,7 +314,7 @@ const CampaignCreationWithTranslator = () => {
         brand: '',
         description: '',
         requirements: '',
-        category: 'beauty',
+        category: 'youtube',  // youtube, instagram, 4week_challenge
         image_url: '',
         reward_amount: '',
         max_participants: '',
@@ -891,7 +887,7 @@ const CampaignCreationWithTranslator = () => {
 
           {/* 오른쪽: 번역기 (스크롤 따라다님) */}
           <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-4 h-fit">
-            <h2 className="text-xl font-semibold mb-6 text-gray-900">🌐 한국어 → 일본어 번역기</h2>
+            <h2 className="text-xl font-semibold mb-6 text-gray-900">🌐 캠페인 정보</h2>
             
             <div className="space-y-6">
               {/* 한국어 입력 */}
@@ -940,7 +936,7 @@ const CampaignCreationWithTranslator = () => {
               {/* 일본어 결과 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  🇯🇵 일본어 번역 결과
+                  🇯🇵 번역 결과
                 </label>
                 <div className="relative">
                   <textarea
