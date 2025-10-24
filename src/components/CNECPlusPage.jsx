@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { database } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { Crown, Star, TrendingUp, Users, CheckCircle, ArrowRight, Home } from 'lucide-react'
-import cnecLogo from '../assets/cnec-logo-clean.png'
+import cnecLogo from '../assets/cnec-logo-final.png'
 
 const CNECPlusPage = () => {
   const navigate = useNavigate()
