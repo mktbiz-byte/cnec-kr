@@ -141,7 +141,7 @@ const HomePageExactReplica = () => {
       case 'instagram':
         return 'bg-pink-100 text-pink-800'
       case 'tiktok':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-blue-100 text-blue-800'
       case 'youtube':
         return 'bg-red-100 text-red-800'
       case 'twitter':
@@ -164,33 +164,33 @@ const HomePageExactReplica = () => {
             
             {/* 데스크톱 네비게이션 메뉴 */}
             <nav className="hidden md:flex items-center space-x-4">
-              <Badge className="bg-green-500 text-white hover:bg-green-600 cursor-pointer">
+              <Badge className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
                 <a href="#campaigns">캠페인</a>
               </Badge>
-              <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer">
+              <Badge className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
                 <a href="#about">서비스소개</a>
               </Badge>
-              <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer">
+              <Badge className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
                 <a href="https://www.youtube.com/@bizcnec" target="_blank" rel="noopener noreferrer">포트폴리오</a>
               </Badge>
-              <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer">
+              <Badge className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
                 <a href="#guide">참가방법</a>
               </Badge>
               {user ? (
                 <>
-                  <Badge className="bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer">
+                  <Badge className="bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer">
                     <Link to="/mypage">마이페이지</Link>
                   </Badge>
-                  <Badge className="bg-gray-500 text-white hover:bg-gray-600 cursor-pointer">
+                  <Badge className="bg-gray-600 text-white hover:bg-gray-700 cursor-pointer">
                     <button onClick={signOut}>로그아웃</button>
                   </Badge>
                 </>
               ) : (
                 <>
-                  <Badge className="bg-teal-500 text-white hover:bg-teal-600 cursor-pointer">
+                  <Badge className="bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer">
                     <Link to="/login">로그인</Link>
                   </Badge>
-                  <Badge className="bg-purple-600 text-white hover:bg-purple-700 cursor-pointer">
+                  <Badge className="bg-blue-700 text-white hover:bg-blue-800 cursor-pointer">
                     <Link to="/signup">회원가입</Link>
                   </Badge>
                 </>
@@ -219,7 +219,7 @@ const HomePageExactReplica = () => {
                 <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer w-fit">
                   <a href="https://www.youtube.com/@bizcnec" target="_blank" rel="noopener noreferrer">포트폴리오</a>
                 </Badge>
-                <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer w-fit">
+                <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer w-fit">
                   <a href="#guide">참가방법</a>
                 </Badge>
                 {user ? (
@@ -236,7 +236,7 @@ const HomePageExactReplica = () => {
                     <Badge className="bg-teal-500 text-white hover:bg-teal-600 cursor-pointer w-fit">
                       <Link to="/login">로그인</Link>
                     </Badge>
-                    <Badge className="bg-purple-600 text-white hover:bg-purple-700 cursor-pointer w-fit">
+                    <Badge className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer w-fit">
                       <Link to="/signup">회원가입</Link>
                     </Badge>
                   </>
@@ -249,19 +249,8 @@ const HomePageExactReplica = () => {
 
       {/* Hero Section - PDF 개선안 반영 */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500"></div>
         <div className="relative container mx-auto px-4 text-center text-white">
-          {/* 로고 섹션 */}
-          <div className="mb-8">
-            <div className="flex items-center justify-center space-x-3 mb-3">
-              <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center">
-                <span className="text-3xl">C</span>
-              </div>
-              <h1 className="text-4xl font-bold">CNEC Korea</h1>
-            </div>
-            <p className="text-lg opacity-90">K-뷰티와 크리에이터를 연결합니다</p>
-          </div>
-
           {/* 메인 타이틀 */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             K-Beauty 크리에이터와 함께
@@ -292,7 +281,7 @@ const HomePageExactReplica = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               size="lg" 
-              className="bg-white text-purple-600 hover:bg-gray-100 font-bold text-lg px-8 py-6"
+              className="bg-white text-blue-600 hover:bg-gray-100 font-bold text-lg px-8 py-6"
               asChild
             >
               <Link to="/signup">
@@ -301,7 +290,7 @@ const HomePageExactReplica = () => {
             </Button>
             <Button 
               size="lg" 
-              className="bg-purple-700 text-white hover:bg-purple-800 font-bold text-lg px-8 py-6"
+              className="bg-blue-700 text-white hover:bg-blue-800 font-bold text-lg px-8 py-6"
             >
               <a href="#programs">
                 프로그램 알아보기
@@ -311,173 +300,26 @@ const HomePageExactReplica = () => {
 
           {/* 핵심 가치 제안 (3가지) */}
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6 shadow-lg">
               <div className="text-5xl mb-4">🎓</div>
-              <h3 className="text-xl font-bold mb-2">체계적인 교육</h3>
-              <p className="text-sm opacity-90">뷰티 콘텐츠 제작 노하우 전수</p>
+              <h3 className="text-xl font-bold mb-2 text-blue-600">체계적인 교육</h3>
+              <p className="text-sm text-gray-700">뷰티 콘텐츠 제작 노하우 전수</p>
             </div>
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6 shadow-lg">
               <div className="text-5xl mb-4">🤝</div>
-              <h3 className="text-xl font-bold mb-2">브랜드 파트너십</h3>
-              <p className="text-sm opacity-90">100+ 뷰티 브랜드와 직접 협업</p>
+              <h3 className="text-xl font-bold mb-2 text-blue-600">브랜드 파트너십</h3>
+              <p className="text-sm text-gray-700">100+ 뷰티 브랜드와 직접 협업</p>
             </div>
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6 shadow-lg">
               <div className="text-5xl mb-4">✅</div>
-              <h3 className="text-xl font-bold mb-2">성장 지원</h3>
-              <p className="text-sm opacity-90">유튜브 채널 육성 프로그램</p>
+              <h3 className="text-xl font-bold mb-2 text-blue-600">성장 지원</h3>
+              <p className="text-sm text-gray-700">유튜브 채널 육성 프로그램</p>
             </div>
           </div>
         </div>
       </section>
 
 
-
-      {/* Campaigns Section */}
-      <section id="campaigns" className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">현재 모집 중인 캠페인</h2>
-            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              한국 화장품 브랜드의 최신 캠페인에 참가하고, 당신의 영향력을 수익화하세요
-            </p>
-          </div>
-          
-          {/* 카테고리 탭 */}
-          <div className="flex justify-center mb-12 flex-wrap gap-4">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                selectedCategory === 'all'
-                  ? 'bg-purple-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              전체 캠페인
-            </button>
-            <button
-              onClick={() => setSelectedCategory('youtube')}
-              className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                selectedCategory === 'youtube'
-                  ? 'bg-red-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              🎬 유튜브 모집
-            </button>
-            <button
-              onClick={() => setSelectedCategory('instagram')}
-              className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                selectedCategory === 'instagram'
-                  ? 'bg-pink-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              📸 인스타 모집
-            </button>
-            <button
-              onClick={() => setSelectedCategory('4week_challenge')}
-              className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                selectedCategory === '4week_challenge'
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              🏆 4주 챌린지
-            </button>
-          </div>
-
-          {loading ? (
-            <div className="text-center py-12">
-              <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-              <p className="text-gray-600">캠페인를로딩중...</p>
-            </div>
-          ) : campaigns.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">📋</div>
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                현재 모집 중인 캠페인없습니다
-              </h3>
-              <p className="text-gray-500">새로운캠페인가시작되는까지기다려주세요.</p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {campaigns
-                .filter(campaign => selectedCategory === 'all' || campaign.category === selectedCategory)
-                .map((campaign) => (
-                <Card 
-                  key={campaign.id} 
-                  className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white overflow-hidden"
-                  onClick={() => handleCampaignClick(campaign)}
-                >
-                  {campaign.image_url && (
-                    <div className="w-full h-48 overflow-hidden">
-                      <img 
-                        src={campaign.image_url} 
-                        alt={campaign.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <CardHeader className="pb-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <CardTitle className="text-lg font-bold text-gray-800 leading-tight">
-                        {campaign.title}
-                      </CardTitle>
-                      <Badge className="bg-green-100 text-green-800 font-medium">모집 중</Badge>
-                    </div>
-                    <CardDescription className="text-purple-600 font-medium text-base">
-                      {campaign.brand}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 mb-4 text-sm leading-relaxed line-clamp-4">
-                      {campaign.description}
-                    </p>
-                    
-                    <div className="mb-4">
-                      <div className="text-sm text-gray-500 mb-2">対象플랫폼:</div>
-                      <div className="flex flex-wrap gap-2">
-                        {(() => {
-                          // target_platforms가 객체인 경우 처리
-                          if (campaign.target_platforms && typeof campaign.target_platforms === 'object') {
-                            const platforms = []
-                            if (campaign.target_platforms.instagram) platforms.push('Instagram')
-                            if (campaign.target_platforms.youtube) platforms.push('YouTube')
-                            if (campaign.target_platforms.tiktok) platforms.push('TikTok')
-                            return platforms.length > 0 ? platforms : ['Instagram', 'TikTok']
-                          }
-                          // 배열인 경우 또는 기본값
-                          return campaign.target_platforms || ['Instagram', 'TikTok']
-                        })().map((platform) => (
-                          <Badge 
-                            key={platform} 
-                            className={`${getPlatformColor(platform)} flex items-center space-x-1 text-xs`}
-                          >
-                            {getPlatformIcon(platform)}
-                            <span>{platform}</span>
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-2xl font-bold text-purple-600">
-                          {formatCurrency(campaign.reward_amount)}
-                        </div>
-                        <div className="text-sm text-gray-500">보상</div>
-                      </div>
-                      <Button className="bg-gray-800 text-white hover:bg-gray-900">
-                        자세히 보기
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* About Section - PDF 개선안 반영: 4개 카드 그리드 */}
       <section id="about" className="py-16 bg-white">
@@ -494,7 +336,7 @@ const HomePageExactReplica = () => {
             {/* Feature 1: 크리에이터 육성 */}
             <Card className="hover:shadow-xl transition-shadow">
               <CardHeader>
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-4xl">🎓</span>
                 </div>
                 <CardTitle className="text-center text-xl">크리에이터 육성</CardTitle>
@@ -505,15 +347,15 @@ const HomePageExactReplica = () => {
                 </p>
                 <ul className="text-sm text-gray-600 space-y-2">
                   <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
+                    <span className="text-blue-600 mr-2">✓</span>
                     <span>콘텐츠 제작 교육</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
+                    <span className="text-blue-600 mr-2">✓</span>
                     <span>1:1 멘토링</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">✓</span>
+                    <span className="text-blue-600 mr-2">✓</span>
                     <span>성공 사례 공유</span>
                   </li>
                 </ul>
@@ -610,8 +452,155 @@ const HomePageExactReplica = () => {
         </div>
       </section>
 
+      {/* Campaigns Section */}
+      <section id="campaigns" className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">현재 모집 중인 캠페인</h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              한국 화장품 브랜드의 최신 캠페인에 참가하고, 당신의 영향력을 수익화하세요
+            </p>
+          </div>
+          
+          {/* 카테고리 탭 */}
+          <div className="flex justify-center mb-12 flex-wrap gap-4">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === 'all'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              전체 캠페인
+            </button>
+            <button
+              onClick={() => setSelectedCategory('youtube')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === 'youtube'
+                  ? 'bg-red-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              🎬 유튜브 모집
+            </button>
+            <button
+              onClick={() => setSelectedCategory('instagram')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === 'instagram'
+                  ? 'bg-pink-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              📸 인스타 모집
+            </button>
+            <button
+              onClick={() => setSelectedCategory('4week_challenge')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === '4week_challenge'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              🏆 4주 챌린지
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+              <p className="text-gray-600">캠페인를로딩중...</p>
+            </div>
+          ) : campaigns.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-6xl mb-4">📋</div>
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                현재 모집 중인 캠페인없습니다
+              </h3>
+              <p className="text-gray-500">새로운캠페인가시작되는까지기다려주세요.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {campaigns
+                .filter(campaign => selectedCategory === 'all' || campaign.category === selectedCategory)
+                .map((campaign) => (
+                <Card 
+                  key={campaign.id} 
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white overflow-hidden"
+                  onClick={() => handleCampaignClick(campaign)}
+                >
+                  {campaign.image_url && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={campaign.image_url} 
+                        alt={campaign.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <CardHeader className="pb-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <CardTitle className="text-lg font-bold text-gray-800 leading-tight">
+                        {campaign.title}
+                      </CardTitle>
+                      <Badge className="bg-green-100 text-green-800 font-medium">모집 중</Badge>
+                    </div>
+                    <CardDescription className="text-blue-600 font-medium text-base">
+                      {campaign.brand}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 mb-4 text-sm leading-relaxed line-clamp-4">
+                      {campaign.description}
+                    </p>
+                    
+                    <div className="mb-4">
+                      <div className="text-sm text-gray-500 mb-2">対象플랫폼:</div>
+                      <div className="flex flex-wrap gap-2">
+                        {(() => {
+                          // target_platforms가 객체인 경우 처리
+                          if (campaign.target_platforms && typeof campaign.target_platforms === 'object') {
+                            const platforms = []
+                            if (campaign.target_platforms.instagram) platforms.push('Instagram')
+                            if (campaign.target_platforms.youtube) platforms.push('YouTube')
+                            if (campaign.target_platforms.tiktok) platforms.push('TikTok')
+                            return platforms.length > 0 ? platforms : ['Instagram', 'TikTok']
+                          }
+                          // 배열인 경우 또는 기본값
+                          return campaign.target_platforms || ['Instagram', 'TikTok']
+                        })().map((platform) => (
+                          <Badge 
+                            key={platform} 
+                            className={`${getPlatformColor(platform)} flex items-center space-x-1 text-xs`}
+                          >
+                            {getPlatformIcon(platform)}
+                            <span>{platform}</span>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {formatCurrency(campaign.reward_amount)}
+                        </div>
+                        <div className="text-sm text-gray-500">보상</div>
+                      </div>
+                      <Button className="bg-gray-800 text-white hover:bg-gray-900">
+                        자세히 보기
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* 크리에이터 성장 프로그램 섹션 */}
-      <section id="growth-programs" className="py-16 bg-gradient-to-br from-purple-50 to-blue-50">
+      <section id="growth-programs" className="py-16 bg-gradient-to-br from-blue-50 to-cyan-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">크리에이터 성장 프로그램</h2>
@@ -660,35 +649,35 @@ const HomePageExactReplica = () => {
             </Card>
 
             {/* 숏폼 크리에이터 */}
-            <Card className="hover:shadow-xl transition-shadow bg-gradient-to-br from-purple-50 to-white border-2 border-purple-300">
+            <Card className="hover:shadow-xl transition-shadow bg-gradient-to-br from-blue-50 to-white border-2 border-blue-300">
               <CardHeader>
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-4xl">⭐</span>
                 </div>
-                <CardTitle className="text-center text-xl text-purple-600">숏폼 크리에이터</CardTitle>
+                <CardTitle className="text-center text-xl text-blue-600">숏폼 크리에이터</CardTitle>
                 <p className="text-center text-sm text-gray-600">활동 실적으로 승격</p>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-blue-600 mt-1">✓</span>
                     <span className="text-gray-700"><strong>20-50% 추가 보상</strong></span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-blue-600 mt-1">✓</span>
                     <span className="text-gray-700">캠페인 우선 배정</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-blue-600 mt-1">✓</span>
                     <span className="text-gray-700">브랜드 협업 기회</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-purple-600 mt-1">✓</span>
+                    <span className="text-blue-600 mt-1">✓</span>
                     <span className="text-gray-700">전담 매니저 배정</span>
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => navigate('/cnec-plus')}
                 >
                   상세 보기
@@ -743,14 +732,14 @@ const HomePageExactReplica = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
                 onClick={() => navigate('/cnec-plus')}
               >
                 CNEC Plus 상세보기
               </Button>
               <Button 
                 variant="outline"
-                className="border-2 border-purple-600 text-purple-600 hover:bg-purple-50 px-8 py-3"
+                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3"
                 onClick={() => navigate('/campaigns')}
               >
                 일반 캠페인 보기
@@ -831,7 +820,7 @@ const HomePageExactReplica = () => {
                     <div className="text-gray-600 text-sm">총재생회수</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600 mb-1">98%</div>
+                    <div className="text-3xl font-bold text-blue-600 mb-1">98%</div>
                     <div className="text-gray-600 text-sm">만족도</div>
                   </div>
                 </div>
@@ -874,10 +863,10 @@ const HomePageExactReplica = () => {
                 }
               ].map((item) => (
                 <div key={item.step} className="text-center">
-                  <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <div className="text-purple-600">{item.icon}</div>
+                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="text-blue-600">{item.icon}</div>
                   </div>
-                  <div className="text-sm text-purple-600 font-semibold mb-2">
+                  <div className="text-sm text-blue-600 font-semibold mb-2">
                     STEP {item.step}
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-gray-800">{item.title}</h3>
@@ -908,10 +897,10 @@ const HomePageExactReplica = () => {
                 }
               ].map((item) => (
                 <div key={item.step} className="text-center">
-                  <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <div className="text-purple-600">{item.icon}</div>
+                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="text-blue-600">{item.icon}</div>
                   </div>
-                  <div className="text-sm text-purple-600 font-semibold mb-2">
+                  <div className="text-sm text-blue-600 font-semibold mb-2">
                     STEP {item.step}
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-gray-800">{item.title}</h3>
@@ -972,7 +961,7 @@ const HomePageExactReplica = () => {
               <details key={index} className="bg-gray-50 rounded-lg p-6 cursor-pointer hover:bg-gray-100 transition-colors">
                 <summary className="font-semibold text-lg text-gray-800 flex justify-between items-center">
                   <span>Q. {faq.question}</span>
-                  <span className="text-purple-600 text-2xl">+</span>
+                  <span className="text-blue-600 text-2xl">+</span>
                 </summary>
                 <div className="mt-4 text-gray-600 leading-relaxed border-t border-gray-200 pt-4">
                   {faq.answer}
@@ -1048,7 +1037,7 @@ const HomePageExactReplica = () => {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl">{selectedCampaign?.title}</DialogTitle>
-            <DialogDescription className="text-purple-600 font-medium text-lg">
+            <DialogDescription className="text-blue-600 font-medium text-lg">
               {selectedCampaign?.brand}
             </DialogDescription>
           </DialogHeader>
@@ -1088,7 +1077,7 @@ const HomePageExactReplica = () => {
               
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2">보상</h4>
-                <p className="text-3xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-blue-600">
                   {formatCurrency(selectedCampaign.reward_amount)}
                 </p>
               </div>
