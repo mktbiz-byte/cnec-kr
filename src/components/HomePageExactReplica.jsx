@@ -173,7 +173,7 @@ const HomePageExactReplica = () => {
                 <a href="#about">서비스소개</a>
               </Badge>
               <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer">
-                <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">포트폴리오</a>
+                <a href="https://www.youtube.com/@bizcnec" target="_blank" rel="noopener noreferrer">포트폴리오</a>
               </Badge>
               <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer">
                 <a href="#guide">참가방법</a>
@@ -219,7 +219,7 @@ const HomePageExactReplica = () => {
                   <a href="#about">서비스소개</a>
                 </Badge>
                 <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer w-fit">
-                  <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">포트폴리오</a>
+                  <a href="https://www.youtube.com/@bizcnec" target="_blank" rel="noopener noreferrer">포트폴리오</a>
                 </Badge>
                 <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer w-fit">
                   <a href="#guide">참가방법</a>
@@ -258,10 +258,26 @@ const HomePageExactReplica = () => {
             <br />
             <span className="text-yellow-300">전문플랫폼</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-4xl mx-auto">
-            한국화장품브랜드와크리에이터를연결하는새로운마케팅플랫폼.
-            당신의 창의성을 수익화하세요!
+          <p className="text-xl md:text-2xl mb-4 opacity-90 max-w-4xl mx-auto">
+            집에서 부업하는 크리에이터 플랫폼
           </p>
+          <p className="text-lg md:text-xl mb-8 opacity-90 max-w-3xl mx-auto">
+            ✨ 빠른 포인트 지급 (10만 포인트 = 10만원) | 🎬 숏폼 영상 특화 | 💰 간편한 출금
+          </p>
+          
+          {/* 메인 영상 */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-lg shadow-2xl"
+                src="https://www.youtube.com/embed/GDwYeELp0aQ"
+                title="CNEC Korea 소개 영상"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
@@ -511,7 +527,7 @@ const HomePageExactReplica = () => {
                     
                     <Button 
                       className="bg-red-600 text-white hover:bg-red-700 mb-6"
-                      onClick={() => window.open('https://www.youtube.com/@CNEC_JP', '_blank')}
+                      onClick={() => window.open('https://www.youtube.com/@bizcnec', '_blank')}
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       포트폴리오를보기
