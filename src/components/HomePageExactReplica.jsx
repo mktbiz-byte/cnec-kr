@@ -19,6 +19,8 @@ const HomePageExactReplica = () => {
   const navigate = useNavigate()
   
   const [campaigns, setCampaigns] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [faqs, setFaqs] = useState([])
   const [stats, setStats] = useState({
     totalCampaigns: 0,
     totalCreators: 0,
@@ -337,11 +339,55 @@ const HomePageExactReplica = () => {
       {/* Campaigns Section */}
       <section id="campaigns" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">현재모집 중의캠페인</h2>
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">현재 모집 중인 캠페인</h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              한국화장품브랜드의최신캠페인에참가하고, 당신의영향력를수익화합시다
+              한국 화장품 브랜드의 최신 캠페인에 참가하고, 당신의 영향력을 수익화하세요
             </p>
+          </div>
+          
+          {/* 카테고리 탭 */}
+          <div className="flex justify-center mb-12 flex-wrap gap-4">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === 'all'
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              전체 캠페인
+            </button>
+            <button
+              onClick={() => setSelectedCategory('youtube')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === 'youtube'
+                  ? 'bg-red-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              🎬 유튜브 모집
+            </button>
+            <button
+              onClick={() => setSelectedCategory('instagram')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === 'instagram'
+                  ? 'bg-pink-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              📸 인스타 모집
+            </button>
+            <button
+              onClick={() => setSelectedCategory('4week_challenge')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                selectedCategory === '4week_challenge'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              🏆 4주 챌린지
+            </button>
           </div>
 
           {loading ? (
@@ -353,13 +399,15 @@ const HomePageExactReplica = () => {
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">📋</div>
               <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                현재모집 중의캠페인없습니다
+                현재 모집 중인 캠페인없습니다
               </h3>
               <p className="text-gray-500">새로운캠페인가시작되는까지기다려주세요.</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {campaigns.map((campaign) => (
+              {campaigns
+                .filter(campaign => selectedCategory === 'all' || campaign.category === selectedCategory)
+                .map((campaign) => (
                 <Card 
                   key={campaign.id} 
                   className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white overflow-hidden"
@@ -638,6 +686,77 @@ const HomePageExactReplica = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* FAQ Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">자주 묻는 질문</h2>
+            <p className="text-gray-600 text-lg">
+              크리에이터들이 가장 궁금해하는 질문들을 모았습니다
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                question: '크넥(CNEC)은 어떤 플랫폼인가요?',
+                answer: '크넥은 한국 화장품 브랜드와 크리에이터를 연결하는 인플루언서 마케팅 플랫폼입니다. 집에서 부업으로 숏폼 영상을 제작하고 포인트를 받을 수 있습니다.'
+              },
+              {
+                question: '캠페인에 어떻게 참여하나요?',
+                answer: '1) 회원가입 및 프로필 완성 → 2) 관심 있는 캠페인 선택 → 3) 지원서 작성 → 4) 브랜드 심사 → 5) 선정 시 제품 수령 → 6) 콘텐츠 제작 및 업로드 → 7) 포인트 지급'
+              },
+              {
+                question: '포인트는 언제 지급되나요?',
+                answer: '캠페인 완료 후 브랜드 승인이 완료되면 즉시 포인트가 지급됩니다. 일반적으로 콘텐츠 업로드 후 3-7일 이내에 지급됩니다.'
+              },
+              {
+                question: '포인트는 어떻게 출금하나요?',
+                answer: '마이페이지에서 출금 신청을 할 수 있습니다. 10만 포인트(10만원) 이상부터 출금 가능하며, 은행 계좌 정보와 주민등록번호를 입력하면 됩니다.'
+              },
+              {
+                question: '출금은 얼마나 걸리나요?',
+                answer: '출금 신청 후 영업일 기준 3-5일 이내에 등록하신 은행 계좌로 입금됩니다.'
+              },
+              {
+                question: '캠페인 선정 기준은 무엇인가요?',
+                answer: 'SNS 팔로워 수, 콘텐츠 품질, 과거 캠페인 참여 이력, 브랜드와의 적합성 등을 종합적으로 고려합니다. 팔로워가 적어도 양질의 콘텐츠를 제작하면 선정될 수 있습니다.'
+              },
+              {
+                question: '여러 캠페인에 동시에 참여할 수 있나요?',
+                answer: '네, 가능합니다. 단, 각 캠페인의 마감일을 준수하고 양질의 콘텐츠를 제작할 수 있는 범위 내에서 참여해주세요.'
+              },
+              {
+                question: '개인정보는 안전하게 보관되나요?',
+                answer: '네, 주민등록번호 등 민감한 정보는 암호화되어 저장되며, 관리자도 원본을 볼 수 없습니다. 개인정보보호법에 따라 안전하게 관리됩니다.'
+              }
+            ].map((faq, index) => (
+              <details key={index} className="bg-gray-50 rounded-lg p-6 cursor-pointer hover:bg-gray-100 transition-colors">
+                <summary className="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                  <span>Q. {faq.question}</span>
+                  <span className="text-purple-600 text-2xl">+</span>
+                </summary>
+                <div className="mt-4 text-gray-600 leading-relaxed border-t border-gray-200 pt-4">
+                  {faq.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-gray-600 mb-4">더 궁금한 점이 있으신가요?</p>
+            <Button 
+              size="lg" 
+              className="bg-purple-600 text-white hover:bg-purple-700"
+              onClick={() => navigate('/contact')}
+            >
+              1:1 문의하기
+            </Button>
           </div>
         </div>
       </section>
