@@ -33,12 +33,12 @@ const SignupPageExactReplica = () => {
 
   const validateForm = () => {
     if (!formData.email || !formData.password || !formData.confirmPassword || !formData.name) {
-      return 'すべてのフィールドを入力してください。'
+      return 'すべてのフィールド을 입력하세요。'
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) {
-      return '正しいメール形式を入力してください。'
+      return '正しいメール形式을 입력하세요。'
     }
 
     if (formData.password.length < 6) {
@@ -103,10 +103,10 @@ const SignupPageExactReplica = () => {
         <div className="max-w-md mx-auto text-center bg-white rounded-lg shadow-xl p-8">
           <div className="text-6xl mb-4">📧</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            メール確認が必要です
+            メール확인が必要です
           </h2>
           <p className="text-gray-600 mb-6">
-            회원가입が完了しました！メールを確認してアカウントを有効化してください。
+            회원가입が完了しました！メールを확인してアカウントを有効化してください。
           </p>
           <div className="space-y-3">
             <button 
@@ -168,7 +168,7 @@ const SignupPageExactReplica = () => {
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Googleで회원가입
+              Google로회원가입
             </Button>
 
             {/* 구분선 - 참조 사이트와 동일 */}
@@ -197,7 +197,7 @@ const SignupPageExactReplica = () => {
                     type="text"
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="이름を入力してください"
+                    placeholder="이름을 입력하세요"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
@@ -216,7 +216,7 @@ const SignupPageExactReplica = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="이메일を入力してください"
+                    placeholder="이메일을 입력하세요"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
@@ -235,7 +235,7 @@ const SignupPageExactReplica = () => {
                     type="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="비밀번호を入力してください"
+                    placeholder="비밀번호을 입력하세요"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
@@ -244,7 +244,7 @@ const SignupPageExactReplica = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-blue-600 font-medium">
-                  비밀번호確認
+                  비밀번호확인
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
@@ -254,7 +254,7 @@ const SignupPageExactReplica = () => {
                     type="password"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    placeholder="비밀번호を再入力してください"
+                    placeholder="비밀번호을 다시 입력하세요"
                     className="pl-10 border-pink-200 focus:border-pink-400 focus:ring-pink-400"
                     required
                   />
