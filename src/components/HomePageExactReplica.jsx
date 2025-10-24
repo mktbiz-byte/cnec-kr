@@ -259,7 +259,7 @@ const HomePageExactReplica = () => {
             <span className="text-yellow-300">전문플랫폼</span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-4xl mx-auto">
-            韓国화장품브랜드와크리에이터를연결ぐ새로운しい마케팅플랫폼。
+            한국화장품브랜드와크리에이터를연결하는새로운마케팅플랫폼.
             당신의 창의성을 수익화하세요!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -324,7 +324,7 @@ const HomePageExactReplica = () => {
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">현재모집 중의캠페인</h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              韓国화장품브랜드의최신캠페인에참가하고、당신의영향력를수익화합시다
+              한국화장품브랜드의최신캠페인에참가하고, 당신의영향력를수익화합시다
             </p>
           </div>
 
@@ -339,7 +339,7 @@ const HomePageExactReplica = () => {
               <h3 className="text-lg font-semibold text-gray-600 mb-2">
                 현재모집 중의캠페인없습니다
               </h3>
-              <p className="text-gray-500">새로운しい캠페인가開始되는까지기다려주세요。</p>
+              <p className="text-gray-500">새로운캠페인가시작되는까지기다려주세요.</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -446,7 +446,7 @@ const HomePageExactReplica = () => {
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-800">숏폼영상중시</h3>
               <p className="text-gray-600 leading-relaxed">
-                TikTok、Instagram Reels등숏폼영상플랫폼에최적화
+                TikTok, Instagram Reels등숏폼영상플랫폼에최적화
               </p>
             </div>
             
@@ -490,8 +490,8 @@ const HomePageExactReplica = () => {
                     </div>
                     
                     <p className="text-gray-600 mb-6 leading-relaxed">
-                      실제의캠페인영상와성공사례、크리에이터의인터뷰등、
-                      CNEC의매력적콘텐츠를YouTube에서보기받으실 수 있습니다。
+                      실제의캠페인영상와성공사례, 크리에이터의인터뷰등, 
+                      CNEC의매력적콘텐츠를YouTube에서보기받으실 수 있습니다.
                     </p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -605,7 +605,7 @@ const HomePageExactReplica = () => {
                 },
                 {
                   step: 6,
-                  title: '보상受取',
+                  title: '보상받기',
                   description: '포인트획득와한국의은행계좌로송금',
                   icon: <DollarSign className="h-8 w-8" />
                 }
