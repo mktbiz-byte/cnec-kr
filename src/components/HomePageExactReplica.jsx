@@ -159,21 +159,21 @@ const HomePageExactReplica = () => {
             <div className="flex items-center space-x-3">
               <div className="text-2xl">🎬</div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">CNEC Japan</h1>
-                <p className="text-xs text-gray-600">K-Beauty × ショート動画プラットフォーム</p>
+                <h1 className="text-xl font-bold text-gray-800">CNEC Korea</h1>
+                <p className="text-xs text-gray-600">K-Beauty 인플루언서 마케팅 플랫폼</p>
               </div>
             </div>
             
             {/* 데스크톱 네비게이션 메뉴 */}
             <nav className="hidden md:flex items-center space-x-4">
               <Badge className="bg-green-500 text-white hover:bg-green-600 cursor-pointer">
-                <a href="#campaigns">キャンペーン</a>
+                <a href="#campaigns">캠페인</a>
               </Badge>
               <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer">
-                <a href="#about">サービス紹介</a>
+                <a href="#about">서비스紹介</a>
               </Badge>
               <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer">
-                <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">ポートフォリオ</a>
+                <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">포트폴리오</a>
               </Badge>
               <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer">
                 <a href="#guide">参加方法</a>
@@ -181,19 +181,19 @@ const HomePageExactReplica = () => {
               {user ? (
                 <>
                   <Badge className="bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer">
-                    <Link to="/mypage">マイページ</Link>
+                    <Link to="/mypage">마이페이지</Link>
                   </Badge>
                   <Badge className="bg-gray-500 text-white hover:bg-gray-600 cursor-pointer">
-                    <button onClick={signOut}>ログアウト</button>
+                    <button onClick={signOut}>로그아웃</button>
                   </Badge>
                 </>
               ) : (
                 <>
                   <Badge className="bg-teal-500 text-white hover:bg-teal-600 cursor-pointer">
-                    <Link to="/login">ログイン</Link>
+                    <Link to="/login">로그인</Link>
                   </Badge>
                   <Badge className="bg-purple-600 text-white hover:bg-purple-700 cursor-pointer">
-                    <Link to="/signup">新規登録</Link>
+                    <Link to="/signup">회원가입</Link>
                   </Badge>
                 </>
               )}
@@ -213,13 +213,13 @@ const HomePageExactReplica = () => {
             <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
               <div className="flex flex-col space-y-2 pt-4">
                 <Badge className="bg-green-500 text-white hover:bg-green-600 cursor-pointer w-fit">
-                  <a href="#campaigns">キャンペーン</a>
+                  <a href="#campaigns">캠페인</a>
                 </Badge>
                 <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer w-fit">
-                  <a href="#about">サービス紹介</a>
+                  <a href="#about">서비스紹介</a>
                 </Badge>
                 <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer w-fit">
-                  <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">ポートフォリオ</a>
+                  <a href="https://www.youtube.com/@CNEC_JP" target="_blank" rel="noopener noreferrer">포트폴리오</a>
                 </Badge>
                 <Badge className="bg-purple-500 text-white hover:bg-purple-600 cursor-pointer w-fit">
                   <a href="#guide">参加方法</a>
@@ -227,19 +227,19 @@ const HomePageExactReplica = () => {
                 {user ? (
                   <>
                     <Badge className="bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer w-fit">
-                      <Link to="/mypage">マイページ</Link>
+                      <Link to="/mypage">마이페이지</Link>
                     </Badge>
                     <Badge className="bg-gray-500 text-white hover:bg-gray-600 cursor-pointer w-fit">
-                      <button onClick={signOut}>ログアウト</button>
+                      <button onClick={signOut}>로그아웃</button>
                     </Badge>
                   </>
                 ) : (
                   <>
                     <Badge className="bg-teal-500 text-white hover:bg-teal-600 cursor-pointer w-fit">
-                      <Link to="/login">ログイン</Link>
+                      <Link to="/login">로그인</Link>
                     </Badge>
                     <Badge className="bg-purple-600 text-white hover:bg-purple-700 cursor-pointer w-fit">
-                      <Link to="/signup">新規登録</Link>
+                      <Link to="/signup">회원가입</Link>
                     </Badge>
                   </>
                 )}
@@ -254,13 +254,13 @@ const HomePageExactReplica = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500"></div>
         <div className="relative container mx-auto px-4 text-center text-white">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            K-Beauty × ショート動画
+            K-Beauty × 숏폼 영상
             <br />
-            <span className="text-yellow-300">専門プラットフォーム</span>
+            <span className="text-yellow-300">専門플랫폼</span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-4xl mx-auto">
-            韓国コスメブランドとクリエイターを繋ぐ新しいマーケティングプラットフォーム。
-            あなたの創造性を収益化しませんか？
+            韓国화장품브랜드와크리에이터를繋ぐ新しい마케팅플랫폼。
+            당신의 창의성을 수익화하세요!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -270,7 +270,7 @@ const HomePageExactReplica = () => {
             >
               <Link to="/signup">
                 <Users className="h-5 w-5 mr-2" />
-                クリエイター登録
+                크리에이터登録
               </Link>
             </Button>
             <Button 
@@ -279,7 +279,7 @@ const HomePageExactReplica = () => {
             >
               <a href="#campaigns" className="flex items-center">
                 <Eye className="h-5 w-5 mr-2" />
-                キャンペーンを見る
+                캠페인를見
               </a>
             </Button>
           </div>
@@ -294,13 +294,13 @@ const HomePageExactReplica = () => {
               <div className="text-5xl font-bold text-purple-600 mb-2">
                 {stats.totalCampaigns}
               </div>
-              <div className="text-gray-600 font-medium">総キャンペーン数</div>
+              <div className="text-gray-600 font-medium">総캠페인数</div>
             </div>
             <div className="text-center">
               <div className="text-5xl font-bold text-blue-600 mb-2">
                 {stats.totalCreators.toLocaleString()}+
               </div>
-              <div className="text-gray-600 font-medium">登録クリエイター数</div>
+              <div className="text-gray-600 font-medium">登録크리에이터数</div>
             </div>
             <div className="text-center">
               <div className="text-5xl font-bold text-green-600 mb-2">
@@ -322,24 +322,24 @@ const HomePageExactReplica = () => {
       <section id="campaigns" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">現在募集中のキャンペーン</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">現在모집 중의캠페인</h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              韓国コスメブランドの最新キャンペーンに参加して、あなたの影響力を収益化しましょう
+              韓国화장품브랜드의最新캠페인에参加하고、당신의影響力를収益化합시다
             </p>
           </div>
 
           {loading ? (
             <div className="text-center py-12">
               <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
-              <p className="text-gray-600">キャンペーンを読み込み中...</p>
+              <p className="text-gray-600">캠페인를読込中...</p>
             </div>
           ) : campaigns.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">📋</div>
               <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                現在募集中のキャンペーンはありません
+                現在모집 중의캠페인없습니다
               </h3>
-              <p className="text-gray-500">新しいキャンペーンが開始されるまでお待ちください。</p>
+              <p className="text-gray-500">新しい캠페인가開始되는까지기다려주세요。</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -363,7 +363,7 @@ const HomePageExactReplica = () => {
                       <CardTitle className="text-lg font-bold text-gray-800 leading-tight">
                         {campaign.title}
                       </CardTitle>
-                      <Badge className="bg-green-100 text-green-800 font-medium">募集中</Badge>
+                      <Badge className="bg-green-100 text-green-800 font-medium">모집 중</Badge>
                     </div>
                     <CardDescription className="text-purple-600 font-medium text-base">
                       {campaign.brand}
@@ -375,7 +375,7 @@ const HomePageExactReplica = () => {
                     </p>
                     
                     <div className="mb-4">
-                      <div className="text-sm text-gray-500 mb-2">対象プラットフォーム:</div>
+                      <div className="text-sm text-gray-500 mb-2">対象플랫폼:</div>
                       <div className="flex flex-wrap gap-2">
                         {(() => {
                           // target_platforms가 객체인 경우 처리
@@ -408,7 +408,7 @@ const HomePageExactReplica = () => {
                         <div className="text-sm text-gray-500">報酬</div>
                       </div>
                       <Button className="bg-gray-800 text-white hover:bg-gray-900">
-                        詳細を見る
+                        자세히 보기
                       </Button>
                     </div>
                   </CardContent>
@@ -423,9 +423,9 @@ const HomePageExactReplica = () => {
       <section id="about" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC Japanとは</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC Korea이란</h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              K-Beautyブランドとクリエイターを繋ぐ専門プラットフォーム
+              한국 화장품 브랜드와 크리에이터를 연결하는 전문 플랫폼
             </p>
           </div>
           
@@ -434,9 +434,9 @@ const HomePageExactReplica = () => {
               <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Target className="h-10 w-10 text-purple-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">ターゲット特化</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">타겟特化</h3>
               <p className="text-gray-600 leading-relaxed">
-                K-Beautyに特化したマーケティングで効果的なプロモーションを実現
+                K-Beauty에特化한마케팅에서効果的프로모션를実現
               </p>
             </div>
             
@@ -444,9 +444,9 @@ const HomePageExactReplica = () => {
               <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Play className="h-10 w-10 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">ショート動画重視</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">숏폼動画重視</h3>
               <p className="text-gray-600 leading-relaxed">
-                TikTok、Instagram Reelsなどショート動画プラットフォームに最適化
+                TikTok、Instagram Reelsど숏폼動画플랫폼에最適化
               </p>
             </div>
             
@@ -454,9 +454,9 @@ const HomePageExactReplica = () => {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shield className="h-10 w-10 text-green-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">安心のサポート</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">安心의지원</h3>
               <p className="text-gray-600 leading-relaxed">
-                ブランドとクリエイター双方をサポートする充実したサービス
+                브랜드와크리에이터双方를지원하기充実한서비스
               </p>
             </div>
           </div>
@@ -469,9 +469,9 @@ const HomePageExactReplica = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="mb-8">
               <div className="text-6xl mb-6">🎬</div>
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">CNECポートフォリオ</h2>
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC포트폴리오</h2>
               <p className="text-gray-600 text-lg">
-                これまでのキャンペーン実績と成功事例をご覧ください
+                지금까지의캠페인実績와成功事例를ご覧해주세요
               </p>
             </div>
             
@@ -484,28 +484,28 @@ const HomePageExactReplica = () => {
                         <Youtube className="w-10 h-10 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-gray-800">CNEC Japan</h3>
-                        <p className="text-red-600 font-semibold">YouTube チャンネル</p>
+                        <h3 className="text-2xl font-bold text-gray-800">CNEC Korea</h3>
+                        <p className="text-red-600 font-semibold">YouTube 채널</p>
                       </div>
                     </div>
                     
                     <p className="text-gray-600 mb-6 leading-relaxed">
-                      実際のキャンペーン動画や成功事例、クリエイターのインタビューなど、
-                      CNECの魅力的なコンテンツをYouTubeでご覧いただけます。
+                      実際의캠페인動画와成功事例、크리에이터의인터뷰ど、
+                      CNEC의魅力的콘텐츠를YouTube에서ご覧받으실 수 있습니다。
                     </p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                       <div className="bg-red-50 rounded-lg p-4">
-                        <div className="text-red-600 font-semibold">キャンペーン実績</div>
+                        <div className="text-red-600 font-semibold">캠페인実績</div>
                         <div className="text-gray-700 text-sm">成功事例動画</div>
                       </div>
                       <div className="bg-blue-50 rounded-lg p-4">
-                        <div className="text-blue-600 font-semibold">クリエイター紹介</div>
-                        <div className="text-gray-700 text-sm">インタビュー動画</div>
+                        <div className="text-blue-600 font-semibold">크리에이터紹介</div>
+                        <div className="text-gray-700 text-sm">인터뷰動画</div>
                       </div>
                       <div className="bg-green-50 rounded-lg p-4">
-                        <div className="text-green-600 font-semibold">ブランド紹介</div>
-                        <div className="text-gray-700 text-sm">商品レビュー</div>
+                        <div className="text-green-600 font-semibold">브랜드紹介</div>
+                        <div className="text-gray-700 text-sm">商品리뷰</div>
                       </div>
                     </div>
                     
@@ -514,7 +514,7 @@ const HomePageExactReplica = () => {
                       onClick={() => window.open('https://www.youtube.com/@CNEC_JP', '_blank')}
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      ポートフォリオを見る
+                      포트폴리오를見
                     </Button>
                   </div>
                 </div>
@@ -523,11 +523,11 @@ const HomePageExactReplica = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 pt-8 border-t">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-red-600 mb-1">500+</div>
-                    <div className="text-gray-600 text-sm">成功キャンペーン</div>
+                    <div className="text-gray-600 text-sm">成功캠페인</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600 mb-1">5,000+</div>
-                    <div className="text-gray-600 text-sm">参加クリエイター</div>
+                    <div className="text-gray-600 text-sm">参加크리에이터</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-600 mb-1">50M+</div>
@@ -548,9 +548,9 @@ const HomePageExactReplica = () => {
       <section id="guide" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNECキャンペーン参加方法</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC캠페인参加方法</h2>
             <p className="text-gray-600 text-lg">
-              簡単6ステップでキャンペーンに参加できます
+              簡単6단계에서캠페인에参加할 수 있습니다
             </p>
           </div>
           
@@ -560,19 +560,19 @@ const HomePageExactReplica = () => {
                 {
                   step: 1,
                   title: '会員登録',
-                  description: 'Googleアカウントで簡単登録',
+                  description: 'Google계정에서簡単登録',
                   icon: <User className="h-8 w-8" />
                 },
                 {
                   step: 2,
-                  title: 'プロフィール完成',
-                  description: 'SNSアカウントと詳細情報を登録',
+                  title: '프로필完成',
+                  description: 'SNS계정와詳細情報를登録',
                   icon: <Star className="h-8 w-8" />
                 },
                 {
                   step: 3,
-                  title: 'キャンペーン応募',
-                  description: '興味のあるキャンペーンに応募',
+                  title: '캠페인応募',
+                  description: '興味의あ캠페인에応募',
                   icon: <Target className="h-8 w-8" />
                 }
               ].map((item) => (
@@ -593,20 +593,20 @@ const HomePageExactReplica = () => {
               {[
                 {
                   step: 4,
-                  title: '審査・確定',
-                  description: 'ブランドによる審査と参加確定',
+                  title: '審査 · 確定',
+                  description: '브랜드에 의한審査와参加確定',
                   icon: <CheckCircle className="h-8 w-8" />
                 },
                 {
                   step: 5,
-                  title: 'コンテンツ制作',
-                  description: 'ガイドラインに沿って動画制作',
+                  title: '콘텐츠制作',
+                  description: '가이드라인에沿動画制作',
                   icon: <Play className="h-8 w-8" />
                 },
                 {
                   step: 6,
                   title: '報酬受取',
-                  description: 'ポイント獲得と日本の銀行口座へ送金',
+                  description: '포인트獲得와日本의銀行口座로送金',
                   icon: <DollarSign className="h-8 w-8" />
                 }
               ].map((item) => (
@@ -633,33 +633,33 @@ const HomePageExactReplica = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="text-2xl">🎬</div>
-                <div className="text-xl font-bold">CNEC Japan</div>
+                <div className="text-xl font-bold">CNEC Korea</div>
               </div>
               <p className="text-gray-400 text-sm">
-                K-Beautyブランドとクリエイターを繋ぐ専門プラットフォーム
+                한국 화장품 브랜드와 크리에이터를 연결하는 전문 플랫폼
               </p>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">サービス</h4>
+              <h4 className="font-semibold mb-4">서비스</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#campaigns" className="hover:text-white transition-colors">キャンペーン</a></li>
-                <li><a href="#about" className="hover:text-white transition-colors">サービス紹介</a></li>
-                <li><a href="#portfolio" className="hover:text-white transition-colors">ポートフォリオ</a></li>
+                <li><a href="#campaigns" className="hover:text-white transition-colors">캠페인</a></li>
+                <li><a href="#about" className="hover:text-white transition-colors">서비스紹介</a></li>
+                <li><a href="#portfolio" className="hover:text-white transition-colors">포트폴리오</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">サポート</h4>
+              <h4 className="font-semibold mb-4">지원</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><a href="#guide" className="hover:text-white transition-colors">参加方法</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">よくある質問</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">お問い合わせ</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">자주 묻는 질문</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">문의하기</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">お問い合わせ</h4>
+              <h4 className="font-semibold mb-4">문의하기</h4>
               <div className="space-y-2 text-sm text-gray-400">
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4" />
@@ -688,12 +688,12 @@ const HomePageExactReplica = () => {
           {selectedCampaign && (
             <div className="space-y-6">
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2">キャンペーン詳細</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">캠페인詳細</h4>
                 <p className="text-gray-600">{selectedCampaign.description}</p>
               </div>
               
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2">対象プラットフォーム</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">対象플랫폼</h4>
                 <div className="flex flex-wrap gap-2">
                   {(() => {
                     // target_platforms가 객체인 경우 처리
@@ -730,13 +730,13 @@ const HomePageExactReplica = () => {
                   onClick={handleApplyToCampaign}
                   className="flex-1"
                 >
-                  このキャンペーンに応募する
+                  こ의캠페인에지원하기
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setDetailModal(false)}
                 >
-                  閉じる
+                  閉じ
                 </Button>
               </div>
             </div>
