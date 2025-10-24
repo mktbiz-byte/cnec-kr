@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import VideoReferencesSection from './VideoReferencesSection'
 import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
 import { 
