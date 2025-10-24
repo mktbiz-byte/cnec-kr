@@ -752,10 +752,10 @@ const HomePageExactReplica = () => {
             <p className="text-gray-600 mb-4">더 궁금한 점이 있으신가요?</p>
             <Button 
               size="lg" 
-              className="bg-purple-600 text-white hover:bg-purple-700"
-              onClick={() => navigate('/contact')}
+              className="bg-yellow-400 text-gray-800 hover:bg-yellow-500 font-bold"
+              onClick={() => window.open('https://pf.kakao.com/_TjhGG', '_blank')}
             >
-              1:1 문의하기
+              💬 카카오톡 채널 문의하기
             </Button>
           </div>
         </div>
