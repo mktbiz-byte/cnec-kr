@@ -21,8 +21,9 @@ const CampaignCreationKorea = () => {
     requirements: '',
     category: 'youtube',  // youtube, instagram, 4week_challenge
     image_url: '',
-    reward_amount: '',
-    max_participants: '',
+    reward_points: '',
+    total_slots: '',
+    remaining_slots: '',
     application_deadline: '',
     start_date: '',
     end_date: '',
@@ -143,8 +144,9 @@ const CampaignCreationKorea = () => {
     try {
       const campaignData = {
         ...campaignForm,
-        reward_amount: parseInt(campaignForm.reward_amount),
-        max_participants: parseInt(campaignForm.max_participants)
+        reward_points: parseInt(campaignForm.reward_points) || 0,
+        total_slots: parseInt(campaignForm.total_slots) || 0,
+        remaining_slots: parseInt(campaignForm.remaining_slots) || parseInt(campaignForm.total_slots) || 0
       }
 
       if (editId) {
@@ -258,28 +260,35 @@ const CampaignCreationKorea = () => {
 
               {/* 보상 포인트 */}
               <div>
-                <Label htmlFor="reward_amount">보상 포인트 *</Label>
+                <Label htmlFor="reward_points">보상 포인트 *</Label>
                 <Input
-                  id="reward_amount"
+                  id="reward_points"
                   type="number"
-                  value={campaignForm.reward_amount}
-                  onChange={(e) => setCampaignForm(prev => ({ ...prev, reward_amount: e.target.value }))}
+                  value={campaignForm.reward_points}
+                  onChange={(e) => setCampaignForm(prev => ({ ...prev, reward_points: e.target.value }))}
                   placeholder="예: 100000"
                   required
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  {campaignForm.reward_amount && `₩${parseInt(campaignForm.reward_amount).toLocaleString()}`}
+                  {campaignForm.reward_points && `₩${parseInt(campaignForm.reward_points).toLocaleString()}`}
                 </p>
               </div>
 
               {/* 모집 인원 */}
               <div>
-                <Label htmlFor="max_participants">모집 인원 *</Label>
+                <Label htmlFor="total_slots">모집 인원 *</Label>
                 <Input
-                  id="max_participants"
+                  id="total_slots"
                   type="number"
-                  value={campaignForm.max_participants}
-                  onChange={(e) => setCampaignForm(prev => ({ ...prev, max_participants: e.target.value }))}
+                  value={campaignForm.total_slots}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setCampaignForm(prev => ({ 
+                      ...prev, 
+                      total_slots: value,
+                      remaining_slots: value
+                    }))
+                  }}
                   placeholder="예: 10"
                   required
                 />

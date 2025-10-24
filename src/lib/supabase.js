@@ -1043,7 +1043,8 @@ export default supabase
 
 
 // Storage helper functions for image uploads
-export const storage = {
+// Storage helper functions (not exported as default storage)
+const storageHelpers = {
   async uploadCampaignImage(file) {
     try {
       // Generate unique filename
@@ -1101,4 +1102,10 @@ export const storage = {
     }
   }
 }
+
+// Export storage as supabase.storage for direct access to Supabase Storage API
+export const storage = supabase.storage
+
+// Export storage helpers separately if needed
+export { storageHelpers }
 

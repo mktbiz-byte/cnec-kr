@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+import cnecLogo from '../assets/cnec-logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { database } from '../lib/supabase'
@@ -159,7 +160,7 @@ const HomePageExactReplica = () => {
           <div className="flex items-center justify-between">
             {/* 로고 */}
             <Link to="/" className="flex items-center">
-              <img src="/cnec-korea-logo.png" alt="CNEC Korea" className="h-12" />
+              <img src={cnecLogo} alt="CNEC Korea" className="h-12" />
             </Link>
             
             {/* 데스크톱 네비게이션 메뉴 */}
