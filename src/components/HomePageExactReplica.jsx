@@ -523,7 +523,14 @@ const HomePageExactReplica = () => {
           ) : (
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {campaigns
-                .filter(campaign => selectedCategory === 'all' || campaign.category === selectedCategory)
+                .filter(campaign => {
+                  if (selectedCategory === 'all') return true
+                  if (selectedCategory === '4week_challenge') {
+                    // 4주 챌린지는 package_type이 '4week_challenge'인 캠페인만 표시
+                    return campaign.package_type === '4week_challenge'
+                  }
+                  return campaign.category === selectedCategory
+                })
                 .map((campaign) => (
                 <Card 
                   key={campaign.id} 
