@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { database } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
-import { Crown, Star, TrendingUp, Users, CheckCircle, ArrowRight, Youtube, Instagram, Award, Zap, DollarSign, Target } from 'lucide-react'
+import { Crown, Star, TrendingUp, Users, CheckCircle, ArrowRight, Youtube, Instagram, Award, Zap, DollarSign, Target, Home } from 'lucide-react'
+import cnecLogo from '../assets/cnec-logo-final.png'
 
 const CNECPlusPageEnhanced = () => {
   const navigate = useNavigate()
@@ -85,6 +86,22 @@ const CNECPlusPageEnhanced = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      {/* 상단 네비게이션 */}
+      <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition">
+            <img src={cnecLogo} alt="CNEC Korea" className="h-12" />
+          </Link>
+          <Link 
+            to="/" 
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+          >
+            <Home className="w-4 h-4" />
+            메인페이지
+          </Link>
+        </div>
+      </nav>
+
       {/* 헤더 */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
