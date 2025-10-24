@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import emailScheduler from './lib/emailScheduler';
 import './App.css';
 
 // 페이지 컴포넌트
-import HomePage from './components/HomePage';
-import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage';
+import HomePageExactReplica from './components/HomePageExactReplica';
+import LoginPageExactReplica from './components/LoginPageExactReplica';
+import SignupPageExactReplica from './components/SignupPageExactReplica';
 import CampaignApplicationPage from './components/CampaignApplicationPage';
 import CompanyReportNew from './components/CompanyReportNew';
 import MyPageKorea from './components/MyPageKorea';
@@ -52,11 +53,11 @@ const AppContent = () => {
     <div className="App">
       <Routes>
         {/* 메인 페이지 */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomePageExactReplica />} />
         
         {/* 인증 관련 */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/login" element={<LoginPageExactReplica />} />
+        <Route path="/signup" element={<SignupPageExactReplica />} />
         <Route path="/auth/callback" element={<AuthCallbackSafe />} />
         
         {/* 사용자 페이지 */}
@@ -93,7 +94,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <LanguageProvider>
+          <AppContent />
+        </LanguageProvider>
       </AuthProvider>
     </Router>
   );

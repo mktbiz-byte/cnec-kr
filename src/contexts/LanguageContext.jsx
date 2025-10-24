@@ -5,12 +5,19 @@ const LanguageContext = createContext({})
 export const useLanguage = () => {
   const context = useContext(LanguageContext)
   if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider')
+    // Context가 없어도 기본값 반환 (에러 방지)
+    return {
+      language: 'ko',
+      changeLanguage: () => {},
+      t: (key) => key,
+      isKorean: true,
+      isJapanese: false
+    }
   }
   return context
 }
 
-// 번역 데이터
+// 번역 데이터 (한국어만)
 const translations = {
   ko: {
     // 공통
@@ -37,7 +44,7 @@ const translations = {
     admin: '관리자',
     dashboard: '대시보드',
     campaignManagement: '캠페인 관리',
-    creatorManagement: '제작자 관리',
+    creatorManagement: '크리에이터 관리',
     withdrawalManagement: '출금 관리',
     
     // 캠페인
@@ -68,92 +75,26 @@ const translations = {
     adminRequired: '관리자 권한이 필요합니다',
     noData: '데이터가 없습니다',
     loadingFailed: '데이터 로딩에 실패했습니다'
-  },
-  ja: {
-    // 공통
-    loading: '読み込み中...',
-    error: 'エラーが発生しました',
-    success: '成功しました',
-    cancel: 'キャンセル',
-    confirm: '確認',
-    save: '保存',
-    edit: '編集',
-    delete: '削除',
-    create: '作成',
-    update: '更新',
-    
-    // 네비게이션
-    home: 'ホーム',
-    campaigns: 'キャンペーン',
-    mypage: 'マイページ',
-    login: 'ログイン',
-    register: '新規登録',
-    logout: 'ログアウト',
-    
-    // 관리자
-    admin: '管理者',
-    dashboard: 'ダッシュボード',
-    campaignManagement: 'キャンペーン管理',
-    creatorManagement: 'クリエイター管理',
-    withdrawalManagement: '出金管理',
-    
-    // 캠페인
-    campaignTitle: 'キャンペーンタイトル',
-    brand: 'ブランド',
-    description: '説明',
-    reward: '報酬',
-    status: 'ステータス',
-    active: 'アクティブ',
-    inactive: '非アクティブ',
-    draft: '下書き',
-    completed: '完了',
-    
-    // 신청
-    apply: '応募する',
-    application: '応募',
-    applications: '応募一覧',
-    applicant: '応募者',
-    
-    // 통계
-    totalCampaigns: '総キャンペーン数',
-    totalApplications: '総応募数',
-    totalUsers: '総ユーザー数',
-    totalRewards: '総報酬額',
-    
-    // 메시지
-    loginRequired: 'ログインが必要です',
-    adminRequired: '管理者権限が必要です',
-    noData: 'データがありません',
-    loadingFailed: 'データの読み込みに失敗しました'
   }
 }
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('ja') // 기본값을 일본어로 설정
+  const [language] = useState('ko') // 한국어 고정
 
-  useEffect(() => {
-    // 홈페이지와 마이페이지는 항상 일본어로 설정
-    setLanguage('ja')
-    localStorage.setItem('cnec-language', 'ja')
-  }, [])
-
-  const changeLanguage = (newLanguage) => {
-    if (['ko', 'ja'].includes(newLanguage)) {
-      setLanguage(newLanguage)
-      localStorage.setItem('cnec-language', newLanguage)
-    }
+  const changeLanguage = () => {
+    // 한국어 고정이므로 아무 동작도 하지 않음
   }
 
   const t = (key) => {
-    return translations[language][key] || key
+    return translations.ko[key] || key
   }
 
   const value = {
-    language,
+    language: 'ko',
     changeLanguage,
     t,
-    isKorean: language === 'ko',
-    isJapanese: language === 'ja'
+    isKorean: true,
+    isJapanese: false
   }
 
   return (
@@ -162,3 +103,4 @@ export const LanguageProvider = ({ children }) => {
     </LanguageContext.Provider>
   )
 }
+
