@@ -158,13 +158,9 @@ const HomePageExactReplica = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* 로고 */}
-            <div className="flex items-center space-x-3">
-              <div className="text-2xl">🎬</div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">CNEC Korea</h1>
-                <p className="text-xs text-gray-600">K-Beauty 인플루언서 마케팅 플랫폼</p>
-              </div>
-            </div>
+            <Link to="/" className="flex items-center">
+              <img src="/cnec-korea-logo.png" alt="CNEC Korea" className="h-12" />
+            </Link>
             
             {/* 데스크톱 네비게이션 메뉴 */}
             <nav className="hidden md:flex items-center space-x-4">
@@ -334,37 +330,7 @@ const HomePageExactReplica = () => {
         </div>
       </section>
 
-      {/* Stats Section - 참조 사이트와 정확히 일치하는 색상 */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-purple-600 mb-2">
-                {stats.totalCampaigns}
-              </div>
-              <div className="text-gray-600 font-medium">총캠페인수</div>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-blue-600 mb-2">
-                {stats.totalCreators.toLocaleString()}+
-              </div>
-              <div className="text-gray-600 font-medium">등록크리에이터수</div>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-green-600 mb-2">
-                {stats.totalApplications}
-              </div>
-              <div className="text-gray-600 font-medium">총응모수</div>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-red-600 mb-2">
-                {formatCurrency(stats.totalRewards)}
-              </div>
-              <div className="text-gray-600 font-medium">총보상액</div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Campaigns Section */}
       <section id="campaigns" className="py-16 bg-gray-50">
@@ -517,7 +483,7 @@ const HomePageExactReplica = () => {
       <section id="about" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC Korea란?</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">CNEC만의 혜택</h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
               K-뷰티 크리에이터를 육성하고 양성하는 전문 플랫폼입니다.<br />
               브랜드와 크리에이터가 함께 성장하며, 지속 가능한 파트너십을 구축합니다.

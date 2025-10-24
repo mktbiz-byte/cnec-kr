@@ -409,9 +409,9 @@ const CNECPlusPageEnhanced = () => {
               <thead>
                 <tr className="border-b-2 border-gray-200">
                   <th className="text-left py-4 px-4 font-bold text-gray-900">혜택</th>
-                  <th className="text-center py-4 px-4 font-bold text-gray-900">일반 캠페인</th>
-                  <th className="text-center py-4 px-4 font-bold text-purple-600">숏폼 크리에이터</th>
-                  <th className="text-center py-4 px-4 font-bold text-red-600">유튜브 육성</th>
+                  <th className="text-center py-4 px-4 font-bold text-gray-900">일반 크리에이터</th>
+                  <th className="text-center py-4 px-4 font-bold text-purple-600">크넥플러스</th>
+                  <th className="text-center py-4 px-4 font-bold text-red-600">유튜브 육성 프로그램</th>
                 </tr>
               </thead>
               <tbody>
@@ -424,8 +424,8 @@ const CNECPlusPageEnhanced = () => {
                 <tr className="border-b border-gray-100">
                   <td className="py-4 px-4 text-gray-700">포인트 지급</td>
                   <td className="text-center py-4 px-4">기본</td>
-                  <td className="text-center py-4 px-4 text-purple-600 font-semibold">20-50% 추가</td>
-                  <td className="text-center py-4 px-4 text-red-600 font-semibold">100만P 지원</td>
+                  <td className="text-center py-4 px-4 text-purple-600 font-semibold">10~30% 추가 포인트 지급</td>
+                  <td className="text-center py-4 px-4 text-red-600 font-semibold">월간 100만 포인트 지급 + 10~30% 추가 지급</td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="py-4 px-4 text-gray-700">제품 지원</td>
