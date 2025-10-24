@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { database, storage } from '../../lib/supabase'
+import { supabase, storage } from '../../lib/supabase'
 import AdminNavigation from './AdminNavigation'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -151,7 +151,7 @@ const CampaignCreationKorea = () => {
 
       if (editId) {
         // 수정
-        const { error } = await database
+        const { error } = await supabase
           .from('campaigns')
           .update(campaignData)
           .eq('id', editId)
@@ -160,7 +160,7 @@ const CampaignCreationKorea = () => {
         setSuccess('캠페인이 수정되었습니다!')
       } else {
         // 신규 생성
-        const { error } = await database
+        const { error } = await supabase
           .from('campaigns')
           .insert([campaignData])
 
