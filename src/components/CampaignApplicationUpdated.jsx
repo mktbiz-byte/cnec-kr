@@ -45,7 +45,10 @@ const CampaignApplicationUpdated = () => {
     
     // 오프라인 방문 관련
     offline_visit_available: false,
-    offline_visit_notes: ''
+    offline_visit_notes: '',
+    
+    // 메타광고코드 가능 여부
+    meta_ad_code_available: false
   })
 
   // 다국어 텍스트
@@ -109,7 +112,26 @@ const CampaignApplicationUpdated = () => {
       // 초상권 사용 동의
       portraitRightsTitle: '초상권 사용 동의',
       portraitRightsConsent: '본 캠페인에서 제작하는 영상 콘텐츠에 포함된 본인의 초상(얼굴, 모습, 음성 포함)에 대해, 브랜드 및 CNEC 플랫폼이 마케팅, 프로모션, 상업적 목적으로 콘텐츠 제출일로부터 1년간 사용하는 것에 동의합니다. 해당 콘텐츠는 소셜미디어, 웹사이트, 광고, 판촉 자료 등 다양한 미디어 채널에서 사용될 수 있음을 이해합니다.',
-      portraitRightsConsentShort: '영상 콘텐츠의 초상권을 1년간 사용하는 것에 동의합니다'
+      portraitRightsConsentShort: '영상 콘텐츠의 초상권을 1년간 사용하는 것에 동의합니다',
+      
+      // 캠페인 가이드
+      campaignGuide: '캠페인 가이드',
+      requiredDialogues: '필수 대사',
+      requiredScenes: '필수 장면',
+      requiredHashtags: '필수 해시태그',
+      videoDuration: '영상 시간',
+      videoTempo: '영상 템포',
+      videoTone: '영상 톤앤매너',
+      additionalDetails: '기타 디테일 요청사항',
+      shootingScenes: '필수 촬영 장면',
+      additionalShootingRequests: '추가 촬영 요청사항',
+      
+      // 메타광고코드
+      metaAdCodeRequired: '메타광고코드 발급 필요',
+      metaAdCodeAvailable: '메타광고코드 발급 가능 여부',
+      metaAdCodeAvailableConfirm: '메타광고코드 발급이 가능합니다',
+      metaAdCodeRequiredWarning: '이 캠페인은 메타광고코드 발급이 필수입니다. 광고코드 발급이 불가능한 경우 지원하실 수 없습니다.',
+      metaAdCodeNotAvailableError: '메타광고코드 발급이 필수인 캠페인입니다. 광고코드 발급 가능 여부를 확인해주세요.'
     }
   }
 
@@ -226,6 +248,11 @@ const CampaignApplicationUpdated = () => {
       errors.push(t.instagramRequired)
     }
 
+    // 메타광고코드 검증
+    if (campaign?.meta_ad_code_requested && !applicationData.meta_ad_code_available) {
+      errors.push(t.metaAdCodeNotAvailableError)
+    }
+
     // 질문 답변 검증 (개별 질문 필드 사용)
     if (campaign?.question1 && !applicationData.answer_1?.trim()) {
       errors.push(language === 'ja' ? '質問 1は必須です' : '질문 1은 필수입니다')
@@ -276,6 +303,7 @@ const CampaignApplicationUpdated = () => {
         additional_info: applicationData.additional_info || null,
         offline_visit_available: applicationData.offline_visit_available || false,
         offline_visit_notes: applicationData.offline_visit_notes || null,
+        meta_ad_code_available: applicationData.meta_ad_code_available || false,
         status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -529,9 +557,127 @@ const CampaignApplicationUpdated = () => {
                         </div>
                         <p className="text-sm text-blue-700 whitespace-pre-wrap">{campaign.offline_visit_requirement}</p>
                       </div>
-                    )}
+                    )}  
                   </div>
                 </div>
+
+                {/* 캠페인 가이드 */}
+                {(campaign.required_dialogues?.length > 0 || campaign.required_scenes?.length > 0 || campaign.required_hashtags?.length > 0 || campaign.video_duration || campaign.video_tempo || campaign.video_tone || campaign.additional_details || campaign.additional_shooting_requests || campaign.meta_ad_code_requested) && (
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">{t.campaignGuide}</h4>
+                    <div className="space-y-3">
+                      {/* 필수 대사 */}
+                      {campaign.required_dialogues && campaign.required_dialogues.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-purple-700 mb-1">{t.requiredDialogues}</p>
+                          <ul className="list-disc list-inside space-y-1">
+                            {campaign.required_dialogues.map((dialogue, idx) => (
+                              <li key={idx} className="text-sm text-gray-600">{dialogue}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* 필수 장면 */}
+                      {campaign.required_scenes && campaign.required_scenes.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-purple-700 mb-1">{t.requiredScenes}</p>
+                          <ul className="list-disc list-inside space-y-1">
+                            {campaign.required_scenes.map((scene, idx) => (
+                              <li key={idx} className="text-sm text-gray-600">{scene}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* 필수 촬영 장면 */}
+                      {(campaign.shooting_scenes_ba_photo || campaign.shooting_scenes_no_makeup || campaign.shooting_scenes_closeup || campaign.shooting_scenes_product_closeup || campaign.shooting_scenes_product_texture || campaign.shooting_scenes_outdoor || campaign.shooting_scenes_couple || campaign.shooting_scenes_child || campaign.shooting_scenes_troubled_skin || campaign.shooting_scenes_wrinkles) && (
+                        <div>
+                          <p className="text-xs font-medium text-purple-700 mb-1">{t.shootingScenes}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {campaign.shooting_scenes_ba_photo && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">확실한 B&A 촬영</span>}
+                            {campaign.shooting_scenes_no_makeup && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">노메이크업</span>}
+                            {campaign.shooting_scenes_closeup && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">클로즈업</span>}
+                            {campaign.shooting_scenes_product_closeup && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">제품 클로즈업</span>}
+                            {campaign.shooting_scenes_product_texture && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">제품 제형 클로즈업</span>}
+                            {campaign.shooting_scenes_outdoor && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">외부촬영</span>}
+                            {campaign.shooting_scenes_couple && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">커플출연</span>}
+                            {campaign.shooting_scenes_child && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">아이출연</span>}
+                            {campaign.shooting_scenes_troubled_skin && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">트러블 피부 노출</span>}
+                            {campaign.shooting_scenes_wrinkles && <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">피부 주름 노출</span>}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 추가 촬영 요청사항 */}
+                      {campaign.additional_shooting_requests && (
+                        <div>
+                          <p className="text-xs font-medium text-purple-700 mb-1">{t.additionalShootingRequests}</p>
+                          <p className="text-sm text-gray-600 whitespace-pre-wrap">{campaign.additional_shooting_requests}</p>
+                        </div>
+                      )}
+
+                      {/* 필수 해시태그 */}
+                      {campaign.required_hashtags && campaign.required_hashtags.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-purple-700 mb-1">{t.requiredHashtags}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {campaign.required_hashtags.map((hashtag, idx) => (
+                              <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {hashtag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 영상 정보 */}
+                      {(campaign.video_duration || campaign.video_tempo || campaign.video_tone) && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {campaign.video_duration && (
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">{t.videoDuration}</p>
+                              <p className="text-sm text-gray-700">{campaign.video_duration}</p>
+                            </div>
+                          )}
+                          {campaign.video_tempo && (
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">{t.videoTempo}</p>
+                              <p className="text-sm text-gray-700">{campaign.video_tempo}</p>
+                            </div>
+                          )}
+                          {campaign.video_tone && (
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">{t.videoTone}</p>
+                              <p className="text-sm text-gray-700">{campaign.video_tone}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* 기타 디테일 요청사항 */}
+                      {campaign.additional_details && (
+                        <div>
+                          <p className="text-xs font-medium text-purple-700 mb-1">{t.additionalDetails}</p>
+                          <p className="text-sm text-gray-600 whitespace-pre-wrap">{campaign.additional_details}</p>
+                        </div>
+                      )}
+
+                      {/* 메타광고코드 발급 필요 */}
+                      {campaign.meta_ad_code_requested && (
+                        <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                          <div className="flex items-center text-sm text-yellow-800 mb-1">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span className="font-medium">{t.metaAdCodeRequired}</span>
+                          </div>
+                          <p className="text-sm text-yellow-700">{t.metaAdCodeRequiredWarning}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -713,6 +859,32 @@ const CampaignApplicationUpdated = () => {
                   )}
                 </div>
               </div>
+
+              {/* 메타광고코드 가능 여부 */}
+              {campaign?.meta_ad_code_requested && (
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                  <h3 className="text-lg font-medium text-yellow-900 mb-2 flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    {t.metaAdCodeRequired}
+                  </h3>
+                  <p className="text-sm text-yellow-800 mb-3">{t.metaAdCodeRequiredWarning}</p>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={applicationData.meta_ad_code_available || false}
+                      onChange={(e) => setApplicationData(prev => ({ 
+                        ...prev, 
+                        meta_ad_code_available: e.target.checked 
+                      }))}
+                      className="mr-2 w-4 h-4"
+                      required
+                    />
+                    <span className="text-sm font-medium text-yellow-900">{t.metaAdCodeAvailableConfirm}</span>
+                  </label>
+                </div>
+              )}
 
               {/* SNS 정보 섹션 */}
               <div>
