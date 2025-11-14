@@ -44,7 +44,13 @@ const MyPageKorea = () => {
   const [selectedApplication, setSelectedApplication] = useState(null)
   const [snsUploadForm, setSnsUploadForm] = useState({
     sns_upload_url: '',
-    notes: ''
+    notes: '',
+    // 올영세일 전용 필드
+    step1_url: '',
+    step2_url: '',
+    step3_url: '',
+    step1_2_video_folder: '',
+    step3_video_folder: ''
   })
 
   // 프로필 편집 관련 상태
@@ -374,33 +380,119 @@ const MyPageKorea = () => {
     }
   }
 
+  // 영상 파일 업로드 핸들러
+  const handleVideoUpload = async (e, step) => {
+    const files = Array.from(e.target.files)
+    if (files.length === 0) return
+
+    try {
+      setProcessing(true)
+      setError('')
+
+      // 폴더 경로 생성: creator-videos/{user_id}/{campaign_id}/{step}/
+      const folderPath = `${user.id}/${selectedApplication.campaign_id}/${step}`
+
+      // 각 파일 업로드
+      const uploadPromises = files.map(async (file) => {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+        const filePath = `${folderPath}/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('creator-videos')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          })
+
+        if (uploadError) throw uploadError
+        return filePath
+      })
+
+      await Promise.all(uploadPromises)
+
+      // 업로드 성공 시 폴더 경로 저장
+      if (step === 'step1_2') {
+        setSnsUploadForm({...snsUploadForm, step1_2_video_folder: folderPath})
+      } else if (step === 'step3') {
+        setSnsUploadForm({...snsUploadForm, step3_video_folder: folderPath})
+      }
+
+      setSuccess(`${step === 'step1_2' ? 'STEP 1&2' : 'STEP 3'} 영상이 업로드되었습니다.`)
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('영상 업로드 오류:', err)
+      setError('영상 업로드 중 오류가 발생했습니다: ' + err.message)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
   // SNS 업로드 제출
   const handleSnsUploadSubmit = async () => {
     try {
       setProcessing(true)
       setError('')
 
-      if (!snsUploadForm.sns_upload_url) {
-        setError('SNS 업로드 URL을 입력해주세요.')
-        setProcessing(false)
-        return
+      // 올영세일 캠페인 여부 확인
+      const isOliveYoungSale = selectedApplication?.campaign?.is_oliveyoung_sale
+
+      if (isOliveYoungSale) {
+        // 올영세일: 3개 URL 모두 필수
+        if (!snsUploadForm.step1_url || !snsUploadForm.step2_url || !snsUploadForm.step3_url) {
+          setError('STEP 1, 2, 3 URL을 모두 입력해주세요.')
+          setProcessing(false)
+          return
+        }
+        // 올영세일: 2개 영상 폴더 필수
+        if (!snsUploadForm.step1_2_video_folder || !snsUploadForm.step3_video_folder) {
+          setError('STEP 1&2 영상 폴더와 STEP 3 영상 폴더를 모두 업로드해주세요.')
+          setProcessing(false)
+          return
+        }
+      } else {
+        // 일반 캠페인: 1개 URL 필수
+        if (!snsUploadForm.sns_upload_url) {
+          setError('SNS 업로드 URL을 입력해주세요.')
+          setProcessing(false)
+          return
+        }
+      }
+
+      const updateData = isOliveYoungSale ? {
+        step1_url: snsUploadForm.step1_url,
+        step2_url: snsUploadForm.step2_url,
+        step3_url: snsUploadForm.step3_url,
+        step1_2_video_folder: snsUploadForm.step1_2_video_folder,
+        step3_video_folder: snsUploadForm.step3_video_folder,
+        sns_upload_date: new Date().toISOString(),
+        notes: snsUploadForm.notes,
+        status: 'sns_uploaded'
+      } : {
+        sns_upload_url: snsUploadForm.sns_upload_url,
+        sns_upload_date: new Date().toISOString(),
+        notes: snsUploadForm.notes,
+        status: 'sns_uploaded'
       }
 
       const { error: updateError } = await database
         .from('applications')
-        .update({
-          sns_upload_url: snsUploadForm.sns_upload_url,
-          sns_upload_date: new Date().toISOString(),
-          notes: snsUploadForm.notes,
-          status: 'sns_uploaded'
-        })
+        .update(updateData)
         .eq('id', selectedApplication.id)
 
       if (updateError) throw updateError
 
       setSuccess('SNS 업로드가 완료되었습니다. 관리자 승인 후 포인트가 지급됩니다.')
       setShowSnsUploadModal(false)
-      setSnsUploadForm({ sns_upload_url: '', notes: '' })
+      setSnsUploadForm({ 
+        sns_upload_url: '', 
+        notes: '', 
+        step1_url: '', 
+        step2_url: '', 
+        step3_url: '',
+        step1_2_video_folder: '',
+        step3_video_folder: ''
+      })
       setSelectedApplication(null)
       
       await fetchUserData()
@@ -1178,18 +1270,61 @@ const MyPageKorea = () => {
               </div>
               
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SNS 업로드 URL *
-                  </label>
-                  <input
-                    type="url"
-                    value={snsUploadForm.sns_upload_url}
-                    onChange={(e) => setSnsUploadForm({...snsUploadForm, sns_upload_url: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="https://instagram.com/p/..."
-                  />
-                </div>
+                {selectedApplication?.campaign?.is_oliveyoung_sale ? (
+                  // 올영세일 캠페인: 3개 URL 입력
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        STEP 1 릴스 URL (세일 7일 전) *
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm.step1_url}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, step1_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/reel/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        STEP 2 릴스 URL (세일 1일 전) *
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm.step2_url}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, step2_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/reel/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        STEP 3 스토리 URL (세일 당일) *
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm.step3_url}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, step3_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/stories/..."
+                      />
+                    </div>
+                  </>
+                ) : (
+                  // 일반 캠페인: 1개 URL 입력
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      SNS 업로드 URL *
+                    </label>
+                    <input
+                      type="url"
+                      value={snsUploadForm.sns_upload_url}
+                      onChange={(e) => setSnsUploadForm({...snsUploadForm, sns_upload_url: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="https://instagram.com/p/..."
+                    />
+                  </div>
+                )}
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1203,6 +1338,59 @@ const MyPageKorea = () => {
                     placeholder="추가 메모를 입력하세요"
                   />
                 </div>
+                
+                {/* 올영세일 캠페인: 영상 폴더 업로드 */}
+                {selectedApplication?.campaign?.is_oliveyoung_sale && (
+                  <>
+                    <div className="border-t pt-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">영상 파일 제출</h4>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            STEP 1&2 영상 폴더 (릴스 2개) *
+                          </label>
+                          <input
+                            type="file"
+                            multiple
+                            accept="video/*"
+                            onChange={(e) => handleVideoUpload(e, 'step1_2')}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            STEP 1, STEP 2 릴스 영상을 모두 업로드해주세요
+                          </p>
+                          {snsUploadForm.step1_2_video_folder && (
+                            <p className="text-xs text-green-600 mt-1">
+                              ✓ 업로드 완료: {snsUploadForm.step1_2_video_folder}
+                            </p>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            STEP 3 영상 폴더 (스토리 1개) *
+                          </label>
+                          <input
+                            type="file"
+                            multiple
+                            accept="video/*"
+                            onChange={(e) => handleVideoUpload(e, 'step3')}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            STEP 3 스토리 영상을 업로드해주세요
+                          </p>
+                          {snsUploadForm.step3_video_folder && (
+                            <p className="text-xs text-green-600 mt-1">
+                              ✓ 업로드 완료: {snsUploadForm.step3_video_folder}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
                 
                 {error && (
                   <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800">
