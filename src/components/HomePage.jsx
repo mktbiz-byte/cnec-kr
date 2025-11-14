@@ -47,6 +47,20 @@ const HomePage = () => {
     }).format(amount || 0)
   }
 
+  const getCampaignTypeBadge = (campaignType) => {
+    const badges = {
+      regular: { label: '📝 일반', labelJa: '📝 一般', color: 'bg-blue-100 text-blue-700' },
+      oliveyoung: { label: '🌸 올영세일', labelJa: '🌸 オリーブヤング', color: 'bg-pink-100 text-pink-700' },
+      '4week_challenge': { label: '💪 4주 챌린지', labelJa: '💪 4週チャレンジ', color: 'bg-purple-100 text-purple-700' }
+    }
+    const badge = badges[campaignType] || badges.regular
+    return (
+      <Badge variant="outline" className={`${badge.color} font-semibold text-xs`}>
+        {language === 'ko' ? badge.label : badge.labelJa}
+      </Badge>
+    )
+  }
+
   const getPlatformBadge = (platform) => {
     const platformStyles = {
       instagram: 'bg-pink-100 text-pink-800',
@@ -242,9 +256,12 @@ const HomePage = () => {
                 <Card key={campaign.id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg">
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
-                      <Badge variant="secondary" className="bg-green-100 text-green-800">
-                        {language === 'ko' ? '모집중' : '募集中'}
-                      </Badge>
+                      <div className="flex flex-col gap-1">
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          {language === 'ko' ? '모집중' : '募集中'}
+                        </Badge>
+                        {getCampaignTypeBadge(campaign.campaign_type)}
+                      </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-purple-600">
                           {formatCurrency(campaign.reward_amount)}
@@ -273,6 +290,22 @@ const HomePage = () => {
                         ))}
                       </div>
                     )}
+                    
+                    <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
+                      <div className="bg-blue-50 p-2 rounded">
+                        <div className="text-xs text-gray-600">{language === 'ko' ? '모집 인원' : '募集人数'}</div>
+                        <div className="font-bold text-blue-600">{campaign.total_slots || campaign.max_participants || 0}명</div>
+                      </div>
+                      <div className="bg-orange-50 p-2 rounded">
+                        <div className="text-xs text-gray-600">{language === 'ko' ? '마감일' : '締切'}</div>
+                        <div className="font-bold text-orange-600">
+                          {campaign.recruitment_deadline || campaign.application_deadline
+                            ? new Date(campaign.recruitment_deadline || campaign.application_deadline).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP', { month: 'numeric', day: 'numeric' })
+                            : '-'
+                          }
+                        </div>
+                      </div>
+                    </div>
                     
                     <Link to={`/campaign-application?campaign_id=${campaign.id}`}>
                       <Button className="w-full bg-purple-600 hover:bg-purple-700">
