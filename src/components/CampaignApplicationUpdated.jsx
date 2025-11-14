@@ -346,6 +346,20 @@ const CampaignApplicationUpdated = () => {
     return `₩${amount.toLocaleString()}`
   }
 
+  const getCampaignTypeBadge = (campaignType) => {
+    const badges = {
+      regular: { label: '📝 일반 캠페인', color: 'bg-blue-100 text-blue-700' },
+      oliveyoung: { label: '🌸 올영세일 캠페인', color: 'bg-pink-100 text-pink-700' },
+      '4week_challenge': { label: '💪 4주 챌린지', color: 'bg-purple-100 text-purple-700' }
+    }
+    const badge = badges[campaignType] || badges.regular
+    return (
+      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${badge.color}`}>
+        {badge.label}
+      </span>
+    )
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
@@ -413,12 +427,15 @@ const CampaignApplicationUpdated = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* 캠페인 정보 */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              {t.campaignInfo}
-            </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  {t.campaignInfo}
+                </h2>
+                {getCampaignTypeBadge(campaign.campaign_type)}
+              </div>
 
             {campaign && (
               <div className="space-y-4">
@@ -562,9 +579,56 @@ const CampaignApplicationUpdated = () => {
                 </div>
 
                 {/* 캠페인 가이드 */}
-                {(campaign.required_dialogues?.length > 0 || campaign.required_scenes?.length > 0 || campaign.required_hashtags?.length > 0 || campaign.video_duration || campaign.video_tempo || campaign.video_tone || campaign.additional_details || campaign.additional_shooting_requests || campaign.meta_ad_code_requested) && (
+                {(campaign.required_dialogues?.length > 0 || campaign.required_scenes?.length > 0 || campaign.required_hashtags?.length > 0 || campaign.video_duration || campaign.video_tempo || campaign.video_tone || campaign.additional_details || campaign.additional_shooting_requests || campaign.meta_ad_code_requested || campaign.ai_generated_guide || campaign.creator_guide) && (
                   <div className="border-t pt-4 mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">{t.campaignGuide}</h4>
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-sm font-medium text-gray-700">{t.campaignGuide}</h4>
+                      {getCampaignTypeBadge(campaign.campaign_type)}
+                    </div>
+                    
+                    {/* 캠페인 유형별 설명 */}
+                    {campaign.campaign_type === 'oliveyoung' && (
+                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-3 mb-4">
+                        <p className="text-sm text-pink-800">
+                          <strong>🌸 올영세일 캠페인:</strong> 이 캠페인은 3단계(STEP 1/2/3)로 진행됩니다. 각 STEP별로 영상을 제작하고 업로드해주세요.
+                        </p>
+                      </div>
+                    )}
+                    {campaign.campaign_type === '4week_challenge' && (
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-4">
+                        <p className="text-sm text-purple-800">
+                          <strong>💪 4주 챌린지:</strong> 이 캠페인은 4주 동안 진행됩니다. 매주 영상을 제작하고 업로드하여 제품 사용 경험을 공유해주세요.
+                        </p>
+                      </div>
+                    )}
+                    {campaign.campaign_type === 'regular' && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                        <p className="text-sm text-blue-800">
+                          <strong>📝 일반 캠페인:</strong> 아래 가이드를 참고하여 영상을 제작해주세요. 필수 대사와 장면을 반드시 포함해주세요.
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* AI 생성 가이드 */}
+                    {campaign.ai_generated_guide && (
+                      <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
+                        <div className="flex items-center mb-2">
+                          <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                          </svg>
+                          <h5 className="text-sm font-semibold text-purple-800">AI 생성 가이드</h5>
+                        </div>
+                        <pre className="text-sm text-gray-700 whitespace-pre-wrap">{campaign.ai_generated_guide}</pre>
+                      </div>
+                    )}
+                    
+                    {/* 크리에이터 가이드 */}
+                    {campaign.creator_guide && (
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                        <h5 className="text-sm font-semibold text-gray-800 mb-2">크리에이터 가이드</h5>
+                        <pre className="text-sm text-gray-700 whitespace-pre-wrap">{campaign.creator_guide}</pre>
+                      </div>
+                    )}
                     <div className="space-y-3">
                       {/* 필수 대사 */}
                       {campaign.required_dialogues && campaign.required_dialogues.length > 0 && (
