@@ -50,7 +50,16 @@ const MyPageKorea = () => {
     step2_url: '',
     step3_url: '',
     step1_2_video_folder: '',
-    step3_video_folder: ''
+    step3_video_folder: '',
+    // 4주 챌린지 전용 필드
+    week1_url: '',
+    week2_url: '',
+    week3_url: '',
+    week4_url: '',
+    week1_video: '',
+    week2_video: '',
+    week3_video: '',
+    week4_video: ''
   })
 
   // 프로필 편집 관련 상태
@@ -155,7 +164,9 @@ const MyPageKorea = () => {
             id,
             title,
             image_url,
-            reward_points
+            reward_points,
+            campaign_type,
+            is_oliveyoung_sale
           )
         `)
         .eq('user_id', user.id)
@@ -434,10 +445,11 @@ const MyPageKorea = () => {
       setProcessing(true)
       setError('')
 
-      // 올영세일 캠페인 여부 확인
-      const isOliveYoungSale = selectedApplication?.campaign?.is_oliveyoung_sale
+      // 캐페인 타입 확인
+      const campaignType = selectedApplication?.campaigns?.campaign_type || 'regular'
+      const isOliveYoungSale = selectedApplication?.campaigns?.is_oliveyoung_sale
 
-      if (isOliveYoungSale) {
+      if (campaignType === 'oliveyoung' || isOliveYoungSale) {
         // 올영세일: 3개 URL 모두 필수
         if (!snsUploadForm.step1_url || !snsUploadForm.step2_url || !snsUploadForm.step3_url) {
           setError('STEP 1, 2, 3 URL을 모두 입력해주세요.')
@@ -450,8 +462,21 @@ const MyPageKorea = () => {
           setProcessing(false)
           return
         }
+      } else if (campaignType === '4week_challenge') {
+        // 4주 챌린지: 4개 URL 모두 필수
+        if (!snsUploadForm.week1_url || !snsUploadForm.week2_url || !snsUploadForm.week3_url || !snsUploadForm.week4_url) {
+          setError('Week 1, 2, 3, 4 URL을 모두 입력해주세요.')
+          setProcessing(false)
+          return
+        }
+        // 4주 챌린지: 4개 영상 파일 필수
+        if (!snsUploadForm.week1_video || !snsUploadForm.week2_video || !snsUploadForm.week3_video || !snsUploadForm.week4_video) {
+          setError('Week 1, 2, 3, 4 영상 파일을 모두 업로드해주세요.')
+          setProcessing(false)
+          return
+        }
       } else {
-        // 일반 캠페인: 1개 URL 필수
+        // 일반 캐페인: 1개 URL 필수
         if (!snsUploadForm.sns_upload_url) {
           setError('SNS 업로드 URL을 입력해주세요.')
           setProcessing(false)
@@ -459,20 +484,40 @@ const MyPageKorea = () => {
         }
       }
 
-      const updateData = isOliveYoungSale ? {
-        step1_url: snsUploadForm.step1_url,
-        step2_url: snsUploadForm.step2_url,
-        step3_url: snsUploadForm.step3_url,
-        step1_2_video_folder: snsUploadForm.step1_2_video_folder,
-        step3_video_folder: snsUploadForm.step3_video_folder,
-        sns_upload_date: new Date().toISOString(),
-        notes: snsUploadForm.notes,
-        status: 'sns_uploaded'
-      } : {
-        sns_upload_url: snsUploadForm.sns_upload_url,
-        sns_upload_date: new Date().toISOString(),
-        notes: snsUploadForm.notes,
-        status: 'sns_uploaded'
+      let updateData
+      
+      if (campaignType === 'oliveyoung' || isOliveYoungSale) {
+        updateData = {
+          step1_url: snsUploadForm.step1_url,
+          step2_url: snsUploadForm.step2_url,
+          step3_url: snsUploadForm.step3_url,
+          step1_2_video_folder: snsUploadForm.step1_2_video_folder,
+          step3_video_folder: snsUploadForm.step3_video_folder,
+          sns_upload_date: new Date().toISOString(),
+          notes: snsUploadForm.notes,
+          status: 'sns_uploaded'
+        }
+      } else if (campaignType === '4week_challenge') {
+        updateData = {
+          week1_url: snsUploadForm.week1_url,
+          week2_url: snsUploadForm.week2_url,
+          week3_url: snsUploadForm.week3_url,
+          week4_url: snsUploadForm.week4_url,
+          week1_video: snsUploadForm.week1_video,
+          week2_video: snsUploadForm.week2_video,
+          week3_video: snsUploadForm.week3_video,
+          week4_video: snsUploadForm.week4_video,
+          sns_upload_date: new Date().toISOString(),
+          notes: snsUploadForm.notes,
+          status: 'sns_uploaded'
+        }
+      } else {
+        updateData = {
+          sns_upload_url: snsUploadForm.sns_upload_url,
+          sns_upload_date: new Date().toISOString(),
+          notes: snsUploadForm.notes,
+          status: 'sns_uploaded'
+        }
       }
 
       const { error: updateError } = await database
@@ -491,7 +536,15 @@ const MyPageKorea = () => {
         step2_url: '', 
         step3_url: '',
         step1_2_video_folder: '',
-        step3_video_folder: ''
+        step3_video_folder: '',
+        week1_url: '',
+        week2_url: '',
+        week3_url: '',
+        week4_url: '',
+        week1_video: '',
+        week2_video: '',
+        week3_video: '',
+        week4_video: ''
       })
       setSelectedApplication(null)
       
@@ -1270,8 +1323,61 @@ const MyPageKorea = () => {
               </div>
               
               <div className="space-y-4">
-                {selectedApplication?.campaign?.is_oliveyoung_sale ? (
-                  // 올영세일 캠페인: 3개 URL 입력
+                {selectedApplication?.campaigns?.campaign_type === '4week_challenge' ? (
+                  // 4주 챌린지: 4개 URL 입력
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Week 1 URL *
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm.week1_url}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, week1_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/p/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Week 2 URL *
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm.week2_url}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, week2_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/p/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Week 3 URL *
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm.week3_url}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, week3_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/p/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Week 4 URL *
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm.week4_url}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, week4_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/p/..."
+                      />
+                    </div>
+                    {/* TODO: 4주 챌린지 영상 파일 업로드 UI 추가 */}
+                  </>
+                ) : selectedApplication?.campaigns?.is_oliveyoung_sale ? (
+                  // 올영세일 캐페인: 3개 URL 입력
                   <>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1311,7 +1417,7 @@ const MyPageKorea = () => {
                     </div>
                   </>
                 ) : (
-                  // 일반 캠페인: 1개 URL 입력
+                  // 일반 캐페인: 1개 URL 입력
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       SNS 업로드 URL *
