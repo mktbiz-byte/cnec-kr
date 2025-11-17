@@ -286,9 +286,9 @@ const CampaignApplicationEnhanced = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -392,7 +392,7 @@ const CampaignApplicationEnhanced = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4 text-blue-600" />
-                      <span>応募締切: {new Date(campaign.application_deadline).toLocaleDateString('ja-JP')}</span>
+                      <span>応募締切: {new Date(campaign.application_deadline).toLocaleDateString('ko-KR')}</span>
                     </div>
                   </div>
                 </div>

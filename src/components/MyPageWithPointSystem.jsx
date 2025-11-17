@@ -200,9 +200,9 @@ const MyPageWithPointSystem = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -324,7 +324,7 @@ const MyPageWithPointSystem = () => {
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4 text-gray-500" />
                       <span>
-                        応募日: {new Date(application.created_at).toLocaleDateString('ja-JP')}
+                        応募日: {new Date(application.created_at).toLocaleDateString('ko-KR')}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -339,7 +339,7 @@ const MyPageWithPointSystem = () => {
                       <div className="flex items-center space-x-2">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         <span>
-                          承認日: {new Date(application.approved_at).toLocaleDateString('ja-JP')}
+                          承認日: {new Date(application.approved_at).toLocaleDateString('ko-KR')}
                         </span>
                       </div>
                     )}

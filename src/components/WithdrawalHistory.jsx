@@ -27,13 +27,13 @@ const WithdrawalHistory = ({ userId }) => {
   }, [userId])
   
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')
   }
   
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
   

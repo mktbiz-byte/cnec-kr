@@ -134,7 +134,7 @@ const EmailScheduler = () => {
             const emailData = {
               name: user.name || 'ユーザー',
               campaignTitle: campaign.title,
-              deadline: new Date(campaign.deadline).toLocaleDateString('ja-JP'),
+              deadline: new Date(campaign.deadline).toLocaleDateString('ko-KR'),
               rewardAmount: campaign.reward_amount
             }
 
@@ -212,7 +212,7 @@ const EmailScheduler = () => {
   }
 
   const formatDateTime = (dateString) => {
-    return new Date(dateString).toLocaleString('ja-JP')
+    return new Date(dateString).toLocaleString('ko-KR')
   }
 
   const manualTriggerEmail = async (scheduleId) => {

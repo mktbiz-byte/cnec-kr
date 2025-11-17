@@ -231,7 +231,7 @@ const CompanyReport = () => {
       ).length
       
       dailyApplications.push({
-        date: date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }),
+        date: date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
         applications: dayApplications
       })
     }
@@ -285,8 +285,8 @@ const CompanyReport = () => {
         'ユーザーID': app.user_id,
         'ユーザー名': app.user_profiles?.name || '',
         '状態': app.status,
-        '応募日': new Date(app.created_at).toLocaleDateString('ja-JP'),
-        '更新日': new Date(app.updated_at).toLocaleDateString('ja-JP'),
+        '応募日': new Date(app.created_at).toLocaleDateString('ko-KR'),
+        '更新日': new Date(app.updated_at).toLocaleDateString('ko-KR'),
         'Instagram フォロワー': app.user_profiles?.instagram_followers || 0,
         'TikTok フォロワー': app.user_profiles?.tiktok_followers || 0,
         'YouTube フォロワー': app.user_profiles?.youtube_followers || 0,
@@ -337,14 +337,14 @@ const CompanyReport = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
   const formatNumber = (num) => {
-    return new Intl.NumberFormat('ja-JP').format(num || 0)
+    return new Intl.NumberFormat('ko-KR').format(num || 0)
   }
 
   if (loading) {

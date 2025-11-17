@@ -226,14 +226,14 @@ const MyPageEnhanced = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')
   }
 
   const getStatusBadge = (status) => {
@@ -411,7 +411,7 @@ const MyPageEnhanced = () => {
                 </Button>
                 {points < 1000 && (
                   <p className="text-xs text-purple-200 mt-1">
-                    {language === 'ko' ? '최소 ¥1,000부터 출금 가능' : '最低¥1,000から出金可能'}
+                    {language === 'ko' ? '최소 ₩1,000부터 출금 가능' : '最低₩1,000から出金可能'}
                   </p>
                 )}
               </div>
@@ -656,7 +656,7 @@ const MyPageEnhanced = () => {
               {/* 출금 금액 */}
               <div className="space-y-2">
                 <Label htmlFor="amount">
-                  {language === 'ko' ? '출금 금액 (¥)' : '出金金額 (¥)'} *
+                  {language === 'ko' ? '출금 금액 (₩)' : '出金金額 (₩)'} *
                 </Label>
                 <Input
                   id="amount"
@@ -669,8 +669,8 @@ const MyPageEnhanced = () => {
                 />
                 <p className="text-xs text-gray-500">
                   {language === 'ko' 
-                    ? `최소 ¥1,000, 최대 ${formatCurrency(points)}`
-                    : `最低¥1,000、最大${formatCurrency(points)}`
+                    ? `최소 ₩1,000, 최대 ${formatCurrency(points)}`
+                    : `最低₩1,000、最大${formatCurrency(points)}`
                   }
                 </p>
               </div>

@@ -306,9 +306,9 @@ const CampaignApplicationWithEmail = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -410,13 +410,13 @@ const CampaignApplicationWithEmail = () => {
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-5 w-5 text-gray-500" />
                   <span className="text-sm">
-                    <strong>応募締切:</strong> {new Date(campaign.application_deadline).toLocaleDateString('ja-JP')}
+                    <strong>応募締切:</strong> {new Date(campaign.application_deadline).toLocaleDateString('ko-KR')}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Target className="h-5 w-5 text-gray-500" />
                   <span className="text-sm">
-                    <strong>投稿締切:</strong> {new Date(campaign.deadline).toLocaleDateString('ja-JP')}
+                    <strong>投稿締切:</strong> {new Date(campaign.deadline).toLocaleDateString('ko-KR')}
                   </span>
                 </div>
               </div>

@@ -133,9 +133,9 @@ const MyPageWithVideoUpload = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -334,7 +334,7 @@ const MyPageWithVideoUpload = () => {
                                   </div>
                                   <div className="flex items-center space-x-2">
                                     <Calendar className="h-4 w-4 text-gray-500" />
-                                    <span>応募日: {new Date(application.created_at).toLocaleDateString('ja-JP')}</span>
+                                    <span>応募日: {new Date(application.created_at).toLocaleDateString('ko-KR')}</span>
                                   </div>
                                 </div>
 

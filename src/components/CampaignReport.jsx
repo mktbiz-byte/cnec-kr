@@ -109,18 +109,18 @@ const CampaignReport = () => {
   }
 
   const formatNumber = (num) => {
-    return new Intl.NumberFormat(language === 'ko' ? 'ko-KR' : 'ja-JP').format(num || 0)
+    return new Intl.NumberFormat(language === 'ko' ? 'ko-KR' : 'ko-KR').format(num || 0)
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')
   }
 
   const getStatusColor = (status) => {
@@ -198,7 +198,7 @@ const CampaignReport = () => {
   const dailyData = Object.entries(dailyApplications)
     .sort(([a], [b]) => new Date(a) - new Date(b))
     .map(([date, count]) => ({
-      date: new Date(date).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP', { month: 'short', day: 'numeric' }),
+      date: new Date(date).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR', { month: 'short', day: 'numeric' }),
       applications: count
     }))
 

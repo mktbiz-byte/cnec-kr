@@ -120,9 +120,9 @@ const ConfirmedCreatorsReport = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -139,7 +139,7 @@ const ConfirmedCreatorsReport = () => {
         `${profile?.prefecture || ''} ${profile?.city || ''} ${profile?.address || ''}`.trim() || 'N/A',
         app.tracking_number || '未発送',
         app.tracking_number ? '発送済み' : '未発送',
-        app.approved_at ? new Date(app.approved_at).toLocaleDateString('ja-JP') : 'N/A'
+        app.approved_at ? new Date(app.approved_at).toLocaleDateString('ko-KR') : 'N/A'
       ]
     })
     
@@ -538,7 +538,7 @@ const ConfirmedCreatorsReport = () => {
                         </div>
                         <div className="mt-2 text-sm text-green-700">
                           <p><strong>配送番号:</strong> {application.tracking_number}</p>
-                          <p><strong>発送日:</strong> {application.shipped_at ? new Date(application.shipped_at).toLocaleDateString('ja-JP') : 'N/A'}</p>
+                          <p><strong>発送日:</strong> {application.shipped_at ? new Date(application.shipped_at).toLocaleDateString('ko-KR') : 'N/A'}</p>
                         </div>
                       </div>
                     )}

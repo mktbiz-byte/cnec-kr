@@ -300,7 +300,7 @@ const HomePage = () => {
                         <div className="text-xs text-gray-600">{language === 'ko' ? '마감일' : '締切'}</div>
                         <div className="font-bold text-orange-600">
                           {campaign.recruitment_deadline || campaign.application_deadline
-                            ? new Date(campaign.recruitment_deadline || campaign.application_deadline).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP', { month: 'numeric', day: 'numeric' })
+                            ? new Date(campaign.recruitment_deadline || campaign.application_deadline).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR', { month: 'numeric', day: 'numeric' })
                             : '-'
                           }
                         </div>

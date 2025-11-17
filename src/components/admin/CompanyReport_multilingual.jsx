@@ -178,9 +178,9 @@ const CompanyReport = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat(language === 'en' ? 'en-US' : language === 'ko' ? 'ko-KR' : 'ja-JP', {
+    return new Intl.NumberFormat(language === 'en' ? 'en-US' : language === 'ko' ? 'ko-KR' : 'ko-KR', {
       style: 'currency',
-      currency: language === 'ko' ? 'KRW' : 'JPY'
+      currency: language === 'ko' ? 'KRW' : 'KRW'
     }).format(amount || 0)
   }
 
@@ -189,7 +189,7 @@ const CompanyReport = () => {
     
     const date = new Date(dateString)
     const locale = language === 'en' ? 'en-US' : 
-                  language === 'ko' ? 'ko-KR' : 'ja-JP'
+                  language === 'ko' ? 'ko-KR' : 'ko-KR'
     
     return date.toLocaleDateString(locale)
   }

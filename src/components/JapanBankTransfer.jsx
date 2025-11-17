@@ -146,7 +146,7 @@ const JapanBankTransfer = ({ withdrawalId, onClose, onSuccess }) => {
     
     // 송금 정보
     amount: 0,
-    currency: 'JPY',
+    currency: 'KRW',
     purpose: '',
     purposeDescription: '',
     
@@ -347,9 +347,9 @@ const JapanBankTransfer = ({ withdrawalId, onClose, onSuccess }) => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -443,7 +443,7 @@ const JapanBankTransfer = ({ withdrawalId, onClose, onSuccess }) => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">要求日:</span>
-                    <span>{new Date(withdrawal?.created_at).toLocaleDateString('ja-JP')}</span>
+                    <span>{new Date(withdrawal?.created_at).toLocaleDateString('ko-KR')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">状態:</span>

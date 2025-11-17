@@ -139,7 +139,7 @@ const AdminEmailManagement = () => {
         campaignTitle: 'テストキャンペーン',
         brandName: 'テストブランド',
         rewardAmount: 10000,
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('ja-JP')
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('ko-KR')
       }
 
       // 실제 이메일 발송 로직 호출
@@ -209,7 +209,7 @@ const AdminEmailManagement = () => {
               campaignTitle: campaign.title,
               brandName: campaign.brand,
               rewardAmount: campaign.reward_amount,
-              deadline: new Date(campaign.deadline).toLocaleDateString('ja-JP')
+              deadline: new Date(campaign.deadline).toLocaleDateString('ko-KR')
             }
 
             const result = await emailTriggers.sendEmail(emailType, user.email, emailData)

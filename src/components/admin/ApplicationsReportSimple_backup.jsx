@@ -179,9 +179,9 @@ const ApplicationsReportSimple = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -197,7 +197,7 @@ const ApplicationsReportSimple = () => {
         profile?.tiktok_url || 'N/A',
         profile?.youtube_url || 'N/A',
         app.virtual_selected ? '仮選択' : (app.status === 'approved' ? '승인됨' : '審査中'),
-        new Date(app.created_at).toLocaleDateString('ja-JP')
+        new Date(app.created_at).toLocaleDateString('ko-KR')
       ]
     })
     
@@ -382,7 +382,7 @@ const ApplicationsReportSimple = () => {
                       <h3 className="text-lg font-semibold">{application.user_profiles?.name || 'N/A'}</h3>
                       {getStatusBadge(application.status, application.virtual_selected)}
                       <span className="text-sm text-gray-500">
-                        {new Date(application.created_at).toLocaleDateString('ja-JP')}
+                        {new Date(application.created_at).toLocaleDateString('ko-KR')}
                       </span>
                     </div>
                     
@@ -410,7 +410,7 @@ const ApplicationsReportSimple = () => {
                         <span className="font-medium">肌タイプ:</span> {application.user_profiles?.skin_type || 'N/A'}
                       </div>
                       <div>
-                        <span className="font-medium">지원日:</span> {new Date(application.created_at).toLocaleDateString('ja-JP')}
+                        <span className="font-medium">지원日:</span> {new Date(application.created_at).toLocaleDateString('ko-KR')}
                       </div>
                     </div>
                     
@@ -561,7 +561,7 @@ const ApplicationsReportSimple = () => {
                 </div>
                 <div>
                   <span className="font-medium">지원日:</span>
-                  <p>{new Date(selectedApplication.created_at).toLocaleDateString('ja-JP')}</p>
+                  <p>{new Date(selectedApplication.created_at).toLocaleDateString('ko-KR')}</p>
                 </div>
               </div>
               

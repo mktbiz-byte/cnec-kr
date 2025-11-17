@@ -324,7 +324,7 @@ const AdminCompanyAccess = () => {
   }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')
   }
 
   const filteredTokens = accessTokens.filter(token => {

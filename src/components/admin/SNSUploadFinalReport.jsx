@@ -146,9 +146,9 @@ const SNSUploadFinalReport = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -164,7 +164,7 @@ const SNSUploadFinalReport = () => {
         videoLinks.youtube_url || '',
         videoLinks.other_url || '',
         videoLinks.notes || '',
-        app.video_uploaded_at ? new Date(app.video_uploaded_at).toLocaleDateString('ja-JP') : 'N/A'
+        app.video_uploaded_at ? new Date(app.video_uploaded_at).toLocaleDateString('ko-KR') : 'N/A'
       ]
     })
     
@@ -358,7 +358,7 @@ const SNSUploadFinalReport = () => {
                       <div>
                         <h3 className="text-lg font-semibold">{profile?.name || 'N/A'}</h3>
                         <p className="text-sm text-gray-600">
-                          업로드日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ja-JP') : 'N/A'}
+                          업로드日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ko-KR') : 'N/A'}
                         </p>
                       </div>
                       <Badge className="bg-blue-100 text-blue-800">
@@ -499,7 +499,7 @@ const SNSUploadFinalReport = () => {
               <div className="flex items-center space-x-4 mt-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{new Date(campaign.start_date).toLocaleDateString('ja-JP')} - {new Date(campaign.end_date).toLocaleDateString('ja-JP')}</span>
+                  <span>{new Date(campaign.start_date).toLocaleDateString('ko-KR')} - {new Date(campaign.end_date).toLocaleDateString('ko-KR')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Activity className="h-4 w-4" />
@@ -661,7 +661,7 @@ const SNSUploadFinalReport = () => {
                     <div>
                       <h3 className="text-lg font-semibold">{profile?.name || 'N/A'}</h3>
                       <p className="text-sm text-gray-600">
-                        업로드日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ja-JP') : 'N/A'}
+                        업로드日: {application.video_uploaded_at ? new Date(application.video_uploaded_at).toLocaleDateString('ko-KR') : 'N/A'}
                       </p>
                     </div>
                     <Badge className="bg-blue-100 text-blue-800">

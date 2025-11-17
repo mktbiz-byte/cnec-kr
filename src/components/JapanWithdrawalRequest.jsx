@@ -165,7 +165,7 @@ const JapanWithdrawalRequest = () => {
         bank_info_id: existingBankInfo.id,
         status: 'pending',
         requested_at: new Date().toISOString(),
-        currency: 'JPY',
+        currency: 'KRW',
         transfer_type: 'japan_bank'
       })
       
@@ -182,9 +182,9 @@ const JapanWithdrawalRequest = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 

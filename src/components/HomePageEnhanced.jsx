@@ -42,7 +42,7 @@
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-orange-600 mb-2">
-                ¥20,000,000+
+                ₩20,000,000+
               </div>
               <div className="text-gray-600">総報酬額</div>
             </div>

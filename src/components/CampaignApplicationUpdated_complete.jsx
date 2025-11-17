@@ -310,12 +310,12 @@ const CampaignApplicationUpdated = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return ''
-    return new Date(dateString).toLocaleDateString(language === 'ja' ? 'ja-JP' : 'ko-KR')
+    return new Date(dateString).toLocaleDateString(language === 'ja' ? 'ko-KR' : 'ko-KR')
   }
 
   const formatCurrency = (amount) => {
-    if (!amount) return '¥0'
-    return `¥${amount.toLocaleString()}`
+    if (!amount) return '₩0'
+    return `₩${amount.toLocaleString()}`
   }
 
   if (loading) {

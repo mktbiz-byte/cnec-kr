@@ -264,7 +264,7 @@ const ApplicationsReportSimple = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return t.noData
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP', {
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -275,9 +275,9 @@ const ApplicationsReportSimple = () => {
 
   const formatCurrency = (amount) => {
     if (!amount) return t.noData
-    return new Intl.NumberFormat(language === 'ko' ? 'ko-KR' : 'ja-JP', {
+    return new Intl.NumberFormat(language === 'ko' ? 'ko-KR' : 'ko-KR', {
       style: 'currency',
-      currency: language === 'ko' ? 'KRW' : 'JPY'
+      currency: language === 'ko' ? 'KRW' : 'KRW'
     }).format(amount)
   }
 

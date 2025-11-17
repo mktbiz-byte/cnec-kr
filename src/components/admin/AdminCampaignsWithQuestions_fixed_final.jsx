@@ -456,14 +456,14 @@ const AdminCampaignsWithQuestions = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return '-'
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')
   }
 
   const formatCurrency = (amount) => {
     if (!amount) return '-'
-    return new Intl.NumberFormat(language === 'ko' ? 'ko-KR' : 'ja-JP', {
+    return new Intl.NumberFormat(language === 'ko' ? 'ko-KR' : 'ko-KR', {
       style: 'currency',
-      currency: language === 'ko' ? 'KRW' : 'JPY'
+      currency: language === 'ko' ? 'KRW' : 'KRW'
     }).format(amount)
   }
 

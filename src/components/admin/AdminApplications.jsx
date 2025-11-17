@@ -249,7 +249,7 @@ const AdminApplications = () => {
       [language === 'ko' ? '유튜브' : 'YouTube']: app.youtube_url || '',
       [language === 'ko' ? '유튜브 구독자' : 'YouTube 登録者']: app.youtube_subscribers || 0,
       [language === 'ko' ? '상태' : 'ステータス']: getStatusText(app.status),
-      [language === 'ko' ? '신청일' : '지원日']: new Date(app.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP'),
+      [language === 'ko' ? '신청일' : '지원日']: new Date(app.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR'),
       [language === 'ko' ? '관리자 메모' : '관리자メモ']: app.admin_notes || ''
     }))
     
@@ -275,7 +275,7 @@ const AdminApplications = () => {
       [language === 'ko' ? '주소' : '住所']: app.address || '',
       [language === 'ko' ? '우편번호' : '郵便番号']: app.postal_code || '',
       [language === 'ko' ? '배송 메모' : '配送メモ']: app.shipping_notes || '',
-      [language === 'ko' ? '승인일' : '승인日']: app.approved_at ? new Date(app.approved_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP') : ''
+      [language === 'ko' ? '승인일' : '승인日']: app.approved_at ? new Date(app.approved_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR') : ''
     }))
     
     const worksheet = XLSX.utils.json_to_sheet(shippingData)
@@ -331,7 +331,7 @@ const AdminApplications = () => {
   })
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')
   }
 
   if (loading) {

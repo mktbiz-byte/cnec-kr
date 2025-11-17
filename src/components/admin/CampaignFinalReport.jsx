@@ -164,14 +164,14 @@ const CampaignFinalReport = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
   const formatNumber = (num) => {
-    return new Intl.NumberFormat('ja-JP').format(num || 0)
+    return new Intl.NumberFormat('ko-KR').format(num || 0)
   }
 
   const exportReport = () => {
@@ -181,7 +181,7 @@ const CampaignFinalReport = () => {
 
 캠페인명: ${campaign?.title}
 ブランド: ${campaign?.brand}
-期間: ${new Date(campaign?.start_date).toLocaleDateString('ja-JP')} - ${new Date(campaign?.end_date).toLocaleDateString('ja-JP')}
+期間: ${new Date(campaign?.start_date).toLocaleDateString('ko-KR')} - ${new Date(campaign?.end_date).toLocaleDateString('ko-KR')}
 
 === 실행 결과 ===
 총 응모자 수: ${reportData.totalApplications}명
@@ -270,7 +270,7 @@ YouTube: ${reportData.videoStats.youtube}개
               <div className="flex items-center space-x-4 mt-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{new Date(campaign.start_date).toLocaleDateString('ja-JP')} - {new Date(campaign.end_date).toLocaleDateString('ja-JP')}</span>
+                  <span>{new Date(campaign.start_date).toLocaleDateString('ko-KR')} - {new Date(campaign.end_date).toLocaleDateString('ko-KR')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Building className="h-4 w-4" />

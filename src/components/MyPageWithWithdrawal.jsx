@@ -1118,7 +1118,7 @@ const MyPageWithWithdrawal = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">{t.joinDate}</label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {profile?.created_at ? new Date(profile.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP') : '-'}
+                      {profile?.created_at ? new Date(profile.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR') : '-'}
                     </p>
                   </div>
                   
@@ -1389,7 +1389,7 @@ const MyPageWithWithdrawal = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(application.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')}
+                            {new Date(application.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {application.status === 'approved' ? (
@@ -1526,7 +1526,7 @@ const MyPageWithWithdrawal = () => {
                              withdrawal.withdrawal_method || 'PayPal'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ¥{withdrawal.amount?.toLocaleString() || '0'}
+                            ₩{withdrawal.amount?.toLocaleString() || '0'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -1542,11 +1542,11 @@ const MyPageWithWithdrawal = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(withdrawal.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')}
+                            {new Date(withdrawal.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {withdrawal.processed_at ? 
-                              new Date(withdrawal.processed_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP') : 
+                              new Date(withdrawal.processed_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR') : 
                               '-'
                             }
                           </td>
@@ -1728,7 +1728,7 @@ const MyPageWithWithdrawal = () => {
                       {language === 'ja' ? '保有ポイント' : '보유 포인트'}: {profile?.points?.toLocaleString() || 0}P
                       {withdrawForm.amount && (
                         <span className="ml-2 text-green-600 font-medium">
-                          (≈ ¥{parseInt(withdrawForm.amount || 0).toLocaleString()})
+                          (≈ ₩{parseInt(withdrawForm.amount || 0).toLocaleString()})
                         </span>
                       )}
                     </p>

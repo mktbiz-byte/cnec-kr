@@ -308,7 +308,7 @@ const AdminCampaignsEnhanced = () => {
         '시작일': campaign.start_date,
         '종료日': campaign.end_date,
         '지원締切': campaign.application_deadline,
-        '생성일': new Date(campaign.created_at).toLocaleDateString('ja-JP'),
+        '생성일': new Date(campaign.created_at).toLocaleDateString('ko-KR'),
         'カテゴリー': campaign.category || '',
         'ターゲット': campaign.target_audience || ''
       }))
@@ -356,8 +356,8 @@ const AdminCampaignsEnhanced = () => {
         'ユーザーID': app.user_id,
         '캠페인 제목': app.campaigns?.title || '',
         '状態': app.status,
-        '지원日': new Date(app.created_at).toLocaleDateString('ja-JP'),
-        '업데이트日': new Date(app.updated_at).toLocaleDateString('ja-JP'),
+        '지원日': new Date(app.created_at).toLocaleDateString('ko-KR'),
+        '업데이트日': new Date(app.updated_at).toLocaleDateString('ko-KR'),
         'SNS Instagram': app.sns_urls?.instagram || '',
         'SNS TikTok': app.sns_urls?.tiktok || '',
         'SNS YouTube': app.sns_urls?.youtube || '',
@@ -432,7 +432,7 @@ const AdminCampaignsEnhanced = () => {
           'TikTokフォロワー': profile?.tiktok_followers || '',
           'YouTube': profile?.youtube_url || '',
           'YouTubeフォロワー': profile?.youtube_followers || '',
-          '지원日': new Date(app.created_at).toLocaleDateString('ja-JP'),
+          '지원日': new Date(app.created_at).toLocaleDateString('ko-KR'),
           '状態': app.status
         }
       })
@@ -533,14 +533,14 @@ const AdminCampaignsEnhanced = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ja-JP')
+    return new Date(dateString).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')
   }
 
   const filteredCampaigns = campaigns.filter(campaign => {

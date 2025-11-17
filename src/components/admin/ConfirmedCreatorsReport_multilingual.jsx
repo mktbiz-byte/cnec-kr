@@ -155,9 +155,9 @@ const ConfirmedCreatorsReport_multilingual = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat(language === 'en' ? 'en-US' : language === 'ko' ? 'ko-KR' : 'ja-JP', {
+    return new Intl.NumberFormat(language === 'en' ? 'en-US' : language === 'ko' ? 'ko-KR' : 'ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -166,7 +166,7 @@ const ConfirmedCreatorsReport_multilingual = () => {
     
     const date = new Date(dateString)
     const locale = language === 'en' ? 'en-US' : 
-                  language === 'ko' ? 'ko-KR' : 'ja-JP'
+                  language === 'ko' ? 'ko-KR' : 'ko-KR'
     
     return date.toLocaleDateString(locale)
   }

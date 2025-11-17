@@ -158,9 +158,9 @@ const CampaignApplicationsReport = () => {
   }
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'JPY'
+      currency: 'KRW'
     }).format(amount || 0)
   }
 
@@ -178,7 +178,7 @@ const CampaignApplicationsReport = () => {
         profile?.tiktok_url || 'N/A',
         profile?.youtube_url || 'N/A',
         getStatusText(app.status),
-        new Date(app.created_at).toLocaleDateString('ja-JP')
+        new Date(app.created_at).toLocaleDateString('ko-KR')
       ]
     })
     
@@ -278,7 +278,7 @@ const CampaignApplicationsReport = () => {
             <div className="flex items-center space-x-2">
               <Calendar className="h-5 w-5 text-gray-500" />
               <span className="text-sm">
-                <strong>締切:</strong> {new Date(campaign.application_deadline).toLocaleDateString('ja-JP')}
+                <strong>締切:</strong> {new Date(campaign.application_deadline).toLocaleDateString('ko-KR')}
               </span>
             </div>
           </div>
@@ -335,7 +335,7 @@ const CampaignApplicationsReport = () => {
                       <h3 className="text-lg font-semibold">{profile?.name || 'N/A'}</h3>
                       {getStatusBadge(application.status)}
                       <span className="text-sm text-gray-500">
-                        {new Date(application.created_at).toLocaleDateString('ja-JP')}
+                        {new Date(application.created_at).toLocaleDateString('ko-KR')}
                       </span>
                     </div>
                     
