@@ -618,7 +618,7 @@ const CampaignApplicationUpdated = () => {
                           </svg>
                           <h5 className="text-sm font-semibold text-purple-800">AI 생성 가이드</h5>
                         </div>
-                        <pre className="text-sm text-gray-700 whitespace-pre-wrap">{campaign.ai_generated_guide}</pre>
+                        <pre className="text-sm text-gray-700 whitespace-pre-wrap">{typeof campaign.ai_generated_guide === 'object' ? JSON.stringify(campaign.ai_generated_guide, null, 2) : campaign.ai_generated_guide}</pre>
                       </div>
                     )}
                     
