@@ -563,7 +563,7 @@ const HomePageExactReplica = () => {
                     </p>
                     
                     <div className="mb-4">
-                      <div className="text-sm text-gray-500 mb-2">対象플랫폼:</div>
+                      <div className="text-sm text-gray-500 mb-2">지원 가능 플랫폼:</div>
                       <div className="flex flex-wrap gap-2">
                         {(() => {
                           // target_platforms가 객체인 경우 처리
@@ -591,7 +591,7 @@ const HomePageExactReplica = () => {
                     <div className="flex justify-between items-center">
                       <div>
                         <div className="text-2xl font-bold text-blue-600">
-                          {formatCurrency(campaign.reward_amount)}
+                          {formatCurrency(campaign.reward_points || campaign.reward_amount || 0)}
                         </div>
                         <div className="text-sm text-gray-500">보상</div>
                       </div>
@@ -1058,7 +1058,7 @@ const HomePageExactReplica = () => {
               </div>
               
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2">対象플랫폼</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">지원 가능 플랫폼</h4>
                 <div className="flex flex-wrap gap-2">
                   {(() => {
                     // target_platforms가 객체인 경우 처리
@@ -1086,7 +1086,7 @@ const HomePageExactReplica = () => {
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2">보상</h4>
                 <p className="text-3xl font-bold text-blue-600">
-                  {formatCurrency(selectedCampaign.reward_amount)}
+                  {formatCurrency(selectedCampaign.reward_points || selectedCampaign.reward_amount || 0)}
                 </p>
               </div>
               
