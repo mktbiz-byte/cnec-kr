@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { database } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { Youtube, Instagram, Music } from 'lucide-react'
 
 const VideoReferencesSection = ({ userId }) => {
@@ -22,7 +22,7 @@ const VideoReferencesSection = ({ userId }) => {
 
   const loadVideoReferences = async () => {
     try {
-      const { data, error } = await database
+      const { data, error } = await supabase
         .from('creator_video_references')
         .select('*')
         .eq('user_id', userId)
@@ -53,7 +53,7 @@ const VideoReferencesSection = ({ userId }) => {
     try {
       const platform = detectPlatform(newVideo.video_url)
       
-      const { error } = await database
+      const { error } = await supabase
         .from('creator_video_references')
         .insert([{
           user_id: userId,
@@ -81,7 +81,7 @@ const VideoReferencesSection = ({ userId }) => {
     if (!confirm('이 영상을 삭제하시겠습니까?')) return
 
     try {
-      const { error } = await database
+      const { error } = await supabase
         .from('creator_video_references')
         .delete()
         .eq('id', videoId)
