@@ -482,7 +482,7 @@ const CampaignApplicationUpdated = () => {
                     </svg>
                     <div>
                       <p className="text-xs text-gray-500">{t.participants}</p>
-                      <p className="text-sm font-medium text-gray-900">{campaign.max_participants}명</p>
+                      <p className="text-sm font-medium text-gray-900">{campaign.total_slots || campaign.max_participants}명</p>
                     </div>
                   </div>
 
@@ -610,15 +610,62 @@ const CampaignApplicationUpdated = () => {
                     )}
                     
                     {/* AI 생성 가이드 */}
-                    {campaign.ai_generated_guide && (
+                    {campaign.ai_generated_guide && typeof campaign.ai_generated_guide === 'object' && (
                       <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
-                        <div className="flex items-center mb-2">
+                        <div className="flex items-center mb-3">
                           <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                           </svg>
                           <h5 className="text-sm font-semibold text-purple-800">AI 생성 가이드</h5>
                         </div>
-                        <pre className="text-sm text-gray-700 whitespace-pre-wrap">{typeof campaign.ai_generated_guide === 'object' ? JSON.stringify(campaign.ai_generated_guide, null, 2) : campaign.ai_generated_guide}</pre>
+                        <div className="space-y-4">
+                          {campaign.ai_generated_guide.product_intro && (
+                            <div className="bg-white rounded-lg p-3">
+                              <h6 className="text-xs font-semibold text-purple-700 mb-2">📝 제품 소개</h6>
+                              <p className="text-sm text-gray-700">{campaign.ai_generated_guide.product_intro}</p>
+                            </div>
+                          )}
+                          {campaign.ai_generated_guide.must_include && campaign.ai_generated_guide.must_include.length > 0 && (
+                            <div className="bg-white rounded-lg p-3">
+                              <h6 className="text-xs font-semibold text-red-600 mb-2">✅ 필수 포함 사항</h6>
+                              <ul className="list-disc list-inside space-y-1">
+                                {campaign.ai_generated_guide.must_include.map((item, idx) => (
+                                  <li key={idx} className="text-sm text-gray-700">{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {campaign.ai_generated_guide.filming_tips && campaign.ai_generated_guide.filming_tips.length > 0 && (
+                            <div className="bg-white rounded-lg p-3">
+                              <h6 className="text-xs font-semibold text-blue-600 mb-2">🎥 촬영 팁</h6>
+                              <ul className="list-disc list-inside space-y-1">
+                                {campaign.ai_generated_guide.filming_tips.map((tip, idx) => (
+                                  <li key={idx} className="text-sm text-gray-700">{tip}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {campaign.ai_generated_guide.video_concepts && campaign.ai_generated_guide.video_concepts.length > 0 && (
+                            <div className="bg-white rounded-lg p-3">
+                              <h6 className="text-xs font-semibold text-green-600 mb-2">🎨 영상 컨셉</h6>
+                              <ul className="list-disc list-inside space-y-1">
+                                {campaign.ai_generated_guide.video_concepts.map((concept, idx) => (
+                                  <li key={idx} className="text-sm text-gray-700">{concept}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {campaign.ai_generated_guide.cautions && campaign.ai_generated_guide.cautions.length > 0 && (
+                            <div className="bg-white rounded-lg p-3">
+                              <h6 className="text-xs font-semibold text-orange-600 mb-2">⚠️ 주의사항</h6>
+                              <ul className="list-disc list-inside space-y-1">
+                                {campaign.ai_generated_guide.cautions.map((caution, idx) => (
+                                  <li key={idx} className="text-sm text-gray-700">{caution}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                     
@@ -780,7 +827,7 @@ const CampaignApplicationUpdated = () => {
                       type="text"
                       value={applicationData.applicant_name || userProfile?.name || ''}
                       onChange={(e) => setApplicationData(prev => ({ ...prev, applicant_name: e.target.value }))}
-                      placeholder="名前を入力してください"
+                      placeholder="이름을 입력하세요"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
                       required
                     />
@@ -806,7 +853,7 @@ const CampaignApplicationUpdated = () => {
                       type="number"
                       value={applicationData.age || userProfile?.age || ''}
                       onChange={(e) => setApplicationData(prev => ({ ...prev, age: e.target.value }))}
-                      placeholder="年齢を入力してください"
+                      placeholder="나이를 입력하세요"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
                       required
                     />
