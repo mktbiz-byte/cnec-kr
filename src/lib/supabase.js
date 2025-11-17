@@ -310,11 +310,11 @@ export const database = {
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
           
-          if (!appsError && appsData && appsData.length > 0) {
+          if (!appsError && appsData && Array.isArray(appsData) && appsData.length > 0) {
             console.log('Applications에서 사용자 데이터 발견:', appsData.length, '개')
             
-            // 캠페인 정보도 함께 가져오기
-            const campaignIds = [...new Set(appsData.map(app => app.campaign_id).filter(Boolean))]
+            // 캐페인 정보도 함께 가져오기
+            const campaignIds = Array.from(new Set(appsData.map(app => app.campaign_id).filter(Boolean)))
             if (campaignIds.length > 0) {
               const { data: campaigns, error: campaignsError } = await supabase
                 .from('campaigns')
@@ -345,9 +345,9 @@ export const database = {
               .eq('user_id', userId)
               .order('created_at', { ascending: false })
             
-            if (!campaignAppsError && campaignAppsData && campaignAppsData.length > 0) {
+            if (!campaignAppsError && campaignAppsData && Array.isArray(campaignAppsData) && campaignAppsData.length > 0) {
               console.log('Campaign Applications에서 사용자 데이터 발견:', campaignAppsData.length, '개')
-              const campaignIds = campaignAppsData.map(app => app.campaign_id)
+              const campaignIds = Array.from(new Set(campaignAppsData.map(app => app.campaign_id).filter(Boolean)))
               const { data: campaigns, error: campaignsError } = await supabase
                 .from('campaigns')
                 .select('id, title')
