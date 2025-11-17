@@ -665,7 +665,7 @@ export const database = {
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
-          .eq('user_id', userId)
+          .eq('id', userId)
           .single()
         if (error && error.code !== 'PGRST116') throw error
         return data
@@ -713,15 +713,15 @@ export const database = {
         const { data: existingProfile } = await supabase
           .from('user_profiles')
           .select('id')
-          .eq('user_id', profileData.user_id)
+          .eq('id', profileData.id)
           .single()
         
         if (existingProfile) {
-          console.log('기존 프로필 업데이트:', existingProfile.id)
+          // 업데이트
           const { data, error } = await supabase
             .from('user_profiles')
             .update(profileData)
-            .eq('user_id', profileData.user_id)
+            .eq('id', profileData.id)
             .select()
             .single()
           
@@ -755,7 +755,7 @@ export const database = {
             ...updateData,
             updated_at: new Date().toISOString()
           })
-          .eq('user_id', userId)
+          .eq('id', userId)
           .select()
         
         if (error || !data || data.length === 0) {
