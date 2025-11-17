@@ -63,7 +63,9 @@ const MyPageKoreaEnhanced = () => {
     phone: '',
     bio: '',
     age: '',
-    region: '',
+    postcode: '',
+    address: '',
+    detail_address: '',
     skin_type: '',
     instagram_url: '',
     tiktok_url: '',
@@ -138,7 +140,7 @@ const MyPageKoreaEnhanced = () => {
       setLoading(true)
       
       // 프로필 정보 가져오기
-      const { data: profileData, error: profileError } = await database
+      const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
@@ -163,7 +165,9 @@ const MyPageKoreaEnhanced = () => {
         phone: profileData?.phone || '',
         bio: profileData?.bio || '',
         age: profileData?.age || '',
-        region: profileData?.region || '',
+        postcode: profileData?.postcode || '',
+        address: profileData?.address || '',
+        detail_address: profileData?.detail_address || '',
         skin_type: profileData?.skin_type || '',
         instagram_url: profileData?.instagram_url || '',
         tiktok_url: profileData?.tiktok_url || '',
@@ -181,7 +185,7 @@ const MyPageKoreaEnhanced = () => {
       setPhotoPreview(profileData?.profile_photo_url)
 
       // 캠페인 지원 내역
-      const { data: applicationsData, error: applicationsError } = await database
+      const { data: applicationsData, error: applicationsError } = await supabase
         .from('applications')
         .select(`
           *,
@@ -199,7 +203,7 @@ const MyPageKoreaEnhanced = () => {
       setApplications(applicationsData || [])
 
       // 출금 내역
-      const { data: withdrawalsData, error: withdrawalsError } = await database
+      const { data: withdrawalsData, error: withdrawalsError } = await supabase
         .from('withdrawals')
         .select('*')
         .eq('user_id', user.id)
@@ -209,7 +213,7 @@ const MyPageKoreaEnhanced = () => {
       setWithdrawals(withdrawalsData || [])
 
       // 포인트 거래 내역
-      const { data: transactionsData, error: transactionsError } = await database
+      const { data: transactionsData, error: transactionsError } = await supabase
         .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
@@ -686,17 +690,57 @@ const MyPageKoreaEnhanced = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">지역</label>
+                    <label className="block text-sm font-medium text-gray-700">주소</label>
                     {isEditing ? (
-                      <input
-                        type="text"
-                        value={editForm.region || ''}
-                        onChange={(e) => setEditForm({...editForm, region: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="서울특별시"
-                      />
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={editForm.postcode || ''}
+                            readOnly
+                            className="w-32 px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                            placeholder="우편번호"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              new window.daum.Postcode({
+                                oncomplete: function(data) {
+                                  setEditForm({
+                                    ...editForm,
+                                    postcode: data.zonecode,
+                                    address: data.address
+                                  })
+                                }
+                              }).open()
+                            }}
+                            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                          >
+                            우편번호 검색
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={editForm.address || ''}
+                          readOnly
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                          placeholder="기본 주소"
+                        />
+                        <input
+                          type="text"
+                          value={editForm.detail_address || ''}
+                          onChange={(e) => setEditForm({...editForm, detail_address: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          placeholder="상세 주소"
+                        />
+                      </div>
                     ) : (
-                      <p className="mt-1 text-sm text-gray-900">{profile?.region || '미설정'}</p>
+                      <p className="mt-1 text-sm text-gray-900">
+                        {profile?.postcode && profile?.address 
+                          ? `(${profile.postcode}) ${profile.address} ${profile.detail_address || ''}`
+                          : '미설정'
+                        }
+                      </p>
                     )}
                   </div>
                   

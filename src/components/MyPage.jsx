@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useAuth } from '../contexts/AuthContext'
-import { database } from '../lib/supabase'
+import { database, supabase } from '../lib/supabase'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -42,8 +42,12 @@ const MyPage = () => {
     tiktok_url: '',
     tiktok_followers: '',
     youtube_url: '',
-    youtube_followers: ''
+    youtube_followers: '',
+    avatar_url: ''
   })
+  
+  const [avatarFile, setAvatarFile] = useState(null)
+  const [avatarPreview, setAvatarPreview] = useState(null)
 
   useEffect(() => {
     if (!user) {
@@ -68,7 +72,8 @@ const MyPage = () => {
         tiktok_url: userProfile.tiktok_url || '',
         tiktok_followers: userProfile.tiktok_followers || '',
         youtube_url: userProfile.youtube_url || '',
-        youtube_followers: userProfile.youtube_followers || ''
+        youtube_followers: userProfile.youtube_followers || '',
+        avatar_url: userProfile.avatar_url || ''
       })
     }
   }, [userProfile, user])
@@ -106,14 +111,52 @@ const MyPage = () => {
     }))
   }
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError(language === 'ko' ? '파일 크기는 5MB 이하여야 합니다.' : 'ファイルサイズは5MB以下である必要があります。')
+        return
+      }
+      setAvatarFile(file)
+      setAvatarPreview(URL.createObjectURL(file))
+    }
+  }
+
   const handleSaveProfile = async () => {
     try {
       setUpdating(true)
       setError('')
       setSuccess('')
 
+      let updatedData = { ...profileData }
+
+      // 프로필 사진 업로드
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split('.').pop()
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`
+        const filePath = `${fileName}`
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('profile-photos')
+          .upload(filePath, avatarFile, {
+            cacheControl: '3600',
+            upsert: true
+          })
+
+        if (uploadError) throw uploadError
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('profile-photos')
+          .getPublicUrl(filePath)
+
+        updatedData.avatar_url = publicUrl
+        setAvatarFile(null)
+        setAvatarPreview(null)
+      }
+
       // 프로필 업데이트 함수 호출
-      await database.userProfiles.update(user.id, profileData)
+      await database.userProfiles.update(user.id, updatedData)
       
       setSuccess(language === 'ko' 
         ? '프로필이 성공적으로 업데이트되었습니다.'
@@ -285,6 +328,39 @@ const MyPage = () => {
               </CardHeader>
               
               <CardContent className="space-y-6">
+                {/* 프로필 사진 */}
+                <div className="flex flex-col items-center space-y-4 pb-6 border-b">
+                  <Avatar className="h-32 w-32">
+                    <AvatarImage src={avatarPreview || profileData.avatar_url} alt={profileData.name} />
+                    <AvatarFallback className="text-3xl bg-purple-100 text-purple-600">
+                      {profileData.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {editMode && (
+                    <div className="flex flex-col items-center space-y-2">
+                      <input
+                        type="file"
+                        id="avatar-upload"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                        className="w-full"
+                      >
+                        {language === 'ko' ? '프로필 사진 변경' : 'プロフィール写真変更'}
+                      </Button>
+                      <p className="text-xs text-gray-500">
+                        {language === 'ko' ? 'JPG, PNG 파일 (5MB 이하)' : 'JPG, PNGファイル (5MB以下)'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {/* 기본 정보 */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-800">
