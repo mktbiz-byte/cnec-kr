@@ -473,33 +473,33 @@ const HomePageExactReplica = () => {
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              전체 캠페인
+              전체 캐페인
             </button>
             <button
-              onClick={() => setSelectedCategory('youtube')}
+              onClick={() => setSelectedCategory('planned')}
               className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                selectedCategory === 'youtube'
-                  ? 'bg-red-600 text-white shadow-lg'
+                selectedCategory === 'planned'
+                  ? 'bg-purple-600 text-white shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              🎬 유튜브 모집
+              📹 일반 캐페인
             </button>
             <button
-              onClick={() => setSelectedCategory('instagram')}
+              onClick={() => setSelectedCategory('oliveyoung')}
               className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                selectedCategory === 'instagram'
+                selectedCategory === 'oliveyoung'
                   ? 'bg-pink-600 text-white shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              📸 인스타 모집
+              📸 올영 캐페인
             </button>
             <button
               onClick={() => setSelectedCategory('4week_challenge')}
               className={`px-6 py-3 rounded-full font-semibold transition-all ${
                 selectedCategory === '4week_challenge'
-                  ? 'bg-blue-600 text-white shadow-lg'
+                  ? 'bg-orange-600 text-white shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
@@ -525,11 +525,17 @@ const HomePageExactReplica = () => {
               {campaigns
                 .filter(campaign => {
                   if (selectedCategory === 'all') return true
-                  if (selectedCategory === '4week_challenge') {
-                    // 4주 챌린지는 package_type이 '4week_challenge'인 캠페인만 표시
-                    return campaign.package_type === '4week_challenge'
+                  // campaign_type으로 필터링
+                  if (selectedCategory === 'planned') {
+                    return campaign.campaign_type === 'planned'
                   }
-                  return campaign.category === selectedCategory
+                  if (selectedCategory === 'oliveyoung') {
+                    return campaign.campaign_type === 'oliveyoung'
+                  }
+                  if (selectedCategory === '4week_challenge') {
+                    return campaign.campaign_type === '4week_challenge'
+                  }
+                  return false
                 })
                 .map((campaign) => (
                 <Card 
