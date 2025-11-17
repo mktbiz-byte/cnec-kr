@@ -264,7 +264,7 @@ const HomePage = () => {
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-purple-600">
-                          {formatCurrency(campaign.reward_amount)}
+                          {formatCurrency(campaign.reward_points * 0.6)}
                         </div>
                         <div className="text-xs text-gray-500">
                           {language === 'ko' ? '보상' : '報酬'}
