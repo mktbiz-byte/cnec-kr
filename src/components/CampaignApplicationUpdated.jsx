@@ -519,16 +519,22 @@ const CampaignApplicationUpdated = () => {
                     <h4 className="text-sm font-medium text-gray-700 mb-2">대상 SNS 플랫폼</h4>
                     <div className="flex flex-wrap gap-2">
                       {(() => {
-                        // target_platforms가 객체인 경우 처리
-                        if (typeof campaign.target_platforms === 'object') {
+                        // target_platforms가 배열인 경우
+                        if (Array.isArray(campaign.target_platforms)) {
+                          return campaign.target_platforms.map(p => {
+                            return p.charAt(0).toUpperCase() + p.slice(1)
+                          })
+                        }
+                        // target_platforms가 객체인 경우 (레거시 지원)
+                        if (campaign.target_platforms && typeof campaign.target_platforms === 'object') {
                           const platforms = []
                           if (campaign.target_platforms.instagram) platforms.push('Instagram')
                           if (campaign.target_platforms.youtube) platforms.push('YouTube')
                           if (campaign.target_platforms.tiktok) platforms.push('TikTok')
                           return platforms
                         }
-                        // 배열인 경우
-                        return campaign.target_platforms || []
+                        // 기본값
+                        return []
                       })().map((platform) => (
                         <span 
                           key={platform} 

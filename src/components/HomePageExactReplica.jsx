@@ -572,16 +572,23 @@ const HomePageExactReplica = () => {
                       <div className="text-sm text-gray-500 mb-2">지원 가능 플랫폼:</div>
                       <div className="flex flex-wrap gap-2">
                         {(() => {
-                          // target_platforms가 객체인 경우 처리
+                          // target_platforms가 배열인 경우
+                          if (Array.isArray(campaign.target_platforms)) {
+                            return campaign.target_platforms.map(p => {
+                              // 소문자를 대문자로 변환
+                              return p.charAt(0).toUpperCase() + p.slice(1)
+                            })
+                          }
+                          // target_platforms가 객체인 경우 (레거시 지원)
                           if (campaign.target_platforms && typeof campaign.target_platforms === 'object') {
                             const platforms = []
                             if (campaign.target_platforms.instagram) platforms.push('Instagram')
                             if (campaign.target_platforms.youtube) platforms.push('YouTube')
                             if (campaign.target_platforms.tiktok) platforms.push('TikTok')
-                            return platforms.length > 0 ? platforms : ['Instagram', 'TikTok']
+                            return platforms.length > 0 ? platforms : ['Instagram']
                           }
-                          // 배열인 경우 또는 기본값
-                          return campaign.target_platforms || ['Instagram', 'TikTok']
+                          // 기본값
+                          return ['Instagram']
                         })().map((platform) => (
                           <Badge 
                             key={platform} 
@@ -1067,16 +1074,22 @@ const HomePageExactReplica = () => {
                 <h4 className="font-semibold text-gray-800 mb-2">지원 가능 플랫폼</h4>
                 <div className="flex flex-wrap gap-2">
                   {(() => {
-                    // target_platforms가 객체인 경우 처리
+                    // target_platforms가 배열인 경우
+                    if (Array.isArray(selectedCampaign.target_platforms)) {
+                      return selectedCampaign.target_platforms.map(p => {
+                        return p.charAt(0).toUpperCase() + p.slice(1)
+                      })
+                    }
+                    // target_platforms가 객체인 경우 (레거시 지원)
                     if (selectedCampaign.target_platforms && typeof selectedCampaign.target_platforms === 'object') {
                       const platforms = []
                       if (selectedCampaign.target_platforms.instagram) platforms.push('Instagram')
                       if (selectedCampaign.target_platforms.youtube) platforms.push('YouTube')
                       if (selectedCampaign.target_platforms.tiktok) platforms.push('TikTok')
-                      return platforms.length > 0 ? platforms : ['Instagram', 'TikTok']
+                      return platforms.length > 0 ? platforms : ['Instagram']
                     }
-                    // 배열인 경우 또는 기본값
-                    return selectedCampaign.target_platforms || ['Instagram', 'TikTok']
+                    // 기본값
+                    return ['Instagram']
                   })().map((platform) => (
                     <Badge 
                       key={platform} 
