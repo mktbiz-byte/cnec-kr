@@ -453,7 +453,7 @@ const CampaignApplicationUpdated = () => {
                       <>
                         <span className="text-gray-300">|</span>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          {campaign.category}
+                          {Array.isArray(campaign.category) ? campaign.category.join('/') : campaign.category}
                         </span>
                       </>
                     )}
