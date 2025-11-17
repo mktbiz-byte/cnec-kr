@@ -20,6 +20,13 @@ const CampaignApplicationUpdated = () => {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  
+  // SNS 플랫폼 선택 상태
+  const [selectedPlatforms, setSelectedPlatforms] = useState({
+    instagram: true,  // 인스타그램은 기본 선택
+    youtube: false,
+    tiktok: false
+  })
 
   // 신청서 폼 데이터 (기존 질문 + 새로운 필수 정보)
   const [applicationData, setApplicationData] = useState({
@@ -1034,25 +1041,80 @@ const CampaignApplicationUpdated = () => {
               {/* SNS 정보 섹션 */}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">{t.snsInfo}</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t.instagramUrl} <span className="text-red-500">*</span>
+                
+                {/* 플랫폼 선택 */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    지원하는 SNS <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedPlatforms.instagram}
+                        onChange={(e) => {
+                          setSelectedPlatforms(prev => ({ ...prev, instagram: e.target.checked }))
+                          if (!e.target.checked) {
+                            setApplicationData(prev => ({ ...prev, instagram_url: '' }))
+                          }
+                        }}
+                        className="mr-2 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">인스타그램</span>
                     </label>
-                    <input
-                      type="url"
-                      value={applicationData.instagram_url}
-                      onChange={(e) => setApplicationData(prev => ({ ...prev, instagram_url: e.target.value }))}
-                      placeholder={t.instagramPlaceholder}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
-                      required
-                    />
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedPlatforms.youtube}
+                        onChange={(e) => {
+                          setSelectedPlatforms(prev => ({ ...prev, youtube: e.target.checked }))
+                          if (!e.target.checked) {
+                            setApplicationData(prev => ({ ...prev, youtube_url: '' }))
+                          }
+                        }}
+                        className="mr-2 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">유튜브</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedPlatforms.tiktok}
+                        onChange={(e) => {
+                          setSelectedPlatforms(prev => ({ ...prev, tiktok: e.target.checked }))
+                          if (!e.target.checked) {
+                            setApplicationData(prev => ({ ...prev, tiktok_url: '' }))
+                          }
+                        }}
+                        className="mr-2 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">틱톡</span>
+                    </label>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* URL 입력 필드 (선택된 플랫폼만 표시) */}
+                <div className="space-y-4">
+                  {selectedPlatforms.instagram && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t.youtubeUrl}
+                        {t.instagramUrl} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="url"
+                        value={applicationData.instagram_url}
+                        onChange={(e) => setApplicationData(prev => ({ ...prev, instagram_url: e.target.value }))}
+                        placeholder={t.instagramPlaceholder}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {selectedPlatforms.youtube && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t.youtubeUrl} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="url"
@@ -1060,12 +1122,15 @@ const CampaignApplicationUpdated = () => {
                         onChange={(e) => setApplicationData(prev => ({ ...prev, youtube_url: e.target.value }))}
                         placeholder={t.youtubePlaceholder}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                        required
                       />
                     </div>
+                  )}
 
+                  {selectedPlatforms.tiktok && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t.tiktokUrl}
+                        {t.tiktokUrl} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="url"
@@ -1073,9 +1138,10 @@ const CampaignApplicationUpdated = () => {
                         onChange={(e) => setApplicationData(prev => ({ ...prev, tiktok_url: e.target.value }))}
                         placeholder={t.tiktokPlaceholder}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                        required
                       />
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 

@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
             const { data: profile, error: profileError } = await supabase
               .from('user_profiles')
               .select('*')
-              .eq('user_id', session.user.id)
+              .eq('id', session.user.id)
               .single();
 
             if (profileError && profileError.code === 'PGRST116') {
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
               const { error: insertError } = await supabase
                 .from('user_profiles')
                 .insert({
-                  user_id: session.user.id,
+                  id: session.user.id,
                   email: session.user.email,
                   name: session.user.user_metadata?.full_name || session.user.email,
                 });
