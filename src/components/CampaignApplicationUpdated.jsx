@@ -452,9 +452,19 @@ const CampaignApplicationUpdated = () => {
                     {campaign.category && (
                       <>
                         <span className="text-gray-300">|</span>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          {Array.isArray(campaign.category) ? campaign.category.join('/') : campaign.category}
-                        </span>
+                        {(Array.isArray(campaign.category) ? campaign.category : [campaign.category]).map((platform) => {
+                          const platformColors = {
+                            youtube: 'bg-red-100 text-red-800',
+                            instagram: 'bg-pink-100 text-pink-800',
+                            tiktok: 'bg-gray-800 text-white'
+                          }
+                          const color = platformColors[platform.toLowerCase()] || 'bg-purple-100 text-purple-800'
+                          return (
+                            <span key={platform} className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
+                              {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                            </span>
+                          )
+                        })}
                       </>
                     )}
                   </div>
