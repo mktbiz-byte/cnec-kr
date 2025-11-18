@@ -45,6 +45,7 @@ const CampaignApplicationUpdated = () => {
     // 새로운 필수 정보
     postal_code: '',
     address: '',
+    delivery_request: '',
     phone_number: '',
     instagram_url: '',
     youtube_url: '',
@@ -96,6 +97,7 @@ const CampaignApplicationUpdated = () => {
       skinType: '피부타입',
       postalCode: '우편번호',
       address: '주소',
+      deliveryRequest: '배송 시 요청사항',
       phoneNumber: '연락처',
       instagramUrl: '인스타그램 URL',
       youtubeUrl: '유튜브 URL',
@@ -104,6 +106,7 @@ const CampaignApplicationUpdated = () => {
       // 플레이스홀더
       postalCodePlaceholder: '예: 123-4567',
       addressPlaceholder: '상세 주소를 입력해주세요',
+      deliveryRequestPlaceholder: '배송 시 요청사항이 있으면 입력해주세요 (선택사항)',
       phoneNumberPlaceholder: '예: 010-1234-5678',
       instagramPlaceholder: 'https://instagram.com/username',
       youtubePlaceholder: 'https://youtube.com/@username',
@@ -218,6 +221,7 @@ const CampaignApplicationUpdated = () => {
           skin_type: existingApp.skin_type || profileData?.skin_type || '',
           postal_code: existingApp.postal_code || '',
           address: existingApp.address || '',
+          delivery_request: existingApp.delivery_request || '',
           phone_number: existingApp.phone_number || '',
           instagram_url: existingApp.instagram_url || profileData?.instagram_url || '',
           youtube_url: existingApp.youtube_url || profileData?.youtube_url || '',
@@ -308,6 +312,7 @@ const CampaignApplicationUpdated = () => {
         skin_type: applicationData.skin_type,
         postal_code: applicationData.postal_code,
         address: applicationData.address,
+        delivery_request: applicationData.delivery_request || null,
         phone_number: applicationData.phone_number,
         instagram_url: applicationData.instagram_url,
         youtube_url: applicationData.youtube_url || null,
@@ -994,6 +999,20 @@ const CampaignApplicationUpdated = () => {
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
                       required
+                    />
+                  </div>
+
+                  {/* 배송 시 요청사항 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t.deliveryRequest}
+                    </label>
+                    <textarea
+                      value={applicationData.delivery_request}
+                      onChange={(e) => setApplicationData(prev => ({ ...prev, delivery_request: e.target.value }))}
+                      placeholder={t.deliveryRequestPlaceholder}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
                     />
                   </div>
 

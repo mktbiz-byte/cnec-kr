@@ -17,6 +17,7 @@ import { User, Settings, Award, AlertCircle, Loader2, CheckCircle2, Palette, Mai
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import WithdrawalModal from './WithdrawalModal'
 import WithdrawalHistory from './WithdrawalHistory'
+import { compressImage, isImageFile } from '../lib/imageCompression'
 
 const MyPage = () => {
   const { user, userProfile, signOut } = useAuth()
@@ -133,13 +134,28 @@ const MyPage = () => {
 
       // 프로필 사진 업로드
       if (avatarFile) {
-        const fileExt = avatarFile.name.split('.').pop()
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`
+        // 이미지 압축
+        let fileToUpload = avatarFile
+        if (isImageFile(avatarFile)) {
+          try {
+            fileToUpload = await compressImage(avatarFile, {
+              maxSizeMB: 2,
+              maxWidthOrHeight: 1920,
+              quality: 0.8
+            })
+          } catch (compressionError) {
+            console.error('이미지 압축 실패:', compressionError)
+            // 압축 실패 시 원본 파일 사용
+          }
+        }
+
+        const fileExt = fileToUpload.name.split('.').pop()
+        const fileName = `${user.id}/${user.id}-${Date.now()}.${fileExt}`
         const filePath = `${fileName}`
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError} = await supabase.storage
           .from('profile-photos')
-          .upload(filePath, avatarFile, {
+          .upload(filePath, fileToUpload, {
             cacheControl: '3600',
             upsert: true
           })

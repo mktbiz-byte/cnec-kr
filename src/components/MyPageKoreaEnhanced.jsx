@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import VideoReferencesSection from './VideoReferencesSection'
 import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
+import { compressImage, isImageFile } from '../lib/imageCompression'
 import { 
   User, Mail, Phone, MapPin, Calendar, Award, 
   CreditCard, Download, Settings, LogOut, 
@@ -261,14 +262,29 @@ const MyPageKoreaEnhanced = () => {
       }
       reader.readAsDataURL(file)
 
+      // 이미지 압축
+      let fileToUpload = file
+      if (isImageFile(file)) {
+        try {
+          fileToUpload = await compressImage(file, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 1920,
+            quality: 0.8
+          })
+        } catch (compressionError) {
+          console.error('이미지 압축 실패:', compressionError)
+          // 압축 실패 시 원본 파일 사용
+        }
+      }
+
       // Supabase Storage에 업로드
-      const fileExt = file.name.split('.').pop()
+      const fileExt = fileToUpload.name.split('.').pop()
       const fileName = `${user.id}-${Date.now()}.${fileExt}`
       const filePath = `${user.id}/${fileName}`
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('profile-photos')
-        .upload(filePath, file, {
+        .upload(filePath, fileToUpload, {
           cacheControl: '3600',
           upsert: true
         })
