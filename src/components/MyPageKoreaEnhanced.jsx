@@ -656,6 +656,45 @@ const MyPageKoreaEnhanced = () => {
                   </div>
                   
                   <div>
+                    <label className="block text-sm font-medium text-gray-700">프로필 사진</label>
+                    {isEditing ? (
+                      <div className="mt-2 space-y-2">
+                        {(photoPreview || profile?.profile_photo_url) && (
+                          <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
+                            <img
+                              src={photoPreview || profile?.profile_photo_url}
+                              alt="프로필 사진"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          disabled={uploadingPhoto}
+                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                        />
+                        {uploadingPhoto && <p className="text-sm text-gray-500">업로드 중...</p>}
+                      </div>
+                    ) : (
+                      <div className="mt-2">
+                        {profile?.profile_photo_url ? (
+                          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
+                            <img
+                              src={profile.profile_photo_url}
+                              alt="프로필 사진"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500">등록되지 않음</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
                     <label className="block text-sm font-medium text-gray-700">이메일</label>
                     <p className="mt-1 text-sm text-gray-900">{profile?.email || user?.email}</p>
                   </div>
