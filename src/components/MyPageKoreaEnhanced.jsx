@@ -160,7 +160,9 @@ const MyPageKoreaEnhanced = () => {
         localStorage.setItem('hasSeenWelcome', 'true')
       }
       
-      setEditForm({
+      // 편집 모드가 아닐 때만 editForm 업데이트 (편집 중인 데이터 보호)
+      if (!isEditing) {
+        setEditForm({
         name: profileData?.name || '',
         phone: profileData?.phone || '',
         bio: profileData?.bio || '',
@@ -180,7 +182,8 @@ const MyPageKoreaEnhanced = () => {
         bank_account_number: profileData?.bank_account_number || '',
         bank_account_holder: profileData?.bank_account_holder || '',
         resident_number: '' // 보안상 빈 값으로 시작
-      })
+        })
+      }
       
       setPhotoPreview(profileData?.profile_photo_url)
 
@@ -278,7 +281,7 @@ const MyPageKoreaEnhanced = () => {
         .getPublicUrl(filePath)
 
       // 데이터베이스 업데이트
-      const { error: updateError } = await database
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update({ profile_photo_url: publicUrl })
         .eq('id', user.id)
@@ -309,7 +312,9 @@ const MyPageKoreaEnhanced = () => {
         phone: editForm.phone,
         bio: editForm.bio,
         age: editForm.age ? parseInt(editForm.age) : null,
-        region: editForm.region,
+        postcode: editForm.postcode,
+        address: editForm.address,
+        detail_address: editForm.detail_address,
         skin_type: editForm.skin_type,
         instagram_url: editForm.instagram_url,
         tiktok_url: editForm.tiktok_url,
@@ -337,7 +342,7 @@ const MyPageKoreaEnhanced = () => {
         }
 
         // 암호화 함수 호출
-        const { data: encryptedData, error: encryptError } = await database.rpc(
+        const { data: encryptedData, error: encryptError } = await supabase.rpc(
           'encrypt_resident_number',
           {
             resident_number: editForm.resident_number.replace('-', ''),
@@ -355,7 +360,7 @@ const MyPageKoreaEnhanced = () => {
         updateData.resident_number_encrypted = encryptedData
       }
 
-      const { error: updateError } = await database
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update(updateData)
         .eq('id', user.id)
