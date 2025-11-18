@@ -197,7 +197,7 @@ const MyPageKoreaEnhanced = () => {
             id,
             title,
             image_url,
-            reward_points, reward_amount
+            reward_points
           )
         `)
         .eq('user_id', user.id)
