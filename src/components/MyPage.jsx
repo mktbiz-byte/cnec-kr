@@ -114,8 +114,8 @@ const MyPage = () => {
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0]
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setError(language === 'ko' ? '파일 크기는 5MB 이하여야 합니다.' : 'ファイルサイズは5MB以下である必要があります。')
+      if (file.size > 10 * 1024 * 1024) {
+        setError(language === 'ko' ? '파일 크기는 10MB 이하여야 합니다.' : 'ファイルサイズは10MB以下である必要があります。')
         return
       }
       setAvatarFile(file)
@@ -355,7 +355,7 @@ const MyPage = () => {
                         {language === 'ko' ? '프로필 사진 변경' : 'プロフィール写真変更'}
                       </Button>
                       <p className="text-xs text-gray-500">
-                        {language === 'ko' ? 'JPG, PNG 파일 (5MB 이하)' : 'JPG, PNGファイル (5MB以下)'}
+                        {language === 'ko' ? 'JPG, PNG 파일 (10MB 이하)' : 'JPG, PNGファイル (10MB以下)'}
                       </p>
                     </div>
                   )}
