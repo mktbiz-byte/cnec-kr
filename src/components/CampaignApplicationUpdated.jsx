@@ -188,6 +188,11 @@ const CampaignApplicationUpdated = () => {
           applicant_name: profileData.name || '',
           age: profileData.age || '',
           skin_type: profileData.skin_type || '',
+          // 연락처 및 배송 정보
+          postal_code: profileData.postcode || '',
+          address: profileData.address ? `${profileData.address} ${profileData.detail_address || ''}`.trim() : '',
+          phone_number: profileData.phone || '',
+          // SNS 정보
           instagram_url: profileData.instagram_url || '',
           youtube_url: profileData.youtube_url || '',
           tiktok_url: profileData.tiktok_url || ''
