@@ -69,7 +69,7 @@ const CampaignApplicationUpdated = () => {
       contactInfo: '연락처 및 배송 정보',
       snsInfo: 'SNS 정보',
       questions: '질문 답변',
-      additionalInfo: '추가 정보',
+      additionalInfo: '지원자 한마디',
       submit: '신청하기',
       submitting: '신청 중...',
       alreadyApplied: '이미 신청한 캠페인입니다',
