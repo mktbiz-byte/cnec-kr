@@ -405,7 +405,7 @@ export const database = {
               const { data: profiles, error: profilesError } = await supabase
                 .from('user_profiles')
                 .select('*')
-                .in('user_id', userIds)
+                .in('id', userIds)
               
               if (!profilesError && profiles) {
                 userProfiles = profiles
@@ -414,7 +414,7 @@ export const database = {
             
             // 데이터 병합
             const enrichedData = appsData.map(application => {
-              const userProfile = userProfiles.find(up => up.user_id === application.user_id)
+              const userProfile = userProfiles.find(up => up.id === application.user_id)
               
               return {
                 ...application,
