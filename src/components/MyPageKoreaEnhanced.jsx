@@ -197,7 +197,7 @@ const MyPageKoreaEnhanced = () => {
             id,
             title,
             image_url,
-            reward_amount
+            reward_points, reward_amount
           )
         `)
         .eq('user_id', user.id)
@@ -1005,11 +1005,11 @@ const MyPageKoreaEnhanced = () => {
                             </span>
                           </p>
                         </div>
-                        {app.campaigns?.reward_amount && (
+                        {(app.campaigns?.reward_points || app.campaigns?.reward_amount) && (
                           <div className="text-right">
                             <p className="text-sm text-gray-600">보상 포인트</p>
                             <p className="text-lg font-bold text-purple-600">
-                              ₩{app.campaigns.reward_amount.toLocaleString()}
+                              {(app.campaigns.reward_points || app.campaigns.reward_amount || 0).toLocaleString()}P
                             </p>
                           </div>
                         )}
