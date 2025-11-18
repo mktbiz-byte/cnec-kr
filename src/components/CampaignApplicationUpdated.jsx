@@ -113,7 +113,7 @@ const CampaignApplicationUpdated = () => {
       postalCodeRequired: '우편번호는 필수입니다',
       addressRequired: '주소는 필수입니다',
       phoneRequired: '연락처는 필수입니다',
-      instagramRequired: '인스타그램 URL은 필수입니다',
+      atLeastOneSnsRequired: '선택한 플랫폼 중 최소 1개의 SNS URL을 입력해주세요',
       portraitRightsRequired: '초상권 사용 동의가 필요합니다',
       
       // 초상권 사용 동의
@@ -256,8 +256,15 @@ const CampaignApplicationUpdated = () => {
     if (!applicationData.phone_number.trim()) {
       errors.push(t.phoneRequired)
     }
-    if (!applicationData.instagram_url.trim()) {
-      errors.push(t.instagramRequired)
+    
+    // SNS URL 검증: 선택된 플랫폼 중 최소 1개의 URL 필요
+    const hasAtLeastOneSnsUrl = 
+      (selectedPlatforms.instagram && applicationData.instagram_url.trim()) ||
+      (selectedPlatforms.youtube && applicationData.youtube_url.trim()) ||
+      (selectedPlatforms.tiktok && applicationData.tiktok_url.trim())
+    
+    if (!hasAtLeastOneSnsUrl) {
+      errors.push(t.atLeastOneSnsRequired)
     }
 
     // 메타광고코드 검증
@@ -1119,7 +1126,7 @@ const CampaignApplicationUpdated = () => {
                   {selectedPlatforms.instagram && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t.instagramUrl} <span className="text-red-500">*</span>
+                        {t.instagramUrl}
                       </label>
                       <input
                         type="url"
@@ -1127,7 +1134,6 @@ const CampaignApplicationUpdated = () => {
                         onChange={(e) => setApplicationData(prev => ({ ...prev, instagram_url: e.target.value }))}
                         placeholder={t.instagramPlaceholder}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
-                        required
                       />
                     </div>
                   )}
@@ -1135,7 +1141,7 @@ const CampaignApplicationUpdated = () => {
                   {selectedPlatforms.youtube && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t.youtubeUrl} <span className="text-red-500">*</span>
+                        {t.youtubeUrl}
                       </label>
                       <input
                         type="url"
@@ -1143,7 +1149,6 @@ const CampaignApplicationUpdated = () => {
                         onChange={(e) => setApplicationData(prev => ({ ...prev, youtube_url: e.target.value }))}
                         placeholder={t.youtubePlaceholder}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
-                        required
                       />
                     </div>
                   )}
@@ -1151,7 +1156,7 @@ const CampaignApplicationUpdated = () => {
                   {selectedPlatforms.tiktok && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t.tiktokUrl} <span className="text-red-500">*</span>
+                        {t.tiktokUrl}
                       </label>
                       <input
                         type="url"
@@ -1159,7 +1164,6 @@ const CampaignApplicationUpdated = () => {
                         onChange={(e) => setApplicationData(prev => ({ ...prev, tiktok_url: e.target.value }))}
                         placeholder={t.tiktokPlaceholder}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
-                        required
                       />
                     </div>
                   )}
