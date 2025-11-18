@@ -503,7 +503,7 @@ const CampaignApplicationUpdated = () => {
                     </svg>
                     <div>
                       <p className="text-xs text-gray-500">{t.reward}</p>
-                      <p className="text-sm font-medium text-gray-900">{formatCurrency(campaign.reward_points * 0.6)}</p>
+                      <p className="text-sm font-medium text-gray-900">{formatCurrency(campaign.reward_amount || 0)}</p>
                     </div>
                   </div>
 

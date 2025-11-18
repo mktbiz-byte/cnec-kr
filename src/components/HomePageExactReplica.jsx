@@ -604,7 +604,7 @@ const HomePageExactReplica = () => {
                     <div className="flex justify-between items-center">
                       <div>
                         <div className="text-2xl font-bold text-blue-600">
-                          {formatCurrency(campaign.reward_points || campaign.reward_amount || 0)}
+                          {formatCurrency(campaign.reward_amount || 0)}
                         </div>
                         <div className="text-sm text-gray-500">보상</div>
                       </div>
@@ -1105,7 +1105,7 @@ const HomePageExactReplica = () => {
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2">보상</h4>
                 <p className="text-3xl font-bold text-blue-600">
-                  {formatCurrency(selectedCampaign.reward_points || selectedCampaign.reward_amount || 0)}
+                  {formatCurrency(selectedCampaign.reward_amount || 0)}
                 </p>
               </div>
               
