@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { useLanguage } from '../contexts/LanguageContext'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,7 @@ import { Loader2, Mail, Lock, User, ArrowLeft } from 'lucide-react'
 
 const SignupPage = () => {
   const { signUpWithEmail, signInWithGoogle } = useAuth()
-  const { language, t } = useLanguage()
+
   const navigate = useNavigate()
   
   const [loading, setLoading] = useState(false)
