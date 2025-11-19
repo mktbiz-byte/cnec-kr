@@ -37,7 +37,7 @@ const LoginPage = () => {
     e.preventDefault()
     
     if (!formData.email || !formData.password) {
-      setError(language === 'ko' ? '이메일과 비밀번호를 입력해주세요.' : 'メールアドレスとパスワードを入力してください。')
+      setError('이메일과 비밀번호를 입력해주세요.')
       return
     }
 
@@ -55,9 +55,7 @@ const LoginPage = () => {
       // 에러 메시지 번역
       let errorMessage = error.message
       if (error.message.includes('Invalid login credentials')) {
-        errorMessage = language === 'ko' 
-          ? '이메일 또는 비밀번호가 올바르지 않습니다.'
-          : 'メールアドレスまたはパスワードが正しくありません。'
+        errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.'
       } else if (error.message.includes('Email not confirmed')) {
         errorMessage = '이메일 인증이 필요합니다. 메일을 확인해주세요.'
       }
@@ -77,10 +75,7 @@ const LoginPage = () => {
       // 구글 로그인은 리다이렉트되므로 여기서 navigate 하지 않음
     } catch (error) {
       console.error('Google login error:', error)
-      setError(language === 'ko' 
-        ? '구글 로그인에 실패했습니다. 다시 시도해주세요.'
-        : 'Googleログインに失敗しました。再度お試しください。'
-      )
+      setError('구글 로그인에 실패했습니다. 다시 시도해주세요.')
       setIsLoading(false)
     }
   }
@@ -96,7 +91,7 @@ const LoginPage = () => {
             className="text-gray-600 hover:text-gray-800"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {language === 'ko' ? '홈으로 돌아가기' : 'ホームに戻る'}
+            홈으로 돌아가기
           </Button>
         </div>
 
@@ -131,7 +126,7 @@ const LoginPage = () => {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
               )}
-              {language === 'ko' ? 'Google로 로그인' : 'Googleでログイン'}
+              Google로 로그인
             </Button>
 
             <div className="relative">
@@ -140,7 +135,7 @@ const LoginPage = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-white px-2 text-gray-500">
-                  {language === 'ko' ? '또는' : 'または'}
+                  또는
                 </span>
               </div>
             </div>
@@ -149,7 +144,7 @@ const LoginPage = () => {
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  {language === 'ko' ? '이메일' : 'メールアドレス'}
+                  이메일
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -157,7 +152,7 @@ const LoginPage = () => {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder={language === 'ko' ? '이메일을 입력하세요' : 'メールアドレスを入力してください'}
+                    placeholder="이메일을 입력하세요"
                     value={formData.email}
                     onChange={handleInputChange}
                     className="pl-10"
@@ -168,7 +163,7 @@ const LoginPage = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="password">
-                  {language === 'ko' ? '비밀번호' : 'パスワード'}
+                  비밀번호
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -176,7 +171,7 @@ const LoginPage = () => {
                     id="password"
                     name="password"
                     type="password"
-                    placeholder={language === 'ko' ? '비밀번호를 입력하세요' : 'パスワードを入力してください'}
+                    placeholder="비밀번호를 입력하세요"
                     value={formData.password}
                     onChange={handleInputChange}
                     className="pl-10"
@@ -200,17 +195,17 @@ const LoginPage = () => {
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : null}
-                {language === 'ko' ? '로그인' : 'ログイン'}
+                로그인
               </Button>
             </form>
 
             {/* 회원가입 링크 */}
             <div className="text-center text-sm">
               <span className="text-gray-600">
-                {language === 'ko' ? '계정이 없으신가요?' : 'アカウントをお持ちでないですか？'}
+                계정이 없으신가요?
               </span>{' '}
               <Link to="/register" className="text-purple-600 hover:text-purple-700 font-medium">
-                {language === 'ko' ? '회원가입' : '新規登録'}
+                회원가입
               </Link>
             </div>
 
