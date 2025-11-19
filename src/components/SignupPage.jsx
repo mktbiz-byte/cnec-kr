@@ -128,20 +128,17 @@ const SignupPage = () => {
           <CardContent className="pt-8">
             <div className="text-6xl mb-4">📧</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {language === 'ko' ? '이메일 확인 필요' : 'メール確認が必要です'}
+              이메일 확인이 필요합니다
             </h2>
             <p className="text-gray-600 mb-6">
-              {language === 'ko' 
-                ? '회원가입이 완료되었습니다! 이메일을 확인하여 계정을 활성화해주세요.'
-                : '会員登録が完了しました！メールを確認してアカウントを有効化してください。'
-              }
+              회원가입이 완료되었습니다! 이메일을 확인하여 계정을 활성화해주세요.
             </p>
             <div className="space-y-3">
               <Button onClick={() => navigate('/login')} className="w-full bg-purple-600 hover:bg-purple-700">
-                {language === 'ko' ? '로그인 페이지로' : 'ログインページへ'}
+                로그인 페이지로
               </Button>
               <Button variant="outline" onClick={() => navigate('/')} className="w-full">
-                {language === 'ko' ? '홈으로 돌아가기' : 'ホームに戻る'}
+                홈으로 돌아가기
               </Button>
             </div>
           </CardContent>
