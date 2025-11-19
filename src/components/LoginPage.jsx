@@ -59,9 +59,7 @@ const LoginPage = () => {
           ? '이메일 또는 비밀번호가 올바르지 않습니다.'
           : 'メールアドレスまたはパスワードが正しくありません。'
       } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = language === 'ko'
-          ? '이메일 인증이 필요합니다. 이메일을 확인해주세요.'
-          : 'メール認証が必要です。メールを確認してください。'
+        errorMessage = '이메일 인증이 필요합니다. 메일을 확인해주세요.'
       }
       
       setError(errorMessage)
