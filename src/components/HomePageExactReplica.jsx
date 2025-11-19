@@ -473,7 +473,7 @@ const HomePageExactReplica = () => {
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              전체 캐페인
+              전체 캠페인
             </button>
             <button
               onClick={() => setSelectedCategory('planned')}
@@ -483,7 +483,7 @@ const HomePageExactReplica = () => {
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              📹 일반 캐페인
+              📹 일반 캠페인
             </button>
             <button
               onClick={() => setSelectedCategory('oliveyoung')}
@@ -493,7 +493,7 @@ const HomePageExactReplica = () => {
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              📸 올영 캐페인
+              📸 올영 캠페인
             </button>
             <button
               onClick={() => setSelectedCategory('4week_challenge')}
@@ -600,6 +600,24 @@ const HomePageExactReplica = () => {
                         ))}
                       </div>
                     </div>
+                    
+                    {/* 참여조건 */}
+                    {(campaign.min_followers || campaign.min_subscribers || campaign.recruitment_count) && (
+                      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                        <div className="text-sm font-semibold text-gray-700 mb-2">📋 참여조건</div>
+                        <div className="space-y-1 text-xs text-gray-600">
+                          {campaign.min_followers && (
+                            <div>• 최소 팔로워: {campaign.min_followers.toLocaleString()}명</div>
+                          )}
+                          {campaign.min_subscribers && (
+                            <div>• 최소 구독자: {campaign.min_subscribers.toLocaleString()}명</div>
+                          )}
+                          {campaign.recruitment_count && (
+                            <div>• 모집 인원: {campaign.recruitment_count}명</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="flex justify-between items-center">
                       <div>
@@ -1102,12 +1120,61 @@ const HomePageExactReplica = () => {
                 </div>
               </div>
               
+              {/* 참여조건 */}
+              {(selectedCampaign.min_followers || selectedCampaign.min_subscribers || selectedCampaign.recruitment_count) && (
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-3">📋 참여조건</h4>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {selectedCampaign.min_followers && (
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span>최소 팔로워: <strong>{selectedCampaign.min_followers.toLocaleString()}명</strong></span>
+                      </div>
+                    )}
+                    {selectedCampaign.min_subscribers && (
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span>최소 구독자: <strong>{selectedCampaign.min_subscribers.toLocaleString()}명</strong></span>
+                      </div>
+                    )}
+                    {selectedCampaign.recruitment_count && (
+                      <div className="flex items-center gap-2">
+                        <Target className="h-4 w-4 text-blue-600" />
+                        <span>모집 인원: <strong>{selectedCampaign.recruitment_count}명</strong></span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {/* 보상 */}
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2">보상</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">🎁 보상</h4>
                 <p className="text-3xl font-bold text-blue-600">
                   {formatCurrency(selectedCampaign.reward_points || selectedCampaign.reward_amount || 0)}
                 </p>
               </div>
+              
+              {/* 추가 정보 */}
+              {(selectedCampaign.deadline || selectedCampaign.campaign_type) && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-3">📌 추가 정보</h4>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {selectedCampaign.deadline && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-600" />
+                        <span>마감일: <strong>{new Date(selectedCampaign.deadline).toLocaleDateString('ko-KR')}</strong></span>
+                      </div>
+                    )}
+                    {selectedCampaign.campaign_type && (
+                      <div className="flex items-center gap-2">
+                        <Award className="h-4 w-4 text-gray-600" />
+                        <span>캠페인 타입: <strong>{selectedCampaign.campaign_type === '4week_challenge' ? '4주 챌린지' : selectedCampaign.is_oliveyoung_sale ? '올영 캠페인' : '일반 캠페인'}</strong></span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               
               <div className="flex space-x-3">
                 <Button 
