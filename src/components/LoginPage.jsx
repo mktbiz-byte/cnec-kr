@@ -106,10 +106,10 @@ const LoginPage = () => {
           <CardHeader className="text-center">
             <div className="text-4xl mb-4">🎬</div>
             <CardTitle className="text-2xl font-bold">
-              ログイン
+              로그인
             </CardTitle>
             <CardDescription>
-              CNEC Japanアカウントでログインしてください
+              CNEC Korea에 가입하고 캠페인에 참여하세요
             </CardDescription>
           </CardHeader>
           
