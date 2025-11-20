@@ -680,7 +680,10 @@ const CampaignApplicationUpdated = () => {
                             </p>
                           </div>
                         </div>
-                                       {/* 모든 캠페인에 가이드 배너 표시 */}
+                      </div>
+                    )}
+                    
+                    {/* 모든 캠페인에 가이드 배너 표시 */}
                     <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-400 rounded-lg p-4 mb-4 shadow-md">
                       <div className="flex items-start">
                         <div className="flex-shrink-0 mr-3">
