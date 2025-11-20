@@ -80,7 +80,7 @@ const CampaignApplicationUpdated = () => {
       reward: '보상금',
       participants: '모집 인원',
       deadline: '신청 마감',
-      period: '캠페인 기간',
+      period: '캠페인 마감일',
       requirements: '참여 조건',
       description: '캠페인 설명',
       brand: '브랜드',
@@ -680,33 +680,22 @@ const CampaignApplicationUpdated = () => {
                             </p>
                           </div>
                         </div>
-                      </div>
-                    )}
-                    {campaign.campaign_type === 'regular' && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                        <p className="text-sm text-blue-800">
-                          <strong>📝 일반 캠페인:</strong> 아래 가이드를 참고하여 영상을 제작해주세요. 필수 대사와 장면을 반드시 포함해주세요.
-                        </p>
-                      </div>
-                    )}
-                    {campaign.campaign_type === 'planned' && (
-                      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-400 rounded-lg p-4 mb-4 shadow-md">
-                        <div className="flex items-start">
-                          <div className="flex-shrink-0 mr-3">
-                            <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                          <div>
-                            <p className="text-base font-bold text-yellow-900 mb-2">📋 기획형 캠페인</p>
-                            <p className="text-sm text-yellow-800 leading-relaxed">
-                              아래 가이드는 <strong className="text-yellow-900">지원 참고용</strong>이며, 실제 촬영시 <strong className="text-yellow-900">대사와 촬영 장면이 작성 된 별도 가이드로 제공</strong> 됩니다. 필수 대사와 장면을 반드시 포함해주세요.
-                            </p>
-                          </div>
+                                       {/* 모든 캠페인에 가이드 배너 표시 */}
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-400 rounded-lg p-4 mb-4 shadow-md">
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mr-3">
+                          <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-base font-bold text-yellow-900 mb-2">📋 {campaign.campaign_type === 'planned' ? '기획형 캠페인' : '캠페인 가이드'}</p>
+                          <p className="text-sm text-yellow-800 leading-relaxed">
+                            아래 가이드는 <strong className="text-yellow-900">지원 참고용</strong>이며, 실제 촬영시 <strong className="text-yellow-900">대사와 촬영 장면이 작성 된 별도 가이드로 제공</strong> 됩니다. 필수 대사와 장면을 반드시 포함해주세요.
+                          </p>
                         </div>
                       </div>
-                    )}
-                    
+                    </div>          
                     {/* AI 생성 가이드 */}
                     {campaign.ai_generated_guide && typeof campaign.ai_generated_guide === 'object' && (
                       <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
