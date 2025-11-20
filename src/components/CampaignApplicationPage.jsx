@@ -336,6 +336,34 @@ const CampaignApplicationPage = () => {
                 </Badge>
               </div>
             </div>
+            <CardContent className="pt-4 border-t">
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                {campaign.application_deadline && (
+                  <div>
+                    <span className="text-gray-500">지원 마감:</span>
+                    <span className="ml-2 font-medium text-gray-900">
+                      {new Date(campaign.application_deadline).toLocaleDateString('ko-KR')}
+                    </span>
+                  </div>
+                )}
+                {campaign.recruitment_deadline && (
+                  <div>
+                    <span className="text-gray-500">모집 마감:</span>
+                    <span className="ml-2 font-medium text-orange-600">
+                      {new Date(campaign.recruitment_deadline).toLocaleDateString('ko-KR')}
+                    </span>
+                  </div>
+                )}
+                {campaign.content_submission_deadline && (
+                  <div>
+                    <span className="text-gray-500">콘텐츠 제출:</span>
+                    <span className="ml-2 font-medium text-red-600">
+                      {new Date(campaign.content_submission_deadline).toLocaleDateString('ko-KR')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
           </CardHeader>
         </Card>
 
@@ -387,40 +415,73 @@ const CampaignApplicationPage = () => {
               </div>
               
               <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">🎯 콘텐츠 방향</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• 매주 다른 각도로 제품을 소개해주세요</li>
-                  <li>• 사용 경험을 솔직하고 자세히 공유해주세요</li>
-                  <li>• 주차별 변화나 효과를 기록해주세요</li>
-                  <li>• 시청자와의 소통을 활발히 해주세요</li>
-                </ul>
+                <h4 className="font-semibold text-gray-800 mb-2">📝 4주 챌린지 소개</h4>
+                <p className="text-sm text-gray-700">
+                  4주 챌린지는 매주 제품을 사용하며 변화를 기록하는 장기 캠페인입니다. 
+                  주차별로 다른 각도로 제품을 소개하고, 사용 경험을 솔직하게 공유해주세요.
+                </p>
               </div>
               
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">📸 촬영 팁</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• 일관된 촬영 스타일을 유지해주세요</li>
-                  <li>• 주차별로 다른 콘텐츠 형식을 시도해보세요</li>
-                  <li>• 사용 전후 비교를 주차별로 보여주세요</li>
-                  <li>• 자연광과 좋은 조명으로 품질을 높여주세요</li>
-                </ul>
-              </div>
-              
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">✨ 필수 포함 요소</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• 매주 제품 사용 장면</li>
-                  <li>• 주차별 사용 후기와 변화</li>
-                  <li>• 솔직한 리뷰와 평가</li>
-                  <li>• 해시태그와 브랜드 태그</li>
-                </ul>
-              </div>
+              {campaign.ai_generated_guide && (
+                <>
+                  {campaign.ai_generated_guide.product_intro && (
+                    <div className="bg-white p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-2">📝 제품 소개</h4>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{campaign.ai_generated_guide.product_intro}</p>
+                    </div>
+                  )}
+                  
+                  {campaign.ai_generated_guide.video_concepts && campaign.ai_generated_guide.video_concepts.length > 0 && (
+                    <div className="bg-white p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-2">🎬 주차별 콘텐츠 컨셉</h4>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        {campaign.ai_generated_guide.video_concepts.map((concept, idx) => (
+                          <li key={idx}>• {concept}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {campaign.ai_generated_guide.filming_tips && campaign.ai_generated_guide.filming_tips.length > 0 && (
+                    <div className="bg-white p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-2">📸 촬영 팁</h4>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        {campaign.ai_generated_guide.filming_tips.map((tip, idx) => (
+                          <li key={idx}>• {tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {campaign.ai_generated_guide.must_include && campaign.ai_generated_guide.must_include.length > 0 && (
+                    <div className="bg-white p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-2">✨ 필수 포함 요소</h4>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        {campaign.ai_generated_guide.must_include.map((item, idx) => (
+                          <li key={idx}>• {item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {campaign.ai_generated_guide.cautions && campaign.ai_generated_guide.cautions.length > 0 && (
+                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                      <h4 className="font-semibold text-orange-800 mb-2">⚠️ 주의사항</h4>
+                      <ul className="space-y-2 text-sm text-orange-700">
+                        {campaign.ai_generated_guide.cautions.map((caution, idx) => (
+                          <li key={idx}>• {caution}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
         )}
         
         {/* AI 가이드 - 올영 캠페인 */}
-        {campaign.is_oliveyoung_sale && (
+        {campaign.is_oliveyoung_sale && campaign.ai_generated_guide && (
           <Card className="mb-8 shadow-xl border-0 bg-gradient-to-br from-pink-50 to-purple-50">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
@@ -432,35 +493,56 @@ const CampaignApplicationPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">🎯 콘텐츠 방향</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• 올리브영 매장에서의 쇼핑 경험을 자연스럽게 담아주세요</li>
-                  <li>• 제품의 특장과 사용감을 솔직하게 공유해주세요</li>
-                  <li>• 올리브영 할인 혜택이나 프로모션 정보를 포함해주세요</li>
-                  <li>• 명확한 제품명과 브랜드명을 언급해주세요</li>
-                </ul>
-              </div>
+              {campaign.ai_generated_guide.product_intro && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">📝 제품 소개</h4>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{campaign.ai_generated_guide.product_intro}</p>
+                </div>
+              )}
               
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">📸 촬영 팁</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• 올리브영 매장 분위기를 살려 촬영해주세요</li>
-                  <li>• 제품 패키지와 텍스처를 명확하게 보여주세요</li>
-                  <li>• 사용 전후 비교나 스위치 샷을 포함해주세요</li>
-                  <li>• 자연광 아래에서 촬영하면 더 좋은 품질을 얻을 수 있습니다</li>
-                </ul>
-              </div>
+              {campaign.ai_generated_guide.video_concepts && campaign.ai_generated_guide.video_concepts.length > 0 && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">🎬 영상 컨셉</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {campaign.ai_generated_guide.video_concepts.map((concept, idx) => (
+                      <li key={idx}>• {concept}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-2">✨ 필수 포함 요소</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• 올리브영 매장 또는 온라인 쇼핑 화면</li>
-                  <li>• 제품 사용 장면 (언박싱, 적용, 효과)</li>
-                  <li>• 솔직한 리뷰와 추천 이유</li>
-                  <li>• 구매 링크 또는 올리브영 해시태그</li>
-                </ul>
-              </div>
+              {campaign.ai_generated_guide.filming_tips && campaign.ai_generated_guide.filming_tips.length > 0 && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">📸 촬영 팁</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {campaign.ai_generated_guide.filming_tips.map((tip, idx) => (
+                      <li key={idx}>• {tip}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {campaign.ai_generated_guide.must_include && campaign.ai_generated_guide.must_include.length > 0 && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">✨ 필수 포함 요소</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {campaign.ai_generated_guide.must_include.map((item, idx) => (
+                      <li key={idx}>• {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {campaign.ai_generated_guide.cautions && campaign.ai_generated_guide.cautions.length > 0 && (
+                <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                  <h4 className="font-semibold text-orange-800 mb-2">⚠️ 주의사항</h4>
+                  <ul className="space-y-2 text-sm text-orange-700">
+                    {campaign.ai_generated_guide.cautions.map((caution, idx) => (
+                      <li key={idx}>• {caution}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

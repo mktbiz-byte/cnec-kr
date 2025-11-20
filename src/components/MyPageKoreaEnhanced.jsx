@@ -224,7 +224,8 @@ const MyPageKoreaEnhanced = () => {
             id,
             title,
             image_url,
-            reward_points
+            reward_points,
+            recruitment_deadline
           )
         `)
         .eq('user_id', user.id)
@@ -1059,9 +1060,23 @@ const MyPageKoreaEnhanced = () => {
                           {app.status === 'selected' && (
                             <div className="mt-2 space-y-1">
                               {app.tracking_number && (
-                                <p className="text-sm text-gray-600">
-                                  송장번호: <span className="font-medium text-blue-600">{app.tracking_number}</span>
-                                </p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm text-gray-600">
+                                    {app.shipping_company && (
+                                      <span className="font-medium text-purple-600">[{app.shipping_company}]</span>
+                                    )}
+                                    {' '}송장번호: <span className="font-medium text-blue-600">{app.tracking_number}</span>
+                                  </p>
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(app.tracking_number)
+                                      alert('송장번호가 복사되었습니다.')
+                                    }}
+                                    className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                                  >
+                                    복사
+                                  </button>
+                                </div>
                               )}
                               {app.product_delivery_date && (
                                 <p className="text-sm text-gray-600">
