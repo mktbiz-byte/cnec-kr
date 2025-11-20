@@ -1227,13 +1227,13 @@ const HomePageExactReplica = () => {
                   onClick={handleApplyToCampaign}
                   className="flex-1"
                 >
-                  こ의캠페인에지원하기
+                  이 캠페인에 지원하기
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setDetailModal(false)}
                 >
-                  閉じ
+                  닫기
                 </Button>
               </div>
             </div>
