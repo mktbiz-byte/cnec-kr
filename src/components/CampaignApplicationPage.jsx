@@ -547,6 +547,199 @@ const CampaignApplicationPage = () => {
           </Card>
         )}
 
+        {/* AI 가이드 - 기획형 캠페인 */}
+        {campaign.campaign_type === 'planned' && campaign.ai_generated_guide && (
+          <Card className="mb-8 shadow-xl border-0 bg-gradient-to-br from-purple-50 to-blue-50">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Palette className="h-5 w-5 text-purple-600" />
+                AI 생성 가이드
+              </CardTitle>
+              <CardDescription>
+                크리에이터 프로필과 캠페인 정보를 기반으로 생성된 맞춤형 가이드
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {campaign.ai_generated_guide.product_intro && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">📝 제품 소개</h4>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{campaign.ai_generated_guide.product_intro}</p>
+                </div>
+              )}
+              
+              {campaign.ai_generated_guide.must_include && campaign.ai_generated_guide.must_include.length > 0 && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">✅ 필수 포함 사항</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {campaign.ai_generated_guide.must_include.map((item, idx) => (
+                      <li key={idx}>• {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {campaign.ai_generated_guide.filming_tips && campaign.ai_generated_guide.filming_tips.length > 0 && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">🎥 촬영 팁</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {campaign.ai_generated_guide.filming_tips.map((tip, idx) => (
+                      <li key={idx}>• {tip}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {campaign.ai_generated_guide.video_concepts && campaign.ai_generated_guide.video_concepts.length > 0 && (
+                <div className="bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">🎨 영상 컨셉</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {campaign.ai_generated_guide.video_concepts.map((concept, idx) => (
+                      <li key={idx}>컨셉 {idx + 1}: {concept}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {campaign.ai_generated_guide.cautions && campaign.ai_generated_guide.cautions.length > 0 && (
+                <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                  <h4 className="font-semibold text-orange-800 mb-2">⚠️ 주의사항</h4>
+                  <ul className="space-y-2 text-sm text-orange-700">
+                    {campaign.ai_generated_guide.cautions.map((caution, idx) => (
+                      <li key={idx}>• {caution}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 올영 캠페인 안내 배너 */}
+        {campaign.is_oliveyoung_sale && (
+          <Card className="mb-8 shadow-xl border-0 bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-pink-900 mb-3 flex items-center gap-2">
+                🌸 올영세일 캠페인
+              </h3>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                이 캠페인은 <strong>3단계(STEP 1/2/3)</strong>로 진행됩니다. 각 STEP별로 영상을 제작하고 업로드해주세요. 
+                상품에 맞는 별도 가이드가 제공됩니다.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 4주 챌린지 안내 배너 */}
+        {campaign.campaign_type === '4week_challenge' && (
+          <Card className="mb-8 shadow-xl border-0 bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-yellow-900 mb-3 flex items-center gap-2">
+                📅 4주 챌린지 캠페인
+              </h3>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                이 캠페인은 <strong>4주 동안 매주 콘텐츠를 제작</strong>하는 장기 캠페인입니다. 
+                주차별로 다른 각도로 제품을 소개하고, 사용 경험을 솔직하게 공유해주세요.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 캠페인 상세 정보 */}
+        <Card className="mb-8 shadow-xl border-0">
+          <CardHeader>
+            <CardTitle className="text-xl">캠페인 상세 정보</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {campaign.required_scenes && campaign.required_scenes.length > 0 && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">필수 장면</h4>
+                <p className="text-sm text-gray-700">{campaign.required_scenes.join(' / ')}</p>
+              </div>
+            )}
+            
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-2">필수 촬영 장면</h4>
+              <div className="flex flex-wrap gap-2">
+                {campaign.shooting_scenes_ba_photo && <Badge variant="outline">B&A 촬영</Badge>}
+                {campaign.shooting_scenes_closeup && <Badge variant="outline">클로즈업</Badge>}
+                {campaign.shooting_scenes_product_texture && <Badge variant="outline">제품 제형</Badge>}
+                {campaign.shooting_scenes_product_closeup && <Badge variant="outline">제품 클로즈업</Badge>}
+                {campaign.shooting_scenes_outdoor && <Badge variant="outline">야외 촬영</Badge>}
+                {campaign.shooting_scenes_no_makeup && <Badge variant="outline">노메이크</Badge>}
+                {campaign.shooting_scenes_couple && <Badge variant="outline">커플</Badge>}
+                {campaign.shooting_scenes_child && <Badge variant="outline">아이</Badge>}
+                {campaign.shooting_scenes_wrinkles && <Badge variant="outline">주름</Badge>}
+                {campaign.shooting_scenes_troubled_skin && <Badge variant="outline">트러블 피부</Badge>}
+              </div>
+            </div>
+            
+            {campaign.required_hashtags && campaign.required_hashtags.length > 0 && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">필수 해시태그</h4>
+                <p className="text-sm text-gray-700">{campaign.required_hashtags.join(' ')}</p>
+              </div>
+            )}
+            
+            {campaign.video_duration && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">영상 시간</h4>
+                <p className="text-sm text-gray-700">
+                  {campaign.video_duration === '15sec' ? '15초' : 
+                   campaign.video_duration === '30sec' ? '30초' : 
+                   campaign.video_duration === '45sec' ? '45초' : 
+                   campaign.video_duration === '60sec' ? '60초' : 
+                   campaign.video_duration}
+                </p>
+              </div>
+            )}
+            
+            {campaign.video_tempo && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">영상 템포</h4>
+                <p className="text-sm text-gray-700">
+                  {campaign.video_tempo === 'slow' ? '느림' : 
+                   campaign.video_tempo === 'normal' ? '보통' : 
+                   campaign.video_tempo === 'fast' ? '빠름' : 
+                   campaign.video_tempo}
+                </p>
+              </div>
+            )}
+            
+            {campaign.video_tone && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">영상 톤앤매너</h4>
+                <p className="text-sm text-gray-700">
+                  {campaign.video_tone === 'bright' ? '밝은' : 
+                   campaign.video_tone === 'calm' ? '차분한' : 
+                   campaign.video_tone === 'energetic' ? '활기찬' : 
+                   campaign.video_tone === 'luxurious' ? '고급스러운' : 
+                   campaign.video_tone}
+                </p>
+              </div>
+            )}
+            
+            {(campaign.start_date || campaign.end_date) && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">캠페인 기간</h4>
+                <p className="text-sm text-gray-700">
+                  {campaign.start_date && new Date(campaign.start_date).toLocaleDateString('ko-KR')}
+                  {campaign.start_date && campaign.end_date && ' ~ '}
+                  {campaign.end_date && new Date(campaign.end_date).toLocaleDateString('ko-KR')}
+                </p>
+              </div>
+            )}
+            
+            {campaign.content_submission_deadline && (
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">캠페인 촬영 마감일</h4>
+                <p className="text-sm text-red-600 font-medium">
+                  {new Date(campaign.content_submission_deadline).toLocaleDateString('ko-KR')}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* 신청 폼 */}
         <Card className="shadow-xl border-0">
           <CardHeader>
