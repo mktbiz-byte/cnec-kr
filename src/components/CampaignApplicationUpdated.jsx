@@ -136,6 +136,30 @@ const CampaignApplicationUpdated = () => {
       shootingScenes: '필수 촬영 장면',
       additionalShootingRequests: '추가 촬영 요청사항',
       
+      // 비디오 속성 변환
+      translateVideoDuration: (duration) => {
+        if (!duration) return duration
+        return duration.replace(/sec$/, '초').replace(/min$/, '분')
+      },
+      translateVideoTempo: (tempo) => {
+        const tempoMap = {
+          'slow': '느림',
+          'normal': '보통',
+          'fast': '빠름'
+        }
+        return tempoMap[tempo?.toLowerCase()] || tempo
+      },
+      translateVideoTone: (tone) => {
+        const toneMap = {
+          'bright': '밝음',
+          'dark': '어두움',
+          'warm': '따뜻함',
+          'cool': '시원함',
+          'natural': '자연스러움'
+        }
+        return toneMap[tone?.toLowerCase()] || tone
+      },
+      
       // 메타광고코드
       metaAdCodeRequired: '메타광고코드 발급 필요',
       metaAdCodeAvailable: '메타광고코드 발급 가능 여부',
@@ -822,19 +846,19 @@ const CampaignApplicationUpdated = () => {
                           {campaign.video_duration && (
                             <div>
                               <p className="text-xs font-medium text-gray-500">{t.videoDuration}</p>
-                              <p className="text-sm text-gray-700">{campaign.video_duration}</p>
+                              <p className="text-sm text-gray-700">{t.translateVideoDuration(campaign.video_duration)}</p>
                             </div>
                           )}
                           {campaign.video_tempo && (
                             <div>
                               <p className="text-xs font-medium text-gray-500">{t.videoTempo}</p>
-                              <p className="text-sm text-gray-700">{campaign.video_tempo}</p>
+                              <p className="text-sm text-gray-700">{t.translateVideoTempo(campaign.video_tempo)}</p>
                             </div>
                           )}
                           {campaign.video_tone && (
                             <div>
                               <p className="text-xs font-medium text-gray-500">{t.videoTone}</p>
-                              <p className="text-sm text-gray-700">{campaign.video_tone}</p>
+                              <p className="text-sm text-gray-700">{t.translateVideoTone(campaign.video_tone)}</p>
                             </div>
                           )}
                         </div>
