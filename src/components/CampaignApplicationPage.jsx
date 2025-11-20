@@ -339,6 +339,132 @@ const CampaignApplicationPage = () => {
           </CardHeader>
         </Card>
 
+        {/* AI 가이드 - 4주 챌린지 */}
+        {campaign.campaign_type === '4week_challenge' && (
+          <Card className="mb-8 shadow-xl border-0 bg-gradient-to-br from-yellow-50 to-orange-50">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Palette className="h-5 w-5 text-yellow-600" />
+                4주 챌린지 가이드
+              </CardTitle>
+              <CardDescription>
+                4주 동안 매주 콘텐츠를 제작하는 장기 캠페인입니다
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-white p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-800 mb-3">📅 주차별 일정</h4>
+                <div className="space-y-3">
+                  {campaign.week1_deadline && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-yellow-600" />
+                      <span className="font-medium">1주차 마감:</span>
+                      <span className="text-gray-700">{new Date(campaign.week1_deadline).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                  )}
+                  {campaign.week2_deadline && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-yellow-600" />
+                      <span className="font-medium">2주차 마감:</span>
+                      <span className="text-gray-700">{new Date(campaign.week2_deadline).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                  )}
+                  {campaign.week3_deadline && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-yellow-600" />
+                      <span className="font-medium">3주차 마감:</span>
+                      <span className="text-gray-700">{new Date(campaign.week3_deadline).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                  )}
+                  {campaign.week4_deadline && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-yellow-600" />
+                      <span className="font-medium">4주차 마감:</span>
+                      <span className="text-gray-700">{new Date(campaign.week4_deadline).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-800 mb-2">🎯 콘텐츠 방향</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>• 매주 다른 각도로 제품을 소개해주세요</li>
+                  <li>• 사용 경험을 솔직하고 자세히 공유해주세요</li>
+                  <li>• 주차별 변화나 효과를 기록해주세요</li>
+                  <li>• 시청자와의 소통을 활발히 해주세요</li>
+                </ul>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-800 mb-2">📸 촬영 팁</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>• 일관된 촬영 스타일을 유지해주세요</li>
+                  <li>• 주차별로 다른 콘텐츠 형식을 시도해보세요</li>
+                  <li>• 사용 전후 비교를 주차별로 보여주세요</li>
+                  <li>• 자연광과 좋은 조명으로 품질을 높여주세요</li>
+                </ul>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-800 mb-2">✨ 필수 포함 요소</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>• 매주 제품 사용 장면</li>
+                  <li>• 주차별 사용 후기와 변화</li>
+                  <li>• 솔직한 리뷰와 평가</li>
+                  <li>• 해시태그와 브랜드 태그</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* AI 가이드 - 올영 캠페인 */}
+        {campaign.is_oliveyoung_sale && (
+          <Card className="mb-8 shadow-xl border-0 bg-gradient-to-br from-pink-50 to-purple-50">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Palette className="h-5 w-5 text-pink-600" />
+                AI 콘텐츠 가이드
+              </CardTitle>
+              <CardDescription>
+                올리브영 캠페인을 위한 맞춤형 콘텐츠 제작 가이드
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-white p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-800 mb-2">🎯 콘텐츠 방향</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>• 올리브영 매장에서의 쇼핑 경험을 자연스럽게 담아주세요</li>
+                  <li>• 제품의 특장과 사용감을 솔직하게 공유해주세요</li>
+                  <li>• 올리브영 할인 혜택이나 프로모션 정보를 포함해주세요</li>
+                  <li>• 명확한 제품명과 브랜드명을 언급해주세요</li>
+                </ul>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-800 mb-2">📸 촬영 팁</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>• 올리브영 매장 분위기를 살려 촬영해주세요</li>
+                  <li>• 제품 패키지와 텍스처를 명확하게 보여주세요</li>
+                  <li>• 사용 전후 비교나 스위치 샷을 포함해주세요</li>
+                  <li>• 자연광 아래에서 촬영하면 더 좋은 품질을 얻을 수 있습니다</li>
+                </ul>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-800 mb-2">✨ 필수 포함 요소</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>• 올리브영 매장 또는 온라인 쇼핑 화면</li>
+                  <li>• 제품 사용 장면 (언박싱, 적용, 효과)</li>
+                  <li>• 솔직한 리뷰와 추천 이유</li>
+                  <li>• 구매 링크 또는 올리브영 해시태그</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* 신청 폼 */}
         <Card className="shadow-xl border-0">
           <CardHeader>

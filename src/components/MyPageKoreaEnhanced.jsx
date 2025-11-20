@@ -1006,6 +1006,30 @@ const MyPageKoreaEnhanced = () => {
                                app.status === 'rejected' ? '거절됨' : app.status}
                             </span>
                           </p>
+                          {app.status === 'selected' && (
+                            <div className="mt-2 space-y-1">
+                              {app.tracking_number && (
+                                <p className="text-sm text-gray-600">
+                                  송장번호: <span className="font-medium text-blue-600">{app.tracking_number}</span>
+                                </p>
+                              )}
+                              {app.product_delivery_date && (
+                                <p className="text-sm text-gray-600">
+                                  배송일: <span className="font-medium">{new Date(app.product_delivery_date).toLocaleDateString('ko-KR')}</span>
+                                </p>
+                              )}
+                              {app.content_submission_deadline && (
+                                <p className="text-sm text-gray-600">
+                                  콘텐츠 제출 마감: <span className="font-medium text-orange-600">{new Date(app.content_submission_deadline).toLocaleDateString('ko-KR')}</span>
+                                </p>
+                              )}
+                              {app.admin_notes && (
+                                <p className="text-sm text-gray-600 mt-2">
+                                  관리자 메모: <span className="text-gray-700">{app.admin_notes}</span>
+                                </p>
+                              )}
+                            </div>
+                          )}
                         </div>
                         {(app.campaigns?.reward_points || app.campaigns?.reward_amount) && (
                           <div className="text-right">

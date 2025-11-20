@@ -483,7 +483,7 @@ const HomePageExactReplica = () => {
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              📹 일반 캠페인
+              📹 기획형 캠페인
             </button>
             <button
               onClick={() => setSelectedCategory('oliveyoung')}
@@ -559,9 +559,22 @@ const HomePageExactReplica = () => {
                       </CardTitle>
                       <Badge className="bg-green-100 text-green-800 font-medium">모집 중</Badge>
                     </div>
-                    <CardDescription className="text-blue-600 font-medium text-base">
-                      {campaign.brand}
-                    </CardDescription>
+                    <div className="flex items-center gap-2 mb-2">
+                      <CardDescription className="text-blue-600 font-medium text-base">
+                        {campaign.brand}
+                      </CardDescription>
+                      <Badge 
+                        className={
+                          campaign.campaign_type === '4week_challenge' 
+                            ? 'bg-yellow-100 text-yellow-800 text-xs' 
+                            : campaign.is_oliveyoung_sale 
+                            ? 'bg-pink-100 text-pink-800 text-xs' 
+                            : 'bg-purple-100 text-purple-800 text-xs'
+                        }
+                      >
+                        {campaign.campaign_type === '4week_challenge' ? '🏆 4주 챌린지' : campaign.is_oliveyoung_sale ? '📸 올영' : '📹 기획형'}
+                      </Badge>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-600 mb-4 text-sm leading-relaxed line-clamp-4">
@@ -656,7 +669,7 @@ const HomePageExactReplica = () => {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-4xl">🚀</span>
                 </div>
-                <CardTitle className="text-center text-xl">일반 캠페인</CardTitle>
+                <CardTitle className="text-center text-xl">기획형 캠페인</CardTitle>
                 <p className="text-center text-sm text-gray-600">누구나 시작할 수 있어요</p>
               </CardHeader>
               <CardContent>
@@ -766,7 +779,7 @@ const HomePageExactReplica = () => {
           <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">지금 바로 CNEC Plus에 도전하세요!</h3>
             <p className="text-gray-600 mb-6">
-              일반 캠페인 5회 이상 참여 시 숏폼 크리에이터로 승격 가능합니다.<br />
+              기획형 캠페인 5회 이상 참여 시 숏폼 크리에이터로 승격 가능합니다.<br />
               뷰티 전문 유튜버를 꾸꾸신다면 유튜브 육성 프로그램에 지원하세요!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -781,7 +794,7 @@ const HomePageExactReplica = () => {
                 className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3"
                 onClick={() => navigate('/campaigns')}
               >
-                일반 캠페인 보기
+                기획형 캠페인 보기
               </Button>
             </div>
           </div>
@@ -1147,6 +1160,39 @@ const HomePageExactReplica = () => {
                 </div>
               )}
               
+              {/* 일정 및 요구사항 */}
+              {(selectedCampaign.application_start_date || selectedCampaign.application_end_date || selectedCampaign.content_submission_deadline || selectedCampaign.requirements) && (
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-3">📅 일정 및 요구사항</h4>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {selectedCampaign.application_start_date && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-purple-600" />
+                        <span>지원 시작: <strong>{new Date(selectedCampaign.application_start_date).toLocaleDateString('ko-KR')}</strong></span>
+                      </div>
+                    )}
+                    {selectedCampaign.application_end_date && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-purple-600" />
+                        <span>지원 마감: <strong>{new Date(selectedCampaign.application_end_date).toLocaleDateString('ko-KR')}</strong></span>
+                      </div>
+                    )}
+                    {selectedCampaign.content_submission_deadline && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-purple-600" />
+                        <span>콘텐츠 제출 마감: <strong>{new Date(selectedCampaign.content_submission_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                      </div>
+                    )}
+                    {selectedCampaign.requirements && (
+                      <div className="mt-3">
+                        <div className="font-medium text-gray-800 mb-1">지원 요구사항:</div>
+                        <p className="text-gray-600 whitespace-pre-wrap">{selectedCampaign.requirements}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
               {/* 보상 */}
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2">🎁 보상</h4>
@@ -1169,7 +1215,7 @@ const HomePageExactReplica = () => {
                     {selectedCampaign.campaign_type && (
                       <div className="flex items-center gap-2">
                         <Award className="h-4 w-4 text-gray-600" />
-                        <span>캠페인 타입: <strong>{selectedCampaign.campaign_type === '4week_challenge' ? '4주 챌린지' : selectedCampaign.is_oliveyoung_sale ? '올영 캠페인' : '일반 캠페인'}</strong></span>
+                        <span>캠페인 타입: <strong>{selectedCampaign.campaign_type === '4week_challenge' ? '4주 챌린지' : selectedCampaign.is_oliveyoung_sale ? '올영 캠페인' : '기획형 캠페인'}</strong></span>
                       </div>
                     )}
                   </div>
