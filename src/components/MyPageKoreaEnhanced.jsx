@@ -223,7 +223,7 @@ const MyPageKoreaEnhanced = () => {
           campaigns (
             id,
             title,
-            brand_name,
+            brand,
             image_url,
             reward_points,
             recruitment_deadline,
@@ -235,29 +235,7 @@ const MyPageKoreaEnhanced = () => {
         .order('created_at', { ascending: false })
 
       if (applicationsError) throw applicationsError
-
-      // campaign_participants와 비교하여 실제 선정 여부 확인
-      const applicationsWithValidation = await Promise.all(
-        (applicationsData || []).map(async (app) => {
-          if (app.status === 'selected') {
-            // campaign_participants에 존재하는지 확인
-            const { data: participant } = await supabase
-              .from('campaign_participants')
-              .select('id')
-              .eq('campaign_id', app.campaign_id)
-              .eq('creator_name', app.applicant_name)
-              .maybeSingle()
-
-            // campaign_participants에 없으면 status를 pending으로 변경
-            if (!participant) {
-              return { ...app, status: 'pending' }
-            }
-          }
-          return app
-        })
-      )
-
-      setApplications(applicationsWithValidation)
+      setApplications(applicationsData || [])
 
       // 출금 내역
       const { data: withdrawalsData, error: withdrawalsError } = await supabase
