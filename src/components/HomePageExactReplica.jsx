@@ -1155,7 +1155,7 @@ const HomePageExactReplica = () => {
             <div className="space-y-6">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2">캠페인상세</h4>
-                <p className="text-gray-600">{selectedCampaign.description}</p>
+                <p className="text-gray-600 whitespace-pre-wrap">{selectedCampaign.description || selectedCampaign.product_features || '캠페인 설명이 없습니다.'}</p>
               </div>
               
               <div>
@@ -1234,12 +1234,67 @@ const HomePageExactReplica = () => {
                         <span>지원 마감: <strong>{new Date(selectedCampaign.application_end_date).toLocaleDateString('ko-KR')}</strong></span>
                       </div>
                     )}
-                    {selectedCampaign.content_submission_deadline && (
+                    {/* 콘텐츠 제출 마감: 캠페인 타입별로 다르게 표시 */}
+                    {selectedCampaign.campaign_type === '4week_challenge' ? (
+                      <div>
+                        <div className="font-medium text-gray-800 mb-2">콘텐츠 제출 마감 (4주 챌린지):</div>
+                        <div className="space-y-1 ml-6">
+                          {selectedCampaign.week1_deadline && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                              <span>1주차: <strong>{new Date(selectedCampaign.week1_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                            </div>
+                          )}
+                          {selectedCampaign.week2_deadline && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                              <span>2주차: <strong>{new Date(selectedCampaign.week2_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                            </div>
+                          )}
+                          {selectedCampaign.week3_deadline && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                              <span>3주차: <strong>{new Date(selectedCampaign.week3_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                            </div>
+                          )}
+                          {selectedCampaign.week4_deadline && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                              <span>4주차: <strong>{new Date(selectedCampaign.week4_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : selectedCampaign.campaign_type === 'oliveyoung' ? (
+                      <div>
+                        <div className="font-medium text-gray-800 mb-2">콘텐츠 제출 마감 (올영세일):</div>
+                        <div className="space-y-1 ml-6">
+                          {selectedCampaign.step1_deadline && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                              <span>STEP 1: <strong>{new Date(selectedCampaign.step1_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                            </div>
+                          )}
+                          {selectedCampaign.step2_deadline && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                              <span>STEP 2: <strong>{new Date(selectedCampaign.step2_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                            </div>
+                          )}
+                          {selectedCampaign.step3_deadline && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-purple-600" />
+                              <span>STEP 3: <strong>{new Date(selectedCampaign.step3_deadline).toLocaleDateString('ko-KR')}</strong></span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : selectedCampaign.content_submission_deadline ? (
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-purple-600" />
                         <span>콘텐츠 제출 마감: <strong>{new Date(selectedCampaign.content_submission_deadline).toLocaleDateString('ko-KR')}</strong></span>
                       </div>
-                    )}
+                    ) : null}
                     {selectedCampaign.requirements && (
                       <div className="mt-3">
                         <div className="font-medium text-gray-800 mb-1">지원 요구사항:</div>

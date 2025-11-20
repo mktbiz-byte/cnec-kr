@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useAuth } from '../contexts/AuthContext'
 import { database } from '../lib/supabase'
 
@@ -706,9 +708,46 @@ const CampaignApplicationUpdated = () => {
                       </div>
                       <div className="bg-white rounded-lg p-4 shadow-inner">
                         <div className="prose prose-sm max-w-none">
-                          <div className="text-gray-800 whitespace-pre-wrap leading-relaxed" style={{fontSize: '14px'}}>
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            className="text-gray-800 leading-relaxed"
+                            components={{
+                              table: ({node, ...props}) => (
+                                <div className="overflow-x-auto my-4">
+                                  <table className="min-w-full border-collapse border border-gray-300" {...props} />
+                                </div>
+                              ),
+                              thead: ({node, ...props}) => (
+                                <thead className="bg-emerald-100" {...props} />
+                              ),
+                              th: ({node, ...props}) => (
+                                <th className="border border-gray-300 px-4 py-2 text-left font-semibold text-emerald-900" {...props} />
+                              ),
+                              td: ({node, ...props}) => (
+                                <td className="border border-gray-300 px-4 py-2 text-sm" {...props} />
+                              ),
+                              h2: ({node, ...props}) => (
+                                <h2 className="text-xl font-bold text-emerald-900 mt-6 mb-3" {...props} />
+                              ),
+                              h3: ({node, ...props}) => (
+                                <h3 className="text-lg font-semibold text-emerald-800 mt-4 mb-2" {...props} />
+                              ),
+                              ul: ({node, ...props}) => (
+                                <ul className="list-disc list-inside space-y-1 my-2" {...props} />
+                              ),
+                              ol: ({node, ...props}) => (
+                                <ol className="list-decimal list-inside space-y-1 my-2" {...props} />
+                              ),
+                              strong: ({node, ...props}) => (
+                                <strong className="font-bold text-emerald-900" {...props} />
+                              ),
+                              p: ({node, ...props}) => (
+                                <p className="my-2" {...props} />
+                              )
+                            }}
+                          >
                             {existingApplication.personalized_guide}
-                          </div>
+                          </ReactMarkdown>
                         </div>
                       </div>
                     </div>
@@ -967,6 +1006,56 @@ const CampaignApplicationUpdated = () => {
                     </div>
                   </div>
                 )}
+
+                {/* 필수 사항 */}
+                <div className="border-t pt-4 mt-4">
+                  <div className="bg-red-50 border-2 border-red-300 rounded-lg p-5 shadow-md">
+                    <div className="flex items-start mb-3">
+                      <div className="flex-shrink-0 mr-3">
+                        <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-lg font-bold text-red-900 mb-2">⚠️ 필수 사항</h4>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 space-y-3">
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mr-2">
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-800 text-sm font-bold">1</span>
+                        </div>
+                        <p className="text-sm text-gray-800">
+                          <strong className="text-red-900">마감일 엄수</strong>: 지정된 영상 제출 마감일을 <strong className="text-red-900">반드시 지켜주세요</strong>. 지연 시 패널티가 발생할 수 있습니다.
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mr-2">
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-800 text-sm font-bold">2</span>
+                        </div>
+                        <p className="text-sm text-gray-800">
+                          <strong className="text-red-900">정확한 제품 정보</strong>: 브랜드에서 제공한 제품 정보를 <strong className="text-red-900">100% 정확하게</strong> 영상에 반영해야 합니다.
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mr-2">
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-800 text-sm font-bold">3</span>
+                        </div>
+                        <p className="text-sm text-gray-800">
+                          <strong className="text-red-900">마감일 엄수</strong>: 라브 마감일은 <strong className="text-red-900">그릭 사이트 내에서 검수 완료 후 업로드해야 하는 마감일</strong>을 의미합니다.
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mr-2">
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-800 text-sm font-bold">4</span>
+                        </div>
+                        <p className="text-sm text-gray-800">
+                          <strong className="text-red-900">기업 검수</strong>: 제작된 영상은 브랜드의 검수를 거치며, <strong className="text-red-900">수정이 가능</strong>합니다. 피드백을 명확히 확인하고 반영해주세요.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
