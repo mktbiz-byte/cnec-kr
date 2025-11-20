@@ -1061,7 +1061,29 @@ const MyPageKoreaEnhanced = () => {
                             </div>
                           )}
                           {app.status === 'selected' && (
-                            <div className="mt-2 space-y-1">
+                            <div className="mt-2 space-y-2">
+                              {/* 가이드 확인 배너 */}
+                              {app.guide_shared_to_company && (
+                                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
+                                    <h4 className="font-semibold text-purple-900">📝 가이드가 전달되었습니다!</h4>
+                                  </div>
+                                  <p className="text-sm text-purple-700 mb-2">
+                                    기업에서 맞춤형 촬영 가이드를 전달했습니다. 가이드를 확인하고 촬영을 시작하세요.
+                                  </p>
+                                  <button
+                                    onClick={() => {
+                                      // TODO: 가이드 보기 모달 열기
+                                      alert('가이드 보기 기능은 곧 추가됩니다.')
+                                    }}
+                                    className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                  >
+                                    가이드 확인하기
+                                  </button>
+                                </div>
+                              )}
+                              
                               {app.tracking_number && (
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm text-gray-600">
@@ -1095,6 +1117,54 @@ const MyPageKoreaEnhanced = () => {
                                 <p className="text-sm text-gray-600 mt-2">
                                   관리자 메모: <span className="text-gray-700">{app.admin_notes}</span>
                                 </p>
+                              )}
+                              
+                              {/* 촬영 마감일 강조 표시 */}
+                              {app.guide_shared_to_company && app.campaigns?.content_submission_deadline && (
+                                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <h4 className="font-semibold text-orange-900 mb-1">📅 촬영 마감일</h4>
+                                      <p className="text-lg font-bold text-orange-600">
+                                        {new Date(app.campaigns.content_submission_deadline).toLocaleDateString('ko-KR')}
+                                      </p>
+                                      <p className="text-xs text-orange-700 mt-1">
+                                        {Math.ceil((new Date(app.campaigns.content_submission_deadline) - new Date()) / (1000 * 60 * 60 * 24))}일 남음
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* 영상 제출 및 마감일 연장 버튼 */}
+                              {app.guide_shared_to_company && (
+                                <div className="flex gap-2 mt-3">
+                                  <button
+                                    onClick={() => {
+                                      setSelectedApplication(app)
+                                      setShowSnsUploadModal(true)
+                                    }}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                  >
+                                    🎥 영상 제출하기
+                                  </button>
+                                  <button
+                                    onClick={async () => {
+                                      if (!confirm('촬영 마감일 연장을 요청하시겠습니까?')) return
+                                      
+                                      try {
+                                        // TODO: 마감일 연장 요청 기능 구현
+                                        alert('마감일 연장 요청이 전송되었습니다. 관리자가 검토 후 연락드립니다.')
+                                      } catch (error) {
+                                        console.error('Error requesting deadline extension:', error)
+                                        alert('요청에 실패했습니다.')
+                                      }
+                                    }}
+                                    className="px-4 py-2 border border-orange-300 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-medium"
+                                  >
+                                    📅 마감일 연장 요청
+                                  </button>
+                                </div>
                               )}
                             </div>
                           )}
