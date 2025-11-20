@@ -563,9 +563,51 @@ const CampaignApplicationUpdated = () => {
                     </svg>
                     <div>
                       <p className="text-xs text-gray-500">{t.period}</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        {formatDate(campaign.start_date)} ~ {formatDate(campaign.end_date)}
-                      </p>
+                      <div className="text-sm font-medium text-gray-900">
+                        {(() => {
+                          // 4주 챌린지: 주차별 마감일
+                          if (campaign.campaign_type === '4week_challenge') {
+                            const weeks = [
+                              { label: '1주차', date: campaign.week1_deadline },
+                              { label: '2주차', date: campaign.week2_deadline },
+                              { label: '3주차', date: campaign.week3_deadline },
+                              { label: '4주차', date: campaign.week4_deadline }
+                            ].filter(w => w.date)
+                            if (weeks.length > 0) {
+                              return (
+                                <div className="space-y-1">
+                                  {weeks.map((week, idx) => (
+                                    <div key={idx} className="text-xs">
+                                      {week.label}: {formatDate(week.date)}
+                                    </div>
+                                  ))}
+                                </div>
+                              )
+                            }
+                          }
+                          // 올영세일: 단계별 마감일
+                          if (campaign.campaign_type === 'oliveyoung') {
+                            const steps = [
+                              { label: '1단계', date: campaign.step1_deadline },
+                              { label: '2단계', date: campaign.step2_deadline },
+                              { label: '3단계', date: campaign.step3_deadline }
+                            ].filter(s => s.date)
+                            if (steps.length > 0) {
+                              return (
+                                <div className="space-y-1">
+                                  {steps.map((step, idx) => (
+                                    <div key={idx} className="text-xs">
+                                      {step.label}: {formatDate(step.date)}
+                                    </div>
+                                  ))}
+                                </div>
+                              )
+                            }
+                          }
+                          // 기본: start_date ~ end_date
+                          return `${formatDate(campaign.start_date)} ~ ${formatDate(campaign.end_date)}`
+                        })()}
+                      </div>
                     </div>
                   </div>
                 </div>
