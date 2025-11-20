@@ -15,6 +15,7 @@ const SignupPageExactReplica = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [showBrowserWarning, setShowBrowserWarning] = useState(false)
   
   const [formData, setFormData] = useState({
     email: '',
@@ -22,6 +23,19 @@ const SignupPageExactReplica = () => {
     confirmPassword: '',
     name: ''
   })
+
+  // iPhone 브라우저 감지
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera
+    const isIPhone = /iPhone/i.test(userAgent)
+    const isSafari = /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent) && !/CriOS/i.test(userAgent)
+    const isChrome = /CriOS/i.test(userAgent)
+    
+    // iPhone에서 Safari나 Chrome이 아닌 브라우저를 사용하는 경우
+    if (isIPhone && !isSafari && !isChrome) {
+      setShowBrowserWarning(true)
+    }
+  }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -33,20 +47,20 @@ const SignupPageExactReplica = () => {
 
   const validateForm = () => {
     if (!formData.email || !formData.password || !formData.confirmPassword || !formData.name) {
-      return 'すべてのフィールド을 입력하세요。'
+      return '모든 필드를 입력해주세요.'
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) {
-      return '正しいメール形式을 입력하세요。'
+      return '올바른 이메일 형식을 입력해주세요.'
     }
 
     if (formData.password.length < 6) {
-      return '비밀번호は6文字以上である必要があります。'
+      return '비밀번호는 6자 이상이어야 합니다.'
     }
 
     if (formData.password !== formData.confirmPassword) {
-      return '비밀번호が一致しません。'
+      return '비밀번호가 일치하지 않습니다.'
     }
 
     return null
@@ -103,10 +117,9 @@ const SignupPageExactReplica = () => {
         <div className="max-w-md mx-auto text-center bg-white rounded-lg shadow-xl p-8">
           <div className="text-6xl mb-4">📧</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            メール확인が必要です
-          </h2>
-          <p className="text-gray-600 mb-6">
-            회원가입が完了しました！メールを확인してアカウントを有効化してください。
+            이메일 확인이 필요합니다
+          </h2>          <p className="text-gray-600 mb-6">
+            회원가입이 완료되었습니다! 이메일을 확인하여 계정을 활성화해주세요.
           </p>
           <div className="space-y-3">
             <button 
@@ -154,6 +167,18 @@ const SignupPageExactReplica = () => {
           </CardHeader>
           
           <CardContent className="space-y-6">
+            {/* iPhone 브라우저 경고 */}
+            {showBrowserWarning && (
+              <Alert className="bg-yellow-50 border-yellow-300">
+                <AlertDescription className="text-yellow-800">
+                  <strong>⚠️ 브라우저 호환성 경고</strong>
+                  <p className="mt-1 text-sm">
+                    iPhone에서 회원가입 문제가 발생할 수 있습니다. Safari 또는 Chrome 브라우저를 사용해 주세요.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
+            
             {/* Google 회원가입 - 참조 사이트와 동일한 스타일 */}
             <Button
               type="button"

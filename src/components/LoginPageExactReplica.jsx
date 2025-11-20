@@ -19,6 +19,20 @@ const LoginPageExactReplica = () => {
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showBrowserWarning, setShowBrowserWarning] = useState(false)
+
+  // iPhone 브라우저 감지
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera
+    const isIPhone = /iPhone/i.test(userAgent)
+    const isSafari = /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent) && !/CriOS/i.test(userAgent)
+    const isChrome = /CriOS/i.test(userAgent)
+    
+    // iPhone에서 Safari나 Chrome이 아닌 브라우저를 사용하는 경우
+    if (isIPhone && !isSafari && !isChrome) {
+      setShowBrowserWarning(true)
+    }
+  }, [])
 
   // 로그인 후 리다이렉트할 경로
   const from = location.state?.from?.pathname || '/'
@@ -35,7 +49,7 @@ const LoginPageExactReplica = () => {
     e.preventDefault()
     
     if (!formData.email || !formData.password) {
-      setError('이메일と비밀번호을 입력하세요。')
+      setError('이메일과 비밀번호를 입력하세요.')
       return
     }
 
@@ -53,9 +67,9 @@ const LoginPageExactReplica = () => {
       // 에러 메시지 번역
       let errorMessage = error.message
       if (error.message.includes('Invalid login credentials')) {
-        errorMessage = '이메일또는비밀번호が正しくありません。'
+        errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.'
       } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = 'メール認証が必要です。メールを확인してください。'
+        errorMessage = '이메일 인증이 필요합니다. 메일을 확인해주세요.'
       }
       
       setError(errorMessage)
@@ -73,7 +87,7 @@ const LoginPageExactReplica = () => {
       // 구글 로그인은 리다이렉트되므로 여기서 navigate 하지 않음
     } catch (error) {
       console.error('Google login error:', error)
-      setError('Google로그인に失敗しました。再度お試しください。')
+      setError('Google 로그인에 실패했습니다. 다시 시도해주세요.')
       setIsLoading(false)
     }
   }
@@ -100,12 +114,23 @@ const LoginPageExactReplica = () => {
             <CardTitle className="text-2xl font-bold text-gray-800">
               로그인
             </CardTitle>
-            <CardDescription className="text-gray-600">
-              CNEC Japanアカウントで로그인してください
+            <CardDescription className="text-gray-600">              CNEC Korea 계정으로 로그인해주세요
             </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-6">
+            {/* iPhone 브라우저 경고 */}
+            {showBrowserWarning && (
+              <Alert className="bg-yellow-50 border-yellow-300">
+                <AlertDescription className="text-yellow-800">
+                  <strong>⚠️ 브라우저 호환성 경고</strong>
+                  <p className="mt-1 text-sm">
+                    iPhone에서 로그인 문제가 발생할 수 있습니다. Safari 또는 Chrome 브라우저를 사용해 주세요.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
+            
             {/* 구글 로그인 - 참조 사이트와 동일한 스타일 */}
             <Button
               onClick={handleGoogleLogin}
@@ -203,7 +228,7 @@ const LoginPageExactReplica = () => {
                 계정이 없으신가요?
               </span>{' '}
               <Link to="/signup" className="text-red-600 hover:text-red-700 font-medium underline">
-                新規登録
+                회원가입
               </Link>
             </div>
           </CardContent>

@@ -996,11 +996,13 @@ const MyPageKoreaEnhanced = () => {
                           <p className="text-sm text-gray-600">
                             상태: <span className={`font-medium ${
                               app.status === 'approved' ? 'text-green-600' :
+                              app.status === 'selected' ? 'text-blue-600' :
                               app.status === 'rejected' ? 'text-red-600' :
                               'text-yellow-600'
                             }`}>
                               {app.status === 'pending' ? '검토중' :
                                app.status === 'approved' ? '승인됨' :
+                               app.status === 'selected' ? '선정됨' :
                                app.status === 'rejected' ? '거절됨' : app.status}
                             </span>
                           </p>

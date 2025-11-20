@@ -97,10 +97,7 @@ const CampaignApplicationPage = () => {
       }))
     } catch (error) {
       console.error('Load campaign error:', error)
-      setError(language === 'ko' 
-        ? '캠페인 정보를 불러올 수 없습니다.'
-        : 'キャンペーン情報を読み込めません。'
-      )
+      setError('캠페인 정보를 불러올 수 없습니다.')
     } finally {
       setLoading(false)
     }
@@ -145,9 +142,7 @@ const CampaignApplicationPage = () => {
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.user_email)) {
-      return language === 'ko' 
-        ? '올바른 이메일 형식을 입력해주세요.'
-        : '正しいメール形式を入力してください。'
+      return '올바른 이메일 형식을 입력해주세요.'
     }
 
     // 나이 검증
@@ -214,10 +209,7 @@ const CampaignApplicationPage = () => {
       
     } catch (error) {
       console.error('Submit application error:', error)
-      setError(language === 'ko' 
-        ? '신청 중 오류가 발생했습니다. 다시 시도해주세요.'
-        : '応募中にエラーが発生しました。再度お試しください。'
-      )
+      setError('신청 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setSubmitting(false)
     }
@@ -263,16 +255,13 @@ const CampaignApplicationPage = () => {
           <CardContent className="pt-8">
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {language === 'ko' ? '신청 완료!' : '応募完了！'}
+              신청 완료!
             </h2>
             <p className="text-gray-600 mb-6">
-              {language === 'ko' 
-                ? '캠페인 신청이 성공적으로 완료되었습니다. 검토 후 연락드리겠습니다.'
-                : 'キャンペーンの応募が正常に完了しました。審査後にご連絡いたします。'
-              }
+              캠페인 신청이 성공적으로 완료되었습니다. 검토 후 연락드리겠습니다.
             </p>
             <Button onClick={() => navigate('/mypage')} className="bg-purple-600 hover:bg-purple-700">
-              {language === 'ko' ? '마이페이지로 이동' : 'マイページに移動'}
+              마이페이지로 이동
             </Button>
           </CardContent>
         </Card>
@@ -287,11 +276,11 @@ const CampaignApplicationPage = () => {
           <CardContent className="pt-8">
             <div className="text-6xl mb-4">❌</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {language === 'ko' ? '캠페인을 찾을 수 없습니다' : 'キャンペーンが見つかりません'}
+              캠페인을 찾을 수 없습니다
             </h2>
             <p className="text-gray-600 mb-6">{error}</p>
             <Button onClick={() => navigate('/')} className="bg-purple-600 hover:bg-purple-700">
-              {language === 'ko' ? '홈으로 돌아가기' : 'ホームに戻る'}
+              홈으로 돌아가기
             </Button>
           </CardContent>
         </Card>
@@ -310,7 +299,7 @@ const CampaignApplicationPage = () => {
             className="text-gray-600 hover:text-gray-800"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {language === 'ko' ? '캠페인 목록으로' : 'キャンペーン一覧へ'}
+            캠페인 목록으로
           </Button>
         </div>
 
@@ -354,13 +343,10 @@ const CampaignApplicationPage = () => {
         <Card className="shadow-xl border-0">
           <CardHeader>
             <CardTitle className="text-xl">
-              {language === 'ko' ? '캠페인 신청' : 'キャンペーン応募'}
+              캠페인 신청
             </CardTitle>
             <CardDescription>
-              {language === 'ko' 
-                ? '아래 정보를 정확히 입력해주세요.'
-                : '以下の情報を正確に入力してください。'
-              }
+              필수 정보를 입력하여 캠페인에 신청하세요.
             </CardDescription>
           </CardHeader>
           
@@ -390,7 +376,7 @@ const CampaignApplicationPage = () => {
                   
                   <div className="space-y-2">
                     <Label htmlFor="user_email">
-                      {language === 'ko' ? '이메일' : 'メールアドレス'} *
+                      이메일 *
                     </Label>
                     <Input
                       id="user_email"
@@ -398,7 +384,7 @@ const CampaignApplicationPage = () => {
                       type="email"
                       value={formData.user_email}
                       onChange={handleInputChange}
-                      placeholder={language === 'ko' ? '이메일을 입력하세요' : 'メールアドレスを入力してください'}
+                      placeholder="이메일을 입력하세요"
                       required
                     />
                   </div>
@@ -538,7 +524,7 @@ const CampaignApplicationPage = () => {
               {(campaign.question1 || campaign.question2 || campaign.question3 || campaign.question4) && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {language === 'ko' ? '캠페인 질문' : 'キャンペーン質問'}
+                    캠페인 질문
                   </h3>
                   
                   {[1, 2, 3, 4].map((num) => {
@@ -627,7 +613,7 @@ const CampaignApplicationPage = () => {
                   {submitting ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : null}
-                  {language === 'ko' ? '신청하기' : '応募する'}
+                  신청하기
                 </Button>
               </div>
             </form>
