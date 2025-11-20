@@ -321,7 +321,27 @@ const MyPageWithWithdrawal = () => {
       
       // 신청 내역 로드
       const applicationsData = await database.applications.getByUser(user.id)
-      setApplications(applicationsData || [])
+      
+      // campaign_participants 데이터 로드 (선정된 캠페인 정보)
+      const { data: participantsData, error: participantsError } = await supabase
+        .from('campaign_participants')
+        .select('*')
+        .eq('user_id', user.id)
+      
+      // applications에 participants 데이터 조인
+      const enrichedApplications = (applicationsData || []).map(app => {
+        const participant = (participantsData || []).find(p => p.campaign_id === app.campaign_id)
+        return {
+          ...app,
+          tracking_number: participant?.tracking_number,
+          guide_confirmed: participant?.guide_confirmed,
+          personalized_guide: participant?.personalized_guide,
+          video_status: participant?.video_status,
+          content_url: participant?.content_url
+        }
+      })
+      
+      setApplications(enrichedApplications)
       
       // 출금 내역 로딩 (point_transactions 테이블에서 직접 가져오기)
       try {
@@ -1380,19 +1400,97 @@ const MyPageWithWithdrawal = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               application.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              application.status === 'selected' ? 'bg-blue-100 text-blue-800' :
                               application.status === 'rejected' ? 'bg-red-100 text-red-800' :
                               'bg-yellow-100 text-yellow-800'
                             }`}>
                               {application.status === 'approved' ? (language === 'ko' ? '승인됨' : '承認済み') :
+                               application.status === 'selected' ? (language === 'ko' ? '선정됨' : '選定済み') :
                                application.status === 'rejected' ? (language === 'ko' ? '거절됨' : '拒否済み') : 
-                               (language === 'ko' ? '대기중' : '待機中')}
+                               (language === 'ko' ? '검토중' : '検討中')}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(application.created_at).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'ko-KR')}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {application.status === 'approved' ? (
+                            {application.status === 'selected' ? (
+                              <div className="space-y-2">
+                                {/* 송장번호 확인 */}
+                                {application.tracking_number && (
+                                  <div className="text-sm">
+                                    <span className="font-medium text-gray-700">📦 송장번호: </span>
+                                    <span className="text-blue-600">{application.tracking_number}</span>
+                                  </div>
+                                )}
+                                
+                                {/* 가이드 확인 */}
+                                {application.guide_confirmed ? (
+                                  application.personalized_guide ? (
+                                    <button
+                                      onClick={() => {
+                                        alert(application.personalized_guide)
+                                      }}
+                                      className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
+                                    >
+                                      📝 가이드 보기
+                                    </button>
+                                  ) : (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800">
+                                      ✅ 가이드 확인완료
+                                    </span>
+                                  )
+                                ) : (
+                                  <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    ⏳ 가이드 준비중
+                                  </span>
+                                )}
+                                
+                                {/* 영상 업로드 버튼 */}
+                                {application.guide_confirmed && (
+                                  application.content_url ? (
+                                    <a
+                                      href={application.content_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
+                                    >
+                                      🎥 영상 보기
+                                    </a>
+                                  ) : (
+                                    <button
+                                      onClick={() => {
+                                        const url = prompt('영상 URL을 입력하세요:')
+                                        if (url) {
+                                          // TODO: 영상 URL 업로드 로직
+                                          alert('영상 업로드 기능은 공사중입니다.')
+                                        }
+                                      }}
+                                      className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors"
+                                    >
+                                      📹 영상 업로드
+                                    </button>
+                                  )
+                                )}
+                                
+                                {/* 영상 수정요청 */}
+                                {application.video_status === 'revision_requested' && (
+                                  <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800">
+                                    ⚠️ 수정요청
+                                  </span>
+                                )}
+                                
+                                {/* 마감일 연장 신청 */}
+                                <button
+                                  onClick={() => {
+                                    alert('마감일 연장 신청 기능은 공사중입니다.')
+                                  }}
+                                  className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-orange-100 text-orange-800 hover:bg-orange-200 transition-colors"
+                                >
+                                  📅 마감일 연장 신청
+                                </button>
+                              </div>
+                            ) : application.status === 'approved' ? (
                               <div className="space-y-2">
                                 <div className="flex flex-wrap gap-2">
                                   {application.google_drive_url && (
@@ -1452,6 +1550,43 @@ const MyPageWithWithdrawal = () => {
                                     {language === 'ko' ? '자료 준비 중' : '資料準備中'}
                                   </span>
                                 )}
+                              </div>
+                            ) : application.status === 'pending' ? (
+                              <div className="space-y-2">
+                                {/* 지원취소 버튼 */}
+                                <button
+                                  onClick={async () => {
+                                    if (confirm('정말로 지원을 취소하시겠습니까?')) {
+                                      try {
+                                        const { error } = await supabase
+                                          .from('campaign_applications')
+                                          .delete()
+                                          .eq('id', application.id)
+                                        
+                                        if (error) throw error
+                                        
+                                        alert('지원이 취소되었습니다.')
+                                        loadUserData() // 데이터 새로고침
+                                      } catch (error) {
+                                        console.error('Error cancelling application:', error)
+                                        alert('지원 취소에 실패했습니다.')
+                                      }
+                                    }
+                                  }}
+                                  className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors"
+                                >
+                                  ❌ 지원취소
+                                </button>
+                                
+                                {/* 지원내역 수정 버튼 */}
+                                <button
+                                  onClick={() => {
+                                    alert('지원내역 수정 기능은 공사중입니다.')
+                                  }}
+                                  className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
+                                >
+                                  ✏️ 지원내역 수정
+                                </button>
                               </div>
                             ) : (
                               <span className="text-xs text-gray-400">-</span>
