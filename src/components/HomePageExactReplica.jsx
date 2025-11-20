@@ -614,6 +614,63 @@ const HomePageExactReplica = () => {
                       </div>
                     </div>
                     
+                    {/* 마감일 정보 */}
+                    <div className="mb-4 p-3 bg-purple-50 rounded-lg">
+                      <div className="space-y-2 text-xs text-gray-700">
+                        {campaign.application_deadline && (
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">📅 모집 마감:</span>
+                            <span>{new Date(campaign.application_deadline).toLocaleDateString('ko-KR')}</span>
+                          </div>
+                        )}
+                        {(() => {
+                          // 4주 챌린지: 주차별 마감일
+                          if (campaign.campaign_type === '4week_challenge') {
+                            const weeks = [
+                              campaign.week1_deadline,
+                              campaign.week2_deadline,
+                              campaign.week3_deadline,
+                              campaign.week4_deadline
+                            ].filter(Boolean)
+                            if (weeks.length > 0) {
+                              return (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">🏆 캠페인:</span>
+                                  <span>{weeks.length}주차 ({new Date(weeks[0]).toLocaleDateString('ko-KR')} ~ {new Date(weeks[weeks.length-1]).toLocaleDateString('ko-KR')})</span>
+                                </div>
+                              )
+                            }
+                          }
+                          // 올영세일: 단계별 마감일
+                          if (campaign.campaign_type === 'oliveyoung') {
+                            const steps = [
+                              campaign.step1_deadline,
+                              campaign.step2_deadline,
+                              campaign.step3_deadline
+                            ].filter(Boolean)
+                            if (steps.length > 0) {
+                              return (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">📸 캠페인:</span>
+                                  <span>{steps.length}단계 ({new Date(steps[0]).toLocaleDateString('ko-KR')} ~ {new Date(steps[steps.length-1]).toLocaleDateString('ko-KR')})</span>
+                                </div>
+                              )
+                            }
+                          }
+                          // 기본: start_date ~ end_date
+                          if (campaign.start_date && campaign.end_date) {
+                            return (
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">📹 캠페인:</span>
+                                <span>{new Date(campaign.start_date).toLocaleDateString('ko-KR')} ~ {new Date(campaign.end_date).toLocaleDateString('ko-KR')}</span>
+                              </div>
+                            )
+                          }
+                          return null
+                        })()}
+                      </div>
+                    </div>
+
                     {/* 참여조건 */}
                     {(campaign.min_followers || campaign.min_subscribers || campaign.recruitment_count) && (
                       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
