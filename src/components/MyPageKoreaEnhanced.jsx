@@ -136,6 +136,33 @@ const MyPageKoreaEnhanced = () => {
     }
   }, [user])
 
+  const handleCancelApplication = async (applicationId) => {
+    if (!confirm('정말로 지원을 취소하시겠습니까?')) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', applicationId)
+        .eq('user_id', user.id) // 보안: 자신의 지원만 삭제 가능
+
+      if (error) throw error
+
+      alert('지원이 취소되었습니다.')
+      fetchUserData() // 데이터 새로고침
+    } catch (error) {
+      console.error('Error canceling application:', error)
+      alert('지원 취소에 실패했습니다.')
+    }
+  }
+
+  const handleEditApplication = (applicationId, campaignId) => {
+    // 지원 페이지로 이동 (수정 모드)
+    window.location.href = `/campaign-application?campaign_id=${campaignId}&edit=${applicationId}`
+  }
+
   const fetchUserData = async () => {
     try {
       setLoading(true)
@@ -992,20 +1019,43 @@ const MyPageKoreaEnhanced = () => {
                           <h3 className="font-semibold text-gray-900">{app.campaigns?.title}</h3>
                           <p className="text-sm text-gray-600 mt-1">
                             지원일: {new Date(app.created_at).toLocaleDateString('ko-KR')}
+                            {app.campaigns?.recruitment_deadline && (
+                              <span className="ml-2 text-gray-500">
+                                | 모집 마감: {new Date(app.campaigns.recruitment_deadline).toLocaleDateString('ko-KR')}
+                              </span>
+                            )}
                           </p>
                           <p className="text-sm text-gray-600">
                             상태: <span className={`font-medium ${
                               app.status === 'approved' ? 'text-green-600' :
                               app.status === 'selected' ? 'text-blue-600' :
                               app.status === 'rejected' ? 'text-red-600' :
+                              (app.status === 'pending' && app.campaigns?.recruitment_deadline && new Date(app.campaigns.recruitment_deadline) < new Date()) ? 'text-gray-600' :
                               'text-yellow-600'
                             }`}>
-                              {app.status === 'pending' ? '검토중' :
+                              {app.status === 'pending' && app.campaigns?.recruitment_deadline && new Date(app.campaigns.recruitment_deadline) < new Date() ? '모집 마감' :
+                               app.status === 'pending' ? '검토중' :
                                app.status === 'approved' ? '승인됨' :
                                app.status === 'selected' ? '선정됨' :
                                app.status === 'rejected' ? '거절됨' : app.status}
                             </span>
                           </p>
+                          {app.status === 'pending' && !(app.campaigns?.recruitment_deadline && new Date(app.campaigns.recruitment_deadline) < new Date()) && (
+                            <div className="mt-3 flex gap-2">
+                              <button
+                                onClick={() => handleCancelApplication(app.id)}
+                                className="px-3 py-1 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors"
+                              >
+                                취소
+                              </button>
+                              <button
+                                onClick={() => handleEditApplication(app.id, app.campaign_id)}
+                                className="px-3 py-1 text-sm border border-blue-300 text-blue-600 rounded hover:bg-blue-50 transition-colors"
+                              >
+                                수정
+                              </button>
+                            </div>
+                          )}
                           {app.status === 'selected' && (
                             <div className="mt-2 space-y-1">
                               {app.tracking_number && (
