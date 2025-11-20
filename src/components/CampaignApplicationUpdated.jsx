@@ -382,8 +382,14 @@ const CampaignApplicationUpdated = () => {
   }
 
   const formatDate = (dateString) => {
-    if (!dateString) return ''
-    return new Date(dateString).toLocaleDateString('ko-KR')
+    if (!dateString) return '연동 오류'
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return '연동 오류'
+      return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+    } catch (e) {
+      return '연동 오류'
+    }
   }
 
   const formatCurrency = (amount) => {
@@ -700,7 +706,7 @@ const CampaignApplicationUpdated = () => {
                       </div>
                     </div>          
                     {/* AI 생성 가이드 */}
-                    {campaign.ai_generated_guide && typeof campaign.ai_generated_guide === 'object' && (
+                    {campaign.ai_generated_guide && (typeof campaign.ai_generated_guide === 'object' ? (
                       <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
                         <div className="flex items-center mb-3">
                           <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -757,7 +763,19 @@ const CampaignApplicationUpdated = () => {
                           )}
                         </div>
                       </div>
-                    )}
+                    ) : (
+                      <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
+                        <div className="flex items-center mb-3">
+                          <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                          </svg>
+                          <h5 className="text-sm font-semibold text-purple-800">AI 생성 가이드</h5>
+                        </div>
+                        <div className="bg-white rounded-lg p-3">
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{campaign.ai_generated_guide}</p>
+                        </div>
+                      </div>
+                    ))}
                     
                     {/* 크리에이터 가이드 */}
                     {campaign.creator_guide && (
