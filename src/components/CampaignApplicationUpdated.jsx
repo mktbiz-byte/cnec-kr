@@ -687,6 +687,34 @@ const CampaignApplicationUpdated = () => {
                   </div>
                 </div>
 
+                {/* 맞춤형 AI 가이드 (지원자에게만 표시) */}
+                {existingApplication?.personalized_guide && (
+                  <div className="border-t pt-4 mt-4">
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-lg p-5 shadow-lg">
+                      <div className="flex items-start mb-4">
+                        <div className="flex-shrink-0 mr-3">
+                          <svg className="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-lg font-bold text-emerald-900 mb-2">✨ 당신만을 위한 맞춤형 촬영 가이드</h4>
+                          <p className="text-sm text-emerald-800 mb-3">
+                            이 가이드는 <strong className="text-emerald-900">당신의 SNS 스타일과 팔로워 특성을 분석</strong>하여 AI가 맞춤 제작한 촬영 가이드입니다. 아래 가이드를 참고하여 콘텐츠를 제작해주세요.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 shadow-inner">
+                        <div className="prose prose-sm max-w-none">
+                          <div className="text-gray-800 whitespace-pre-wrap leading-relaxed" style={{fontSize: '14px'}}>
+                            {existingApplication.personalized_guide}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* 캠페인 가이드 */}
                 {(campaign.required_dialogues?.length > 0 || campaign.required_scenes?.length > 0 || campaign.required_hashtags?.length > 0 || campaign.video_duration || campaign.video_tempo || campaign.video_tone || campaign.additional_details || campaign.additional_shooting_requests || campaign.meta_ad_code_requested || campaign.ai_generated_guide || campaign.creator_guide) && (
                   <div className="border-t pt-4 mt-4">
