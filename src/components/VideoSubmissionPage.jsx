@@ -475,7 +475,33 @@ export default function VideoSubmissionPage() {
                     <p className="text-green-800 text-sm mt-1">포인트가 지급되었습니다.</p>
                   </div>
                 )}
+                {videoSubmission.status === 'submitted' && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="font-semibold text-blue-900">✅ 영상이 제출되었습니다!</p>
+                    <p className="text-blue-800 text-sm mt-1">기업에서 검수 중입니다. 잠시만 기다려주세요.</p>
+                  </div>
+                )}
               </div>
+              {videoSubmission.status !== 'approved' && (
+                <div className="mt-4 pt-4 border-t">
+                  <Button
+                    onClick={() => {
+                      if (window.confirm('영상을 다시 제출하시겠습니까?\n\n기존 영상은 새 영상으로 교체됩니다.')) {
+                        setVideoSubmission(null)
+                        setVideoFile(null)
+                        setVideoFileUrl('')
+                        setSnsTitle('')
+                        setSnsContent('')
+                        setShowSnsUploadForm(false)
+                      }
+                    }}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    🔄 영상 다시 제출하기
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -601,7 +627,7 @@ export default function VideoSubmissionPage() {
             <CardHeader>
               <CardTitle>SNS 업로드 정보 제출</CardTitle>
               <CardDescription>
-                영상을 SNS에 업로드한 후 URL과 광고 코드를 입력해주세요. (선택사항)
+                영상을 SNS에 업로드한 후 URL과 광고 코드를 입력해주세요.
               </CardDescription>
               <Alert className="mt-3 border-red-200 bg-red-50">
                 <AlertCircle className="h-4 w-4 text-red-600" />
@@ -645,7 +671,7 @@ export default function VideoSubmissionPage() {
                   )}
                   {!isInstagram && (
                     <p className="text-xs text-gray-500 mt-1">
-                      YouTube, TikTok의 경우 제출이 불가능하므로 선택사항입니다.
+                      인스타그램 업로드 시에는 파트너십 광고 코드를 제출해주세요.
                     </p>
                   )}
                 </div>
