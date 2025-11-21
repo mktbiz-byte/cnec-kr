@@ -223,7 +223,15 @@ const MyPageKoreaEnhanced = () => {
       const { data: applicationsData, error: applicationsError } = await supabase
         .from('applications')
         .select(`
-          *,
+          id,
+          user_id,
+          campaign_id,
+          applicant_name,
+          status,
+          created_at,
+          updated_at,
+          tracking_number,
+          shipping_company,
           personalized_guide,
           additional_message,
           campaigns (
