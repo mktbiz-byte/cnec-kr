@@ -1121,7 +1121,16 @@ const MyPageKoreaEnhanced = () => {
                               )}
                               
                               {/* 가이드 확인 배너 */}
-                              {app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted') && (
+                              {(() => {
+                                console.log('Button condition check:', {
+                                  campaign: app.campaigns?.title,
+                                  status: app.status,
+                                  hasGuide: !!app.personalized_guide,
+                                  guideLength: app.personalized_guide?.length,
+                                  shouldShow: app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
+                                })
+                                return app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
+                              })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
