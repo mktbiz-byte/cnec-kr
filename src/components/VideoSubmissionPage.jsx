@@ -268,9 +268,9 @@ export default function VideoSubmissionPage() {
             })
           }
 
-          // 이메일 발송
+          // 이메일 발송 (cnectotal API 호출)
           if (companyProfile.email) {
-            await fetch('/.netlify/functions/send-email', {
+            await fetch('https://cnectotal.netlify.app/.netlify/functions/send-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
