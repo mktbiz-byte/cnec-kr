@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useAuth } from '../contexts/AuthContext'
