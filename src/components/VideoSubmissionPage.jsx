@@ -442,7 +442,7 @@ export default function VideoSubmissionPage() {
         )}
 
         {/* 현재 상태 */}
-        {videoSubmission && videoSubmission.video_file_url && (
+        {videoSubmission && videoSubmission.video_file_url && videoSubmission.video_file_url.trim() !== '' && (
           <Card className="mb-6">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -459,9 +459,14 @@ export default function VideoSubmissionPage() {
                   </span>
                 </div>
                 {videoSubmission.status === 'revision_requested' && videoSubmission.feedback && (
-                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="font-semibold text-yellow-900 mb-2">수정 요청 사항:</p>
-                    <p className="text-yellow-800 whitespace-pre-wrap">{videoSubmission.feedback}</p>
+                  <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-bold text-yellow-900 mb-2 text-lg">📝 기업 피드백 (수정 요청)</p>
+                        <p className="text-yellow-800 whitespace-pre-wrap font-medium">{videoSubmission.feedback}</p>
+                      </div>
+                    </div>
                   </div>
                 )}
                 {videoSubmission.status === 'approved' && (
@@ -479,11 +484,13 @@ export default function VideoSubmissionPage() {
         {(!videoSubmission || videoSubmission.status === 'revision_requested') && !showSnsUploadForm && (
           <Card>
             <CardHeader>
-              <CardTitle>
-                {videoSubmission?.status === 'revision_requested' ? '영상 재제출' : '영상 제출'}
+              <CardTitle className={videoSubmission?.status === 'revision_requested' ? 'text-orange-600' : ''}>
+                {videoSubmission?.status === 'revision_requested' ? '🔄 영상 재제출' : '영상 제출'}
               </CardTitle>
               <CardDescription>
-                촬영한 영상 파일을 업로드해주세요. (MP4, MOV 등)
+                {videoSubmission?.status === 'revision_requested' 
+                  ? '기업 피드백을 반영하여 수정한 영상을 다시 업로드해주세요.'
+                  : '촬영한 영상 파일을 업로드해주세요. (MP4, MOV 등)'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -596,6 +603,12 @@ export default function VideoSubmissionPage() {
               <CardDescription>
                 영상을 SNS에 업로드한 후 URL과 광고 코드를 입력해주세요. (선택사항)
               </CardDescription>
+              <Alert className="mt-3 border-red-200 bg-red-50">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800 font-semibold">
+                  ⚠️ 영상 검수가 완료된 후 SNS에 업로드해주세요!
+                </AlertDescription>
+              </Alert>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSnsUploadSubmit} className="space-y-6">
@@ -613,31 +626,29 @@ export default function VideoSubmissionPage() {
                   </p>
                 </div>
 
-                {hasAdCode && (
-                  <div>
-                    <Label htmlFor="partnershipCode">
-                      파트너십 광고 코드 {isInstagram && <span className="text-red-500">*</span>}
-                    </Label>
-                    <Input
-                      id="partnershipCode"
-                      type="text"
-                      value={partnershipCode}
-                      onChange={(e) => setPartnershipCode(e.target.value)}
-                      placeholder="광고 코드를 입력해주세요"
-                      required={isInstagram}
-                    />
-                    {isInstagram && (
-                      <p className="text-xs text-orange-600 mt-1">
-                        ⚠️ 인스타그램 업로드 시 파트너십 광고 코드 입력이 필수입니다.
-                      </p>
-                    )}
-                    {!isInstagram && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        YouTube, TikTok의 경우 제출이 불가능하므로 선택사항입니다.
-                      </p>
-                    )}
-                  </div>
-                )}
+                <div>
+                  <Label htmlFor="partnershipCode">
+                    파트너십 광고 코드 {isInstagram && <span className="text-red-500">*</span>}
+                  </Label>
+                  <Input
+                    id="partnershipCode"
+                    type="text"
+                    value={partnershipCode}
+                    onChange={(e) => setPartnershipCode(e.target.value)}
+                    placeholder="광고 코드를 입력해주세요"
+                    required={isInstagram}
+                  />
+                  {isInstagram && (
+                    <p className="text-xs text-orange-600 mt-1">
+                      ⚠️ 인스타그램 업로드 시 파트너십 광고 코드 입력이 필수입니다.
+                    </p>
+                  )}
+                  {!isInstagram && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      YouTube, TikTok의 경우 제출이 불가능하므로 선택사항입니다.
+                    </p>
+                  )}
+                </div>
 
                 <div className="flex gap-3">
                   <Button
