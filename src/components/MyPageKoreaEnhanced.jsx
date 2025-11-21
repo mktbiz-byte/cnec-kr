@@ -1098,7 +1098,7 @@ const MyPageKoreaEnhanced = () => {
                               </button>
                             </div>
                           )}
-                          {app.status === 'selected' && (
+                          {(app.status === 'selected' || app.status === 'filming' || app.status === 'video_submitted') && (
                             <div className="mt-2 space-y-2">
                               {/* 마감일 표시 */}
                               {(app.campaigns?.start_date || app.campaigns?.end_date) && (
