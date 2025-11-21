@@ -1054,6 +1054,8 @@ const MyPageKoreaEnhanced = () => {
                               app.status === 'approved' ? 'text-green-600' :
                               app.status === 'selected' ? 'text-blue-600' :
                               app.status === 'rejected' ? 'text-red-600' :
+                              app.status === 'video_submitted' ? 'text-purple-600' :
+                              app.status === 'filming' ? 'text-orange-600' :
                               (app.status === 'pending' && app.campaigns?.recruitment_deadline && new Date(app.campaigns.recruitment_deadline) < new Date()) ? 'text-gray-600' :
                               'text-yellow-600'
                             }`}>
@@ -1061,7 +1063,9 @@ const MyPageKoreaEnhanced = () => {
                                app.status === 'pending' ? '검토중' :
                                app.status === 'approved' ? '승인됨' :
                                app.status === 'selected' ? '선정됨' :
-                               app.status === 'rejected' ? '거절됨' : app.status}
+                               app.status === 'rejected' ? '거절됨' :
+                               app.status === 'filming' ? '촬영중' :
+                               app.status === 'video_submitted' ? '기업 영상 검수중' : app.status}
                             </span>
                           </p>
                           {app.status === 'pending' && !(app.campaigns?.recruitment_deadline && new Date(app.campaigns.recruitment_deadline) < new Date()) && (
@@ -1107,7 +1111,7 @@ const MyPageKoreaEnhanced = () => {
                               )}
                               
                               {/* 가이드 확인 배너 */}
-                              {app.personalized_guide && (
+                              {app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted') && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
