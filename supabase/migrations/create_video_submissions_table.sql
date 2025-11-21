@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS video_submissions (
   
   -- Company feedback
   feedback TEXT,
-  feedback_data JSONB, -- For timestamped feedback
+  feedback_data JSONB,
   
   -- Timestamps
   submitted_at TIMESTAMPTZ DEFAULT NOW(),
@@ -49,20 +49,20 @@ ALTER TABLE video_submissions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Creators can view own video submissions"
   ON video_submissions
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = video_submissions.user_id);
 
 -- Creators can insert their own video submissions
 CREATE POLICY "Creators can insert own video submissions"
   ON video_submissions
   FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = video_submissions.user_id);
 
 -- Creators can update their own video submissions (for resubmission)
 CREATE POLICY "Creators can update own video submissions"
   ON video_submissions
   FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (auth.uid() = video_submissions.user_id)
+  WITH CHECK (auth.uid() = video_submissions.user_id);
 
 -- Companies can view video submissions for their campaigns
 CREATE POLICY "Companies can view video submissions for their campaigns"
@@ -94,9 +94,9 @@ CREATE POLICY "Admins can do everything on video submissions"
   FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role = 'admin'
+      SELECT 1 FROM user_profiles
+      WHERE user_profiles.id = auth.uid()
+      AND user_profiles.role = 'admin'
     )
   );
 
