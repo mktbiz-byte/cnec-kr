@@ -5,10 +5,14 @@ CREATE TABLE IF NOT EXISTS video_submissions (
   campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   
-  -- Video information
-  video_url TEXT NOT NULL,
-  video_title TEXT,
-  video_description TEXT,
+  -- Video file information (uploaded to Supabase Storage)
+  video_file_url TEXT NOT NULL,
+  
+  -- SNS upload information
+  sns_title TEXT,
+  sns_content TEXT,
+  sns_upload_url TEXT,
+  partnership_code TEXT,
   
   -- Status tracking
   status TEXT DEFAULT 'submitted' CHECK (status IN ('submitted', 'revision_requested', 'approved', 'rejected')),
@@ -23,6 +27,7 @@ CREATE TABLE IF NOT EXISTS video_submissions (
   reviewed_at TIMESTAMPTZ,
   approved_at TIMESTAMPTZ,
   rejected_at TIMESTAMPTZ,
+  sns_uploaded_at TIMESTAMPTZ,
   
   -- Metadata
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -110,4 +115,4 @@ CREATE TRIGGER update_video_submissions_updated_at_trigger
   EXECUTE FUNCTION update_video_submissions_updated_at();
 
 -- Add comment to table
-COMMENT ON TABLE video_submissions IS 'Stores video submissions from creators with status tracking and company feedback';
+COMMENT ON TABLE video_submissions IS 'Stores video file submissions from creators with SNS upload info, status tracking and company feedback';
