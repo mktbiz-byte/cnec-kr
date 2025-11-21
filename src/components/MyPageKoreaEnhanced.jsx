@@ -232,7 +232,8 @@ const MyPageKoreaEnhanced = () => {
             reward_points,
             recruitment_deadline,
             application_deadline,
-            content_submission_deadline
+            content_submission_deadline,
+            campaign_type
           )
         `)
         .eq('user_id', user.id)
