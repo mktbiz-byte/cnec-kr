@@ -251,7 +251,11 @@ const MyPageKoreaEnhanced = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (applicationsError) throw applicationsError
+      if (applicationsError) {
+        console.error('Applications fetch error:', applicationsError)
+        throw applicationsError
+      }
+      console.log('Fetched applications:', applicationsData)
       setApplications(applicationsData || [])
 
       // 출금 내역
