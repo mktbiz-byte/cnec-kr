@@ -463,7 +463,7 @@ const CampaignApplicationUpdated = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* 헤더 */}
         <div className="mb-8">
           <button
@@ -475,7 +475,7 @@ const CampaignApplicationUpdated = () => {
             </svg>
             {t.backToCampaigns}
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">{t.title}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t.title}</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
