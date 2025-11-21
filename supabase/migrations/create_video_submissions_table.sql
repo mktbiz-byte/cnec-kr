@@ -43,60 +43,24 @@ CREATE INDEX IF NOT EXISTS idx_video_submissions_status ON video_submissions(sta
 -- Enable Row Level Security
 ALTER TABLE video_submissions ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies
+-- RLS Policies (Simplified)
 
--- Creators can view their own video submissions
-CREATE POLICY "Creators can view own video submissions"
+-- 1. Creators can manage their own video submissions
+CREATE POLICY "video_submissions_creator_policy"
   ON video_submissions
-  FOR SELECT
-  USING (auth.uid() = video_submissions.user_id);
-
--- Creators can insert their own video submissions
-CREATE POLICY "Creators can insert own video submissions"
-  ON video_submissions
-  FOR INSERT
-  WITH CHECK (auth.uid() = video_submissions.user_id);
-
--- Creators can update their own video submissions (for resubmission)
-CREATE POLICY "Creators can update own video submissions"
-  ON video_submissions
-  FOR UPDATE
+  FOR ALL
   USING (auth.uid() = video_submissions.user_id)
   WITH CHECK (auth.uid() = video_submissions.user_id);
 
--- Companies can view video submissions for their campaigns
-CREATE POLICY "Companies can view video submissions for their campaigns"
-  ON video_submissions
-  FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM campaigns
-      WHERE campaigns.id = video_submissions.campaign_id
-      AND campaigns.company_id = auth.uid()
-    )
-  );
-
--- Companies can update video submissions for their campaigns (for feedback)
-CREATE POLICY "Companies can update video submissions for their campaigns"
-  ON video_submissions
-  FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1 FROM campaigns
-      WHERE campaigns.id = video_submissions.campaign_id
-      AND campaigns.company_id = auth.uid()
-    )
-  );
-
--- Admins can do everything
-CREATE POLICY "Admins can do everything on video submissions"
+-- 2. Companies can view and update video submissions for their campaigns
+CREATE POLICY "video_submissions_company_policy"
   ON video_submissions
   FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM user_profiles
-      WHERE user_profiles.id = auth.uid()
-      AND user_profiles.role = 'admin'
+      SELECT 1 FROM campaigns
+      WHERE campaigns.id = video_submissions.campaign_id
+      AND campaigns.company_id = auth.uid()
     )
   );
 
