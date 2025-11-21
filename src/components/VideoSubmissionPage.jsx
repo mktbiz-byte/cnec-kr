@@ -137,22 +137,41 @@ export default function VideoSubmissionPage() {
       const fileName = `${user.id}_${campaignId}_${Date.now()}.${fileExt}`
       const filePath = `videos/${fileName}`
 
-      // Supabase Storage에 업로드
-      const { data, error } = await supabase.storage
-        .from('campaign-videos')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+      // 50MB 이상의 파일은 Resumable Upload 사용
+      const CHUNK_SIZE = 50 * 1024 * 1024 // 50MB
+      
+      if (file.size > CHUNK_SIZE) {
+        // Resumable Upload
+        const { data, error } = await supabase.storage
+          .from('campaign-videos')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+            onUploadProgress: (progress) => {
+              const percent = (progress.loaded / progress.total) * 100
+              setUploadProgress(Math.round(percent))
+            }
+          })
 
-      if (error) throw error
+        if (error) throw error
+      } else {
+        // 일반 Upload
+        const { data, error } = await supabase.storage
+          .from('campaign-videos')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          })
+
+        if (error) throw error
+        setUploadProgress(100)
+      }
 
       // 공개 URL 가져오기
       const { data: urlData } = supabase.storage
         .from('campaign-videos')
         .getPublicUrl(filePath)
 
-      setUploadProgress(100)
       return urlData.publicUrl
 
     } catch (err) {
