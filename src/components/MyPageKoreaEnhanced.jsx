@@ -1139,7 +1139,11 @@ const MyPageKoreaEnhanced = () => {
                                           alert('가이드 내용이 비어있습니다.')
                                           return
                                         }
-                                        setSelectedGuide(guideData)
+                                        // additional_message도 함께 전달
+                                        setSelectedGuide({
+                                          ...guideData,
+                                          additional_message: app.additional_message
+                                        })
                                         setShowGuideModal(true)
                                       }}
                                       className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
@@ -1388,7 +1392,19 @@ const MyPageKoreaEnhanced = () => {
                   <div className="space-y-2">
                     {selectedGuide.required_hashtags.real && (
                       <div>
-                        <span className="text-sm font-medium text-gray-700">리얼 후기:</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-gray-700">리얼 후기:</span>
+                          <button
+                            onClick={() => {
+                              const hashtags = selectedGuide.required_hashtags.real.map(tag => `#${tag}`).join(' ')
+                              navigator.clipboard.writeText(hashtags)
+                              alert('해시태그가 복사되었습니다!')
+                            }}
+                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            복사
+                          </button>
+                        </div>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {selectedGuide.required_hashtags.real.map((tag, i) => (
                             <span key={i} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">#{tag}</span>
@@ -1398,7 +1414,19 @@ const MyPageKoreaEnhanced = () => {
                     )}
                     {selectedGuide.required_hashtags.product && (
                       <div>
-                        <span className="text-sm font-medium text-gray-700">제품 관련:</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-gray-700">제품 관련:</span>
+                          <button
+                            onClick={() => {
+                              const hashtags = selectedGuide.required_hashtags.product.map(tag => `#${tag}`).join(' ')
+                              navigator.clipboard.writeText(hashtags)
+                              alert('해시태그가 복사되었습니다!')
+                            }}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            복사
+                          </button>
+                        </div>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {selectedGuide.required_hashtags.product.map((tag, i) => (
                             <span key={i} className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm">#{tag}</span>
@@ -1408,7 +1436,19 @@ const MyPageKoreaEnhanced = () => {
                     )}
                     {selectedGuide.required_hashtags.common && (
                       <div>
-                        <span className="text-sm font-medium text-gray-700">공통:</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-gray-700">공통:</span>
+                          <button
+                            onClick={() => {
+                              const hashtags = selectedGuide.required_hashtags.common.map(tag => `#${tag}`).join(' ')
+                              navigator.clipboard.writeText(hashtags)
+                              alert('해시태그가 복사되었습니다!')
+                            }}
+                            className="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+                          >
+                            복사
+                          </button>
+                        </div>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {selectedGuide.required_hashtags.common.map((tag, i) => (
                             <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">#{tag}</span>
