@@ -90,8 +90,8 @@ export default function VideoSubmissionPage() {
         setSnsUploadUrl(videoData.sns_upload_url || '')
         setPartnershipCode(videoData.partnership_code || '')
         
-        // 영상이 이미 제출되었고 SNS 업로드 정보가 없으면 폼 표시
-        if (videoData.status === 'submitted' && !videoData.sns_upload_url) {
+        // 영상이 제출되었고 승인되지 않았으면 SNS 업로드 폼 표시
+        if (videoData.status !== 'approved') {
           setShowSnsUploadForm(true)
         }
       }

@@ -1365,78 +1365,117 @@ const MyPageKoreaEnhanced = () => {
                 </div>
               )}
               
-              {/* 크리에이터 정보 */}
-              {selectedGuide && selectedGuide.creator_info && (
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-purple-900 mb-2">크리에이터 정보</h4>
-                  <div className="text-sm text-purple-800 whitespace-pre-wrap">
-                    {selectedGuide.creator_info}
+              {/* 기본 정보 */}
+              {selectedGuide && (selectedGuide.campaign_title || selectedGuide.target_platform || selectedGuide.video_duration) && (
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <div className="space-y-1 text-sm">
+                    {selectedGuide.campaign_title && <div><strong>캠페인:</strong> {selectedGuide.campaign_title}</div>}
+                    {selectedGuide.target_platform && <div><strong>플랫폼:</strong> {selectedGuide.target_platform}</div>}
+                    {selectedGuide.video_duration && <div><strong>영상 길이:</strong> {selectedGuide.video_duration}</div>}
                   </div>
                 </div>
               )}
 
-              {/* 제품 정보 */}
-              {selectedGuide.product_info && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">제품 정보</h4>
-                  <div className="text-gray-700 whitespace-pre-wrap">
-                    {selectedGuide.product_info}
-                  </div>
-                </div>
-              )}
-
-              {/* 해시태그 */}
-              {selectedGuide.hashtags && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">해시태그</h4>
-                  <div className="text-blue-600 whitespace-pre-wrap">
-                    {selectedGuide.hashtags}
+              {/* 필수 해시태그 */}
+              {selectedGuide.required_hashtags && (
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold mb-3">필수 해시태그</h4>
+                  <div className="space-y-2">
+                    {selectedGuide.required_hashtags.real && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">리얼 후기:</span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {selectedGuide.required_hashtags.real.map((tag, i) => (
+                            <span key={i} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">#{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedGuide.required_hashtags.product && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">제품 관련:</span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {selectedGuide.required_hashtags.product.map((tag, i) => (
+                            <span key={i} className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm">#{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedGuide.required_hashtags.common && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">공통:</span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {selectedGuide.required_hashtags.common.map((tag, i) => (
+                            <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">#{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
               {/* 촬영 요구사항 */}
-              {selectedGuide.filming_requirements && (
+              {selectedGuide.shooting_requirements && (
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                  <h4 className="font-semibold mb-3">촬영 요구사항</h4>
+                  <div className="space-y-2">
+                    {selectedGuide.shooting_requirements.must_include && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">필수 포함 장면:</span>
+                        <ul className="list-disc list-inside mt-1 space-y-1">
+                          {selectedGuide.shooting_requirements.must_include.map((item, i) => (
+                            <li key={i} className="text-sm text-gray-700">{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {selectedGuide.shooting_requirements.video_style && (
+                      <div className="mt-2">
+                        <span className="text-sm font-medium text-gray-700">영상 스타일:</span>
+                        <div className="text-sm text-gray-700 mt-1">
+                          <div>템포: {selectedGuide.shooting_requirements.video_style.tempo}</div>
+                          <div>톤: {selectedGuide.shooting_requirements.video_style.tone}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 촬영 씬 */}
+              {selectedGuide.shooting_scenes && selectedGuide.shooting_scenes.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">촬영 요구사항</h4>
-                  <div className="text-gray-700 whitespace-pre-wrap">
-                    {selectedGuide.filming_requirements}
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold">촬영 씬 ({selectedGuide.shooting_scenes.length}개)</h4>
+                    <span className="text-sm text-red-600 font-medium">본 대사와 촬영 장면은 크리에이터의 스타일에 맞게 변경하여 촬영해 주세요.</span>
+                  </div>
+                  <div className="space-y-3">
+                    {selectedGuide.shooting_scenes.map((scene, idx) => (
+                      <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+                        <div className="font-semibold text-purple-700">씬 {scene.order}: {scene.scene_type}</div>
+                        <div className="text-sm mt-1 text-gray-700">{scene.scene_description}</div>
+                        {scene.dialogue && (
+                          <div className="text-sm mt-1 italic text-gray-600">"{scene.dialogue}"</div>
+                        )}
+                        {scene.shooting_tip && (
+                          <div className="text-xs mt-1 text-gray-500">팁: {scene.shooting_tip}</div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
 
               {/* 크리에이터 팁 */}
-              {selectedGuide.creator_tips && (
-                <div className="bg-yellow-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-yellow-900 mb-2">💡 크리에이터 팁</h4>
-                  <div className="text-yellow-800 whitespace-pre-wrap">
-                    {selectedGuide.creator_tips}
-                  </div>
-                </div>
-              )}
-
-              {/* 촬영 장면 */}
-              {selectedGuide.filming_scenes && selectedGuide.filming_scenes.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">촬영 장면 가이드</h4>
-                  <p className="text-sm text-red-600 mb-4">
-                    ⚠️ 본 대사와 촬영 장면은 크리에이터의 스타일에 맞게 변경하여 촬영해 주세요
-                  </p>
-                  <div className="space-y-4">
-                    {selectedGuide.filming_scenes.map((scene, index) => (
-                      <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1">
-                            <h5 className="font-semibold text-gray-900 mb-2">{scene.scene}</h5>
-                            <p className="text-gray-700 text-sm whitespace-pre-wrap">{scene.dialogue}</p>
-                          </div>
-                        </div>
-                      </div>
+              {selectedGuide.creator_tips && selectedGuide.creator_tips.length > 0 && (
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-semibold mb-3">크리에이터 팁</h4>
+                  <ul className="list-decimal list-inside space-y-1">
+                    {selectedGuide.creator_tips.filter(tip => tip).map((tip, i) => (
+                      <li key={i} className="text-sm text-gray-700">{tip}</li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
 
