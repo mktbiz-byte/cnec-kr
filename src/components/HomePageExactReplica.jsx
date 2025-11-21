@@ -624,7 +624,7 @@ const HomePageExactReplica = () => {
                           </div>
                         )}
                         {(() => {
-                          // 4주 챌린지: 주차별 마감일
+                          // 4주 챌린지: 주차별 마감일 (간략하게 표시)
                           if (campaign.campaign_type === '4week_challenge') {
                             const weeks = [
                               campaign.week1_deadline,
@@ -635,8 +635,8 @@ const HomePageExactReplica = () => {
                             if (weeks.length > 0) {
                               return (
                                 <div className="flex items-center gap-2">
-                                  <span className="font-semibold">🏆 캠페인:</span>
-                                  <span>{weeks.length}주차 ({new Date(weeks[0]).toLocaleDateString('ko-KR')} ~ {new Date(weeks[weeks.length-1]).toLocaleDateString('ko-KR')})</span>
+                                  <span className="font-semibold">🏆 챌린지:</span>
+                                  <span>{weeks.length}주차</span>
                                 </div>
                               )
                             }
@@ -657,7 +657,26 @@ const HomePageExactReplica = () => {
                               )
                             }
                           }
-                          // 기본: start_date ~ end_date
+                          // 기획형: 촬영 마감일과 업로드 마감일 분리 표시
+                          if (campaign.campaign_type === 'planned') {
+                            return (
+                              <>
+                                {campaign.start_date && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold">📸 촬영 마감:</span>
+                                    <span>{new Date(campaign.start_date).toLocaleDateString('ko-KR')}</span>
+                                  </div>
+                                )}
+                                {campaign.end_date && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold">📱 업로드 마감:</span>
+                                    <span>{new Date(campaign.end_date).toLocaleDateString('ko-KR')}</span>
+                                  </div>
+                                )}
+                              </>
+                            )
+                          }
+                          // 기타: start_date ~ end_date
                           if (campaign.start_date && campaign.end_date) {
                             return (
                               <div className="flex items-center gap-2">

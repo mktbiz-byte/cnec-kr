@@ -607,6 +607,23 @@ const CampaignApplicationUpdated = () => {
                               )
                             }
                           }
+                          // 기획형: 촬영 마감일과 업로드 마감일 분리 표시
+                          if (campaign.campaign_type === 'planned') {
+                            return (
+                              <div className="space-y-1">
+                                {campaign.start_date && (
+                                  <div className="text-xs">
+                                    📸 촬영 마감: {formatDate(campaign.start_date)}
+                                  </div>
+                                )}
+                                {campaign.end_date && (
+                                  <div className="text-xs">
+                                    📱 업로드 마감: {formatDate(campaign.end_date)}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          }
                           // 기본: start_date ~ end_date
                           return `${formatDate(campaign.start_date)} ~ ${formatDate(campaign.end_date)}`
                         })()}
