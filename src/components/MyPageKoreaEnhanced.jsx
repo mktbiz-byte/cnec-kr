@@ -57,6 +57,10 @@ const MyPageKoreaEnhanced = () => {
     notes: ''
   })
 
+  // 가이드 보기 모달 관련 상태
+  const [showGuideModal, setShowGuideModal] = useState(false)
+  const [selectedGuide, setSelectedGuide] = useState(null)
+
   // 프로필 편집 관련 상태
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -1074,8 +1078,8 @@ const MyPageKoreaEnhanced = () => {
                                   </p>
                                   <button
                                     onClick={() => {
-                                      // TODO: 가이드 보기 모달 열기
-                                      alert('가이드 보기 기능은 곧 추가됩니다.')
+                                      setSelectedGuide(app.personalized_guide)
+                                      setShowGuideModal(true)
                                     }}
                                     className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
                                   >
@@ -1277,9 +1281,127 @@ const MyPageKoreaEnhanced = () => {
           )}
         </div>
       </div>
+
+      {/* 가이드 보기 모달 */}
+      {showGuideModal && selectedGuide && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+              <h3 className="text-2xl font-bold text-gray-900">맞춤 촬영 가이드</h3>
+              <button
+                onClick={() => {
+                  setShowGuideModal(false)
+                  setSelectedGuide(null)
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              {/* 크리에이터 정보 */}
+              {selectedGuide.creator_info && (
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-purple-900 mb-2">크리에이터 정보</h4>
+                  <div className="text-sm text-purple-800 whitespace-pre-wrap">
+                    {selectedGuide.creator_info}
+                  </div>
+                </div>
+              )}
+
+              {/* 제품 정보 */}
+              {selectedGuide.product_info && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">제품 정보</h4>
+                  <div className="text-gray-700 whitespace-pre-wrap">
+                    {selectedGuide.product_info}
+                  </div>
+                </div>
+              )}
+
+              {/* 해시태그 */}
+              {selectedGuide.hashtags && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">해시태그</h4>
+                  <div className="text-blue-600 whitespace-pre-wrap">
+                    {selectedGuide.hashtags}
+                  </div>
+                </div>
+              )}
+
+              {/* 촬영 요구사항 */}
+              {selectedGuide.filming_requirements && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">촬영 요구사항</h4>
+                  <div className="text-gray-700 whitespace-pre-wrap">
+                    {selectedGuide.filming_requirements}
+                  </div>
+                </div>
+              )}
+
+              {/* 크리에이터 팁 */}
+              {selectedGuide.creator_tips && (
+                <div className="bg-yellow-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-yellow-900 mb-2">💡 크리에이터 팁</h4>
+                  <div className="text-yellow-800 whitespace-pre-wrap">
+                    {selectedGuide.creator_tips}
+                  </div>
+                </div>
+              )}
+
+              {/* 촬영 장면 */}
+              {selectedGuide.filming_scenes && selectedGuide.filming_scenes.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">촬영 장면 가이드</h4>
+                  <p className="text-sm text-red-600 mb-4">
+                    ⚠️ 본 대사와 촬영 장면은 크리에이터의 스타일에 맞게 변경하여 촬영해 주세요
+                  </p>
+                  <div className="space-y-4">
+                    {selectedGuide.filming_scenes.map((scene, index) => (
+                      <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-semibold text-gray-900 mb-2">{scene.scene}</h5>
+                            <p className="text-gray-700 text-sm whitespace-pre-wrap">{scene.dialogue}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 추가 메시지 */}
+              {selectedGuide.additional_message && (
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-2">📢 기업 추가 메시지</h4>
+                  <div className="text-blue-800 whitespace-pre-wrap">
+                    {selectedGuide.additional_message}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t px-6 py-4">
+              <button
+                onClick={() => {
+                  setShowGuideModal(false)
+                  setSelectedGuide(null)
+                }}
+                className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 export default MyPageKoreaEnhanced
-
