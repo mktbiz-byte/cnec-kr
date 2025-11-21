@@ -233,7 +233,9 @@ const MyPageKoreaEnhanced = () => {
             recruitment_deadline,
             application_deadline,
             content_submission_deadline,
-            campaign_type
+            campaign_type,
+            start_date,
+            end_date
           )
         `)
         .eq('user_id', user.id)
@@ -1080,13 +1082,27 @@ const MyPageKoreaEnhanced = () => {
                           )}
                           {app.status === 'selected' && (
                             <div className="mt-2 space-y-2">
-                              {/* 영상 제출 마감일 */}
-                              {app.submission_deadline && (
-                                <div className="flex items-center gap-2 text-sm">
-                                  <span className="text-gray-600">📹 영상 제출 마감:</span>
-                                  <span className="font-semibold text-red-600">
-                                    {new Date(app.submission_deadline).toLocaleDateString('ko-KR')}
-                                  </span>
+                              {/* 마감일 표시 */}
+                              {(app.campaigns?.start_date || app.campaigns?.end_date) && (
+                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                  <div className="grid grid-cols-2 gap-3 text-sm">
+                                    {app.campaigns?.start_date && (
+                                      <div>
+                                        <span className="text-gray-600">🎥 영상 촬영 마감:</span>
+                                        <div className="font-semibold text-red-600 mt-1">
+                                          {new Date(app.campaigns.start_date).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {app.campaigns?.end_date && (
+                                      <div>
+                                        <span className="text-gray-600">📱 SNS 업로드 마감:</span>
+                                        <div className="font-semibold text-orange-600 mt-1">
+                                          {new Date(app.campaigns.end_date).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                               
