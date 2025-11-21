@@ -224,6 +224,8 @@ const MyPageKoreaEnhanced = () => {
         .from('applications')
         .select(`
           *,
+          personalized_guide,
+          additional_message,
           campaigns (
             id,
             title,
