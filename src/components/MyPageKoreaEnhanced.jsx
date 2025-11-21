@@ -1024,7 +1024,20 @@ const MyPageKoreaEnhanced = () => {
                     <div key={app.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{app.campaigns?.title}</h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-gray-900">{app.campaigns?.title}</h3>
+                            {app.campaigns?.campaign_type && (
+                              <span className={`px-2 py-0.5 text-xs rounded ${
+                                app.campaigns.campaign_type === 'oliveyoung' ? 'bg-green-100 text-green-700' :
+                                app.campaigns.campaign_type === '4week_challenge' ? 'bg-purple-100 text-purple-700' :
+                                'bg-blue-100 text-blue-700'
+                              }`}>
+                                {app.campaigns.campaign_type === 'oliveyoung' ? '올영' :
+                                 app.campaigns.campaign_type === '4week_challenge' ? '4주 챌린지' :
+                                 '기획형'}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-600 mt-1">
                             지원일: {new Date(app.created_at).toLocaleDateString('ko-KR')}
                             {app.campaigns?.recruitment_deadline && (
@@ -1067,24 +1080,34 @@ const MyPageKoreaEnhanced = () => {
                           {app.status === 'selected' && (
                             <div className="mt-2 space-y-2">
                               {/* 가이드 확인 배너 */}
-                              {app.guide_shared_to_company && (
+                              {(app.guide_sent || app.guide_confirmed) && app.personalized_guide && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
                                     <h4 className="font-semibold text-purple-900">📝 가이드가 전달되었습니다!</h4>
                                   </div>
-                                  <p className="text-sm text-purple-700 mb-2">
+                                  <p className="text-sm text-purple-700 mb-3">
                                     기업에서 맞춤형 촬영 가이드를 전달했습니다. 가이드를 확인하고 촬영을 시작하세요.
                                   </p>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedGuide(app.personalized_guide)
-                                      setShowGuideModal(true)
-                                    }}
-                                    className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-                                  >
-                                    가이드 확인하기
-                                  </button>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => {
+                                        setSelectedGuide(app.personalized_guide)
+                                        setShowGuideModal(true)
+                                      }}
+                                      className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                    >
+                                      가이드 보기
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        window.location.href = `/submit-video/${app.campaign_id}`
+                                      }}
+                                      className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                    >
+                                      영상 제출하기
+                                    </button>
+                                  </div>
                                 </div>
                               )}
                               
