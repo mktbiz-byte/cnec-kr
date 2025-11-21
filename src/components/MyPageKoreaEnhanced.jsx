@@ -1080,15 +1080,27 @@ const MyPageKoreaEnhanced = () => {
                           )}
                           {app.status === 'selected' && (
                             <div className="mt-2 space-y-2">
+                              {/* 영상 제출 마감일 */}
+                              {app.submission_deadline && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <span className="text-gray-600">📹 영상 제출 마감:</span>
+                                  <span className="font-semibold text-red-600">
+                                    {new Date(app.submission_deadline).toLocaleDateString('ko-KR')}
+                                  </span>
+                                </div>
+                              )}
+                              
                               {/* 가이드 확인 배너 */}
-                              {(app.guide_sent || app.guide_confirmed) && app.personalized_guide && (
+                              {app.personalized_guide && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
                                     <h4 className="font-semibold text-purple-900">📝 가이드가 전달되었습니다!</h4>
                                   </div>
                                   <p className="text-sm text-purple-700 mb-3">
-                                    기업에서 맞춤형 촬영 가이드를 전달했습니다. 가이드를 확인하고 촬영을 시작하세요.
+                                    {app.guide_sent || app.guide_confirmed 
+                                      ? '기업에서 맞춤형 촬영 가이드를 전달했습니다. 가이드를 확인하고 촬영을 시작하세요.'
+                                      : '맞춤형 촬영 가이드가 생성되었습니다. 가이드를 확인하고 촬영을 시작하세요.'}
                                   </p>
                                   <div className="flex gap-2">
                                     <button
