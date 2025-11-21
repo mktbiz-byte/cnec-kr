@@ -754,9 +754,8 @@ const CampaignApplicationUpdated = () => {
                   </div>
                 )}
 
-                {/* 캠페인 가이드 */}
-                {(campaign.required_dialogues?.length > 0 || campaign.required_scenes?.length > 0 || campaign.required_hashtags?.length > 0 || campaign.video_duration || campaign.video_tempo || campaign.video_tone || campaign.additional_details || campaign.additional_shooting_requests || campaign.meta_ad_code_requested || campaign.ai_generated_guide || campaign.creator_guide) && (
-                  <div className="border-t pt-4 mt-4">
+                {/* 캠페인 가이드 - 모든 캠페인 타입에 표시 */}
+                <div className="border-t pt-4 mt-4">
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="text-sm font-medium text-gray-700">{t.campaignGuide}</h4>
                       {getCampaignTypeBadge(campaign.campaign_type)}
@@ -1005,7 +1004,6 @@ const CampaignApplicationUpdated = () => {
                       )}
                     </div>
                   </div>
-                )}
 
                 {/* 필수 사항 */}
                 <div className="border-t pt-4 mt-4">
