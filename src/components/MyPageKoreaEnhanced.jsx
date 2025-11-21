@@ -1121,6 +1121,11 @@ const MyPageKoreaEnhanced = () => {
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() => {
+                                        console.log('Guide data:', app.personalized_guide)
+                                        if (!app.personalized_guide || Object.keys(app.personalized_guide).length === 0) {
+                                          alert('아직 가이드가 생성되지 않았습니다. 기업에서 가이드를 전달할 때까지 기다려주세요.')
+                                          return
+                                        }
                                         setSelectedGuide(app.personalized_guide)
                                         setShowGuideModal(true)
                                       }}
@@ -1352,8 +1357,16 @@ const MyPageKoreaEnhanced = () => {
             </div>
             
             <div className="p-6 space-y-6">
+              {/* 빈 가이드 처리 */}
+              {(!selectedGuide || Object.keys(selectedGuide).length === 0) && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">가이드 내용이 비어있습니다.</p>
+                  <p className="text-gray-400 text-sm mt-2">기업에서 가이드를 전달할 때까지 기다려주세요.</p>
+                </div>
+              )}
+              
               {/* 크리에이터 정보 */}
-              {selectedGuide.creator_info && (
+              {selectedGuide && selectedGuide.creator_info && (
                 <div className="bg-purple-50 rounded-lg p-4">
                   <h4 className="font-semibold text-purple-900 mb-2">크리에이터 정보</h4>
                   <div className="text-sm text-purple-800 whitespace-pre-wrap">
