@@ -442,7 +442,7 @@ export default function VideoSubmissionPage() {
         )}
 
         {/* 현재 상태 */}
-        {videoSubmission && (
+        {videoSubmission && videoSubmission.video_file_url && (
           <Card className="mb-6">
             <CardHeader>
               <div className="flex items-center justify-between">

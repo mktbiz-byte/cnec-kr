@@ -1122,11 +1122,24 @@ const MyPageKoreaEnhanced = () => {
                                     <button
                                       onClick={() => {
                                         console.log('Guide data:', app.personalized_guide)
-                                        if (!app.personalized_guide || Object.keys(app.personalized_guide).length === 0) {
+                                        if (!app.personalized_guide) {
                                           alert('아직 가이드가 생성되지 않았습니다. 기업에서 가이드를 전달할 때까지 기다려주세요.')
                                           return
                                         }
-                                        setSelectedGuide(app.personalized_guide)
+                                        // JSON 문자열인 경우 파싱
+                                        let guideData = app.personalized_guide
+                                        if (typeof guideData === 'string') {
+                                          try {
+                                            guideData = JSON.parse(guideData)
+                                          } catch (e) {
+                                            console.error('Failed to parse guide data:', e)
+                                          }
+                                        }
+                                        if (!guideData || Object.keys(guideData).length === 0) {
+                                          alert('가이드 내용이 비어있습니다.')
+                                          return
+                                        }
+                                        setSelectedGuide(guideData)
                                         setShowGuideModal(true)
                                       }}
                                       className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
@@ -1357,14 +1370,6 @@ const MyPageKoreaEnhanced = () => {
             </div>
             
             <div className="p-6 space-y-6">
-              {/* 빈 가이드 처리 */}
-              {(!selectedGuide || Object.keys(selectedGuide).length === 0) && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">가이드 내용이 비어있습니다.</p>
-                  <p className="text-gray-400 text-sm mt-2">기업에서 가이드를 전달할 때까지 기다려주세요.</p>
-                </div>
-              )}
-              
               {/* 기본 정보 */}
               {selectedGuide && (selectedGuide.campaign_title || selectedGuide.target_platform || selectedGuide.video_duration) && (
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
