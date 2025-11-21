@@ -1162,7 +1162,7 @@ const HomePageExactReplica = () => {
 
       {/* Campaign Detail Modal */}
       <Dialog open={detailModal} onOpenChange={setDetailModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto pb-24">
           <DialogHeader>
             <DialogTitle className="text-2xl">{selectedCampaign?.title}</DialogTitle>
             <DialogDescription className="text-blue-600 font-medium text-lg">

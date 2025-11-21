@@ -718,9 +718,9 @@ const CampaignApplicationUpdated = () => {
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-lg font-bold text-emerald-900 mb-2">✨ 당신만을 위한 맞춤형 촬영 가이드</h4>
+                          <h4 className="text-lg font-bold text-emerald-900 mb-2">✨ 맞춤형 촬영 가이드</h4>
                           <p className="text-sm text-emerald-800 mb-3">
-                            이 가이드는 <strong className="text-emerald-900">당신의 SNS 스타일과 팔로워 특성을 분석</strong>하여 AI가 맞춤 제작한 촬영 가이드입니다. 아래 가이드를 참고하여 콘텐츠를 제작해주세요.
+                            당신의 SNS 스타일과 팔로워 특성을 분석하여 AI가 맞춤 제작한 촬영 가이드입니다.
                           </p>
                         </div>
                       </div>

@@ -222,13 +222,13 @@ export default function AIGuideViewer({ guide }) {
         이 가이드는 당신의 SNS 스타일과 콘텐츠 특성을 분석하여 맞춤 제작된 촬영 가이드입니다. 아래 가이드를 참고하여 콘텐츠를 제작해주세요.
       </p>
 
-      {/* 탭 네비게이션 - 모바일 최적화 */}
-      <div className="flex overflow-x-auto mb-4 gap-2 pb-2 scrollbar-hide">
+      {/* 탭 네비게이션 - 그리드 레이아웃 */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-3 text-xs md:text-sm font-medium whitespace-nowrap rounded-lg transition-all flex-shrink-0 ${
+            className={`px-3 py-2.5 text-xs md:text-sm font-medium rounded-lg transition-all ${
               activeTab === tab.id
                 ? 'bg-purple-600 text-white shadow-md'
                 : 'bg-white text-gray-700 border border-purple-200 hover:bg-purple-50 hover:border-purple-400'
