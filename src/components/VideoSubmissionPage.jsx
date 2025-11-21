@@ -244,7 +244,7 @@ export default function VideoSubmissionPage() {
       const { error: appUpdateError } = await supabase
         .from('applications')
         .update({
-          creator_status: 'video_submitted',
+          status: 'video_submitted',
           video_submitted_at: new Date().toISOString()
         })
         .eq('id', application.id)
