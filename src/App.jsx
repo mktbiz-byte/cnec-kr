@@ -15,6 +15,7 @@ import MyPageKoreaEnhanced from './components/MyPageKoreaEnhanced';
 import ProfileSettings from './components/ProfileSettings';
 import AuthCallbackSafe from './components/AuthCallbackSafe';
 import VideoSubmissionPage from './components/VideoSubmissionPage';
+import VideoReviewView from './components/VideoReviewView';
 
 // 관리자 컴포넌트
 import AdminDashboardSimple from './components/admin/AdminDashboardSimple';
@@ -71,6 +72,7 @@ const AppContent = () => {
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/submit-video/:campaignId" element={<VideoSubmissionPage />} />
+        <Route path="/video-review/:submissionId" element={<VideoReviewView />} />
         
         {/* 관리자 페이지 */}
         <Route path="/secret-admin-login" element={<SecretAdminLogin />} />

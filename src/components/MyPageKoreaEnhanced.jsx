@@ -246,6 +246,15 @@ const MyPageKoreaEnhanced = () => {
             campaign_type,
             start_date,
             end_date
+          ),
+          video_submissions (
+            id,
+            status,
+            video_file_url,
+            created_at,
+            video_review_comments (
+              id
+            )
           )
         `)
         .eq('user_id', user.id)
@@ -1184,6 +1193,27 @@ const MyPageKoreaEnhanced = () => {
                                       영상 제출하기
                                     </button>
                                   </div>
+                                </div>
+                              )}
+                              
+                              {/* 수정 요청 알림 배너 */}
+                              {app.video_submissions?.[0]?.video_review_comments?.length > 0 && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                                    <h4 className="font-semibold text-red-900">🎬 영상 수정 요청이 있습니다!</h4>
+                                  </div>
+                                  <p className="text-sm text-red-700 mb-3">
+                                    기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.
+                                  </p>
+                                  <button
+                                    onClick={() => {
+                                      window.location.href = `/video-review/${app.video_submissions[0].id}`
+                                    }}
+                                    className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold"
+                                  >
+                                    수정 요청 확인하기 ({app.video_submissions[0].video_review_comments.length}개)
+                                  </button>
                                 </div>
                               )}
                               
