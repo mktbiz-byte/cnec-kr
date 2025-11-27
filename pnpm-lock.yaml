@@ -125,6 +125,9 @@ importers:
       axios:
         specifier: ^1.13.2
         version: 1.13.2
+      call-bind-apply-helpers:
+        specifier: ^1.0.2
+        version: 1.0.2
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -152,6 +155,12 @@ importers:
       embla-carousel-react:
         specifier: ^8.6.0
         version: 8.6.0(react@19.2.0)
+      es-define-property:
+        specifier: ^1.0.1
+        version: 1.0.1
+      es-errors:
+        specifier: ^1.3.0
+        version: 1.3.0
       es-set-tostringtag:
         specifier: ^2.1.0
         version: 2.1.0
@@ -170,6 +179,24 @@ importers:
       framer-motion:
         specifier: ^12.15.0
         version: 12.23.24(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      function-bind:
+        specifier: ^1.1.2
+        version: 1.1.2
+      get-intrinsic:
+        specifier: ^1.3.0
+        version: 1.3.0
+      gopd:
+        specifier: ^1.2.0
+        version: 1.2.0
+      has-proto:
+        specifier: ^1.2.0
+        version: 1.2.0
+      has-symbols:
+        specifier: ^1.1.0
+        version: 1.1.0
+      hasown:
+        specifier: ^2.0.2
+        version: 2.0.2
       input-otp:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -2511,6 +2538,10 @@ packages:
 
   has-property-descriptors@1.0.2:
     resolution: {integrity: sha512-55JNKuIW+vq4Ke1BjOTjM2YctQIvCT7GFzHwmfZPGo5wnrgkid0YQtnAleFSqumZm4az3n2BS+erby5ipJdgrg==}
+
+  has-proto@1.2.0:
+    resolution: {integrity: sha512-KIL7eQPfHQRC8+XluaIw7BHUwwqL19bQn4hzNgdr+1wXoU0KKj6rufu47lhY7KbJR2C6T6+PfyN0Ea7wkSS+qQ==}
+    engines: {node: '>= 0.4'}
 
   has-symbols@1.1.0:
     resolution: {integrity: sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==}
@@ -6024,6 +6055,10 @@ snapshots:
   has-property-descriptors@1.0.2:
     dependencies:
       es-define-property: 1.0.1
+
+  has-proto@1.2.0:
+    dependencies:
+      dunder-proto: 1.0.1
 
   has-symbols@1.1.0: {}
 
