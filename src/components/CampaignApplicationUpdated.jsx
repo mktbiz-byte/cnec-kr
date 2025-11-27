@@ -921,6 +921,96 @@ const CampaignApplicationUpdated = () => {
                       </div>
                     )}
                     
+                    {/* AI 생성 가이드 - 4주 챌린지 */}
+                    {campaign.campaign_type === '4week_challenge' && (campaign.week1_guide_ai || campaign.week2_guide_ai || campaign.week3_guide_ai || campaign.week4_guide_ai) && (
+                      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-lg p-6 mb-4 shadow-lg">
+                        <div className="flex items-center gap-2 mb-4">
+                          <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+                          </svg>
+                          <h4 className="text-lg font-bold text-purple-900">✨ 4주 챌린지 촬영 가이드</h4>
+                        </div>
+                        <p className="text-sm text-purple-800 mb-4">
+                          4주간 제품 사용 후 변화된 모습을 보여주는 것이 이 캠페인의 핵심입니다. 매주 정해진 미션에 맞춰 촬영해주세요.
+                        </p>
+                        
+                        {/* 1주차 */}
+                        {campaign.week1_guide_ai && (
+                          <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">1주차</span>
+                            </div>
+                            {campaign.week1_guide_ai === '미정' ? (
+                              <p className="text-sm text-gray-400 italic">미정</p>
+                            ) : (
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week1_guide_ai}</p>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* 2주차 */}
+                        {campaign.week2_guide_ai && (
+                          <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">2주차</span>
+                            </div>
+                            {campaign.week2_guide_ai === '미정' ? (
+                              <p className="text-sm text-gray-400 italic">미정</p>
+                            ) : (
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week2_guide_ai}</p>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* 3주차 */}
+                        {campaign.week3_guide_ai && (
+                          <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">3주차</span>
+                            </div>
+                            {campaign.week3_guide_ai === '미정' ? (
+                              <p className="text-sm text-gray-400 italic">미정</p>
+                            ) : (
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week3_guide_ai}</p>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* 4주차 */}
+                        {campaign.week4_guide_ai && (
+                          <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">4주차</span>
+                            </div>
+                            {campaign.week4_guide_ai === '미정' ? (
+                              <p className="text-sm text-gray-400 italic">미정</p>
+                            ) : (
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week4_guide_ai}</p>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* 주의사항 */}
+                        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mt-3">
+                          <div className="flex items-start">
+                            <svg className="w-5 h-5 text-amber-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            <div>
+                              <h5 className="text-sm font-bold text-amber-900 mb-2">⚠️ 주의사항</h5>
+                              <ul className="text-sm text-amber-800 space-y-1 list-disc list-inside">
+                                <li><strong>4주간 변화된 모습</strong>을 보여주는 것이 핵심입니다</li>
+                                <li>매주 정해진 날짜에 콘텐츠를 업로드해야 합니다</li>
+                                <li>스케줄 미준수 시 리워드 지급이 불가할 수 있습니다</li>
+                                <li>각 주차별 미션에 맞는 내용을 촬영해주세요</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* 크리에이터 가이드 */}
                     {campaign.creator_guide && (
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
