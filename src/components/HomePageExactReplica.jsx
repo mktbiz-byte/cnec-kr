@@ -59,6 +59,9 @@ const HomePageExactReplica = () => {
         // status가 active이어야 함
         if (campaign.status !== 'active') return false
         
+        // approval_status가 pending_approval이 아니어야 함 (승인 대기 중 캠페인 숨김)
+        if (campaign.approval_status === 'pending_approval') return false
+        
         // 모집 마감일이 지나지 않았어야 함
         if (campaign.application_deadline) {
           const deadline = new Date(campaign.application_deadline)
