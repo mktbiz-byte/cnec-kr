@@ -52,6 +52,7 @@
     "embla-carousel-react": "^8.6.0",
     "events": "^3.3.0",
     "firebase": "^12.3.0",
+    "follow-redirects": "^1.15.11",
     "framer-motion": "^12.15.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.510.0",
