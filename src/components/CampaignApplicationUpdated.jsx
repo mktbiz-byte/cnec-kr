@@ -789,10 +789,31 @@ const CampaignApplicationUpdated = () => {
                             </svg>
                           </div>
                           <div>
-                            <p className="text-base font-bold text-pink-900 mb-2">🌸 올영세일 캠페인</p>
+                            <div className="flex items-center gap-2 mb-2">
+                              <p className="text-base font-bold text-pink-900">🌸 올영세일 캠페인</p>
+                              {campaign.content_type && (
+                                <span className={
+                                  campaign.content_type === 'store_visit'
+                                    ? 'inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-purple-200 text-purple-800'
+                                    : 'inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-800'
+                                }>
+                                  {campaign.content_type === 'store_visit' ? '🏪 매장 방문형' : '📦 제품 배송형'}
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-pink-800 leading-relaxed">
                               이 캠페인은 <strong className="text-pink-900">3단계(STEP 1/2/3)로 진행</strong>됩니다. 각 STEP별로 영상을 제작하고 업로드해주세요. <strong className="text-pink-900">상품에 맞는 별도 가이드가 제공</strong>됩니다.
                             </p>
+                            {campaign.content_type === 'store_visit' && (
+                              <p className="text-sm text-purple-700 mt-2 font-medium">
+                                ⚠️ 올리브영 매장을 방문하여 진정성 있는 콘텐츠를 제작해주세요.
+                              </p>
+                            )}
+                            {campaign.content_type === 'product_delivery' && (
+                              <p className="text-sm text-blue-700 mt-2 font-medium">
+                                📦 배송받은 제품으로 빠르게 콘텐츠를 제작해주세요.
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -831,9 +852,73 @@ const CampaignApplicationUpdated = () => {
                         </div>
                       </div>
                     </div>          
-                    {/* AI 생성 가이드 */}
+                    {/* AI 생성 가이드 - 기획형 */}
                     {campaign.ai_generated_guide && (
                       <AIGuideViewer guide={campaign.ai_generated_guide} />
+                    )}
+                    
+                    {/* AI 생성 가이드 - 올영세일 */}
+                    {campaign.campaign_type === 'oliveyoung' && (campaign.oliveyoung_step1_guide_ai || campaign.oliveyoung_step2_guide_ai || campaign.oliveyoung_step3_guide_ai) && (
+                      <div className="bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-300 rounded-lg p-6 mb-4 shadow-lg">
+                        <div className="flex items-center gap-2 mb-4">
+                          <svg className="w-6 h-6 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+                          </svg>
+                          <h4 className="text-lg font-bold text-pink-900">✨ 당신만을 위한 맞춤형 촬영 가이드</h4>
+                        </div>
+                        <p className="text-sm text-pink-800 mb-4">
+                          이 가이드는 당신의 SNS 스타일과 팔로워 특성을 분석하여 만든 맞춤형 가이드입니다. 아래 가이드를 참고하여 영상을 제작해주세요.
+                        </p>
+                        
+                        {/* STEP 1 */}
+                        {campaign.oliveyoung_step1_guide_ai && (
+                          <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold">STEP 1</span>
+                              <h5 className="font-semibold text-gray-800">상품 리뷰</h5>
+                            </div>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.oliveyoung_step1_guide_ai}</p>
+                          </div>
+                        )}
+                        
+                        {/* STEP 2 */}
+                        {campaign.oliveyoung_step2_guide_ai && (
+                          <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold">STEP 2</span>
+                              <h5 className="font-semibold text-gray-800">세일 홍보</h5>
+                            </div>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.oliveyoung_step2_guide_ai}</p>
+                          </div>
+                        )}
+                        
+                        {/* STEP 3 */}
+                        {campaign.oliveyoung_step3_guide_ai && (
+                          <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold">STEP 3</span>
+                              <h5 className="font-semibold text-gray-800">세일 당일 스토리</h5>
+                            </div>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.oliveyoung_step3_guide_ai}</p>
+                          </div>
+                        )}
+                        
+                        {/* 주의사항 */}
+                        {campaign.oliveyoung_cautions && (
+                          <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mt-3">
+                            <div className="flex items-start">
+                              <svg className="w-5 h-5 text-amber-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                              <div>
+                                <h5 className="text-sm font-bold text-amber-900 mb-1">⚠️ 주의사항</h5>
+                                <p className="text-sm text-amber-800 whitespace-pre-wrap">{campaign.oliveyoung_cautions}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
                     
                     {/* 크리에이터 가이드 */}

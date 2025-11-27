@@ -574,6 +574,17 @@ const HomePageExactReplica = () => {
                       >
                         {campaign.campaign_type === '4week_challenge' ? '🏆 4주 챌린지' : campaign.is_oliveyoung_sale ? '📸 올영' : '📹 기획형'}
                       </Badge>
+                      {campaign.is_oliveyoung_sale && campaign.content_type && (
+                        <Badge 
+                          className={
+                            campaign.content_type === 'store_visit'
+                              ? 'bg-purple-100 text-purple-700 text-xs'
+                              : 'bg-blue-100 text-blue-700 text-xs'
+                          }
+                        >
+                          {campaign.content_type === 'store_visit' ? '🏪 매장방문' : '📦 제품배송'}
+                        </Badge>
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent>
