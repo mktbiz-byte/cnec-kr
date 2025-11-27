@@ -54,7 +54,25 @@ const HomePageExactReplica = () => {
   const loadCampaigns = async () => {
     try {
       const campaignsData = await database.campaigns.getAll()
-      const activeCampaigns = campaignsData?.filter(campaign => campaign.status === 'active') || []
+      const now = new Date()
+      const activeCampaigns = campaignsData?.filter(campaign => {
+        // status가 active이어야 함
+        if (campaign.status !== 'active') return false
+        
+        // 모집 마감일이 지나지 않았어야 함
+        if (campaign.application_deadline) {
+          const deadline = new Date(campaign.application_deadline)
+          deadline.setHours(23, 59, 59, 999) // 마감일 맹까지 허용
+          if (now > deadline) return false
+        }
+        
+        // 남은 슬롯이 0보다 커야 함
+        if (campaign.remaining_slots !== undefined && campaign.remaining_slots !== null) {
+          if (campaign.remaining_slots <= 0) return false
+        }
+        
+        return true
+      }) || []
       setCampaigns(activeCampaigns)
     } catch (error) {
       console.error('Load campaigns error:', error)
