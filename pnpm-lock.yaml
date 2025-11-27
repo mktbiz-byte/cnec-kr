@@ -152,6 +152,9 @@ importers:
       embla-carousel-react:
         specifier: ^8.6.0
         version: 8.6.0(react@19.2.0)
+      es-set-tostringtag:
+        specifier: ^2.1.0
+        version: 2.1.0
       events:
         specifier: ^3.3.0
         version: 3.3.0
