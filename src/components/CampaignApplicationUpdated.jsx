@@ -922,7 +922,7 @@ const CampaignApplicationUpdated = () => {
                     )}
                     
                     {/* AI 생성 가이드 - 4주 챌린지 */}
-                    {campaign.campaign_type === '4week_challenge' && (campaign.week1_guide_ai || campaign.week2_guide_ai || campaign.week3_guide_ai || campaign.week4_guide_ai) && (
+                    {campaign.campaign_type === '4week_challenge' && campaign.challenge_weekly_guides_ai && (
                       <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-lg p-6 mb-4 shadow-lg">
                         <div className="flex items-center gap-2 mb-4">
                           <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
@@ -936,57 +936,57 @@ const CampaignApplicationUpdated = () => {
                         </p>
                         
                         {/* 1주차 */}
-                        {campaign.week1_guide_ai && (
+                        {campaign.challenge_weekly_guides_ai?.week1 && (
                           <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">1주차</span>
                             </div>
-                            {campaign.week1_guide_ai === '미정' ? (
+                            {campaign.challenge_weekly_guides_ai.week1 === '미정' ? (
                               <p className="text-sm text-gray-400 italic">미정</p>
                             ) : (
-                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week1_guide_ai}</p>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.challenge_weekly_guides_ai.week1}</p>
                             )}
                           </div>
                         )}
                         
                         {/* 2주차 */}
-                        {campaign.week2_guide_ai && (
+                        {campaign.challenge_weekly_guides_ai?.week2 && (
                           <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">2주차</span>
                             </div>
-                            {campaign.week2_guide_ai === '미정' ? (
+                            {campaign.challenge_weekly_guides_ai.week2 === '미정' ? (
                               <p className="text-sm text-gray-400 italic">미정</p>
                             ) : (
-                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week2_guide_ai}</p>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.challenge_weekly_guides_ai.week2}</p>
                             )}
                           </div>
                         )}
                         
                         {/* 3주차 */}
-                        {campaign.week3_guide_ai && (
+                        {campaign.challenge_weekly_guides_ai?.week3 && (
                           <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">3주차</span>
                             </div>
-                            {campaign.week3_guide_ai === '미정' ? (
+                            {campaign.challenge_weekly_guides_ai.week3 === '미정' ? (
                               <p className="text-sm text-gray-400 italic">미정</p>
                             ) : (
-                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week3_guide_ai}</p>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.challenge_weekly_guides_ai.week3}</p>
                             )}
                           </div>
                         )}
                         
                         {/* 4주차 */}
-                        {campaign.week4_guide_ai && (
+                        {campaign.challenge_weekly_guides_ai?.week4 && (
                           <div className="bg-white rounded-lg p-4 mb-3 shadow-sm">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">4주차</span>
                             </div>
-                            {campaign.week4_guide_ai === '미정' ? (
+                            {campaign.challenge_weekly_guides_ai.week4 === '미정' ? (
                               <p className="text-sm text-gray-400 italic">미정</p>
                             ) : (
-                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.week4_guide_ai}</p>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.challenge_weekly_guides_ai.week4}</p>
                             )}
                           </div>
                         )}
