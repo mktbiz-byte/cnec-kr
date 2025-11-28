@@ -357,17 +357,24 @@ export default function VideoReviewView() {
                   
                   if (!isVisible) return null
                   
+                  // Scale box size for mobile
+                  const isMobile = window.innerWidth < 768
+                  const scaledWidth = isMobile ? Math.min(width * 0.5, 80) : width
+                  const scaledHeight = isMobile ? Math.min(height * 0.5, 80) : height
+                  
                   return (
                     <div
                       key={comment.id}
                       className={`absolute cursor-pointer transition-all ${
-                        isSelected ? 'border-4 border-yellow-500 z-20' : 'border-4 border-blue-500 z-10'
+                        isSelected ? 'border-4 md:border-4 border-2 border-yellow-500 z-20' : 'border-4 md:border-4 border-2 border-blue-500 z-10'
                       }`}
                       style={{
                         left: `${x}%`,
                         top: `${y}%`,
-                        width: `${width}px`,
-                        height: `${height}px`,
+                        width: `${scaledWidth}px`,
+                        height: `${scaledHeight}px`,
+                        maxWidth: '40vw',
+                        maxHeight: '40vw',
                         transform: 'translate(-50%, -50%)'
                       }}
                       onClick={(e) => {

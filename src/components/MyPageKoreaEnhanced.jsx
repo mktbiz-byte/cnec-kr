@@ -1367,7 +1367,7 @@ const MyPageKoreaEnhanced = () => {
                                   </button>
                                 </div>
                               )}
-                            </div>
+                            </>
                           )}
                         </div>
                         {(app.campaigns?.reward_points || app.campaigns?.reward_amount) && (
