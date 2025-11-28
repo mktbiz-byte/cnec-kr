@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import VideoReferencesSection from './VideoReferencesSection'
+import OliveYoungGuideViewer from './OliveYoungGuideViewer'
+import FourWeekGuideViewer from './FourWeekGuideViewer'
+import AIGuideViewer from './AIGuideViewer'
 import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
 import { compressImage, isImageFile } from '../lib/imageCompression'
@@ -253,7 +256,11 @@ const MyPageKoreaEnhanced = () => {
             week1_deadline,
             week2_deadline,
             week3_deadline,
-            week4_deadline
+            week4_deadline,
+            oliveyoung_step1_guide_ai,
+            oliveyoung_step2_guide_ai,
+            oliveyoung_step3_guide_ai,
+            challenge_weekly_guides_ai
           ),
           video_submissions (
             id,
@@ -1503,166 +1510,93 @@ const MyPageKoreaEnhanced = () => {
               </button>
             </div>
             
-            <div className="p-6 space-y-6">
-              {/* 기본 정보 */}
-              {selectedGuide && (selectedGuide.campaign_title || selectedGuide.target_platform || selectedGuide.video_duration) && (
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <div className="space-y-1 text-sm">
-                    {selectedGuide.campaign_title && <div><strong>캠페인:</strong> {selectedGuide.campaign_title}</div>}
-                    {selectedGuide.target_platform && <div><strong>플랫폼:</strong> {selectedGuide.target_platform}</div>}
-                    {selectedGuide.video_duration && <div><strong>영상 길이:</strong> {selectedGuide.video_duration}</div>}
-                  </div>
-                </div>
-              )}
+            <div className="p-6">
+              {/* 캠페인 타입에 따라 다른 뷰어 렌더링 */}
+              {selectedGuide && selectedGuide.campaigns && (() => {
+                const campaign = selectedGuide.campaigns
+                const campaignType = campaign.campaign_type
 
-              {/* 필수 해시태그 */}
-              {selectedGuide.required_hashtags && (
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <h4 className="font-semibold mb-3">필수 해시태그</h4>
-                  <div className="space-y-2">
-                    {selectedGuide.required_hashtags.real && (
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-gray-700">리얼 후기:</span>
-                          <button
-                            onClick={() => {
-                              const hashtags = selectedGuide.required_hashtags.real.map(tag => `#${tag}`).join(' ')
-                              navigator.clipboard.writeText(hashtags)
-                              alert('해시태그가 복사되었습니다!')
-                            }}
-                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                          >
-                            복사
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedGuide.required_hashtags.real.map((tag, i) => (
-                            <span key={i} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">#{tag}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {selectedGuide.required_hashtags.product && (
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-gray-700">제품 관련:</span>
-                          <button
-                            onClick={() => {
-                              const hashtags = selectedGuide.required_hashtags.product.map(tag => `#${tag}`).join(' ')
-                              navigator.clipboard.writeText(hashtags)
-                              alert('해시태그가 복사되었습니다!')
-                            }}
-                            className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                          >
-                            복사
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedGuide.required_hashtags.product.map((tag, i) => (
-                            <span key={i} className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm">#{tag}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {selectedGuide.required_hashtags.common && (
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-gray-700">공통:</span>
-                          <button
-                            onClick={() => {
-                              const hashtags = selectedGuide.required_hashtags.common.map(tag => `#${tag}`).join(' ')
-                              navigator.clipboard.writeText(hashtags)
-                              alert('해시태그가 복사되었습니다!')
-                            }}
-                            className="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
-                          >
-                            복사
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedGuide.required_hashtags.common.map((tag, i) => (
-                            <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">#{tag}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                // 올리브영 세일 캠페인
+                if (campaignType === 'oliveyoung_sale') {
+                  // STEP별 가이드 표시
+                  const step1Guide = campaign.oliveyoung_step1_guide_ai
+                  const step2Guide = campaign.oliveyoung_step2_guide_ai
+                  const step3Guide = campaign.oliveyoung_step3_guide_ai
 
-              {/* 촬영 요구사항 */}
-              {selectedGuide.shooting_requirements && (
-                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                  <h4 className="font-semibold mb-3">촬영 요구사항</h4>
-                  <div className="space-y-2">
-                    {selectedGuide.shooting_requirements.must_include && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">필수 포함 장면:</span>
-                        <ul className="list-disc list-inside mt-1 space-y-1">
-                          {selectedGuide.shooting_requirements.must_include.map((item, i) => (
-                            <li key={i} className="text-sm text-gray-700">{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {selectedGuide.shooting_requirements.video_style && (
-                      <div className="mt-2">
-                        <span className="text-sm font-medium text-gray-700">영상 스타일:</span>
-                        <div className="text-sm text-gray-700 mt-1">
-                          <div>템포: {selectedGuide.shooting_requirements.video_style.tempo}</div>
-                          <div>톤: {selectedGuide.shooting_requirements.video_style.tone}</div>
+                  return (
+                    <div className="space-y-6">
+                      {step1Guide && (
+                        <div>
+                          <h4 className="text-lg font-bold mb-3">📹 STEP 1: 세일 전 영상</h4>
+                          <OliveYoungGuideViewer 
+                            guide={step1Guide}
+                            individualMessage={selectedGuide.additional_message}
+                          />
                         </div>
+                      )}
+                      {step2Guide && (
+                        <div>
+                          <h4 className="text-lg font-bold mb-3">🛍️ STEP 2: 세일 당일 영상</h4>
+                          <OliveYoungGuideViewer 
+                            guide={step2Guide}
+                            individualMessage={null}
+                          />
+                        </div>
+                      )}
+                      {step3Guide && (
+                        <div>
+                          <h4 className="text-lg font-bold mb-3">🔗 STEP 3: 스토리 URL 링크</h4>
+                          <OliveYoungGuideViewer 
+                            guide={step3Guide}
+                            individualMessage={null}
+                          />
+                        </div>
+                      )}
+                      {!step1Guide && !step2Guide && !step3Guide && (
+                        <div className="text-center py-8 text-gray-500">
+                          아직 가이드가 생성되지 않았습니다.
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
+                // 4주 챌린지 캠페인
+                if (campaignType === '4week_challenge') {
+                  const weeklyGuides = campaign.challenge_weekly_guides_ai
+
+                  return (
+                    <div>
+                      {weeklyGuides ? (
+                        <FourWeekGuideViewer 
+                          guides={weeklyGuides}
+                          individualMessage={selectedGuide.additional_message}
+                        />
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          아직 가이드가 생성되지 않았습니다.
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
+                // 기획형 캠페인 (기존 로직)
+                return (
+                  <div>
+                    {selectedGuide.personalized_guide ? (
+                      <AIGuideViewer 
+                        guide={selectedGuide.personalized_guide}
+                        individualMessage={selectedGuide.additional_message}
+                      />
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        아직 가이드가 생성되지 않았습니다.
                       </div>
                     )}
                   </div>
-                </div>
-              )}
-
-              {/* 촬영 씬 */}
-              {selectedGuide.shooting_scenes && selectedGuide.shooting_scenes.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold">촬영 씬 ({selectedGuide.shooting_scenes.length}개)</h4>
-                    <span className="text-sm text-red-600 font-medium">본 대사와 촬영 장면은 크리에이터의 스타일에 맞게 변경하여 촬영해 주세요.</span>
-                  </div>
-                  <div className="space-y-3">
-                    {selectedGuide.shooting_scenes.map((scene, idx) => (
-                      <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
-                        <div className="font-semibold text-purple-700">씬 {scene.order}: {scene.scene_type}</div>
-                        <div className="text-sm mt-1 text-gray-700">{scene.scene_description}</div>
-                        {scene.dialogue && (
-                          <div className="text-sm mt-1 italic text-gray-600">"{scene.dialogue}"</div>
-                        )}
-                        {scene.shooting_tip && (
-                          <div className="text-xs mt-1 text-gray-500">팁: {scene.shooting_tip}</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 크리에이터 팁 */}
-              {selectedGuide.creator_tips && selectedGuide.creator_tips.length > 0 && (
-                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <h4 className="font-semibold mb-3">크리에이터 팁</h4>
-                  <ul className="list-decimal list-inside space-y-1">
-                    {selectedGuide.creator_tips.filter(tip => tip).map((tip, i) => (
-                      <li key={i} className="text-sm text-gray-700">{tip}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* 추가 메시지 */}
-              {selectedGuide.additional_message && (
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2">📢 기업 추가 메시지</h4>
-                  <div className="text-blue-800 whitespace-pre-wrap">
-                    {selectedGuide.additional_message}
-                  </div>
-                </div>
-              )}
+                )
+              })()}
             </div>
 
             <div className="sticky bottom-0 bg-white border-t px-6 py-4">
