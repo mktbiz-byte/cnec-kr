@@ -617,6 +617,7 @@ const HomePageExactReplica = () => {
                       <div className="text-sm text-gray-500 mb-2">지원 가능 플랫폼:</div>
                       <div className="flex flex-wrap gap-2">
                         {(() => {
+                          console.log('[DEBUG] campaign.target_platforms:', campaign.target_platforms, 'type:', typeof campaign.target_platforms, 'isArray:', Array.isArray(campaign.target_platforms))
                           // target_platforms가 배열인 경우
                           if (Array.isArray(campaign.target_platforms)) {
                             return campaign.target_platforms.map(p => {
