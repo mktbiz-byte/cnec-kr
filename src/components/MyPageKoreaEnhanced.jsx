@@ -1111,7 +1111,73 @@ const MyPageKoreaEnhanced = () => {
                           {(app.status === 'selected' || app.status === 'filming' || app.status === 'video_submitted') && (
                             <div className="mt-2 space-y-2">
                               {/* 마감일 표시 */}
-                              {(app.campaigns?.start_date || app.campaigns?.end_date) && (
+                              {app.campaigns?.campaign_type === 'oliveyoung' ? (
+                                <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-3">
+                                  <div className="space-y-2 text-sm">
+                                    {app.campaigns?.step1_deadline && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-700">📹 1차 마감:</span>
+                                        <div className="font-bold text-red-600">
+                                          {new Date(app.campaigns.step1_deadline).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {app.campaigns?.step2_deadline && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-700">📱 2차 마감:</span>
+                                        <div className="font-bold text-orange-600">
+                                          {new Date(app.campaigns.step2_deadline).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {app.campaigns?.step3_deadline && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-700">📱 3차 마감:</span>
+                                        <div className="font-bold text-orange-600">
+                                          {new Date(app.campaigns.step3_deadline).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : app.campaigns?.campaign_type === '4week_challenge' ? (
+                                <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-3">
+                                  <div className="space-y-2 text-sm">
+                                    {app.campaigns?.week1_deadline && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-700">📹 1주차 마감:</span>
+                                        <div className="font-bold text-red-600">
+                                          {new Date(app.campaigns.week1_deadline).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {app.campaigns?.week2_deadline && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-700">📹 2주차 마감:</span>
+                                        <div className="font-bold text-red-600">
+                                          {new Date(app.campaigns.week2_deadline).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {app.campaigns?.week3_deadline && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-700">📹 3주차 마감:</span>
+                                        <div className="font-bold text-orange-600">
+                                          {new Date(app.campaigns.week3_deadline).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {app.campaigns?.week4_deadline && (
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-700">📹 4주차 마감:</span>
+                                        <div className="font-bold text-orange-600">
+                                          {new Date(app.campaigns.week4_deadline).toLocaleDateString('ko-KR')}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : (app.campaigns?.start_date || app.campaigns?.end_date) && (
                                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                                   <div className="grid grid-cols-2 gap-3 text-sm">
                                     {app.campaigns?.start_date && (
