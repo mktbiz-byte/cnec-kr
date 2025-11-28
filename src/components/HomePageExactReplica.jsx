@@ -230,37 +230,37 @@ const HomePageExactReplica = () => {
 
           {/* 모바일 메뉴 */}
           {mobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
-              <div className="flex flex-col space-y-2 pt-4">
-                <Badge className="bg-green-500 text-white hover:bg-green-600 cursor-pointer w-fit">
-                  <a href="#campaigns">캠페인</a>
-                </Badge>
-                <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer w-fit">
-                  <a href="#about">서비스소개</a>
-                </Badge>
-                <Badge className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer w-fit">
-                  <a href="https://www.youtube.com/@bizcnec" target="_blank" rel="noopener noreferrer">포트폴리오</a>
-                </Badge>
-                <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer w-fit">
-                  <a href="#guide">참가방법</a>
-                </Badge>
+            <div className="md:hidden mt-4 pb-6 border-t border-gray-200 bg-white relative z-[60]">
+              <div className="flex flex-col space-y-4 pt-6">
+                <a href="#campaigns" className="bg-green-500 text-white hover:bg-green-600 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                  캠페인
+                </a>
+                <a href="#about" className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                  서비스소개
+                </a>
+                <a href="https://www.youtube.com/@bizcnec" target="_blank" rel="noopener noreferrer" className="bg-orange-500 text-white hover:bg-orange-600 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                  포트폴리오
+                </a>
+                <a href="#guide" className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                  참가방법
+                </a>
                 {user ? (
                   <>
-                    <Badge className="bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer w-fit">
-                      <Link to="/mypage">마이페이지</Link>
-                    </Badge>
-                    <Badge className="bg-gray-500 text-white hover:bg-gray-600 cursor-pointer w-fit">
-                      <button onClick={signOut}>로그아웃</button>
-                    </Badge>
+                    <Link to="/mypage" className="bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                      마이페이지
+                    </Link>
+                    <button onClick={signOut} className="bg-gray-500 text-white hover:bg-gray-600 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                      로그아웃
+                    </button>
                   </>
                 ) : (
                   <>
-                    <Badge className="bg-teal-500 text-white hover:bg-teal-600 cursor-pointer w-fit">
-                      <Link to="/login">로그인</Link>
-                    </Badge>
-                    <Badge className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer w-fit">
-                      <Link to="/signup">회원가입</Link>
-                    </Badge>
+                    <Link to="/login" className="bg-teal-500 text-white hover:bg-teal-600 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                      로그인
+                    </Link>
+                    <Link to="/signup" className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer px-6 py-4 rounded-lg text-base font-medium text-center shadow-sm">
+                      회원가입
+                    </Link>
                   </>
                 )}
               </div>

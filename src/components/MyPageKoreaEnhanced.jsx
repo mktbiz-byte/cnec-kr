@@ -1108,10 +1108,11 @@ const MyPageKoreaEnhanced = () => {
                               </button>
                             </div>
                           )}
+                          
+                          {/* 마감일 표시 - 모든 선정된 캠페인에 표시 */}
                           {(app.status === 'selected' || app.status === 'filming' || app.status === 'video_submitted') && (
-                            <div className="mt-2 space-y-2">
-                              {/* 마감일 표시 */}
-                              {app.campaigns?.campaign_type === 'oliveyoung' ? (
+                            <>
+                              {app.campaigns?.campaign_type === 'oliveyoung' && (app.campaigns?.step1_deadline || app.campaigns?.step2_deadline || app.campaigns?.step3_deadline) ? (
                                 <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-3">
                                   <div className="space-y-2 text-sm">
                                     {app.campaigns?.step1_deadline && (
@@ -1140,7 +1141,7 @@ const MyPageKoreaEnhanced = () => {
                                     )}
                                   </div>
                                 </div>
-                              ) : app.campaigns?.campaign_type === '4week_challenge' ? (
+                              ) : app.campaigns?.campaign_type === '4week_challenge' && (app.campaigns?.week1_deadline || app.campaigns?.week2_deadline || app.campaigns?.week3_deadline || app.campaigns?.week4_deadline) ? (
                                 <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-3">
                                   <div className="space-y-2 text-sm">
                                     {app.campaigns?.week1_deadline && (
