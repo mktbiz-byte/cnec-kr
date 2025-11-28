@@ -246,7 +246,14 @@ const MyPageKoreaEnhanced = () => {
             content_submission_deadline,
             campaign_type,
             start_date,
-            end_date
+            end_date,
+            step1_deadline,
+            step2_deadline,
+            step3_deadline,
+            week1_deadline,
+            week2_deadline,
+            week3_deadline,
+            week4_deadline
           ),
           video_submissions (
             id,
