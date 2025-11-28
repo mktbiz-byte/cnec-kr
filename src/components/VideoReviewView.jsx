@@ -53,25 +53,43 @@ export default function VideoReviewView() {
 
   const loadSubmission = async () => {
     try {
-      const { data, error } = await supabase
+      // 1. video_submissions 데이터 가져오기
+      const { data: submissionData, error: submissionError } = await supabase
         .from('video_submissions')
-        .select(`
-          *,
-          applications (
-            applicant_name,
-            campaigns (
-              title,
-              company_name,
-              company_id
-            )
-          )
-        `)
+        .select('*')
         .eq('id', submissionId)
         .single()
 
-      if (error) throw error
-      setSubmission(data)
-      setSignedVideoUrl(data.video_file_url)
+      if (submissionError) throw submissionError
+
+      // 2. application 데이터 가져오기
+      if (submissionData.application_id) {
+        const { data: applicationData, error: applicationError } = await supabase
+          .from('applications')
+          .select('applicant_name, campaign_id')
+          .eq('id', submissionData.application_id)
+          .single()
+
+        if (!applicationError && applicationData) {
+          submissionData.applications = applicationData
+
+          // 3. campaign 데이터 가져오기
+          if (applicationData.campaign_id) {
+            const { data: campaignData, error: campaignError } = await supabase
+              .from('campaigns')
+              .select('title, company_name, company_id')
+              .eq('id', applicationData.campaign_id)
+              .single()
+
+            if (!campaignError && campaignData) {
+              submissionData.applications.campaigns = campaignData
+            }
+          }
+        }
+      }
+
+      setSubmission(submissionData)
+      setSignedVideoUrl(submissionData.video_file_url)
     } catch (error) {
       console.error('Error loading submission:', error)
       alert('영상을 불러올 수 없습니다.')
