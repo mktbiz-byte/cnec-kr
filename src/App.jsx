@@ -16,6 +16,8 @@ import ProfileSettings from './components/ProfileSettings';
 import AuthCallbackSafe from './components/AuthCallbackSafe';
 import VideoSubmissionPage from './components/VideoSubmissionPage';
 import VideoReviewView from './components/VideoReviewView';
+import OliveyoungVideoSubmissionPage from './components/OliveyoungVideoSubmissionPage';
+import FourWeekVideoSubmissionPage from './components/FourWeekVideoSubmissionPage';
 
 // 관리자 컴포넌트
 import AdminDashboardSimple from './components/admin/AdminDashboardSimple';
@@ -72,6 +74,8 @@ const AppContent = () => {
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/submit-video/:campaignId" element={<VideoSubmissionPage />} />
+        <Route path="/submit-oliveyoung-video/:campaignId" element={<OliveyoungVideoSubmissionPage />} />
+        <Route path="/submit-4week-video/:campaignId" element={<FourWeekVideoSubmissionPage />} />
         <Route path="/video-review/:submissionId" element={<VideoReviewView />} />
         
         {/* 관리자 페이지 */}
