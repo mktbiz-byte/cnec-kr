@@ -240,6 +240,7 @@ const MyPageKoreaEnhanced = () => {
             brand,
             image_url,
             reward_points,
+            creator_points_override,
             recruitment_deadline,
             application_deadline,
             content_submission_deadline,
@@ -1306,7 +1307,7 @@ const MyPageKoreaEnhanced = () => {
                           <div className="text-right">
                             <p className="text-sm text-gray-600">보상 포인트</p>
                             <p className="text-lg font-bold text-purple-600">
-                              {(app.campaigns.reward_points || app.campaigns.reward_amount || 0).toLocaleString()}P
+                              {(app.campaigns.creator_points_override || app.campaigns.reward_points || 0).toLocaleString()}P
                             </p>
                           </div>
                         )}

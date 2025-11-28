@@ -183,7 +183,8 @@ const SNSUploadNew = () => {
             id,
             title,
             brand,
-            reward_amount
+            reward_points,
+            creator_points_override
           ),
           user_profiles (
             user_id,
@@ -273,13 +274,14 @@ const SNSUploadNew = () => {
 
   // 포인트 승인 함수
   const handleApprovePoints = async (application) => {
-    if (!application.campaigns?.reward_amount) {
-      setError('캠페인 보상 금액 정보가 없습니다.')
+    // 보상 포인트 확인 (수정된 포인트 우선)
+    const rewardPoints = application.campaigns?.creator_points_override || application.campaigns?.reward_points || 0
+    if (!rewardPoints) {
+      setError('캠페인 보상 포인트 정보가 없습니다.')
       return
     }
-
     const userName = application.user_profiles?.name || application.applicant_name || '사용자'
-    const confirmMessage = `${userName}님에게 ${application.campaigns.reward_amount.toLocaleString()}P를 지급하시겠습니까?`
+    const confirmMessage = `${userName}님에게 ${rewardPoints.toLocaleString()}P를 지급하시겠습니까?`
     
     if (!window.confirm(confirmMessage)) {
       return
@@ -297,7 +299,7 @@ const SNSUploadNew = () => {
           campaign_id: application.campaign_id,
           application_id: application.id,
           transaction_type: 'campaign_reward',
-          amount: application.campaigns.reward_amount,
+          amount: rewardPoints,
           description: `캠페인 완료 보상: ${application.campaigns.title}`,
           status: 'completed',
           created_at: new Date().toISOString()
@@ -312,7 +314,7 @@ const SNSUploadNew = () => {
         .from('point_transactions')
         .update({
           status: 'approved',
-          amount: application.campaigns.reward_amount,
+          amount: rewardPoints,
           updated_at: new Date().toISOString()
         })
         .eq('application_id', application.id)
@@ -333,7 +335,7 @@ const SNSUploadNew = () => {
           : app
       ))
 
-      setSuccess(`${userName}님에게 ${application.campaigns.reward_amount.toLocaleString()}P가 지급되었습니다.`)
+      setSuccess(`${userName}님에게 ${rewardPoints.toLocaleString()}P가 지급되었습니다.`)
       setTimeout(() => setSuccess(''), 5000)
 
     } catch (error) {
