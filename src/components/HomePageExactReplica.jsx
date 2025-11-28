@@ -633,8 +633,13 @@ const HomePageExactReplica = () => {
                             if (campaign.target_platforms.tiktok) platforms.push('TikTok')
                             return platforms.length > 0 ? platforms : ['Instagram']
                           }
-                          // 기본값
-                          return ['Instagram']
+                          // target_platforms가 null이면 제목에서 추출
+                          const title = (campaign.title || campaign.campaign_name || '').toLowerCase()
+                          const platforms = []
+                          if (title.includes('유튜브') || title.includes('youtube')) platforms.push('YouTube')
+                          if (title.includes('인스타') || title.includes('instagram')) platforms.push('Instagram')
+                          if (title.includes('틱톡') || title.includes('tiktok')) platforms.push('TikTok')
+                          return platforms.length > 0 ? platforms : ['Instagram']
                         })().map((platform) => (
                           <Badge 
                             key={platform} 
@@ -1228,8 +1233,13 @@ const HomePageExactReplica = () => {
                       if (selectedCampaign.target_platforms.tiktok) platforms.push('TikTok')
                       return platforms.length > 0 ? platforms : ['Instagram']
                     }
-                    // 기본값
-                    return ['Instagram']
+                    // target_platforms가 null이면 제목에서 추출
+                    const title = (selectedCampaign.title || selectedCampaign.campaign_name || '').toLowerCase()
+                    const platforms = []
+                    if (title.includes('유튜브') || title.includes('youtube')) platforms.push('YouTube')
+                    if (title.includes('인스타') || title.includes('instagram')) platforms.push('Instagram')
+                    if (title.includes('틱톡') || title.includes('tiktok')) platforms.push('TikTok')
+                    return platforms.length > 0 ? platforms : ['Instagram']
                   })().map((platform) => (
                     <Badge 
                       key={platform} 
