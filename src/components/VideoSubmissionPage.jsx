@@ -60,6 +60,13 @@ export default function VideoSubmissionPage() {
         .single()
 
       if (campaignError) throw campaignError
+      
+      // 4주 챌린지인 경우 FourWeekVideoSubmissionPage로 리다이렉트
+      if (campaignData.campaign_type === '4week_challenge') {
+        navigate(`/submit-4week-video/${campaignId}`)
+        return
+      }
+      
       setCampaign(campaignData)
 
       // 지원 정보 가져오기

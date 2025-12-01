@@ -353,6 +353,15 @@ export default function FourWeekVideoSubmissionPage() {
         <p className="text-gray-600">{campaign?.title}</p>
       </div>
 
+      {application?.individualMessage && (
+        <Alert className="mb-6 bg-blue-50 border-blue-200">
+          <AlertDescription className="text-blue-900">
+            <strong>📢 관리자 메시지:</strong>
+            <p className="mt-2 whitespace-pre-wrap">{application.individualMessage}</p>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
