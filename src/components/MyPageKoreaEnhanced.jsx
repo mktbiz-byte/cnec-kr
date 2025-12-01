@@ -1215,16 +1215,18 @@ const MyPageKoreaEnhanced = () => {
                                 </div>
                               )}
                               
-                              {/* 가이드 확인 배너 */}
+                              {/* 가이드 확인 배너 - 기획형 */}
                               {(() => {
                                 console.log('Button condition check:', {
                                   campaign: app.campaigns?.title,
+                                  campaignType: app.campaigns?.campaign_type,
                                   status: app.status,
                                   hasGuide: !!app.personalized_guide,
                                   guideLength: app.personalized_guide?.length,
                                   shouldShow: app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
                                 })
-                                return app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
+                                // 기획형 캠페인: personalized_guide 사용
+                                return app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
@@ -1265,6 +1267,82 @@ const MyPageKoreaEnhanced = () => {
                                       className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
                                     >
                                       가이드 보기
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        window.location.href = `/submit-video/${app.campaign_id}`
+                                      }}
+                                      className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                    >
+                                      영상 제출하기
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* 가이드 확인 배너 - 올리브영 */}
+                              {(() => {
+                                // 올리브영 캠페인: oliveyoung_step1_guide_ai 등 사용
+                                const hasOliveyoungGuide = app.campaigns?.oliveyoung_step1_guide_ai || app.campaigns?.oliveyoung_step2_guide_ai || app.campaigns?.oliveyoung_step3_guide_ai
+                                return app.campaigns?.campaign_type === 'oliveyoung' && hasOliveyoungGuide && app.guide_confirmed && (app.status === 'filming' || app.status === 'video_submitted')
+                              })() && (
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                                    <h4 className="font-semibold text-green-900">📝 촬영 가이드가 전달되었습니다!</h4>
+                                  </div>
+                                  <p className="text-sm text-green-700 mb-3">
+                                    올리브영 3단계 촬영 가이드를 확인하고 각 단계별로 영상을 제출하세요.
+                                  </p>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => {
+                                        setSelectedGuide({
+                                          campaigns: app.campaigns
+                                        })
+                                        setShowGuideModal(true)
+                                      }}
+                                      className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                    >
+                                      촬영 가이드 보기
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        window.location.href = `/submit-video/${app.campaign_id}`
+                                      }}
+                                      className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                    >
+                                      영상 제출하기 (영상 2개 필요)
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* 가이드 확인 배너 - 4주 챌린지 */}
+                              {(() => {
+                                // 4주 챌린지 캠페인: challenge_weekly_guides_ai 사용
+                                const has4WeekGuide = app.campaigns?.challenge_weekly_guides_ai
+                                return app.campaigns?.campaign_type === '4week_challenge' && has4WeekGuide && app.guide_confirmed && (app.status === 'filming' || app.status === 'video_submitted')
+                              })() && (
+                                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
+                                    <h4 className="font-semibold text-purple-900">📝 4주 챌린지 가이드가 전달되었습니다!</h4>
+                                  </div>
+                                  <p className="text-sm text-purple-700 mb-3">
+                                    주차별 촬영 가이드를 확인하고 각 주차별로 영상을 제출하세요.
+                                  </p>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => {
+                                        setSelectedGuide({
+                                          campaigns: app.campaigns
+                                        })
+                                        setShowGuideModal(true)
+                                      }}
+                                      className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                    >
+                                      촬영 가이드 보기
                                     </button>
                                     <button
                                       onClick={() => {
@@ -1517,7 +1595,7 @@ const MyPageKoreaEnhanced = () => {
                 const campaignType = campaign.campaign_type
 
                 // 올리브영 세일 캠페인
-                if (campaignType === 'oliveyoung_sale') {
+                if (campaignType === 'oliveyoung' || campaignType === 'oliveyoung_sale') {
                   // STEP별 가이드 표시
                   const step1Guide = campaign.oliveyoung_step1_guide_ai
                   const step2Guide = campaign.oliveyoung_step2_guide_ai
