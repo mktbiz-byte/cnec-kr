@@ -1316,11 +1316,19 @@ const MyPageKoreaEnhanced = () => {
                                     </button>
                                     <button
                                       onClick={() => {
-                                        window.location.href = `/submit-video/${app.campaign_id}`
+                                        window.location.href = `/submit-oliveyoung-video/${app.campaign_id}?step=1`
                                       }}
                                       className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                     >
-                                      영상 제출하기 (영상 2개 필요)
+                                      1차 영상 업로드
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        window.location.href = `/submit-oliveyoung-video/${app.campaign_id}?step=2`
+                                      }}
+                                      className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                    >
+                                      2차 영상 업로드
                                     </button>
                                   </div>
                                 </div>
