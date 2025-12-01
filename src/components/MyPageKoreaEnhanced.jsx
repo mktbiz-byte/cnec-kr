@@ -1694,6 +1694,14 @@ const MyPageKoreaEnhanced = () => {
                             
                             return (
                               <div className="space-y-6">
+                                {/* 추가 메시지 - 최상단 */}
+                                {selectedGuide.additional_message && (
+                                  <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                                    <h4 className="font-semibold mb-2 text-orange-900">📢 크리에이터에게 전달하는 추가 메시지</h4>
+                                    <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.additional_message}</p>
+                                  </div>
+                                )}
+
                                 {/* 기본 정보 */}
                                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                                   <div className="space-y-1 text-sm">
@@ -1871,13 +1879,7 @@ const MyPageKoreaEnhanced = () => {
                                   </div>
                                 )}
 
-                                {/* 추가 메시지 */}
-                                {selectedGuide.additional_message && (
-                                  <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
-                                    <h4 className="font-semibold mb-2 text-orange-900">📢 크리에이터에게 전달하는 추가 메시지</h4>
-                                    <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.additional_message}</p>
-                                  </div>
-                                )}
+
                               </div>
                             );
                           } catch (error) {
