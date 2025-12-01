@@ -4,7 +4,7 @@ import { useState } from 'react'
  * 4주 챌린지 캠페인 가이드 뷰어 컴포넌트
  * 주차별 탭으로 구분하여 표시
  */
-export default function FourWeekGuideViewer({ guides, individualMessages, currentWeek, basicGuides }) {
+export default function FourWeekGuideViewer({ guides, individualMessages, currentWeek, basicGuides, commonMessage }) {
   const [activeWeek, setActiveWeek] = useState(currentWeek || 'week1')
 
   if (!guides) {
@@ -70,6 +70,21 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
 
   return (
     <div className="space-y-4">
+      {/* 기업의 추가 전달 사항 - 맨 위 */}
+      {commonMessage && (
+        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-4">
+          <div className="flex items-center mb-2">
+            <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h5 className="text-sm font-bold text-blue-800">📢 기업의 추가 전달 사항</h5>
+          </div>
+          <div className="bg-white rounded-lg p-3">
+            <p className="text-sm text-gray-800 whitespace-pre-wrap">{commonMessage}</p>
+          </div>
+        </div>
+      )}
+
       {/* 주차 탭 */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {['week1', 'week2', 'week3', 'week4'].map((week, idx) => (

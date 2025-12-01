@@ -1670,7 +1670,7 @@ const MyPageKoreaEnhanced = () => {
                         <FourWeekGuideViewer 
                           guides={weeklyGuides}
                           basicGuides={basicGuides}
-                          individualMessage={selectedGuide.additional_message}
+                          commonMessage={selectedGuide.additional_message}
                         />
                       ) : (
                         <div className="text-center py-8 text-gray-500">
