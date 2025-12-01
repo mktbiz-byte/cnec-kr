@@ -260,6 +260,7 @@ const MyPageKoreaEnhanced = () => {
             oliveyoung_step1_guide_ai,
             oliveyoung_step2_guide_ai,
             oliveyoung_step3_guide_ai,
+            challenge_weekly_guides,
             challenge_weekly_guides_ai
           ),
           video_submissions (
@@ -1659,12 +1660,14 @@ const MyPageKoreaEnhanced = () => {
                 // 4주 챌린지 캠페인
                 if (campaignType === '4week_challenge') {
                   const weeklyGuides = campaign.challenge_weekly_guides_ai
+                  const basicGuides = campaign.challenge_weekly_guides
 
                   return (
                     <div>
                       {weeklyGuides ? (
                         <FourWeekGuideViewer 
                           guides={weeklyGuides}
+                          basicGuides={basicGuides}
                           individualMessage={selectedGuide.additional_message}
                         />
                       ) : (

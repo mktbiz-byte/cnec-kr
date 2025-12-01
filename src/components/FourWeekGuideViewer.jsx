@@ -4,7 +4,7 @@ import { useState } from 'react'
  * 4주 챌린지 캠페인 가이드 뷰어 컴포넌트
  * 주차별 탭으로 구분하여 표시
  */
-export default function FourWeekGuideViewer({ guides, individualMessages, currentWeek }) {
+export default function FourWeekGuideViewer({ guides, individualMessages, currentWeek, basicGuides }) {
   const [activeWeek, setActiveWeek] = useState(currentWeek || 'week1')
 
   if (!guides) {
@@ -22,6 +22,16 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
     }
   }
 
+  // 기본 가이드 파싱
+  let parsedBasicGuides = basicGuides
+  if (typeof basicGuides === 'string') {
+    try {
+      parsedBasicGuides = JSON.parse(basicGuides)
+    } catch (e) {
+      parsedBasicGuides = null
+    }
+  }
+
   // 개별 메시지 파싱
   let parsedMessages = individualMessages || {}
   if (typeof individualMessages === 'string') {
@@ -32,8 +42,27 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
     }
   }
 
-  const currentGuide = parsedGuides[activeWeek]
+  // AI 가이드와 기본 가이드 병합
+  let currentGuide = parsedGuides[activeWeek]
   const currentMessage = parsedMessages[activeWeek]
+  const basicGuide = parsedBasicGuides?.[activeWeek]
+
+  // AI 가이드가 문자열인 경우, 기본 가이드와 병합
+  if (typeof currentGuide === 'string' && basicGuide) {
+    currentGuide = {
+      ai_description: currentGuide,
+      mission: basicGuide.mission,
+      required_dialogue: basicGuide.required_dialogue,
+      required_scenes: basicGuide.required_scenes,
+      reference: basicGuide.reference,
+      hashtags: basicGuide.hashtags || []
+    }
+  } else if (typeof currentGuide === 'string') {
+    // 기본 가이드가 없으면 AI 가이드만 표시
+    currentGuide = {
+      ai_description: currentGuide
+    }
+  }
 
   if (!currentGuide) {
     return null
@@ -83,6 +112,14 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
         </div>
 
         <div className="space-y-4">
+          {/* AI 가이드 설명 */}
+          {currentGuide.ai_description && (
+            <div className="bg-gradient-to-r from-blue-100 to-cyan-100 border-2 border-blue-300 rounded-lg p-4">
+              <h6 className="text-sm font-semibold text-blue-800 mb-2">🤖 AI 맞춤형 가이드</h6>
+              <p className="text-sm text-blue-900 font-medium whitespace-pre-wrap">{currentGuide.ai_description}</p>
+            </div>
+          )}
+
           {/* 상품 정보 */}
           {currentGuide.product_info && (
             <div className="bg-white rounded-lg p-3">
@@ -96,6 +133,37 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
             <div className="bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-300 rounded-lg p-3">
               <h6 className="text-sm font-semibold text-purple-800 mb-2">🎯 이번 주 미션</h6>
               <p className="text-sm text-purple-900 font-medium whitespace-pre-wrap">{currentGuide.mission}</p>
+            </div>
+          )}
+
+          {/* 필수 대사 */}
+          {currentGuide.required_dialogue && (
+            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3">
+              <h6 className="text-sm font-semibold text-yellow-800 mb-2">💬 필수 대사</h6>
+              <p className="text-sm text-yellow-900 font-medium whitespace-pre-wrap">{currentGuide.required_dialogue}</p>
+            </div>
+          )}
+
+          {/* 필수 촬영 장면 */}
+          {currentGuide.required_scenes && (
+            <div className="bg-green-50 border border-green-300 rounded-lg p-3">
+              <h6 className="text-sm font-semibold text-green-800 mb-2">🎥 필수 촬영 장면</h6>
+              <p className="text-sm text-green-900 whitespace-pre-wrap">{currentGuide.required_scenes}</p>
+            </div>
+          )}
+
+          {/* 참고 영상 */}
+          {currentGuide.reference && (
+            <div className="bg-white rounded-lg p-3">
+              <h6 className="text-sm font-semibold text-gray-800 mb-2">🔗 참고 영상</h6>
+              <a 
+                href={currentGuide.reference} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-sm text-blue-600 hover:underline break-all"
+              >
+                {currentGuide.reference}
+              </a>
             </div>
           )}
 
@@ -113,7 +181,7 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
             </div>
           )}
 
-          {/* 필수 대사 */}
+          {/* 필수 대사 (배열) */}
           {currentGuide.required_dialogues && currentGuide.required_dialogues.length > 0 && (
             <div className="bg-white rounded-lg p-3">
               <h6 className="text-sm font-semibold text-gray-800 mb-2">💬 필수 대사</h6>
@@ -130,8 +198,8 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
             </div>
           )}
 
-          {/* 필수 촬영 장면 */}
-          {currentGuide.required_scenes && currentGuide.required_scenes.length > 0 && (
+          {/* 필수 촬영 장면 (배열) */}
+          {currentGuide.required_scenes && Array.isArray(currentGuide.required_scenes) && currentGuide.required_scenes.length > 0 && (
             <div className="bg-white rounded-lg p-3">
               <h6 className="text-sm font-semibold text-gray-800 mb-2">🎥 필수 촬영 장면</h6>
               <ul className="space-y-2">
