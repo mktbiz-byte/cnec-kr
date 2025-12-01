@@ -1265,10 +1265,11 @@ const MyPageKoreaEnhanced = () => {
                                           alert('가이드 내용이 비어있습니다.')
                                           return
                                         }
-                                        // additional_message도 함께 전달
+                                        // campaigns 정보와 additional_message도 함께 전달
                                         setSelectedGuide({
-                                          ...guideData,
-                                          additional_message: app.additional_message
+                                          personalized_guide: guideData,
+                                          additional_message: app.additional_message,
+                                          campaigns: app.campaigns
                                         })
                                         setShowGuideModal(true)
                                       }}
