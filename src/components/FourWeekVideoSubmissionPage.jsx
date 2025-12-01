@@ -235,6 +235,72 @@ export default function FourWeekVideoSubmissionPage() {
 
       if (insertError) throw insertError
 
+      // 기업에게 알림톡 및 이메일 발송
+      try {
+        // 기업 정보 가져오기
+        const { data: companyProfile } = await supabase
+          .from('user_profiles')
+          .select('company_name, email, phone')
+          .eq('id', campaign.company_id)
+          .single()
+
+        if (companyProfile) {
+          // 크리에이터 정보
+          const { data: creatorProfile } = await supabase
+            .from('user_profiles')
+            .select('name')
+            .eq('id', user.id)
+            .single()
+
+          const creatorName = creatorProfile?.name || application.creator_name || application.applicant_name || '크리에이터'
+
+          // 알림톡 발송
+          if (companyProfile.phone) {
+            await fetch('/.netlify/functions/send-alimtalk', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                receiver: companyProfile.phone,
+                template_code: '025100001008',
+                variables: {
+                  '회사명': companyProfile.company_name || '기업',
+                  '캐페인명': `${campaign.title} - ${week}주차`,
+                  '크리에이터명': creatorName
+                }
+              })
+            })
+          }
+
+          // 이메일 발송
+          if (companyProfile.email) {
+            await fetch('https://cnectotal.netlify.app/.netlify/functions/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: companyProfile.email,
+                subject: '[CNEC] 신청하신 캐페인 영상 제출',
+                html: `
+                  <h2>영상 제출 알림</h2>
+                  <p>${companyProfile.company_name || '기업'}님, 신청하신 캐페인의 크리에이터가 촬영 영상을 제출했습니다.</p>
+                  <ul>
+                    <li><strong>캐페인:</strong> ${campaign.title}</li>
+                    <li><strong>주차:</strong> ${week}주차</li>
+                    <li><strong>크리에이터:</strong> ${creatorName}</li>
+                    <li><strong>버전:</strong> V${nextVersion}</li>
+                  </ul>
+                  <p>관리자 페이지에서 영상을 검토하시고, 수정 사항이 있으면 피드백을 남겨주세요.</p>
+                  <p>검수 완료 후 SNS 업로드 될 예정입니다.</p>
+                  <p>문의: 1833-6025</p>
+                `
+              })
+            })
+          }
+        }
+      } catch (notificationError) {
+        console.error('Notification error:', notificationError)
+        // 알림 실패해도 영상 제출은 성공으로 처리
+      }
+
       setSuccess(`${week}주차 영상 V${nextVersion}이 제출되었습니다!`)
       await fetchData()
 
