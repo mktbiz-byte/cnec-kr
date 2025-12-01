@@ -1225,7 +1225,7 @@ const MyPageKoreaEnhanced = () => {
                                   guideLength: app.personalized_guide?.length,
                                   shouldShow: app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
                                 })
-                                // 기획형 캠페인: personalized_guide 사용
+                                // 기획형 캠페인: personalized_guide 사용, filming 상태면 가이드 전달된 것으로 간주
                                 return app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
@@ -1282,9 +1282,9 @@ const MyPageKoreaEnhanced = () => {
 
                               {/* 가이드 확인 배너 - 올리브영 */}
                               {(() => {
-                                // 올리브영 캠페인: oliveyoung_step1_guide_ai 등 사용
+                                // 올리브영 캠페인: oliveyoung_step1_guide_ai 등 사용, filming 상태면 가이드 전달된 것으로 간주
                                 const hasOliveyoungGuide = app.campaigns?.oliveyoung_step1_guide_ai || app.campaigns?.oliveyoung_step2_guide_ai || app.campaigns?.oliveyoung_step3_guide_ai
-                                return app.campaigns?.campaign_type === 'oliveyoung' && hasOliveyoungGuide && app.guide_confirmed && (app.status === 'filming' || app.status === 'video_submitted')
+                                return app.campaigns?.campaign_type === 'oliveyoung' && hasOliveyoungGuide && (app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
@@ -1320,9 +1320,9 @@ const MyPageKoreaEnhanced = () => {
 
                               {/* 가이드 확인 배너 - 4주 챌린지 */}
                               {(() => {
-                                // 4주 챌린지 캠페인: challenge_weekly_guides_ai 사용
+                                // 4주 챌린지 캠페인: challenge_weekly_guides_ai 사용, filming 상태면 가이드 전달된 것으로 간주
                                 const has4WeekGuide = app.campaigns?.challenge_weekly_guides_ai
-                                return app.campaigns?.campaign_type === '4week_challenge' && has4WeekGuide && app.guide_confirmed && (app.status === 'filming' || app.status === 'video_submitted')
+                                return app.campaigns?.campaign_type === '4week_challenge' && has4WeekGuide && (app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
