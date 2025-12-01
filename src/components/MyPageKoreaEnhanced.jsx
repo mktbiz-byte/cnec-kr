@@ -237,6 +237,7 @@ const MyPageKoreaEnhanced = () => {
           shipping_company,
           personalized_guide,
           additional_message,
+          custom_guide,
           campaigns (
             id,
             title,
@@ -1659,7 +1660,9 @@ const MyPageKoreaEnhanced = () => {
 
                 // 4주 챌린지 캠페인
                 if (campaignType === '4week_challenge') {
-                  const weeklyGuides = campaign.challenge_weekly_guides_ai
+                  // Use custom_guide (delivered guides) if available, otherwise fallback to campaign guides
+                  const customGuide = selectedGuide.custom_guide
+                  const weeklyGuides = customGuide || campaign.challenge_weekly_guides_ai
                   const basicGuides = campaign.challenge_weekly_guides
 
                   return (
