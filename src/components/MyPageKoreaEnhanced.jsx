@@ -1338,9 +1338,9 @@ const MyPageKoreaEnhanced = () => {
 
                               {/* 가이드 확인 배너 - 4주 챌린지 */}
                               {(() => {
-                                // 4주 챌린지 캠페인: challenge_weekly_guides_ai 사용, filming 상태면 가이드 전달된 것으로 간주
+                                // 4주 챌린지 캠페인: challenge_weekly_guides_ai 사용, selected 이상 상태면 가이드 표시
                                 const has4WeekGuide = app.campaigns?.challenge_weekly_guides_ai
-                                return app.campaigns?.campaign_type === '4week_challenge' && has4WeekGuide && (app.status === 'filming' || app.status === 'video_submitted')
+                                return app.campaigns?.campaign_type === '4week_challenge' && has4WeekGuide && (app.status === 'selected' || app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
