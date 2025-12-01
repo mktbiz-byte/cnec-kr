@@ -276,11 +276,11 @@ export default function OliveyoungVideoSubmissionPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Button
         variant="ghost"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/mypage')}
         className="mb-6"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        뒤로 가기
+        마이페이지로 돌아가기
       </Button>
 
       <div className="mb-6">
