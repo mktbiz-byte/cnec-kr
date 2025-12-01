@@ -1217,16 +1217,24 @@ const MyPageKoreaEnhanced = () => {
                               
                               {/* 가이드 확인 배너 - 기획형 */}
                               {(() => {
-                                console.log('Button condition check:', {
+                                const hasValidGuide = app.personalized_guide && 
+                                  typeof app.personalized_guide === 'string' && 
+                                  app.personalized_guide.trim() !== '' && 
+                                  app.personalized_guide !== 'null' &&
+                                  app.personalized_guide.length > 10
+                                
+                                console.log('Planning campaign button check:', {
                                   campaign: app.campaigns?.title,
                                   campaignType: app.campaigns?.campaign_type,
                                   status: app.status,
                                   hasGuide: !!app.personalized_guide,
+                                  guideType: typeof app.personalized_guide,
                                   guideLength: app.personalized_guide?.length,
-                                  shouldShow: app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
+                                  hasValidGuide: hasValidGuide,
+                                  shouldShow: app.campaigns?.campaign_type === 'planned' && hasValidGuide && (app.status === 'filming' || app.status === 'video_submitted')
                                 })
                                 // 기획형 캠페인: personalized_guide 사용, filming 상태면 가이드 전달된 것으로 간주
-                                return app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (app.status === 'filming' || app.status === 'video_submitted')
+                                return app.campaigns?.campaign_type === 'planned' && hasValidGuide && (app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
