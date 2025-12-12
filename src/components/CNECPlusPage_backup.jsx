@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { database } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
-import { Crown, Star, TrendingUp, Users, CheckCircle, ArrowRight, Home, Award, Briefcase, FileText } from 'lucide-react'
+import { Crown, Star, TrendingUp, Users, CheckCircle, ArrowRight, Home } from 'lucide-react'
 import cnecLogo from '../assets/cnec-logo-final.png'
 
 const CNECPlusPage = () => {
@@ -27,29 +27,24 @@ const CNECPlusPage = () => {
 
   const benefits = [
     {
-      icon: TrendingUp,
-      title: '월 5건 이상 뷰티 캠페인 참여 기회',
-      description: 'CNEC 소속 크리에이터로서 매월 안정적인 캠페인 참여 기회를 보장받습니다.'
-    },
-    {
       icon: Crown,
-      title: '실지급비 10~20% 상향 조정',
-      description: '일반 크리에이터 대비 높은 지원금을 받으며, 성과에 따라 추가 보너스가 제공됩니다.'
+      title: '프리미엄 캠페인 접근',
+      description: '일반 회원에게는 공개되지 않는 고급 브랜드의 비공개 캠페인에 우선 참여할 수 있습니다.'
     },
     {
-      icon: Award,
-      title: '매월 제품비 지원',
-      description: '월간 한도액에 맞춰 제품비를 지원받아 안정적인 콘텐츠 제작이 가능합니다.'
+      icon: TrendingUp,
+      title: '높은 지원금',
+      description: '일반 캠페인 대비 2~3배 높은 지원금을 받을 수 있으며, 성과에 따른 추가 보너스도 제공됩니다.'
+    },
+    {
+      icon: Users,
+      title: '전담 매니저 배정',
+      description: 'CNEC Plus 전담 매니저가 캠페인 매칭부터 콘텐츠 제작까지 1:1로 지원합니다.'
     },
     {
       icon: Star,
-      title: '추천 크리에이터 승급 및 프로필 우선 전달',
-      description: '별도의 지원 과정 없이 기업에게 프로필이 직접 전달되어 브랜드가 먼저 찾는 크리에이터가 됩니다.'
-    },
-    {
-      icon: FileText,
-      title: '차등 적용 프로필화 작업 지원',
-      description: '전문 디자인 및 콘텐츠 팀의 맞춤형 프로필 제작으로 브랜드 어필력을 극대화합니다.'
+      title: '우선 선발 혜택',
+      description: '인기 캠페인 지원 시 CNEC Plus 회원에게 우선 선발 기회가 주어집니다.'
     }
   ]
 
@@ -77,7 +72,7 @@ const CNECPlusPage = () => {
       if (error) throw error
 
       setSuccess(true)
-      alert('CNEC Plus 소속 계약 지원이 완료되었습니다!\n담당자가 검토 후 미팅 일정을 안내드리겠습니다.')
+      alert('CNEC Plus 지원이 완료되었습니다!\n담당자가 검토 후 미팅 일정을 안내드리겠습니다.')
     } catch (err) {
       console.error('지원 실패:', err)
       alert('지원에 실패했습니다: ' + err.message)
@@ -102,7 +97,7 @@ const CNECPlusPage = () => {
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">지원 완료!</h2>
           <p className="text-gray-600 mb-6">
-            CNEC Plus 소속 계약 지원이 성공적으로 제출되었습니다.<br />
+            CNEC Plus 지원이 성공적으로 제출되었습니다.<br />
             담당자가 검토 후 미팅 일정을 이메일로 안내드리겠습니다.
           </p>
           <button
@@ -140,15 +135,12 @@ const CNECPlusPage = () => {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
               <Crown className="w-5 h-5" />
-              <span className="text-sm font-semibold">CNEC 소속 크리에이터 프로그램</span>
+              <span className="text-sm font-semibold">프리미엄 크리에이터 프로그램</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">CNEC Plus</h1>
             <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-              체계적인 지원과 전문 관리로<br />
-              프로페셔널 뷰티 크리에이터로 성장하세요
-            </p>
-            <p className="text-lg text-purple-200 mt-4 italic">
-              "크리에이터의 성공이 곧 우리의 성공입니다"
+              더 높은 수준의 캠페인과 지원금으로<br />
+              프로페셔널 크리에이터로 성장하세요
             </p>
           </div>
         </div>
@@ -157,20 +149,18 @@ const CNECPlusPage = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* CNEC Plus란? */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">CNEC Plus 소속 계약이란?</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">CNEC Plus란?</h2>
           <div className="prose max-w-none text-gray-600">
             <p className="text-lg leading-relaxed mb-4">
-              CNEC Plus는 <strong className="text-purple-600">CNEC 소속 크리에이터</strong>로서 다양한 혜택을 누리며,
-              뷰티 콘텐츠 크리에이터로서의 커리어를 한 단계 업그레이드할 수 있는 프로그램입니다.
-            </p>
-            <p className="text-lg leading-relaxed mb-4">
-              <strong className="text-purple-600">CNEC는 크리에이터의 지속 가능한 성장을 위해 전방위적인 지원을 약속합니다.</strong>
+              CNEC Plus는 <strong className="text-purple-600">검증된 크리에이터</strong>를 위한 프리미엄 프로그램입니다.
+              일반 캠페인의 지원금이 부족하다고 느끼시나요? CNEC Plus 회원이 되면 <strong className="text-purple-600">비공개 프리미엄 캠페인</strong>에 접근할 수 있으며,
+              <strong className="text-purple-600"> 2~3배 높은 지원금</strong>을 받을 수 있습니다.
             </p>
             <div className="bg-amber-50 border-l-4 border-amber-500 p-4 my-6">
               <p className="text-amber-900 font-semibold mb-2">⚠️ 중요 안내</p>
               <p className="text-amber-800">
-                CNEC Plus 소속 계약은 <strong>미팅을 통해 확정</strong>됩니다. 지원서 제출 후 담당자와의 미팅을 거쳐 
-                최종 승인되면 CNEC 소속 크리에이터로 활동하실 수 있습니다.
+                CNEC Plus는 <strong>미팅을 통해 확정</strong>됩니다. 지원서 제출 후 담당자와의 미팅을 거쳐 
+                최종 승인되면 프리미엄 캠페인 활동이 가능합니다.
               </p>
             </div>
           </div>
@@ -178,10 +168,7 @@ const CNECPlusPage = () => {
 
         {/* 혜택 */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">CNEC Plus 소속 크리에이터 혜택</h2>
-          <p className="text-center text-gray-600 mb-8">
-            CNEC는 크리에이터의 지속 가능한 성장을 위해 전방위적인 지원을 약속합니다.
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">CNEC Plus 회원 혜택</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon
@@ -225,7 +212,7 @@ const CNECPlusPage = () => {
 
         {/* 지원 폼 */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">CNEC Plus 소속 계약 지원하기</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">CNEC Plus 지원하기</h2>
           <p className="text-gray-600 mb-8">
             모든 항목을 정확히 작성해주세요. 제출 후 담당자가 검토하여 미팅 일정을 안내드립니다.
           </p>
@@ -294,13 +281,11 @@ const CNECPlusPage = () => {
               </div>
             </div>
 
-            {/* SNS 정보 */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">SNS 채널 정보</h3>
-              
+            {/* SNS 계정 */}
+            <div className="grid md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Instagram 계정
+                  인스타그램 계정
                 </label>
                 <input
                   type="text"
@@ -308,27 +293,27 @@ const CNECPlusPage = () => {
                   value={formData.instagram_handle}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="@your_instagram"
+                  placeholder="@username"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  YouTube 채널 URL
+                  유튜브 채널
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   name="youtube_channel"
                   value={formData.youtube_channel}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="https://youtube.com/@yourchannel"
+                  placeholder="채널 URL"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  TikTok 계정
+                  틱톡 계정
                 </label>
                 <input
                   type="text"
@@ -336,101 +321,132 @@ const CNECPlusPage = () => {
                   value={formData.tiktok_handle}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="@your_tiktok"
+                  placeholder="@username"
                 />
               </div>
             </div>
 
-            {/* 추가 정보 */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  주요 콘텐츠 카테고리 *
-                </label>
-                <input
-                  type="text"
-                  name="content_category"
-                  value={formData.content_category}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="예: 스킨케어, 메이크업, 헤어케어 등"
-                />
-              </div>
+            {/* 콘텐츠 정보 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                주요 콘텐츠 카테고리 *
+              </label>
+              <select
+                name="content_category"
+                value={formData.content_category}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                <option value="">선택하세요</option>
+                <option value="beauty">뷰티/메이크업</option>
+                <option value="fashion">패션/스타일</option>
+                <option value="lifestyle">라이프스타일</option>
+                <option value="food">푸드/쿠킹</option>
+                <option value="fitness">피트니스/건강</option>
+                <option value="travel">여행</option>
+                <option value="other">기타</option>
+              </select>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  포트폴리오 링크
-                </label>
-                <textarea
-                  name="portfolio_links"
-                  value={formData.portfolio_links}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="대표 콘텐츠 링크를 입력해주세요 (여러 개 가능)"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                포트폴리오 링크 *
+              </label>
+              <textarea
+                name="portfolio_links"
+                value={formData.portfolio_links}
+                onChange={handleChange}
+                required
+                rows={3}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="대표 콘텐츠 링크를 줄바꿈으로 구분하여 입력해주세요"
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  지원 동기 및 어필 포인트 *
-                </label>
-                <textarea
-                  name="motivation"
-                  value={formData.motivation}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="CNEC Plus에 지원하시는 이유와 본인의 강점을 자유롭게 작성해주세요."
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  💡 Tip: 구체적인 경험, 콘텐츠 스타일, 목표 등을 작성하면 좋습니다.
-                </p>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                CNEC Plus 지원 동기 *
+              </label>
+              <textarea
+                name="motivation"
+                value={formData.motivation}
+                onChange={handleChange}
+                required
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="CNEC Plus에 지원하시는 이유와 향후 활동 계획을 작성해주세요"
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  크리에이터 경력
-                </label>
-                <textarea
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="크리에이터 활동 경력, 협업 경험 등을 작성해주세요."
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                크리에이터 경력 및 성과
+              </label>
+              <textarea
+                name="experience"
+                value={formData.experience}
+                onChange={handleChange}
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="브랜드 협업 경험, 주요 성과, 수상 경력 등을 작성해주세요"
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  선호 브랜드
-                </label>
-                <input
-                  type="text"
-                  name="preferred_brands"
-                  value={formData.preferred_brands}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="협업하고 싶은 브랜드를 입력해주세요"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                선호하는 브랜드/제품 카테고리
+              </label>
+              <input
+                type="text"
+                name="preferred_brands"
+                value={formData.preferred_brands}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="예: 스킨케어, 메이크업, 헤어케어"
+              />
+            </div>
+
+            {/* 동의 사항 */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <h3 className="font-semibold text-gray-900 mb-3">안내 사항</h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>지원서 제출 후 1~2일 내에 담당자가 검토합니다.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>서류 통과 시 미팅 일정을 이메일로 안내드립니다.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>미팅은 온라인 또는 오프라인으로 진행되며, 약 30분 소요됩니다.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span><strong>미팅을 통해 최종 확정되면</strong> CNEC Plus 활동이 가능합니다.</span>
+                </li>
+              </ul>
             </div>
 
             {/* 제출 버튼 */}
-            <div className="pt-6">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition"
+              >
+                취소
+              </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-8 rounded-lg font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {submitting ? (
-                  <>처리 중...</>
-                ) : (
+                {submitting ? '제출 중...' : (
                   <>
-                    지원서 제출하기
+                    지원서 제출
                     <ArrowRight className="w-5 h-5" />
                   </>
                 )}
@@ -438,21 +454,10 @@ const CNECPlusPage = () => {
             </div>
           </form>
         </div>
-
-        {/* 하단 CTA */}
-        <div className="mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white text-center">
-          <h3 className="text-2xl font-bold mb-4">CNEC와 함께 시작하세요</h3>
-          <p className="text-lg text-purple-100 mb-6">
-            CNEC 소속 크리에이터로서 다양한 혜택을 누리며,<br />
-            뷰티 콘텐츠 크리에이터로서의 커리어를 한 단계 업그레이드하세요.
-          </p>
-          <p className="text-sm text-purple-200">
-            문의 및 지원: CNEC 크리에이터 지원팀
-          </p>
-        </div>
       </div>
     </div>
   )
 }
 
 export default CNECPlusPage
+
