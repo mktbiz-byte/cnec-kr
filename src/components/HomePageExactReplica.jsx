@@ -515,128 +515,101 @@ const HomePageExactReplica = () => {
         </div>
       </section>
 
-      {/* About Section - 캠페인 타입 소개 (Pricing Card Style) */}
+      {/* About Section - 크리에이터 혜택 */}
       <section id="about" className="py-12 md:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 lg:px-10">
           {/* 섹션 헤더 */}
           <div className="text-center mb-10 md:mb-14">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
-              뷰티 크리에이터를 위한 3가지 캠페인
+              CNEC 크리에이터 혜택
             </h2>
             <p className="text-gray-500 text-sm md:text-base max-w-xl mx-auto">
-              데이터 기반 AI 매칭으로 성과를 만들어드립니다.
+              초보부터 전문 크리에이터까지, 단계별 성장을 지원합니다
             </p>
           </div>
 
-          {/* 3개 캠페인 타입 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto">
-            {/* 카드 1: 올영세일 패키지 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-7 hover:border-indigo-300 hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">올영세일 패키지</h3>
-              <div className="mb-4">
-                <span className="text-3xl md:text-4xl font-bold text-indigo-600">₩400,000</span>
-                <span className="text-gray-500 text-sm">/건</span>
+          {/* 4개 혜택 카드 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 max-w-6xl mx-auto">
+            {/* 카드 1: 수익 */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-lg transition-all">
+              <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
+                <DollarSign className="w-6 h-6 text-indigo-600" />
               </div>
-              <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                세일 기간 집중 트래픽과 구매 전환을 유도하는 실속형 패키지
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">확실한 수익</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                콘텐츠당 최대 100만원까지 포인트 지급
               </p>
-              <button
-                onClick={() => { window.location.href = '#campaigns'; }}
-                className="w-full py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors mb-6"
-              >
-                선택하기
-              </button>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  3단계 콘텐츠 (리뷰→홍보→당일)
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  캠페인별 포인트 지급
                 </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  구매 전환 유도형 기획
-                </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  SNS 업로드 URL 3개
-                </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  원본 영상 파일 제공
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  현금 출금 가능
                 </li>
               </ul>
             </div>
 
-            {/* 카드 2: 기획형 캠페인 (인기) */}
-            <div className="relative bg-white border-2 border-indigo-500 rounded-xl p-6 md:p-7 shadow-lg">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                인기
-              </span>
-              <h3 className="text-lg font-semibold text-indigo-600 mb-3">기획형 캠페인</h3>
-              <div className="mb-4">
-                <span className="text-3xl md:text-4xl font-bold text-indigo-600">₩200,000</span>
-                <span className="text-gray-500 text-sm">/건</span>
+            {/* 카드 2: 제품 */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-lg transition-all">
+              <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
+                <Target className="w-6 h-6 text-indigo-600" />
               </div>
-              <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                합리적인 비용으로 전문적인 숏폼 기획을 시작하고 싶은 브랜드
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">K-뷰티 신상품</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                100개+ 브랜드의 신제품을 무료로 체험
               </p>
-              <button
-                onClick={() => { window.location.href = '#campaigns'; }}
-                className="w-full py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors mb-6"
-              >
-                선택하기
-              </button>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  브랜드 맞춤 시나리오 기획
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  정품 제품 무료 제공
                 </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  촬영 가이드라인 제공
-                </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  AI 크리에이터 매칭
-                </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  SNS 업로드 URL 1개
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  출시 전 신제품 체험
                 </li>
               </ul>
             </div>
 
-            {/* 카드 3: 4주 챌린지 */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-7 hover:border-indigo-300 hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">4주 챌린지</h3>
-              <div className="mb-4">
-                <span className="text-3xl md:text-4xl font-bold text-indigo-600">₩600,000</span>
-                <span className="text-gray-500 text-sm">/건</span>
+            {/* 카드 3: 교육 */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-lg transition-all">
+              <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
+                <Star className="w-6 h-6 text-indigo-600" />
               </div>
-              <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                진정성 있는 리뷰와 장기적인 바이럴 효과를 위한 프리미엄 플랜
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">체계적 교육</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                초보도 전문가로 성장하는 교육 프로그램
               </p>
-              <button
-                onClick={() => { window.location.href = '#campaigns'; }}
-                className="w-full py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors mb-6"
-              >
-                선택하기
-              </button>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  주차별 미션 (총 4편 제작)
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  콘텐츠 제작 가이드
                 </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  Before & After 변화 기록
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  1:1 피드백 제공
                 </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  SNS 업로드 URL 4개
+              </ul>
+            </div>
+
+            {/* 카드 4: 성장 */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-lg transition-all">
+              <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-indigo-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">채널 성장</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                뷰티 유튜버가 되는 성장 로드맵
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  유튜브 육성 프로그램
                 </li>
-                <li className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                  2차 활용 및 파트너코드
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                  전담 매니저 배정
                 </li>
               </ul>
             </div>
