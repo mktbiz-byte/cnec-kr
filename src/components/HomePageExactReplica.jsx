@@ -1,4 +1,4 @@
-// Homepage redesign with indigo color system - v1.2 (Mobile Optimized)
+// Homepage redesign v2.0 - Beauty Creator Focused (Violet/Pink Aesthetic)
 import React, { useState, useEffect } from 'react'
 import cnecLogo from '../assets/cnec-logo-final.png'
 import { Link, useNavigate } from 'react-router-dom'
@@ -279,77 +279,88 @@ const HomePageExactReplica = () => {
         </div>
       </header>
 
-      {/* Hero Section - 모바일 최적화 */}
-      <section className="relative py-10 md:py-16 lg:py-24 overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-        <div className="container mx-auto px-4 lg:px-10">
+      {/* Hero Section - 크리에이터 중심 리디자인 */}
+      <section className="relative py-10 md:py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-violet-50 via-white to-rose-50">
+        {/* 배경 장식 */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-pink-200 to-violet-200 rounded-full blur-3xl opacity-40"></div>
+          <div className="absolute bottom-20 right-10 w-48 h-48 bg-gradient-to-br from-indigo-200 to-pink-200 rounded-full blur-3xl opacity-40"></div>
+        </div>
+
+        <div className="container mx-auto px-4 lg:px-10 relative">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* 좌측: 텍스트 콘텐츠 */}
             <div className="text-center lg:text-left">
               {/* 뱃지 */}
-              <span className="inline-flex items-center gap-2 bg-white border border-gray-200 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium text-indigo-600 shadow-sm mb-4 md:mb-6">
-                🎯 매달 100개+ 브랜드 캠페인
+              <span className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-100 to-pink-100 border border-violet-200/50 px-4 py-2 rounded-full text-xs md:text-sm font-medium text-violet-700 mb-4 md:mb-6">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                지금 12개 브랜드가 크리에이터를 찾고 있어요
               </span>
 
               {/* 메인 타이틀 */}
-              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6 leading-tight text-gray-900">
-                뷰티 콘텐츠로
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-5 leading-tight text-gray-900">
+                <span className="bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">뷰티 크리에이터</span>로
                 <br />
-                <span className="text-indigo-600">수익을 만드세요</span>
+                브랜드와 함께 성장하세요
               </h1>
 
               {/* 서브 타이틀 */}
-              <p className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed mb-6 md:mb-8 max-w-xl mx-auto lg:mx-0">
-                K-뷰티 브랜드 캠페인에 참여하고,<br />
-                콘텐츠 하나로 최대 100만원까지 보상받으세요
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6 md:mb-8 max-w-lg mx-auto lg:mx-0">
+                100개+ K-뷰티 브랜드가 당신의 콘텐츠를 기다립니다.<br className="hidden sm:block" />
+                촬영부터 편집까지, <strong className="text-gray-800">초보도 OK!</strong> 체계적으로 성장하세요.
               </p>
 
-              {/* CTA 버튼 - 모바일에서 풀 width */}
-              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-10">
+              {/* 핵심 혜택 태그 */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2 mb-6 md:mb-8">
+                <span className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs md:text-sm text-gray-600 shadow-sm">
+                  💰 콘텐츠당 최대 100만원
+                </span>
+                <span className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs md:text-sm text-gray-600 shadow-sm">
+                  🎁 제품 무료 제공
+                </span>
+                <span className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs md:text-sm text-gray-600 shadow-sm">
+                  📈 전문 교육 지원
+                </span>
+              </div>
+
+              {/* CTA 버튼 */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-8 md:mb-10">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-indigo-600 text-white hover:bg-indigo-700 font-semibold text-sm md:text-base px-6 md:px-8 py-4 md:py-6 rounded-xl shadow-lg shadow-indigo-200"
+                  className="w-full sm:w-auto bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 font-semibold text-sm md:text-base px-6 md:px-8 py-4 md:py-6 rounded-xl shadow-lg shadow-violet-200/50"
                 >
                   <a href="#campaigns" className="flex items-center justify-center gap-2">
-                    지금 캠페인 보기
+                    모집 중인 캠페인 보기
                     <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
                   </a>
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto bg-white text-gray-700 border-gray-200 hover:bg-gray-50 font-semibold text-sm md:text-base px-6 md:px-8 py-4 md:py-6 rounded-xl"
+                  className="w-full sm:w-auto bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-violet-300 font-semibold text-sm md:text-base px-6 md:px-8 py-4 md:py-6 rounded-xl"
                   asChild
                 >
                   <Link to="/signup">
-                    크리에이터 등록하기
+                    1분만에 가입하기
                   </Link>
                 </Button>
               </div>
 
-              {/* 신뢰 지표 - 모바일 최적화 */}
-              <div className="flex justify-center lg:justify-start gap-6 md:gap-8 lg:gap-12">
-                <div className="text-center">
-                  <span className="block text-2xl md:text-3xl font-bold text-indigo-600">5,000+</span>
-                  <span className="text-xs md:text-sm text-gray-500">활동 크리에이터</span>
+              {/* 실시간 활동 지표 */}
+              <div className="flex items-center justify-center lg:justify-start gap-4 text-sm text-gray-500">
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-400 border-2 border-white flex items-center justify-center text-white text-xs">Y</div>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-indigo-400 border-2 border-white flex items-center justify-center text-white text-xs">J</div>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 border-2 border-white flex items-center justify-center text-white text-xs">S</div>
                 </div>
-                <div className="text-center">
-                  <span className="block text-2xl md:text-3xl font-bold text-indigo-600">500+</span>
-                  <span className="text-xs md:text-sm text-gray-500">완료 캠페인</span>
-                </div>
-                <div className="text-center">
-                  <span className="block text-2xl md:text-3xl font-bold text-indigo-600">98%</span>
-                  <span className="text-xs md:text-sm text-gray-500">만족도</span>
-                </div>
+                <span><strong className="text-gray-800">5,000+</strong> 크리에이터와 함께해요</span>
               </div>
             </div>
 
-            {/* 우측: 비주얼 - 모바일에서도 표시 */}
-            <div className="relative mt-8 lg:mt-0">
-              <div className="absolute -top-10 -right-10 w-48 md:w-72 h-48 md:h-72 bg-indigo-200 rounded-full blur-3xl opacity-30"></div>
-              <div className="absolute -bottom-10 -left-10 w-48 md:w-72 h-48 md:h-72 bg-purple-200 rounded-full blur-3xl opacity-30"></div>
-
-              {/* 메인 영상 - 모바일에서도 표시 */}
-              <div className="relative bg-white rounded-xl md:rounded-2xl shadow-xl md:shadow-2xl overflow-hidden border border-gray-100">
+            {/* 우측: 비주얼 */}
+            <div className="relative mt-4 lg:mt-0">
+              {/* 메인 영상 */}
+              <div className="relative bg-white rounded-2xl shadow-2xl shadow-violet-200/30 overflow-hidden border border-gray-100">
                 <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                   <iframe
                     className="absolute top-0 left-0 w-full h-full"
@@ -362,15 +373,26 @@ const HomePageExactReplica = () => {
                 </div>
               </div>
 
-              {/* 플로팅 배지 - 모바일에서 숨김 */}
-              <div className="hidden md:block absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+              {/* 플로팅 카드 - 최근 선정 알림 */}
+              <div className="hidden md:block absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-3 border border-gray-100 max-w-[200px]">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">포인트 즉시 지급</p>
-                    <p className="text-xs text-gray-500">캠페인 완료 시</p>
+                    <p className="text-xs font-semibold text-gray-900">방금 선정됨!</p>
+                    <p className="text-xs text-gray-500">@beauty_jin 님</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 플로팅 카드 - 수익 알림 */}
+              <div className="hidden md:block absolute -top-2 -right-2 bg-white rounded-xl shadow-lg p-3 border border-gray-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">💸</span>
+                  <div>
+                    <p className="text-xs text-gray-500">이번 달 평균 수익</p>
+                    <p className="text-sm font-bold text-violet-600">₩850,000</p>
                   </div>
                 </div>
               </div>
@@ -379,58 +401,61 @@ const HomePageExactReplica = () => {
         </div>
       </section>
 
-      {/* Campaigns Section - 모바일 최적화 */}
-      <section id="campaigns" className="py-12 md:py-16 lg:py-20 bg-gray-50">
+      {/* Campaigns Section - 뷰티 크리에이터 친화적 리디자인 */}
+      <section id="campaigns" className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-white via-violet-50/30 to-white">
         <div className="container mx-auto px-4 lg:px-10">
-          {/* 섹션 헤더 */}
+          {/* 섹션 헤더 - 더 감성적으로 */}
           <div className="text-center mb-8 md:mb-12">
-            <span className="inline-block bg-indigo-50 text-indigo-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs font-semibold tracking-wide mb-3 md:mb-4">
-              CAMPAIGNS
-            </span>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">현재 모집 중인 캠페인</h2>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-100 to-violet-100 border border-pink-200/50 px-4 py-2 rounded-full text-xs md:text-sm font-medium text-pink-700 mb-4">
+              <span className="w-2 h-2 bg-pink-500 rounded-full animate-pulse"></span>
+              HOT 브랜드가 크리에이터를 찾고 있어요
+            </div>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+              지금 <span className="bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">뜨는</span> 캠페인
+            </h2>
             <p className="text-gray-500 text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-4">
-              K-뷰티 브랜드의 최신 캠페인에 참가하고 수익을 만드세요
+              나만의 콘텐츠로 브랜드와 함께 빛나세요 ✨
             </p>
           </div>
 
-          {/* 필터 탭 - 모바일 최적화 (가로 스크롤) */}
+          {/* 필터 탭 - 더 예쁘고 직관적으로 */}
           <div className="flex justify-start md:justify-center mb-6 md:mb-10 gap-2 overflow-x-auto pb-2 px-1 -mx-1 scrollbar-hide">
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all border whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 md:px-5 md:py-3 rounded-xl text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
                 selectedCategory === 'all'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                  ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-lg shadow-violet-200/50'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:shadow-md'
               }`}
             >
-              전체
+              🔥 전체
             </button>
             <button
               onClick={() => setSelectedCategory('planned')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all border whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 md:px-5 md:py-3 rounded-xl text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
                 selectedCategory === 'planned'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                  ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-lg shadow-violet-200/50'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:shadow-md'
               }`}
             >
               📹 기획형
             </button>
             <button
               onClick={() => setSelectedCategory('oliveyoung')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all border whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 md:px-5 md:py-3 rounded-xl text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
                 selectedCategory === 'oliveyoung'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                  ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-lg shadow-violet-200/50'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:shadow-md'
               }`}
             >
-              📸 올영
+              💚 올영
             </button>
             <button
               onClick={() => setSelectedCategory('4week_challenge')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all border whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 md:px-5 md:py-3 rounded-xl text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
                 selectedCategory === '4week_challenge'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                  ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-lg shadow-violet-200/50'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-violet-300 hover:shadow-md'
               }`}
             >
               🏆 4주 챌린지
@@ -457,7 +482,6 @@ const HomePageExactReplica = () => {
               {campaigns
                 .filter(campaign => {
                   if (selectedCategory === 'all') return true
-                  // campaign_type으로 필터링
                   if (selectedCategory === 'planned') {
                     return campaign.campaign_type === 'planned'
                   }
@@ -469,97 +493,129 @@ const HomePageExactReplica = () => {
                   }
                   return false
                 })
-                .map((campaign) => (
+                .map((campaign, index) => (
                 <div
                   key={campaign.id}
-                  className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl overflow-hidden cursor-pointer hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 transition-all duration-200"
+                  className="group bg-white rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl hover:shadow-violet-100/50 transition-all duration-300 hover:-translate-y-1 border border-gray-100"
                   onClick={() => handleCampaignClick(campaign)}
                 >
-                  {/* 썸네일 */}
-                  <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+                  {/* 썸네일 - 더 인스타그램 스타일 */}
+                  <div className="relative aspect-[4/3] bg-gradient-to-br from-violet-100 to-pink-100 overflow-hidden">
                     {campaign.image_url ? (
                       <img
                         src={campaign.image_url}
                         alt={campaign.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50">
-                        <Target className="w-12 h-12 text-indigo-300" />
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-100 via-pink-50 to-rose-100">
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-white/60 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-2">
+                            <Target className="w-8 h-8 text-violet-400" />
+                          </div>
+                          <span className="text-xs text-violet-500 font-medium">Coming Soon</span>
+                        </div>
                       </div>
                     )}
-                    {/* 상태 배지 */}
-                    <span className="absolute top-3 left-3 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-md">
-                      모집 중
+
+                    {/* 그라데이션 오버레이 */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                    {/* 상태 배지 - 더 눈에 띄게 */}
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-semibold rounded-full shadow-lg">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                        모집중
+                      </span>
+                    </div>
+
+                    {/* 타입 배지 - 더 세련되게 */}
+                    <span className="absolute top-3 right-3 px-3 py-1 bg-white/95 backdrop-blur-sm text-violet-600 text-xs font-semibold rounded-full shadow-sm">
+                      {campaign.campaign_type === '4week_challenge' ? '🏆 4주 챌린지' : campaign.is_oliveyoung_sale ? '💚 올영' : '📹 기획형'}
                     </span>
-                    {/* 타입 배지 */}
-                    <span className="absolute top-3 right-3 px-3 py-1 bg-white/90 text-indigo-600 text-xs font-medium rounded-md backdrop-blur-sm">
-                      {campaign.campaign_type === '4week_challenge' ? '4주 챌린지' : campaign.is_oliveyoung_sale ? '올영' : '기획형'}
-                    </span>
+
+                    {/* 보상 미리보기 - 하단 오버레이 */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="flex items-center justify-between text-white">
+                        <span className="text-xs opacity-90">예상 보상</span>
+                        <span className="text-sm font-bold">{formatCurrency(campaign.creator_points_override || campaign.reward_points || campaign.reward_amount || 0)}</span>
+                      </div>
+                    </div>
                   </div>
 
                   {/* 콘텐츠 */}
                   <div className="p-4 md:p-5">
-                    {/* 브랜드 & 제목 */}
-                    <p className="text-xs text-gray-500 mb-1">{campaign.brand}</p>
-                    <h3 className="text-sm md:text-base font-semibold text-gray-900 mb-2 md:mb-3 line-clamp-2 leading-snug">
+                    {/* 브랜드 - 강조 */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                        {campaign.brand?.charAt(0) || 'B'}
+                      </div>
+                      <span className="text-xs font-medium text-violet-600">{campaign.brand}</span>
+                    </div>
+
+                    {/* 제목 */}
+                    <h3 className="text-sm md:text-base font-bold text-gray-900 mb-3 line-clamp-2 leading-snug group-hover:text-violet-700 transition-colors">
                       {campaign.title}
                     </h3>
 
-                    {/* 플랫폼 */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {(() => {
-                        if (Array.isArray(campaign.target_platforms)) {
-                          return campaign.target_platforms.map(p => p.charAt(0).toUpperCase() + p.slice(1))
-                        }
-                        if (campaign.target_platforms && typeof campaign.target_platforms === 'object') {
-                          const platforms = []
-                          if (campaign.target_platforms.instagram) platforms.push('Instagram')
-                          if (campaign.target_platforms.youtube) platforms.push('YouTube')
-                          if (campaign.target_platforms.tiktok) platforms.push('TikTok')
-                          return platforms.length > 0 ? platforms : ['Instagram']
-                        }
-                        return ['Instagram']
-                      })().map((platform) => (
-                        <span
-                          key={platform}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
-                        >
-                          {getPlatformIcon(platform)}
-                          <span>{platform}</span>
+                    {/* 플랫폼 - 아이콘 중심 */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="flex -space-x-1">
+                        {(() => {
+                          if (Array.isArray(campaign.target_platforms)) {
+                            return campaign.target_platforms.slice(0, 3).map(p => p.charAt(0).toUpperCase() + p.slice(1))
+                          }
+                          if (campaign.target_platforms && typeof campaign.target_platforms === 'object') {
+                            const platforms = []
+                            if (campaign.target_platforms.instagram) platforms.push('Instagram')
+                            if (campaign.target_platforms.youtube) platforms.push('YouTube')
+                            if (campaign.target_platforms.tiktok) platforms.push('TikTok')
+                            return platforms.length > 0 ? platforms.slice(0, 3) : ['Instagram']
+                          }
+                          return ['Instagram']
+                        })().map((platform) => (
+                          <span
+                            key={platform}
+                            className={`w-7 h-7 rounded-full flex items-center justify-center border-2 border-white ${
+                              platform.toLowerCase() === 'instagram' ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white' :
+                              platform.toLowerCase() === 'youtube' ? 'bg-red-600 text-white' :
+                              platform.toLowerCase() === 'tiktok' ? 'bg-black text-white' :
+                              'bg-gray-200 text-gray-600'
+                            }`}
+                          >
+                            {getPlatformIcon(platform)}
+                          </span>
+                        ))}
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {(() => {
+                          if (Array.isArray(campaign.target_platforms)) {
+                            return campaign.target_platforms.join(' · ')
+                          }
+                          return 'Instagram'
+                        })()}
+                      </span>
+                    </div>
+
+                    {/* 마감일 - 강조 */}
+                    {campaign.application_deadline && (
+                      <div className="flex items-center gap-2 mb-4">
+                        <Clock className="w-3.5 h-3.5 text-rose-500" />
+                        <span className="text-xs font-medium text-rose-600">
+                          {new Date(campaign.application_deadline).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })} 마감
                         </span>
-                      ))}
-                    </div>
+                      </div>
+                    )}
 
-                    {/* 일정 (1줄로 간결하게) */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-                      {campaign.application_deadline && (
-                        <>
-                          <span>마감 {new Date(campaign.application_deadline).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })}</span>
-                          {campaign.start_date && <span className="text-gray-300">│</span>}
-                        </>
-                      )}
-                      {campaign.start_date && (
-                        <span>촬영 {new Date(campaign.start_date).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })}</span>
-                      )}
-                      {campaign.end_date && (
-                        <>
-                          <span className="text-gray-300">│</span>
-                          <span>업로드 {new Date(campaign.end_date).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })}</span>
-                        </>
-                      )}
-                    </div>
-
-                    {/* 하단: 보상 & 버튼 */}
-                    <div className="flex justify-between items-center pt-3 md:pt-4 border-t border-gray-100">
+                    {/* 하단: 보상 & CTA */}
+                    <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                       <div>
-                        <span className="text-lg md:text-xl font-bold text-indigo-600">
+                        <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">
                           {formatCurrency(campaign.creator_points_override || campaign.reward_points || campaign.reward_amount || 0)}
                         </span>
-                        <span className="text-xs text-gray-400 ml-1">보상</span>
                       </div>
-                      <button className="px-3 py-1.5 md:px-4 md:py-2 bg-slate-900 text-white text-xs md:text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors">
-                        자세히 보기
+                      <button className="px-4 py-2 bg-gradient-to-r from-violet-600 to-pink-600 text-white text-xs md:text-sm font-semibold rounded-full hover:shadow-lg hover:shadow-violet-200/50 transition-all group-hover:scale-105">
+                        지원하기
                       </button>
                     </div>
                   </div>
@@ -570,283 +626,292 @@ const HomePageExactReplica = () => {
         </div>
       </section>
 
-      {/* About Section - 혜택 섹션 (모바일 최적화) */}
-      <section id="about" className="py-12 md:py-16 lg:py-20 bg-white">
+      {/* About Section - 크리에이터 중심 혜택 섹션 */}
+      <section id="about" className="py-12 md:py-16 lg:py-20 bg-white overflow-hidden">
         <div className="container mx-auto px-4 lg:px-10">
-          {/* 섹션 헤더 */}
+          {/* 섹션 헤더 - 더 감성적으로 */}
           <div className="text-center mb-10 md:mb-16">
-            <span className="inline-block bg-indigo-50 text-indigo-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs font-semibold tracking-wide mb-3 md:mb-4">
-              WHY CNEC
-            </span>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">CNEC에서만 가능한 혜택</h2>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-100 to-pink-100 border border-violet-200/50 px-4 py-2 rounded-full text-xs md:text-sm font-medium text-violet-700 mb-4">
+              💜 ONLY AT CNEC
+            </div>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+              왜 크리에이터들이 <br className="sm:hidden" />
+              <span className="bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">CNEC</span>을 선택할까요?
+            </h2>
             <p className="text-gray-500 text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-4">
-              초보부터 전문 크리에이터까지, 단계별 성장을 지원합니다
+              집에서 편하게, 내 채널을 키우면서, 수익까지 ✨
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
-            {/* 카드 1: 체계적인 교육 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+          {/* 3개 메인 혜택 카드 - 더 크고 임팩트있게 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto mb-10 md:mb-16">
+            {/* 카드 1: 수익 */}
+            <div className="group relative bg-gradient-to-br from-violet-500 to-pink-500 rounded-2xl md:rounded-3xl p-6 md:p-8 text-white overflow-hidden hover:scale-105 transition-transform duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+              <div className="relative">
+                <span className="text-4xl md:text-5xl mb-4 block">💰</span>
+                <h3 className="text-xl md:text-2xl font-bold mb-2">콘텐츠당 최대 100만원</h3>
+                <p className="text-white/80 text-sm md:text-base leading-relaxed mb-4">
+                  영상 하나로 확실한 수익!<br />
+                  팔로워 적어도 OK
+                </p>
+                <div className="flex items-center gap-2 text-white/90 text-xs md:text-sm">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>제품 + 포인트 동시 지급</span>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">체계적인 교육</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                초보도 전문가로 성장할 수 있는 1:1 멘토링과 교육 프로그램
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  콘텐츠 제작 교육
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  1:1 멘토링
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  성공 사례 공유
-                </li>
-              </ul>
             </div>
 
-            {/* 카드 2: 브랜드 파트너십 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+            {/* 카드 2: 제품 */}
+            <div className="group relative bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl md:rounded-3xl p-6 md:p-8 text-white overflow-hidden hover:scale-105 transition-transform duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+              <div className="relative">
+                <span className="text-4xl md:text-5xl mb-4 block">🎁</span>
+                <h3 className="text-xl md:text-2xl font-bold mb-2">K-뷰티 신상 무료</h3>
+                <p className="text-white/80 text-sm md:text-base leading-relaxed mb-4">
+                  출시 전 신제품을<br />
+                  누구보다 먼저 경험
+                </p>
+                <div className="flex items-center gap-2 text-white/90 text-xs md:text-sm">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>100+ K-뷰티 브랜드</span>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">브랜드 파트너십</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                100개 이상의 K-뷰티 브랜드와 직접 협업 기회
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  브랜드 직접 매칭
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  장기 계약 기회
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  독점 캠페인 참여
-                </li>
-              </ul>
             </div>
 
-            {/* 카드 3: 성장 지원 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+            {/* 카드 3: 성장 */}
+            <div className="group relative bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl md:rounded-3xl p-6 md:p-8 text-white overflow-hidden hover:scale-105 transition-transform duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+              <div className="relative">
+                <span className="text-4xl md:text-5xl mb-4 block">📈</span>
+                <h3 className="text-xl md:text-2xl font-bold mb-2">채널 성장 지원</h3>
+                <p className="text-white/80 text-sm md:text-base leading-relaxed mb-4">
+                  1:1 멘토링 & 교육으로<br />
+                  뷰티 유튜버로 성장
+                </p>
+                <div className="flex items-center gap-2 text-white/90 text-xs md:text-sm">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>유튜브 육성 프로그램</span>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">성장 지원</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                유튜브 채널 육성부터 숏폼 크리에이터까지 단계별 성장 지원
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  유튜브 육성 프로그램
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  숏폼 크리에이터 혜택
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  포인트 추가 지급
-                </li>
-              </ul>
             </div>
+          </div>
 
-            {/* 카드 4: 숏폼 전문 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+          {/* 추가 혜택 - 심플하게 */}
+          <div className="bg-gradient-to-r from-violet-50 to-pink-50 rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-4xl mx-auto">
+            <h4 className="text-center text-lg md:text-xl font-bold text-gray-900 mb-6">
+              초보도 걱정 없어요 👋
+            </h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-2">
+                  <span className="text-xl">📱</span>
+                </div>
+                <p className="text-xs md:text-sm font-medium text-gray-800">스마트폰만 있으면 OK</p>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">숏폼 전문</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                TikTok, Instagram Reels, YouTube Shorts 최적화 콘텐츠 지원
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  숏폼 트렌드 분석
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  편집 가이드 제공
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  바이럴 전략 공유
-                </li>
-              </ul>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-2">
+                  <span className="text-xl">🏠</span>
+                </div>
+                <p className="text-xs md:text-sm font-medium text-gray-800">집에서 자유롭게</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-2">
+                  <span className="text-xl">📝</span>
+                </div>
+                <p className="text-xs md:text-sm font-medium text-gray-800">상세 가이드 제공</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-2">
+                  <span className="text-xl">💬</span>
+                </div>
+                <p className="text-xs md:text-sm font-medium text-gray-800">1:1 피드백</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 크리에이터 성장 프로그램 섹션 - 모바일 최적화 */}
-      <section id="growth-programs" className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-50 to-white">
+      {/* 크리에이터 성장 프로그램 섹션 - 매력적으로 리디자인 */}
+      <section id="growth-programs" className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-50 via-violet-50/30 to-white overflow-hidden">
         <div className="container mx-auto px-4 lg:px-10">
           {/* 섹션 헤더 */}
-          <div className="text-center mb-10 md:mb-16">
-            <span className="inline-block bg-indigo-50 text-indigo-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs font-semibold tracking-wide mb-3 md:mb-4">
-              GROWTH PATH
-            </span>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">크리에이터 성장 프로그램</h2>
+          <div className="text-center mb-10 md:mb-14">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-pink-100 border border-amber-200/50 px-4 py-2 rounded-full text-xs md:text-sm font-medium text-amber-700 mb-4">
+              🚀 LEVEL UP
+            </div>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+              <span className="bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">뷰티 유튜버</span>로 성장하는 길
+            </h2>
             <p className="text-gray-500 text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-4">
-              단계별 성장 경로를 통해 초보부터 전문 크리에이터까지
+              처음 시작해서 전문 크리에이터까지, 단계별로 함께해요
             </p>
           </div>
 
-          {/* 단계별 카드 - 화살표 연결 */}
-          <div className="flex flex-col lg:flex-row items-stretch justify-center gap-4 lg:gap-0 max-w-6xl mx-auto mb-10 md:mb-16">
-            {/* STEP 1 - 기획형 캠페인 */}
-            <div className="flex-1 bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
-              <span className="inline-block text-xs font-semibold text-indigo-600 mb-3 md:mb-4">STEP 1</span>
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-5">
-                <Zap className="w-6 h-6 md:w-8 md:h-8 text-indigo-600" />
+          {/* 성장 로드맵 - 모바일 친화적 */}
+          <div className="relative max-w-5xl mx-auto mb-10 md:mb-14">
+            {/* 연결선 (데스크톱) */}
+            <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-violet-200 via-pink-200 to-amber-200 -translate-y-1/2 z-0"></div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 relative z-10">
+              {/* STEP 1 */}
+              <div className="relative">
+                <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-lg shadow-violet-100/50 border border-violet-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  {/* 레벨 뱃지 */}
+                  <div className="absolute -top-3 left-6 flex items-center gap-2">
+                    <span className="bg-gradient-to-r from-violet-500 to-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      Lv.1
+                    </span>
+                    <span className="text-xs text-gray-500 font-medium">누구나 시작</span>
+                  </div>
+
+                  <div className="pt-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-violet-100 to-pink-100 rounded-2xl flex items-center justify-center mb-4">
+                      <span className="text-2xl">🌱</span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">기획형 캠페인</h3>
+                    <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+                      가입만 하면 바로 시작!<br />경험 쌓으면서 수익도 챙겨요
+                    </p>
+                    <ul className="space-y-2.5 mb-6">
+                      <li className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="w-5 h-5 bg-violet-100 rounded-full flex items-center justify-center text-violet-600 text-xs">✓</span>
+                        제품 제공 + 포인트 지급
+                      </li>
+                      <li className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="w-5 h-5 bg-violet-100 rounded-full flex items-center justify-center text-violet-600 text-xs">✓</span>
+                        팔로워 제한 없음
+                      </li>
+                      <li className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="w-5 h-5 bg-violet-100 rounded-full flex items-center justify-center text-violet-600 text-xs">✓</span>
+                        초보자 친화적
+                      </li>
+                    </ul>
+                    <button
+                      onClick={() => { window.location.href = '#campaigns'; }}
+                      className="w-full py-3 bg-gradient-to-r from-violet-500 to-violet-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-violet-200/50 transition-all"
+                    >
+                      캠페인 둘러보기
+                    </button>
+                  </div>
+                </div>
+                {/* 화살표 (모바일) */}
+                <div className="flex justify-center py-4 lg:hidden">
+                  <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-pink-500 rounded-full flex items-center justify-center text-white">
+                    <ArrowRight className="w-4 h-4 rotate-90" />
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 md:mb-2">기획형 캠페인</h3>
-              <p className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6">누구나 시작할 수 있어요</p>
-              <ul className="space-y-2 md:space-y-3 text-left mb-4 md:mb-6">
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  가입 후 바로 참여 가능
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  다양한 브랜드 캠페인
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  제품 제공 + 포인트 지급
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  경험 쌓으며 성장
-                </li>
-              </ul>
-              <button
-                onClick={() => { window.location.href = '#campaigns'; }}
-                className="w-full py-2.5 md:py-3 border border-indigo-600 text-indigo-600 text-sm md:text-base font-medium rounded-xl hover:bg-indigo-50 transition-colors"
-              >
-                캠페인 보기
-              </button>
-            </div>
 
-            {/* 화살표 1 */}
-            <div className="hidden lg:flex items-center justify-center px-4">
-              <ArrowRight className="w-8 h-8 text-gray-300" />
-            </div>
+              {/* STEP 2 - Featured */}
+              <div className="relative">
+                <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-xl shadow-violet-200/50 text-white hover:-translate-y-1 transition-all duration-300">
+                  {/* 레벨 뱃지 */}
+                  <div className="absolute -top-3 left-6 flex items-center gap-2">
+                    <span className="bg-white text-violet-600 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      Lv.2 ⭐
+                    </span>
+                    <span className="text-xs text-white/80 font-medium">실적으로 승격</span>
+                  </div>
 
-            {/* STEP 2 - 숏폼 크리에이터 (Featured) */}
-            <div className="flex-1 relative bg-white border-2 border-indigo-400 rounded-xl md:rounded-2xl p-5 md:p-8 text-center shadow-lg shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-semibold px-3 md:px-4 py-1 rounded-full whitespace-nowrap">
-                실적으로 승격
-              </span>
-              <span className="inline-block text-xs font-semibold text-indigo-600 mb-3 md:mb-4">STEP 2</span>
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-5">
-                <Star className="w-6 h-6 md:w-8 md:h-8 text-indigo-600" />
+                  <div className="pt-4">
+                    <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4">
+                      <span className="text-2xl">⚡</span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-bold mb-2">숏폼 크리에이터</h3>
+                    <p className="text-sm text-white/80 mb-5 leading-relaxed">
+                      활동 실적으로 승격!<br />더 많은 혜택을 누려요
+                    </p>
+                    <ul className="space-y-2.5 mb-6">
+                      <li className="flex items-center gap-2 text-sm text-white/90">
+                        <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center text-white text-xs">✓</span>
+                        <strong>20~50% 추가 보상</strong>
+                      </li>
+                      <li className="flex items-center gap-2 text-sm text-white/90">
+                        <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center text-white text-xs">✓</span>
+                        캠페인 우선 배정
+                      </li>
+                      <li className="flex items-center gap-2 text-sm text-white/90">
+                        <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center text-white text-xs">✓</span>
+                        전담 매니저 배정
+                      </li>
+                    </ul>
+                    <button
+                      onClick={() => navigate('/cnec-plus')}
+                      className="w-full py-3 bg-white text-violet-600 text-sm font-semibold rounded-xl hover:shadow-lg transition-all"
+                    >
+                      승격 조건 보기
+                    </button>
+                  </div>
+                </div>
+                {/* 화살표 (모바일) */}
+                <div className="flex justify-center py-4 lg:hidden">
+                  <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-amber-500 rounded-full flex items-center justify-center text-white">
+                    <ArrowRight className="w-4 h-4 rotate-90" />
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-indigo-600 mb-1 md:mb-2">숏폼 크리에이터</h3>
-              <p className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6">활동 실적으로 승격</p>
-              <ul className="space-y-2 md:space-y-3 text-left mb-4 md:mb-6">
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  <strong>20~50% 추가 보상</strong>
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  캠페인 우선 배정
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  브랜드 협업 기회
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  전담 매니저 배정
-                </li>
-              </ul>
-              <button
-                onClick={() => navigate('/cnec-plus')}
-                className="w-full py-2.5 md:py-3 bg-indigo-600 text-white text-sm md:text-base font-medium rounded-xl hover:bg-indigo-700 transition-colors"
-              >
-                상세 보기
-              </button>
-            </div>
 
-            {/* 화살표 2 */}
-            <div className="hidden lg:flex items-center justify-center px-4">
-              <ArrowRight className="w-8 h-8 text-gray-300" />
-            </div>
+              {/* STEP 3 */}
+              <div className="relative">
+                <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-lg shadow-amber-100/50 border border-amber-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  {/* 레벨 뱃지 */}
+                  <div className="absolute -top-3 left-6 flex items-center gap-2">
+                    <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      Lv.MAX 👑
+                    </span>
+                    <span className="text-xs text-gray-500 font-medium">뷰티 유튜버</span>
+                  </div>
 
-            {/* STEP 3 - 유튜브 육성 */}
-            <div className="flex-1 bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
-              <span className="inline-block text-xs font-semibold text-amber-600 mb-3 md:mb-4">STEP 3</span>
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-5">
-                <Award className="w-6 h-6 md:w-8 md:h-8 text-amber-600" />
+                  <div className="pt-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl flex items-center justify-center mb-4">
+                      <span className="text-2xl">🎬</span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">유튜브 육성</h3>
+                    <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+                      뷰티 유튜버가 되는 길!<br />전폭 지원을 받으세요
+                    </p>
+                    <ul className="space-y-2.5 mb-6">
+                      <li className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-xs">✓</span>
+                        <strong>100만P 지원</strong>
+                      </li>
+                      <li className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-xs">✓</span>
+                        1:1 전문 멘토링
+                      </li>
+                      <li className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-xs">✓</span>
+                        제품비 100% 지원
+                      </li>
+                    </ul>
+                    <button
+                      onClick={() => navigate('/cnec-plus')}
+                      className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-amber-200/50 transition-all"
+                    >
+                      자세히 알아보기
+                    </button>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 md:mb-2">유튜브 육성</h3>
-              <p className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6">최고 등급 프로그램</p>
-              <ul className="space-y-2 md:space-y-3 text-left mb-4 md:mb-6">
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-amber-600 font-semibold">✓</span>
-                  <strong>100만P 지원</strong>
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-amber-600 font-semibold">✓</span>
-                  제품비 100% 지원
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-amber-600 font-semibold">✓</span>
-                  1:1 멘토링 + 교육
-                </li>
-                <li className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                  <span className="text-amber-600 font-semibold">✓</span>
-                  채널 성장 전략 지원
-                </li>
-              </ul>
-              <button
-                onClick={() => navigate('/cnec-plus')}
-                className="w-full py-2.5 md:py-3 bg-amber-500 text-white text-sm md:text-base font-medium rounded-xl hover:bg-amber-600 transition-colors"
-              >
-                상세 보기
-              </button>
             </div>
           </div>
 
           {/* CTA 섹션 */}
-          <div className="bg-indigo-600 rounded-xl md:rounded-2xl p-6 md:p-8 lg:p-12 max-w-4xl mx-auto text-center">
-            <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-3 md:mb-4">지금 바로 CNEC Plus에 도전하세요!</h3>
-            <p className="text-indigo-100 text-sm md:text-base mb-6 md:mb-8 px-2">
-              기획형 캠페인 5회 이상 참여 시 숏폼 크리에이터로 승격 가능합니다.<br className="hidden sm:block" />
-              뷰티 전문 유튜버를 꿈꾼다면 유튜브 육성 프로그램에 지원하세요!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
+          <div className="relative bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-10 max-w-3xl mx-auto text-center overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            <div className="relative">
+              <span className="text-3xl md:text-4xl mb-3 block">🎯</span>
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-3">오늘 시작하면 내일의 뷰티 유튜버!</h3>
+              <p className="text-white/80 text-sm md:text-base mb-6">
+                5회 캠페인 참여로 숏폼 크리에이터 승격 가능
+              </p>
               <button
-                onClick={() => navigate('/cnec-plus')}
-                className="px-6 md:px-8 py-2.5 md:py-3 bg-white text-indigo-600 text-sm md:text-base font-semibold rounded-xl hover:bg-indigo-50 transition-colors"
+                onClick={() => navigate('/signup')}
+                className="px-8 py-3 bg-white text-violet-600 text-sm md:text-base font-bold rounded-xl hover:shadow-lg transition-all"
               >
-                CNEC Plus 상세보기
-              </button>
-              <button
-                onClick={() => { window.location.href = '#campaigns'; }}
-                className="px-6 md:px-8 py-2.5 md:py-3 border-2 border-white text-white text-sm md:text-base font-semibold rounded-xl hover:bg-white/10 transition-colors"
-              >
-                기획형 캠페인 보기
+                지금 무료로 시작하기
               </button>
             </div>
           </div>
