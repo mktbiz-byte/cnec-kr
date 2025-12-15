@@ -379,134 +379,6 @@ const HomePageExactReplica = () => {
         </div>
       </section>
 
-
-
-      {/* About Section - 혜택 섹션 (모바일 최적화) */}
-      <section id="about" className="py-12 md:py-16 lg:py-20 bg-white">
-        <div className="container mx-auto px-4 lg:px-10">
-          {/* 섹션 헤더 */}
-          <div className="text-center mb-10 md:mb-16">
-            <span className="inline-block bg-indigo-50 text-indigo-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs font-semibold tracking-wide mb-3 md:mb-4">
-              WHY CNEC
-            </span>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">CNEC에서만 가능한 혜택</h2>
-            <p className="text-gray-500 text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-4">
-              초보부터 전문 크리에이터까지, 단계별 성장을 지원합니다
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
-            {/* 카드 1: 체계적인 교육 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">체계적인 교육</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                초보도 전문가로 성장할 수 있는 1:1 멘토링과 교육 프로그램
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  콘텐츠 제작 교육
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  1:1 멘토링
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  성공 사례 공유
-                </li>
-              </ul>
-            </div>
-
-            {/* 카드 2: 브랜드 파트너십 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">브랜드 파트너십</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                100개 이상의 K-뷰티 브랜드와 직접 협업 기회
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  브랜드 직접 매칭
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  장기 계약 기회
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  독점 캠페인 참여
-                </li>
-              </ul>
-            </div>
-
-            {/* 카드 3: 성장 지원 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">성장 지원</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                유튜브 채널 육성부터 숏폼 크리에이터까지 단계별 성장 지원
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  유튜브 육성 프로그램
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  숏폼 크리에이터 혜택
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  포인트 추가 지급
-                </li>
-              </ul>
-            </div>
-
-            {/* 카드 4: 숏폼 전문 */}
-            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
-                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">숏폼 전문</h3>
-              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-                TikTok, Instagram Reels, YouTube Shorts 최적화 콘텐츠 지원
-              </p>
-              <ul className="space-y-2.5">
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  숏폼 트렌드 분석
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  편집 가이드 제공
-                </li>
-                <li className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">✓</span>
-                  바이럴 전략 공유
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Campaigns Section - 모바일 최적화 */}
       <section id="campaigns" className="py-12 md:py-16 lg:py-20 bg-gray-50">
         <div className="container mx-auto px-4 lg:px-10">
@@ -695,6 +567,132 @@ const HomePageExactReplica = () => {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* About Section - 혜택 섹션 (모바일 최적화) */}
+      <section id="about" className="py-12 md:py-16 lg:py-20 bg-white">
+        <div className="container mx-auto px-4 lg:px-10">
+          {/* 섹션 헤더 */}
+          <div className="text-center mb-10 md:mb-16">
+            <span className="inline-block bg-indigo-50 text-indigo-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs font-semibold tracking-wide mb-3 md:mb-4">
+              WHY CNEC
+            </span>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">CNEC에서만 가능한 혜택</h2>
+            <p className="text-gray-500 text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-4">
+              초보부터 전문 크리에이터까지, 단계별 성장을 지원합니다
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
+            {/* 카드 1: 체계적인 교육 */}
+            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
+                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">체계적인 교육</h3>
+              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+                초보도 전문가로 성장할 수 있는 1:1 멘토링과 교육 프로그램
+              </p>
+              <ul className="space-y-2.5">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  콘텐츠 제작 교육
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  1:1 멘토링
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  성공 사례 공유
+                </li>
+              </ul>
+            </div>
+
+            {/* 카드 2: 브랜드 파트너십 */}
+            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
+                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">브랜드 파트너십</h3>
+              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+                100개 이상의 K-뷰티 브랜드와 직접 협업 기회
+              </p>
+              <ul className="space-y-2.5">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  브랜드 직접 매칭
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  장기 계약 기회
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  독점 캠페인 참여
+                </li>
+              </ul>
+            </div>
+
+            {/* 카드 3: 성장 지원 */}
+            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
+                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">성장 지원</h3>
+              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+                유튜브 채널 육성부터 숏폼 크리에이터까지 단계별 성장 지원
+              </p>
+              <ul className="space-y-2.5">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  유튜브 육성 프로그램
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  숏폼 크리에이터 혜택
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  포인트 추가 지급
+                </li>
+              </ul>
+            </div>
+
+            {/* 카드 4: 숏폼 전문 */}
+            <div className="group bg-white border border-gray-200 rounded-xl md:rounded-2xl p-5 md:p-7 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all duration-200">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-indigo-50 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-5">
+                <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">숏폼 전문</h3>
+              <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+                TikTok, Instagram Reels, YouTube Shorts 최적화 콘텐츠 지원
+              </p>
+              <ul className="space-y-2.5">
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  숏폼 트렌드 분석
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  편집 가이드 제공
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-indigo-600 font-semibold">✓</span>
+                  바이럴 전략 공유
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
