@@ -814,8 +814,8 @@ const CampaignApplicationUpdated = () => {
                         </div>
                       </div>
                     </div>          
-                    {/* 맞춤형 촬영 가이드 - 기업 등록 데이터 연동 */}
-                    <AIGuideViewer guide={existingApplication?.personalized_guide || campaign.ai_generated_guide} campaign={campaign} />
+                    {/* 맞춤형 촬영 가이드 - 기업이 CampaignGuideEditor에서 입력한 데이터 */}
+                    <AIGuideViewer guide={campaign.ai_generated_guide} campaign={campaign} />
                     
                     {/* AI 생성 가이드 - 올영세일 */}
                     {campaign.campaign_type === 'oliveyoung' && (campaign.oliveyoung_step1_guide_ai || campaign.oliveyoung_step2_guide_ai || campaign.oliveyoung_step3_guide_ai) && (
