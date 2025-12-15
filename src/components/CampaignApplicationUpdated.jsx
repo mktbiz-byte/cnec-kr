@@ -546,7 +546,6 @@ const CampaignApplicationUpdated = () => {
                   </div>
                   </div>
                 </div>
-                </div>
 
                 {/* 캠페인 설명 */}
                 {campaign.description && (
