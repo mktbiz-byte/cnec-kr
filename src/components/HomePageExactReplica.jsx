@@ -1,3 +1,4 @@
+// Homepage redesign with indigo color system - v1.1
 import React, { useState, useEffect } from 'react'
 import cnecLogo from '../assets/cnec-logo-final.png'
 import { Link, useNavigate } from 'react-router-dom'
