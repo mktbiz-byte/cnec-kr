@@ -494,10 +494,22 @@ const CampaignApplicationUpdated = () => {
 
             {campaign && (
               <div className="space-y-4">
-                {/* 캠페인 제목 */}
-                <div>
-                  <div className="flex items-start justify-between">
-                    <h3 className="text-lg font-medium text-gray-900 flex-1">{campaign.title}</h3>
+                {/* 썸네일 + 캠페인 제목 */}
+                <div className="flex gap-4">
+                  {/* 좌측 썸네일 이미지 */}
+                  {campaign.image_url && (
+                    <div className="flex-shrink-0">
+                      <img
+                        src={campaign.image_url}
+                        alt={campaign.title}
+                        className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                    </div>
+                  )}
+                  {/* 우측 제목 및 정보 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-medium text-gray-900 flex-1">{campaign.title}</h3>
                     {campaign.detail_images && campaign.detail_images.length > 0 && (
                       <button
                         onClick={() => setShowProductModal(true)}
@@ -532,6 +544,8 @@ const CampaignApplicationUpdated = () => {
                       </>
                     )}
                   </div>
+                  </div>
+                </div>
                 </div>
 
                 {/* 캠페인 설명 */}
@@ -866,10 +880,8 @@ const CampaignApplicationUpdated = () => {
                         </div>
                       </div>
                     </div>          
-                    {/* AI 생성 가이드 - 기획형 */}
-                    {campaign.ai_generated_guide && (
-                      <AIGuideViewer guide={campaign.ai_generated_guide} />
-                    )}
+                    {/* 맞춤형 촬영 가이드 - 기업 등록 데이터 연동 */}
+                    <AIGuideViewer guide={campaign.ai_generated_guide} campaign={campaign} />
                     
                     {/* AI 생성 가이드 - 올영세일 */}
                     {campaign.campaign_type === 'oliveyoung' && (campaign.oliveyoung_step1_guide_ai || campaign.oliveyoung_step2_guide_ai || campaign.oliveyoung_step3_guide_ai) && (
