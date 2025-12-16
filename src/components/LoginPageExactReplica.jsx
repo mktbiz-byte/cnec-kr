@@ -222,6 +222,13 @@ const LoginPageExactReplica = () => {
               </Button>
             </form>
 
+            {/* 비밀번호 찾기 링크 */}
+            <div className="text-center">
+              <Link to="/forgot-password" className="text-sm text-gray-500 hover:text-purple-600 underline">
+                비밀번호를 잊으셨나요?
+              </Link>
+            </div>
+
             {/* 회원가입 링크 - 참조 사이트와 동일 */}
             <div className="text-center text-sm">
               <span className="text-gray-600">

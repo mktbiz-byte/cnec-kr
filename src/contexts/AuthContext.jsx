@@ -214,7 +214,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // 먼저 쿠키와 스토리지 정리
       clearAllCookies();
-      
+
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Sign out error:", error);
@@ -222,7 +222,7 @@ export const AuthProvider = ({ children }) => {
       }
       setUser(null);
       setUserProfile(null);
-      
+
       // 로그아웃 후 페이지 새로고침으로 완전한 상태 초기화
       setTimeout(() => {
         window.location.href = '/';
@@ -237,6 +237,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // 비밀번호 재설정 이메일 전송
+  const resetPassword = async (email) => {
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+
+      if (error) {
+        console.error("Password reset error:", error);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Reset password error:", error);
+      throw error;
+    }
+  };
+
+  // 새 비밀번호로 업데이트
+  const updatePassword = async (newPassword) => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        console.error("Update password error:", error);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Update password error:", error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     userProfile,
@@ -246,7 +284,9 @@ export const AuthProvider = ({ children }) => {
     signInWithGoogle,
     signOut,
     updateProfile,
-    loadUserProfile
+    loadUserProfile,
+    resetPassword,
+    updatePassword
   };
 
   // 로딩 상태와 관계없이 children을 렌더링
