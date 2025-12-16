@@ -148,7 +148,7 @@ const LoginPageExactReplica = () => {
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
               )}
-              Google로로그인
+              Google 로그인
             </Button>
 
             {/* 구분선 - 참조 사이트와 동일 */}
@@ -221,6 +221,13 @@ const LoginPageExactReplica = () => {
                 로그인
               </Button>
             </form>
+
+            {/* 비밀번호 찾기 링크 */}
+            <div className="text-center">
+              <Link to="/forgot-password" className="text-sm text-gray-500 hover:text-purple-600 underline">
+                비밀번호를 잊으셨나요?
+              </Link>
+            </div>
 
             {/* 회원가입 링크 - 참조 사이트와 동일 */}
             <div className="text-center text-sm">

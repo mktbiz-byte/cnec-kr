@@ -9,6 +9,8 @@ import './App.css';
 import HomePageExactReplica from './components/HomePageExactReplica';
 import LoginPageExactReplica from './components/LoginPageExactReplica';
 import SignupPageExactReplica from './components/SignupPageExactReplica';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import CampaignApplicationPage from './components/CampaignApplicationPage';
 import CompanyReportNew from './components/CompanyReportNew';
 import MyPageKoreaEnhanced from './components/MyPageKoreaEnhanced';
@@ -63,6 +65,8 @@ const AppContent = () => {
         {/* 인증 관련 */}
         <Route path="/login" element={<LoginPageExactReplica />} />
         <Route path="/signup" element={<SignupPageExactReplica />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/cnecplus" element={<CNECPlusPageEnhanced />} />
         <Route path="/cnec-plus" element={<CNECPlusPageEnhanced />} />
         <Route path="/auth/callback" element={<AuthCallbackSafe />} />

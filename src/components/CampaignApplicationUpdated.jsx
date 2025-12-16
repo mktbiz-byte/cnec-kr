@@ -494,10 +494,22 @@ const CampaignApplicationUpdated = () => {
 
             {campaign && (
               <div className="space-y-4">
-                {/* 캠페인 제목 */}
-                <div>
-                  <div className="flex items-start justify-between">
-                    <h3 className="text-lg font-medium text-gray-900 flex-1">{campaign.title}</h3>
+                {/* 썸네일 + 캠페인 제목 */}
+                <div className="flex gap-4">
+                  {/* 좌측 썸네일 이미지 */}
+                  {campaign.image_url && (
+                    <div className="flex-shrink-0">
+                      <img
+                        src={campaign.image_url}
+                        alt={campaign.title}
+                        className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                    </div>
+                  )}
+                  {/* 우측 제목 및 정보 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-medium text-gray-900 flex-1">{campaign.title}</h3>
                     {campaign.detail_images && campaign.detail_images.length > 0 && (
                       <button
                         onClick={() => setShowProductModal(true)}
@@ -531,6 +543,7 @@ const CampaignApplicationUpdated = () => {
                         })}
                       </>
                     )}
+                  </div>
                   </div>
                 </div>
 
@@ -721,71 +734,6 @@ const CampaignApplicationUpdated = () => {
                   </div>
                 </div>
 
-                {/* 맞춤형 AI 가이드 (지원자에게만 표시) */}
-                {existingApplication?.personalized_guide && (
-                  <div className="border-t pt-4 mt-4">
-                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-lg p-5 shadow-lg">
-                      <div className="flex items-start mb-4">
-                        <div className="flex-shrink-0 mr-3">
-                          <svg className="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                          </svg>
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-lg font-bold text-emerald-900 mb-2">✨ 맞춤형 촬영 가이드</h4>
-                          <p className="text-sm text-emerald-800 mb-3">
-                            당신의 SNS 스타일과 팔로워 특성을 분석하여 AI가 맞춤 제작한 촬영 가이드입니다.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="bg-white rounded-lg p-4 shadow-inner">
-                        <div className="prose prose-sm max-w-none">
-                          <ReactMarkdown 
-                            remarkPlugins={[remarkGfm]}
-                            className="text-gray-800 leading-relaxed"
-                            components={{
-                              table: ({node, ...props}) => (
-                                <div className="overflow-x-auto my-4">
-                                  <table className="min-w-full border-collapse border border-gray-300" {...props} />
-                                </div>
-                              ),
-                              thead: ({node, ...props}) => (
-                                <thead className="bg-emerald-100" {...props} />
-                              ),
-                              th: ({node, ...props}) => (
-                                <th className="border border-gray-300 px-4 py-2 text-left font-semibold text-emerald-900" {...props} />
-                              ),
-                              td: ({node, ...props}) => (
-                                <td className="border border-gray-300 px-4 py-2 text-sm" {...props} />
-                              ),
-                              h2: ({node, ...props}) => (
-                                <h2 className="text-xl font-bold text-emerald-900 mt-6 mb-3" {...props} />
-                              ),
-                              h3: ({node, ...props}) => (
-                                <h3 className="text-lg font-semibold text-emerald-800 mt-4 mb-2" {...props} />
-                              ),
-                              ul: ({node, ...props}) => (
-                                <ul className="list-disc list-inside space-y-1 my-2" {...props} />
-                              ),
-                              ol: ({node, ...props}) => (
-                                <ol className="list-decimal list-inside space-y-1 my-2" {...props} />
-                              ),
-                              strong: ({node, ...props}) => (
-                                <strong className="font-bold text-emerald-900" {...props} />
-                              ),
-                              p: ({node, ...props}) => (
-                                <p className="my-2" {...props} />
-                              )
-                            }}
-                          >
-                            {existingApplication.personalized_guide}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* 캠페인 가이드 - 모든 캠페인 타입에 표시 */}
                 <div className="border-t pt-4 mt-4">
                     <div className="flex items-center justify-between mb-3">
@@ -866,10 +814,8 @@ const CampaignApplicationUpdated = () => {
                         </div>
                       </div>
                     </div>          
-                    {/* AI 생성 가이드 - 기획형 */}
-                    {campaign.ai_generated_guide && (
-                      <AIGuideViewer guide={campaign.ai_generated_guide} />
-                    )}
+                    {/* 맞춤형 촬영 가이드 - 기업이 CampaignGuideEditor에서 입력한 데이터 */}
+                    <AIGuideViewer guide={campaign.ai_generated_guide} campaign={campaign} />
                     
                     {/* AI 생성 가이드 - 올영세일 */}
                     {campaign.campaign_type === 'oliveyoung' && (campaign.oliveyoung_step1_guide_ai || campaign.oliveyoung_step2_guide_ai || campaign.oliveyoung_step3_guide_ai) && (

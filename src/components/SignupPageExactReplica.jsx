@@ -84,13 +84,13 @@ const SignupPageExactReplica = () => {
       setSuccess(true)
     } catch (error) {
       console.error('Signup error:', error)
-      
+
       if (error.message.includes('already registered')) {
-        setError('すでに가입されている이메일です。')
+        setError('이미 가입된 이메일입니다.')
       } else if (error.message.includes('weak password')) {
-        setError('비밀번호が弱すぎます。より強い비밀번호を使用してください。')
+        setError('비밀번호가 너무 약합니다. 더 강력한 비밀번호를 사용해주세요.')
       } else {
-        setError('회원가입中にエラーが発生しました。再度お試しください。')
+        setError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.')
       }
     } finally {
       setLoading(false)
@@ -101,11 +101,11 @@ const SignupPageExactReplica = () => {
     try {
       setLoading(true)
       setError('')
-      
+
       await signInWithGoogle()
     } catch (error) {
       console.error('Google signup error:', error)
-      setError('Google회원가입中にエラーが発生しました。')
+      setError('Google 회원가입 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
@@ -122,11 +122,11 @@ const SignupPageExactReplica = () => {
             회원가입이 완료되었습니다! 이메일을 확인하여 계정을 활성화해주세요.
           </p>
           <div className="space-y-3">
-            <button 
-              onClick={() => navigate('/login')} 
+            <button
+              onClick={() => navigate('/login')}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-md transition-colors"
             >
-              로그인ページへ
+              로그인 페이지로
             </button>
             <button 
               onClick={() => navigate('/')} 
@@ -179,7 +179,7 @@ const SignupPageExactReplica = () => {
               </Alert>
             )}
             
-            {/* Google 회원가입 - 참조 사이트와 동일한 스타일 */}
+            {/* Google 회원가입 버튼 */}
             <Button
               type="button"
               onClick={handleGoogleSignup}
@@ -193,10 +193,10 @@ const SignupPageExactReplica = () => {
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Google로회원가입
+              Google로 회원가입
             </Button>
 
-            {/* 구분선 - 참조 사이트와 동일 */}
+            {/* 구분선 */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-gray-300" />
@@ -208,7 +208,7 @@ const SignupPageExactReplica = () => {
               </div>
             </div>
 
-            {/* 이메일 회원가입 폼 - 참조 사이트와 정확히 일치 */}
+            {/* 이메일 회원가입 폼 */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-purple-600 font-medium">

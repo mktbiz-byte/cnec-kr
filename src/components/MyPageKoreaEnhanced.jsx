@@ -186,12 +186,10 @@ const MyPageKoreaEnhanced = () => {
       // 프로필 완성도 계산
       const completeness = calculateProfileCompleteness(profileData)
       setProfileCompleteness(completeness)
-      
-      // 처음 방문하거나 프로필이 50% 미만이면 환영 모달 표시
-      const hasSeenWelcome = localStorage.getItem('hasSeenWelcome')
-      if (!hasSeenWelcome && completeness < 50) {
+
+      // 프로필이 70% 미만이면 프로필 설정 필수 모달 표시
+      if (completeness < 70) {
         setShowWelcomeModal(true)
-        localStorage.setItem('hasSeenWelcome', 'true')
       }
       
       // 편집 모드가 아닐 때만 editForm 업데이트 (편집 중인 데이터 보호)
@@ -514,69 +512,88 @@ const MyPageKoreaEnhanced = () => {
       </nav>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 환영 모달 - 처음 방문 시 */}
+        {/* 프로필 설정 필수 모달 */}
         {showWelcomeModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <div className="text-center mb-6">
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-purple-100 mb-4">
-                  <User className="h-8 w-8 text-purple-600" />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+              {/* 상단 그라데이션 헤더 */}
+              <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 p-6 text-white text-center">
+                <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-white/20 backdrop-blur mb-4">
+                  <AlertTriangle className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  CNEC Korea에 오신 것을 환영합니다! 🎉
+                <h3 className="text-2xl font-bold mb-1">
+                  프로필 설정이 필요합니다
                 </h3>
-                <p className="text-gray-600">
-                  캠페인에 지원하기 전에 프로필을 완성해주세요.
+                <p className="text-white/80 text-sm">
+                  캠페인 참여를 위해 프로필을 완성해주세요
                 </p>
               </div>
 
-              <div className="mb-6">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>프로필 완성도</span>
-                  <span className="font-semibold">{profileCompleteness}%</span>
+              <div className="p-6">
+                {/* 프로필 완성도 */}
+                <div className="mb-6">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-gray-600">현재 프로필 완성도</span>
+                    <span className="font-bold text-purple-600">{profileCompleteness}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 h-4 rounded-full transition-all duration-700 ease-out"
+                      style={{ width: `${profileCompleteness}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    70% 이상 완성 시 캠페인 지원이 가능합니다
+                  </p>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${profileCompleteness}%` }}
-                  ></div>
-                </div>
-              </div>
 
-              <div className="space-y-3 mb-6 text-sm text-gray-700">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 text-purple-600 mr-2">✓</div>
-                  <span>프로필 사진 업로드</span>
+                {/* 필수 항목 체크리스트 */}
+                <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                  <p className="text-sm font-semibold text-gray-800 mb-3">필수 입력 항목</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${profile?.name ? 'bg-green-500' : 'bg-gray-300'}`}>
+                        {profile?.name ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">1</span>}
+                      </div>
+                      <span className={profile?.name ? 'text-gray-500 line-through' : 'text-gray-700'}>이름</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${profile?.phone ? 'bg-green-500' : 'bg-gray-300'}`}>
+                        {profile?.phone ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">2</span>}
+                      </div>
+                      <span className={profile?.phone ? 'text-gray-500 line-through' : 'text-gray-700'}>연락처</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${(profile?.instagram_url || profile?.youtube_url) ? 'bg-green-500' : 'bg-gray-300'}`}>
+                        {(profile?.instagram_url || profile?.youtube_url) ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">3</span>}
+                      </div>
+                      <span className={(profile?.instagram_url || profile?.youtube_url) ? 'text-gray-500 line-through' : 'text-gray-700'}>SNS 계정 (인스타그램/유튜브)</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${profile?.profile_photo_url ? 'bg-green-500' : 'bg-gray-300'}`}>
+                        {profile?.profile_photo_url ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">4</span>}
+                      </div>
+                      <span className={profile?.profile_photo_url ? 'text-gray-500 line-through' : 'text-gray-700'}>프로필 사진</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 text-purple-600 mr-2">✓</div>
-                  <span>인스타그램 또는 유튜브 주소 등록</span>
-                </div>
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 text-purple-600 mr-2">✓</div>
-                  <span>피부 타입 및 지역 정보 입력</span>
-                </div>
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 text-purple-600 mr-2">✓</div>
-                  <span>연락처 정보 입력</span>
-                </div>
-              </div>
 
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowWelcomeModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  나중에
-                </button>
+                {/* 버튼 */}
                 <button
                   onClick={() => {
                     setShowWelcomeModal(false)
                     setIsEditing(true)
+                    setActiveTab('profile')
                   }}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
+                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
-                  프로필 작성하기
+                  지금 프로필 설정하기
+                </button>
+                <button
+                  onClick={() => setShowWelcomeModal(false)}
+                  className="w-full mt-3 py-3 text-gray-500 text-sm hover:text-gray-700 transition-colors"
+                >
+                  나중에 하기
                 </button>
               </div>
             </div>

@@ -1,205 +1,290 @@
 import React, { useState } from 'react'
 
 /**
- * 탭 기반 AI 가이드 뷰어 컴포넌트
- * 제품소개 / 필수 포함사항 / 촬영 팁 / 영상컨셉 / 주의사항 탭으로 구분
+ * 탭 기반 가이드 뷰어 컴포넌트
+ * 기업이 CampaignGuideEditor에서 입력한 크리에이터 가이드를 표시
+ * ai_generated_guide JSON 구조에 맞게 파싱하여 표시
  */
-export default function AIGuideViewer({ guide }) {
-  const [activeTab, setActiveTab] = useState('product')
+export default function AIGuideViewer({ guide, campaign }) {
+  const [activeTab, setActiveTab] = useState('essential')
 
-  if (!guide) {
+  // guide나 campaign 둘 다 없으면 렌더링 하지 않음
+  if (!guide && !campaign) {
     return null
   }
 
-  // 텍스트 형식인 경우 기존 방식으로 표시
+  // 텍스트 형식인 경우 JSON 파싱 시도
+  let parsedGuide = guide
   if (typeof guide === 'string') {
     try {
-      // JSON 문자열인 경우 파싱 시도
-      const parsed = JSON.parse(guide)
-      guide = parsed
+      parsedGuide = JSON.parse(guide)
     } catch (e) {
-      // 일반 텍스트인 경우 그대로 표시
-      return (
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-3 md:p-4 mb-4">
-          <div className="flex items-center mb-3">
-            <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-            </svg>
-            <h5 className="text-sm font-semibold text-purple-800">✨ AI 생성 가이드</h5>
-          </div>
-          <div className="bg-white rounded-lg p-3">
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{guide}</p>
-          </div>
-        </div>
-      )
+      parsedGuide = null
     }
+  }
+
+  // parsedGuide가 없으면 빈 객체로 초기화
+  parsedGuide = parsedGuide || {}
+
+  // shooting_scenes 구조 (레거시 지원)
+  const hasShootingScenes = parsedGuide.shooting_scenes && parsedGuide.shooting_scenes.length > 0
+
+  // 새로운 가이드 구조 (CampaignGuideEditor에서 저장된 데이터)
+  const hasNewGuideStructure = parsedGuide.hookingPoint || parsedGuide.coreMessage || parsedGuide.missions
+
+  // 미션 라벨 매핑
+  const missionLabels = {
+    beforeAfter: 'Before & After 보여주기',
+    productCloseup: '제품 사용 장면 클로즈업',
+    productTexture: '제품 텍스처 보여주기',
+    storeVisit: '올리브영 매장 방문 인증',
+    weeklyReview: '7일 사용 후기 기록',
+    priceInfo: '가격/혜택 정보 언급',
+    purchaseLink: '구매 링크 유도'
+  }
+
+  // 금지 사항 라벨 매핑
+  const prohibitionLabels = {
+    competitorMention: '경쟁사 제품 언급 금지',
+    exaggeratedClaims: '과장된 효능/효과 표현 금지',
+    medicalMisrepresentation: '의약품 오인 표현 금지',
+    priceOutOfSale: '세일 기간 외 가격 언급 금지',
+    negativeExpression: '부정적 표현 사용 금지',
+    other: '기타'
+  }
+
+  // 영상 길이 라벨 매핑
+  const videoLengthLabels = {
+    '15sec': '15초 이내',
+    '30sec': '30초 내외',
+    '45sec': '45초 내외',
+    '60sec': '60초 내외'
+  }
+
+  // 영상 속도 라벨 매핑
+  const videoTempoLabels = {
+    'fast': '빠른 전개',
+    'normal': '보통',
+    'slow': '느림'
+  }
+
+  // 선택된 미션 가져오기
+  const getSelectedMissions = () => {
+    if (!parsedGuide.missions) return []
+    return Object.entries(parsedGuide.missions)
+      .filter(([key, value]) => value === true)
+      .map(([key]) => missionLabels[key] || key)
+  }
+
+  // 선택된 금지 사항 가져오기
+  const getSelectedProhibitions = () => {
+    if (!parsedGuide.prohibitions) return []
+    const prohibitions = Object.entries(parsedGuide.prohibitions)
+      .filter(([key, value]) => value === true && key !== 'other')
+      .map(([key]) => prohibitionLabels[key] || key)
+
+    // 기타 금지 사항 추가
+    if (parsedGuide.prohibitions.other && parsedGuide.prohibitionOtherText) {
+      prohibitions.push(`기타: ${parsedGuide.prohibitionOtherText}`)
+    }
+
+    return prohibitions
   }
 
   // 탭 정의
   const tabs = [
-    { id: 'product', label: '📝 제품소개' },
-    { id: 'must', label: '✅ 필수 포함사항' },
-    { id: 'filming', label: '🎥 촬영 팁' },
-    { id: 'concept', label: '🎨 영상컨셉' },
-    { id: 'caution', label: '⚠️ 주의사항' }
+    { id: 'essential', label: '🎯 필수 입력' },
+    { id: 'mission', label: '✅ 필수 미션' },
+    { id: 'prohibited', label: '🚫 금지 사항' },
+    { id: 'settings', label: '⚙️ 영상 설정' }
   ]
 
   // 탭별 컨텐츠 렌더링
   const renderTabContent = (tabId) => {
     switch (tabId) {
-      case 'product':
+      case 'essential':
+        // 필수 입력 = 1초 후킹 포인트 / 핵심 메시지
         return (
-          <div className="space-y-3">
-            {guide.brand_info && (
+          <div className="space-y-4">
+            {/* 1초 후킹 포인트 */}
+            {parsedGuide.hookingPoint && (
               <div>
-                <h6 className="text-sm font-semibold text-gray-800 mb-2">브랜드 정보</h6>
-                <div className="bg-gray-50 rounded p-3 space-y-1">
-                  {guide.brand_info.brand && <p className="text-sm"><span className="font-medium">브랜드:</span> {guide.brand_info.brand}</p>}
-                  {guide.brand_info.product && <p className="text-sm"><span className="font-medium">제품명:</span> {guide.brand_info.product}</p>}
-                  {guide.brand_info.product_url && (
-                    <p className="text-sm">
-                      <span className="font-medium">URL:</span>{' '}
-                      <a href={guide.brand_info.product_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                        {guide.brand_info.product_url}
-                      </a>
-                    </p>
-                  )}
+                <h6 className="text-sm font-semibold text-purple-800 mb-2 flex items-center gap-2">
+                  <span>⚡</span> 1초 후킹 포인트
+                </h6>
+                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                  <p className="text-base text-purple-900 font-medium">"{parsedGuide.hookingPoint}"</p>
                 </div>
               </div>
             )}
-            {guide.product_intro && (
+
+            {/* 핵심 메시지 */}
+            {parsedGuide.coreMessage && (
               <div>
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{guide.product_intro}</p>
+                <h6 className="text-sm font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+                  <span>💬</span> 핵심 메시지
+                </h6>
+                <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
+                  <p className="text-sm text-indigo-900 leading-relaxed">{parsedGuide.coreMessage}</p>
+                </div>
               </div>
+            )}
+
+            {/* 데이터가 없을 경우 */}
+            {!parsedGuide.hookingPoint && !parsedGuide.coreMessage && (
+              <p className="text-sm text-gray-500 italic">등록된 필수 입력 사항이 없습니다.</p>
             )}
           </div>
         )
 
-      case 'must':
+      case 'mission':
+        // 필수 미션
+        const selectedMissions = getSelectedMissions()
         return (
           <div className="space-y-3">
-            {guide.must_include && Array.isArray(guide.must_include) && (
-              <ul className="space-y-2">
-                {guide.must_include.map((item, idx) => (
-                  <li key={idx} className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 mr-2 flex-shrink-0"></span>
-                    <span className="text-sm text-gray-700 leading-relaxed">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {guide.must_include && typeof guide.must_include === 'string' && (
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{guide.must_include}</p>
-            )}
-            {guide.shooting_scenes && Array.isArray(guide.shooting_scenes) && (
+            {selectedMissions.length > 0 ? (
               <div>
-                <h6 className="text-sm font-semibold text-gray-800 mb-2">촬영 씬 구성</h6>
-                <div className="space-y-2">
-                  {guide.shooting_scenes.map((scene, idx) => (
-                    <div key={idx} className="bg-gray-50 rounded p-3">
-                      <p className="text-xs font-medium text-purple-600 mb-1">씬 {scene.order}: {scene.scene_type}</p>
-                      {scene.dialogue && <p className="text-sm text-gray-700">💬 {scene.dialogue}</p>}
-                    </div>
+                <h6 className="text-sm font-semibold text-green-800 mb-3">크리에이터가 반드시 수행해야 할 미션</h6>
+                <ul className="space-y-2">
+                  {selectedMissions.map((mission, idx) => (
+                    <li key={idx} className="flex items-center bg-green-50 rounded-lg p-3 border border-green-200">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white text-xs font-bold mr-3">
+                        {idx + 1}
+                      </span>
+                      <span className="text-sm text-green-900">{mission}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">등록된 필수 미션이 없습니다.</p>
             )}
           </div>
         )
 
-      case 'filming':
+      case 'prohibited':
+        // 금지 사항
+        const selectedProhibitions = getSelectedProhibitions()
         return (
           <div className="space-y-3">
-            {guide.filming_tips && Array.isArray(guide.filming_tips) && (
-              <ul className="space-y-2">
-                {guide.filming_tips.map((tip, idx) => (
-                  <li key={idx} className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 mr-2 flex-shrink-0"></span>
-                    <span className="text-sm text-gray-700 leading-relaxed">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {guide.filming_tips && typeof guide.filming_tips === 'string' && (
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{guide.filming_tips}</p>
-            )}
-            {guide.shooting_scenes && Array.isArray(guide.shooting_scenes) && (
+            {selectedProhibitions.length > 0 ? (
               <div>
-                <h6 className="text-sm font-semibold text-gray-800 mb-2">씬별 촬영 팁</h6>
-                <div className="space-y-2">
-                  {guide.shooting_scenes.filter(s => s.shooting_tip).map((scene, idx) => (
-                    <div key={idx} className="bg-blue-50 rounded p-3">
-                      <p className="text-xs font-medium text-blue-600 mb-1">씬 {scene.order}</p>
-                      <p className="text-sm text-gray-700">{scene.shooting_tip}</p>
-                    </div>
+                <h6 className="text-sm font-semibold text-red-800 mb-3">크리에이터가 절대 하면 안 되는 것들</h6>
+                <ul className="space-y-2">
+                  {selectedProhibitions.map((prohibition, idx) => (
+                    <li key={idx} className="flex items-center bg-red-50 rounded-lg p-3 border border-red-200">
+                      <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-3"></span>
+                      <span className="text-sm text-red-900">{prohibition}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">등록된 금지 사항이 없습니다.</p>
             )}
-          </div>
-        )
 
-      case 'concept':
-        return (
-          <div className="space-y-3">
-            {guide.video_concepts && Array.isArray(guide.video_concepts) && (
-              <ul className="space-y-2">
-                {guide.video_concepts.map((concept, idx) => (
-                  <li key={idx} className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-pink-500 mt-2 mr-2 flex-shrink-0"></span>
-                    <span className="text-sm text-gray-700 leading-relaxed">{concept}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {guide.video_concepts && typeof guide.video_concepts === 'string' && (
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{guide.video_concepts}</p>
-            )}
-            {guide.video_duration && (
-              <div className="bg-pink-50 rounded p-3">
-                <p className="text-sm"><span className="font-medium">영상 길이:</span> {guide.video_duration}</p>
-              </div>
-            )}
-            {guide.target_platform && (
-              <div className="bg-pink-50 rounded p-3">
-                <p className="text-sm"><span className="font-medium">타겟 플랫폼:</span> {guide.target_platform}</p>
-              </div>
-            )}
-          </div>
-        )
-
-      case 'caution':
-        return (
-          <div className="space-y-3">
-            {guide.cautions && Array.isArray(guide.cautions) && (
-              <ul className="space-y-2">
-                {guide.cautions.map((caution, idx) => (
-                  <li key={idx} className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 mt-2 mr-2 flex-shrink-0"></span>
-                    <span className="text-sm text-gray-700 leading-relaxed">{caution}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {guide.cautions && typeof guide.cautions === 'string' && (
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{guide.cautions}</p>
-            )}
-            
-            {/* 필수 사항 (항상 표시) */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
-              <h6 className="text-sm font-semibold text-red-800 mb-3">⚠️ 필수 사항</h6>
+            {/* 필수 준수 사항 */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
+              <h6 className="text-sm font-semibold text-amber-800 mb-3">⚠️ 필수 준수 사항</h6>
               <ol className="space-y-2 list-decimal list-inside">
-                <li className="text-sm text-red-900">
-                  <span className="font-medium">마감일 엄수:</span> 지정된 영상 제출 마감일을 반드시 지켜주세요. 지연 시 패널티가 발생할 수 있습니다.
+                <li className="text-sm text-amber-900">
+                  <span className="font-medium">마감일 엄수:</span> 지정된 영상 제출 마감일을 반드시 지켜주세요.
                 </li>
-                <li className="text-sm text-red-900">
-                  <span className="font-medium">정확한 제품 정보:</span> 브랜드에서 제공한 제품 정보를 100% 정확하게 영상에 반영해야 합니다. 가이드에 맞지 않는 촬영 시 포인트 지급이 거부될 수 있습니다.
+                <li className="text-sm text-amber-900">
+                  <span className="font-medium">정확한 제품 정보:</span> 가이드에 맞게 제품 정보를 정확하게 반영해야 합니다.
                 </li>
-                <li className="text-sm text-red-900">
-                  <span className="font-medium">기업 검수:</span> 제작된 영상은 브랜드의 검수를 거치며, 수정이 가능합니다. 피드백을 명확히 확인하고 반영해주세요.
+                <li className="text-sm text-amber-900">
+                  <span className="font-medium">기업 검수:</span> 제작된 영상은 브랜드의 검수를 거칩니다.
                 </li>
               </ol>
             </div>
+          </div>
+        )
+
+      case 'settings':
+        // 영상 설정
+        return (
+          <div className="space-y-4">
+            {/* 해시태그 */}
+            {parsedGuide.hashtags && parsedGuide.hashtags.filter(h => h).length > 0 && (
+              <div>
+                <h6 className="text-sm font-semibold text-blue-800 mb-2">🏷️ 해시태그</h6>
+                <div className="flex flex-wrap gap-2 bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  {parsedGuide.hashtags.filter(h => h).map((tag, idx) => (
+                    <span key={idx} className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-300">
+                      {tag.startsWith('#') ? tag : `#${tag}`}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 영상 설정 그리드 */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* 영상 길이 */}
+              {parsedGuide.videoLength && (
+                <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                  <h6 className="text-xs font-semibold text-purple-800 mb-1">⏱️ 영상 길이</h6>
+                  <p className="text-sm font-medium text-purple-900">
+                    {videoLengthLabels[parsedGuide.videoLength] || parsedGuide.videoLength}
+                  </p>
+                </div>
+              )}
+
+              {/* 영상 속도 */}
+              {parsedGuide.videoTempo && (
+                <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                  <h6 className="text-xs font-semibold text-green-800 mb-1">🎵 영상 속도</h6>
+                  <p className="text-sm font-medium text-green-900">
+                    {videoTempoLabels[parsedGuide.videoTempo] || parsedGuide.videoTempo}
+                  </p>
+                </div>
+              )}
+
+              {/* 나레이션 여부 */}
+              {parsedGuide.hasNarration !== undefined && parsedGuide.hasNarration !== null && (
+                <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
+                  <h6 className="text-xs font-semibold text-orange-800 mb-1">🎙️ 나레이션</h6>
+                  <p className="text-sm font-medium text-orange-900">
+                    {parsedGuide.hasNarration ? '있음' : '없음'}
+                  </p>
+                </div>
+              )}
+
+              {/* 파트너십 코드 */}
+              {parsedGuide.needsPartnershipCode !== undefined && parsedGuide.needsPartnershipCode !== null && (
+                <div className="bg-pink-50 rounded-lg p-3 border border-pink-200">
+                  <h6 className="text-xs font-semibold text-pink-800 mb-1">📢 파트너십 광고 코드</h6>
+                  <p className="text-sm font-medium text-pink-900">
+                    {parsedGuide.needsPartnershipCode ? '필요' : '불필요'}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 레퍼런스 URL */}
+            {parsedGuide.referenceUrl && (
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <h6 className="text-xs font-semibold text-gray-800 mb-1">🔗 레퍼런스 영상</h6>
+                <a
+                  href={parsedGuide.referenceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 hover:underline break-all"
+                >
+                  {parsedGuide.referenceUrl}
+                </a>
+              </div>
+            )}
+
+            {/* 데이터가 없을 경우 */}
+            {!parsedGuide.hashtags?.filter(h => h).length &&
+             !parsedGuide.videoLength &&
+             !parsedGuide.videoTempo &&
+             parsedGuide.hasNarration === undefined &&
+             !parsedGuide.referenceUrl && (
+              <p className="text-sm text-gray-500 italic">등록된 영상 설정이 없습니다.</p>
+            )}
           </div>
         )
 
@@ -208,22 +293,31 @@ export default function AIGuideViewer({ guide }) {
     }
   }
 
+  // 데이터가 전혀 없으면 렌더링 안 함
+  const hasAnyData = hasNewGuideStructure || hasShootingScenes ||
+    parsedGuide.videoLength ||
+    parsedGuide.hashtags?.filter(h => h).length > 0
+
+  if (!hasAnyData) {
+    return null
+  }
+
   return (
     <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-3 md:p-4 mb-4">
       {/* 헤더 */}
       <div className="flex items-center mb-4">
         <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
         </svg>
-        <h5 className="text-sm font-semibold text-purple-800">✨ 당신만을 위한 맞춤형 촬영 가이드</h5>
+        <h5 className="text-sm font-semibold text-purple-800">맞춤형 촬영 가이드</h5>
       </div>
 
       <p className="text-xs text-purple-700 mb-4">
-        이 가이드는 당신의 SNS 스타일과 콘텐츠 특성을 분석하여 맞춤 제작된 촬영 가이드입니다. 아래 가이드를 참고하여 콘텐츠를 제작해주세요.
+        이 가이드는 기업에서 등록한 촬영 가이드입니다. 아래 가이드를 참고하여 콘텐츠를 제작해주세요.
       </p>
 
-      {/* 탭 네비게이션 - 그리드 레이아웃 */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
+      {/* 탭 네비게이션 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
         {tabs.map(tab => (
           <button
             key={tab.id}

@@ -119,40 +119,41 @@ const MinimalSignup = () => {
           textAlign: 'center'
         }}>
           <div style={{ fontSize: '48px', marginBottom: '20px' }}>📧</div>
-          <h2 style={{ color: '#333', marginBottom: '16px' }}>
-            メール確認が必要です
+          <h2 style={{ color: '#1F2937', marginBottom: '16px', fontWeight: '600' }}>
+            이메일 확인이 필요합니다
           </h2>
-          <p style={{ color: '#666', marginBottom: '30px' }}>
-            会員登録が完了しました！メールを確認してアカウントを有効化してください。
+          <p style={{ color: '#6B7280', marginBottom: '30px', lineHeight: '1.5' }}>
+            회원가입이 완료되었습니다!<br />이메일을 확인하여 계정을 활성화해주세요.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button 
               onClick={() => navigate('/login')}
-              style={{ 
-                padding: '12px 24px', 
-                backgroundColor: '#007bff', 
-                color: 'white', 
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#6366F1',
+                color: 'white',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                fontSize: '16px'
+                fontSize: '16px',
+                fontWeight: '500'
               }}
             >
-              ログインページへ
+              로그인 페이지로
             </button>
-            <button 
+            <button
               onClick={() => navigate('/')}
-              style={{ 
-                padding: '12px 24px', 
-                backgroundColor: 'transparent', 
-                color: '#007bff', 
-                border: '1px solid #007bff',
-                borderRadius: '4px',
+              style={{
+                padding: '12px 24px',
+                backgroundColor: 'transparent',
+                color: '#374151',
+                border: '1px solid #D1D5DB',
+                borderRadius: '8px',
                 cursor: 'pointer',
                 fontSize: '16px'
               }}
             >
-              ホームに戻る
+              홈으로 돌아가기
             </button>
           </div>
         </div>
