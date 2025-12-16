@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { database } from '../../lib/supabase'
+import { emailTriggersKorean } from '../../lib/emailService'
 import AdminNavigation from './AdminNavigation'
 import { 
   Loader2, Eye, CheckCircle, XCircle, Clock, Search, Filter,
@@ -227,7 +228,7 @@ const ApplicationsReportSimple = () => {
       setProcessing(true)
       setError('')
       setSuccess('')
-      
+
       console.log('신청서 상태 업데이트:', applicationId, newStatus)
 
       const updateData = {
@@ -245,15 +246,44 @@ const ApplicationsReportSimple = () => {
       }
 
       await database.applications.update(applicationId, updateData)
-      
+
+      // 승인 시 이메일 발송
+      if (newStatus === 'approved') {
+        try {
+          // 신청서 정보 찾기
+          const application = applications.find(app => app.id === applicationId)
+          if (application) {
+            // 캠페인 정보 찾기
+            const campaign = campaigns.find(c => c.id === application.campaign_id)
+
+            // 사용자 정보 구성
+            const user = {
+              email: application.email,
+              name: application.name || application.user_name
+            }
+
+            if (campaign && user.email) {
+              console.log('승인 이메일 발송 시도:', user.email)
+              await emailTriggersKorean.onApplicationApproved(application, campaign, user)
+              console.log('승인 이메일 발송 완료')
+            } else {
+              console.warn('이메일 발송 실패: 캠페인 또는 이메일 정보 없음')
+            }
+          }
+        } catch (emailError) {
+          console.error('이메일 발송 오류:', emailError)
+          // 이메일 발송 실패해도 상태 업데이트는 성공으로 처리
+        }
+      }
+
       console.log('상태 업데이트 완료')
       setSuccess(t.success)
-      
+
       // 데이터 다시 로드
       setTimeout(() => {
         loadData()
       }, 1000)
-      
+
     } catch (error) {
       console.error('상태 업데이트 오류:', error)
       setError(`상태 업데이트에 실패했습니다: ${error.message}`)

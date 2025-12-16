@@ -1,7 +1,89 @@
 // 이메일 발송 서비스
 import { supabase } from './supabase'
 
-// 이메일 템플릿 정의
+// 한국어 이메일 템플릿 정의
+const EMAIL_TEMPLATES_KO = {
+  // 캠페인 확정 (승인) - 한국어
+  APPLICATION_APPROVED: {
+    subject: '【CNEC Korea】🎉 캠페인 참여가 확정되었습니다!',
+    template: (data) => `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CNEC Korea - 캠페인 참여 확정</title>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: white; padding: 30px; border: 1px solid #e0e0e0; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; }
+        .button { display: inline-block; background: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 10px 5px; }
+        .success-box { background: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .deadline-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 축하합니다!</h1>
+            <p>캠페인 참여가 확정되었습니다</p>
+        </div>
+        <div class="content">
+            <div class="success-box">
+                <h2>✅ ${data.campaignTitle}</h2>
+                <p><strong>${data.name}님의 캠페인 참여가 정식으로 확정되었습니다!</strong></p>
+            </div>
+
+            <h3>📅 중요 일정</h3>
+            <div class="deadline-box">
+                <p><strong>🎬 영상 업로드 마감일:</strong> ${data.deadline}</p>
+                <p><strong>📦 제품 발송 예정일:</strong> ${data.shippingDate}</p>
+                <p><strong>💰 리워드 금액:</strong> ${data.rewardAmount}원</p>
+            </div>
+
+            <h3>📋 다음 단계</h3>
+            <ol>
+                <li><strong>캠페인 자료 확인</strong><br>
+                    아래 링크에서 가이드라인과 소재를 다운로드하세요</li>
+                <li><strong>제품 수령</strong><br>
+                    등록하신 주소로 제품을 발송해 드립니다</li>
+                <li><strong>콘텐츠 제작</strong><br>
+                    가이드라인에 맞춰 매력적인 영상을 제작하세요</li>
+                <li><strong>SNS 업로드</strong><br>
+                    지정 해시태그를 사용하여 SNS에 업로드하세요</li>
+                <li><strong>업로드 URL 제출</strong><br>
+                    마이페이지에서 업로드한 영상 URL을 제출하세요</li>
+            </ol>
+
+            <div style="text-align: center;">
+                ${data.googleDriveLink ? `<a href="${data.googleDriveLink}" class="button">📁 Google Drive</a>` : ''}
+                ${data.googleSlidesLink ? `<a href="${data.googleSlidesLink}" class="button">📊 Google Slides</a>` : ''}
+                <a href="https://cnec.co.kr/mypage" class="button">📱 마이페이지</a>
+            </div>
+
+            <h3>⚠️ 중요 주의사항</h3>
+            <ul>
+                <li>업로드 마감일을 반드시 지켜주세요</li>
+                <li>가이드라인에 맞는 내용으로 업로드해주세요</li>
+                <li>지정 해시태그 사용은 필수입니다</li>
+                <li>업로드 후 반드시 URL을 제출해주세요</li>
+            </ul>
+
+            <p>문의사항이 있으시면 언제든지 연락해주세요.<br>
+            멋진 콘텐츠 제작을 기대합니다!</p>
+        </div>
+        <div class="footer">
+            <p>© 2025 CNEC Korea. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+    `
+  }
+}
+
+// 일본어 이메일 템플릿 정의
 const EMAIL_TEMPLATES = {
   // 1. 회원가입 완료
   SIGNUP_COMPLETE: {
@@ -969,9 +1051,127 @@ export const emailTriggers = {
   }
 }
 
+// 한국어 이메일 발송 함수
+export const sendEmailKorean = async (templateType, recipientEmail, data) => {
+  try {
+    const template = EMAIL_TEMPLATES_KO[templateType]
+    if (!template) {
+      console.error(`Korean email template ${templateType} not found`)
+      return { success: false, error: 'Template not found' }
+    }
+
+    const emailData = {
+      to: recipientEmail,
+      subject: template.subject,
+      html: template.template(data),
+      created_at: new Date().toISOString()
+    }
+
+    // Supabase에 이메일 로그 저장
+    const { data: logData, error: logError } = await supabase
+      .from('email_logs')
+      .insert([{
+        recipient_email: recipientEmail,
+        template_type: templateType,
+        subject: template.subject,
+        data: data,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }])
+
+    if (logError) {
+      console.error('Email log error:', logError)
+    }
+
+    // Gmail SMTP 직접 발송 - 시스템 설정에서 SMTP 정보 가져오기
+    const emailSettings = JSON.parse(localStorage.getItem('cnec_email_settings') || '{}')
+
+    if (emailSettings.smtpHost && emailSettings.smtpUser && emailSettings.smtpPass) {
+      try {
+        const gmailEmailService = await import('./gmailEmailService.js')
+        const emailService = gmailEmailService.default
+
+        const result = await emailService.sendEmailDirect(
+          recipientEmail,
+          template.subject,
+          template.template(data)
+        )
+
+        if (result.success) {
+          console.log('✅ 한국어 이메일 발송 성공:', {
+            type: templateType,
+            to: recipientEmail,
+            subject: template.subject,
+            messageId: result.messageId
+          })
+
+          if (logData?.[0]?.id) {
+            await supabase
+              .from('email_logs')
+              .update({
+                status: 'sent',
+                sent_at: new Date().toISOString(),
+                message_id: result.messageId
+              })
+              .eq('id', logData[0].id)
+          }
+        } else {
+          throw new Error(result.error || '이메일 발송 실패')
+        }
+      } catch (gmailError) {
+        console.error('Gmail 발송 오류:', gmailError)
+        console.log('📧 이메일 발송 (Gmail 실패, 콘솔 출력):', {
+          type: templateType,
+          to: recipientEmail,
+          subject: template.subject,
+          error: gmailError.message
+        })
+      }
+    } else {
+      console.log('📧 이메일 발송 (SMTP 미설정, 콘솔 출력):', {
+        type: templateType,
+        to: recipientEmail,
+        subject: template.subject,
+        note: '시스템 설정에서 Gmail SMTP 정보를 입력하면 실제 발송됩니다.'
+      })
+    }
+
+    return { success: true, logId: logData?.[0]?.id }
+
+  } catch (error) {
+    console.error('Send Korean email error:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// 한국어 이메일 트리거
+export const emailTriggersKorean = {
+  // 캠페인 승인 (한국어)
+  onApplicationApproved: async (application, campaign, user) => {
+    const deadline = campaign.deadline
+      ? new Date(campaign.deadline).toLocaleDateString('ko-KR')
+      : '추후 안내'
+    const shippingDate = new Date()
+    shippingDate.setDate(shippingDate.getDate() + 3)
+
+    await sendEmailKorean('APPLICATION_APPROVED', user.email, {
+      name: user.name || '크리에이터',
+      campaignTitle: campaign.title,
+      deadline: deadline,
+      shippingDate: shippingDate.toLocaleDateString('ko-KR'),
+      rewardAmount: campaign.reward_amount || campaign.reward || 0,
+      googleDriveLink: application.google_drive_url || campaign.google_drive_link,
+      googleSlidesLink: application.google_slides_url || campaign.google_slides_link
+    })
+  }
+}
+
 export default {
   sendEmail,
+  sendEmailKorean,
   scheduleReminderEmails,
   emailTriggers,
-  EMAIL_TEMPLATES
+  emailTriggersKorean,
+  EMAIL_TEMPLATES,
+  EMAIL_TEMPLATES_KO
 }
