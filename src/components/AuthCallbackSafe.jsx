@@ -173,11 +173,18 @@ const AuthCallbackSafe = () => {
 
           {status === 'success' && (
             <>
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                로그인 성공!
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-10 w-10 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                {message.includes('이메일 인증') ? '🎉 인증 완료!' : '✨ 로그인 성공!'}
               </h2>
-              <p className="text-gray-600">{message}</p>
+              <p className="text-gray-600 text-lg mb-4">{message}</p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-green-700 text-sm">
+                  잠시 후 자동으로 이동합니다...
+                </p>
+              </div>
             </>
           )}
 
