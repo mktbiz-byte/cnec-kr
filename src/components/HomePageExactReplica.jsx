@@ -367,98 +367,102 @@ const HomePageExactReplica = () => {
             </p>
           </div>
 
-          {/* 필터 탭 */}
-          <div className="flex justify-start md:justify-center mb-6 md:mb-10 gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`flex-shrink-0 px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                selectedCategory === 'all'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
-              }`}
-            >
-              전체
-            </button>
-            <button
-              onClick={() => setSelectedCategory('planned')}
-              className={`flex-shrink-0 px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                selectedCategory === 'planned'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
-              }`}
-            >
-              기획형
-            </button>
-            <button
-              onClick={() => setSelectedCategory('oliveyoung')}
-              className={`flex-shrink-0 px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                selectedCategory === 'oliveyoung'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
-              }`}
-            >
-              올영세일
-            </button>
-            <button
-              onClick={() => setSelectedCategory('4week_challenge')}
-              className={`flex-shrink-0 px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                selectedCategory === '4week_challenge'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
-              }`}
-            >
-              4주 챌린지
-            </button>
+          {/* 필터 탭 + 보기 옵션 */}
+          <div className="mb-6 md:mb-10">
+            {/* 필터 + 보기 옵션 (한 줄에) */}
+            <div className="flex items-center justify-between gap-3">
+              {/* 카테고리 필터 */}
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide flex-1">
+                <button
+                  onClick={() => setSelectedCategory('all')}
+                  className={`flex-shrink-0 px-3 py-1.5 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
+                    selectedCategory === 'all'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
+                  }`}
+                >
+                  전체
+                </button>
+                <button
+                  onClick={() => setSelectedCategory('planned')}
+                  className={`flex-shrink-0 px-3 py-1.5 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
+                    selectedCategory === 'planned'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
+                  }`}
+                >
+                  기획형
+                </button>
+                <button
+                  onClick={() => setSelectedCategory('oliveyoung')}
+                  className={`flex-shrink-0 px-3 py-1.5 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
+                    selectedCategory === 'oliveyoung'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
+                  }`}
+                >
+                  올영세일
+                </button>
+                <button
+                  onClick={() => setSelectedCategory('4week_challenge')}
+                  className={`flex-shrink-0 px-3 py-1.5 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
+                    selectedCategory === '4week_challenge'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
+                  }`}
+                >
+                  4주 챌린지
+                </button>
+              </div>
 
-            {/* 보기 옵션 */}
-            <div className="flex items-center gap-1 ml-auto bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setGridColumns(1)}
-                className={`p-2 rounded-md transition-all ${
-                  gridColumns === 1
-                    ? 'bg-white shadow-sm text-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-                title="1개 보기"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <rect x="3" y="3" width="14" height="14" rx="2" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setGridColumns(2)}
-                className={`p-2 rounded-md transition-all ${
-                  gridColumns === 2
-                    ? 'bg-white shadow-sm text-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-                title="2개 보기"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <rect x="2" y="3" width="6" height="14" rx="1" />
-                  <rect x="12" y="3" width="6" height="14" rx="1" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setGridColumns(4)}
-                className={`p-2 rounded-md transition-all ${
-                  gridColumns === 4
-                    ? 'bg-white shadow-sm text-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-                title="4개 보기"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <rect x="2" y="2" width="3" height="7" rx="0.5" />
-                  <rect x="7" y="2" width="3" height="7" rx="0.5" />
-                  <rect x="12" y="2" width="3" height="7" rx="0.5" />
-                  <rect x="17" y="2" width="1" height="7" rx="0.5" />
-                  <rect x="2" y="11" width="3" height="7" rx="0.5" />
-                  <rect x="7" y="11" width="3" height="7" rx="0.5" />
-                  <rect x="12" y="11" width="3" height="7" rx="0.5" />
-                  <rect x="17" y="11" width="1" height="7" rx="0.5" />
-                </svg>
-              </button>
+              {/* 보기 옵션 */}
+              <div className="flex-shrink-0 flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5">
+                <button
+                  onClick={() => setGridColumns(1)}
+                  className={`p-1.5 md:p-2 rounded-md transition-all ${
+                    gridColumns === 1
+                      ? 'bg-white shadow-sm text-indigo-600'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  title="1개 보기"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <rect x="4" y="4" width="12" height="12" rx="2" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setGridColumns(2)}
+                  className={`p-1.5 md:p-2 rounded-md transition-all ${
+                    gridColumns === 2
+                      ? 'bg-white shadow-sm text-indigo-600'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  title="2개 보기"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <rect x="2" y="4" width="6" height="12" rx="1" />
+                    <rect x="12" y="4" width="6" height="12" rx="1" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setGridColumns(4)}
+                  className={`p-1.5 md:p-2 rounded-md transition-all ${
+                    gridColumns === 4
+                      ? 'bg-white shadow-sm text-indigo-600'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  title="4개 보기"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <rect x="2" y="3" width="3.5" height="6" rx="0.5" />
+                    <rect x="8" y="3" width="3.5" height="6" rx="0.5" />
+                    <rect x="14" y="3" width="3.5" height="6" rx="0.5" />
+                    <rect x="2" y="11" width="3.5" height="6" rx="0.5" />
+                    <rect x="8" y="11" width="3.5" height="6" rx="0.5" />
+                    <rect x="14" y="11" width="3.5" height="6" rx="0.5" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -506,7 +510,9 @@ const HomePageExactReplica = () => {
                   onClick={() => handleCampaignClick(campaign)}
                 >
                   {/* 썸네일 */}
-                  <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+                  <div className={`relative bg-gray-100 overflow-hidden ${
+                    gridColumns === 4 ? 'aspect-square' : 'aspect-[4/3]'
+                  }`}>
                     {campaign.image_url ? (
                       <img
                         src={campaign.image_url}
@@ -515,35 +521,41 @@ const HomePageExactReplica = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <Target className="w-10 h-10 text-gray-300" />
+                        <Target className={`text-gray-300 ${gridColumns === 4 ? 'w-6 h-6' : 'w-10 h-10'}`} />
                       </div>
                     )}
                     {/* 상태 배지 */}
-                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-green-500 text-white text-xs font-medium rounded-md">
+                    <span className={`absolute top-2 left-2 bg-green-500 text-white font-medium rounded-md ${
+                      gridColumns === 4 ? 'px-1.5 py-0.5 text-[9px]' : 'px-2.5 py-1 text-xs top-3 left-3'
+                    }`}>
                       모집중
                     </span>
                   </div>
 
                   {/* 콘텐츠 */}
-                  <div className="p-4 md:p-5">
+                  <div className={`p-3 md:p-4 ${gridColumns === 4 ? 'p-2.5' : ''}`}>
                     {/* 브랜드 */}
-                    <p className="text-xs text-gray-500 mb-1">{campaign.brand}</p>
+                    <p className={`text-gray-500 mb-0.5 truncate ${gridColumns === 4 ? 'text-[10px]' : 'text-xs'}`}>{campaign.brand}</p>
 
                     {/* 제목 */}
-                    <h3 className="text-sm md:text-base font-semibold text-gray-900 mb-3 line-clamp-2 leading-snug">
+                    <h3 className={`font-semibold text-gray-900 mb-2 line-clamp-2 leading-snug ${
+                      gridColumns === 4 ? 'text-xs' : 'text-sm md:text-base mb-3'
+                    }`}>
                       {campaign.title}
                     </h3>
 
                     {/* 플랫폼 & 마감일 */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-                      <div className="flex items-center gap-1">
+                    <div className={`flex flex-wrap items-center gap-1.5 text-gray-500 mb-3 ${
+                      gridColumns === 4 ? 'text-[10px] mb-2' : 'text-xs mb-4'
+                    }`}>
+                      <div className="flex items-center gap-1 flex-wrap">
                         {(() => {
                           if (Array.isArray(campaign.target_platforms)) {
-                            return campaign.target_platforms.slice(0, 2).map(p => p.charAt(0).toUpperCase() + p.slice(1))
+                            return campaign.target_platforms.slice(0, gridColumns === 4 ? 1 : 2).map(p => p.charAt(0).toUpperCase() + p.slice(1))
                           }
                           return ['Instagram']
                         })().map((platform) => (
-                          <span key={platform} className={`px-2 py-0.5 rounded text-xs ${getPlatformColor(platform)}`}>
+                          <span key={platform} className={`px-1.5 py-0.5 rounded ${gridColumns === 4 ? 'text-[9px]' : 'text-xs'} ${getPlatformColor(platform)}`}>
                             {platform}
                           </span>
                         ))}
@@ -551,19 +563,27 @@ const HomePageExactReplica = () => {
                       {campaign.application_deadline && (
                         <>
                           <span className="text-gray-300">|</span>
-                          <span>{new Date(campaign.application_deadline).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} 마감</span>
+                          <span className="whitespace-nowrap">{new Date(campaign.application_deadline).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })} 마감</span>
                         </>
                       )}
                     </div>
 
                     {/* 하단: 보상 & CTA */}
-                    <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                      <span className="text-lg font-bold text-indigo-600">
-                        {formatCurrency(campaign.creator_points_override || campaign.reward_points || campaign.reward_amount || 0)}
-                      </span>
-                      <button className="px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors">
-                        지원하기
-                      </button>
+                    <div className={`pt-2 border-t border-gray-100 ${gridColumns === 4 ? 'pt-1.5' : 'pt-3'}`}>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`font-bold text-indigo-600 ${
+                          gridColumns === 4 ? 'text-sm' : 'text-base md:text-lg'
+                        }`}>
+                          {formatCurrency(campaign.creator_points_override || campaign.reward_points || campaign.reward_amount || 0)}
+                        </span>
+                        <button className={`flex-shrink-0 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors whitespace-nowrap ${
+                          gridColumns === 4
+                            ? 'px-2 py-1 text-[10px]'
+                            : 'px-3 py-1.5 text-xs md:px-4 md:py-2'
+                        }`}>
+                          지원하기
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
