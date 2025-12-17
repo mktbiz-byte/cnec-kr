@@ -24,6 +24,63 @@ const CampaignApplicationUpdated = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showProductModal, setShowProductModal] = useState(false)
+
+  // 프로필 미완성 모달
+  const [showProfileIncompleteModal, setShowProfileIncompleteModal] = useState(false)
+  const [profileCompleteness, setProfileCompleteness] = useState(0)
+  const [missingProfileFields, setMissingProfileFields] = useState([])
+
+  // 프로필 완성도 계산 함수
+  const calculateProfileCompleteness = (profileData) => {
+    if (!profileData) return { completeness: 0, missingFields: ['이름', '연락처', 'SNS 계정', '배송 주소'] }
+
+    const missing = []
+    let score = 0
+
+    if (profileData.name && profileData.name.trim()) {
+      score += 25
+    } else {
+      missing.push('이름')
+    }
+
+    if (profileData.phone && profileData.phone.trim()) {
+      score += 25
+    } else {
+      missing.push('연락처')
+    }
+
+    if ((profileData.instagram_url && profileData.instagram_url.trim()) ||
+        (profileData.youtube_url && profileData.youtube_url.trim()) ||
+        (profileData.tiktok_url && profileData.tiktok_url.trim())) {
+      score += 25
+    } else {
+      missing.push('SNS 계정 (인스타/유튜브/틱톡 중 1개)')
+    }
+
+    if ((profileData.address && profileData.address.trim()) ||
+        (profileData.postcode && profileData.postcode.trim())) {
+      score += 25
+    } else {
+      missing.push('배송 주소')
+    }
+
+    return { completeness: score, missingFields: missing }
+  }
+
+  // 프로필이 캠페인 신청 가능한 상태인지 확인
+  const isProfileComplete = (profileData) => {
+    if (!profileData) return false
+
+    const hasName = profileData.name && profileData.name.trim() !== ''
+    const hasPhone = profileData.phone && profileData.phone.trim() !== ''
+    const hasSnsUrl = (profileData.instagram_url && profileData.instagram_url.trim() !== '') ||
+                      (profileData.youtube_url && profileData.youtube_url.trim() !== '') ||
+                      (profileData.tiktok_url && profileData.tiktok_url.trim() !== '')
+    const hasAddress = (profileData.address && profileData.address.trim() !== '') ||
+                       (profileData.postcode && profileData.postcode.trim() !== '')
+
+    return hasName && hasPhone && hasSnsUrl && hasAddress
+  }
   
   // SNS 플랫폼 선택 상태
   const [selectedPlatforms, setSelectedPlatforms] = useState({
@@ -212,6 +269,16 @@ const CampaignApplicationUpdated = () => {
       console.log('프로필 데이터:', profileData)
       setUserProfile(profileData)
 
+      // 프로필 완성도 체크
+      const { completeness, missingFields } = calculateProfileCompleteness(profileData)
+      setProfileCompleteness(completeness)
+      setMissingProfileFields(missingFields)
+
+      // 프로필이 완성되지 않았으면 모달 표시
+      if (!isProfileComplete(profileData)) {
+        setShowProfileIncompleteModal(true)
+      }
+
       // 프로필에서 기존 정보 가져와서 폼에 미리 채우기
       if (profileData) {
         setApplicationData(prev => ({
@@ -320,6 +387,13 @@ const CampaignApplicationUpdated = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    // 프로필 완성도 체크
+    if (!isProfileComplete(userProfile)) {
+      setShowProfileIncompleteModal(true)
+      setError('프로필을 완성한 후 캠페인에 지원할 수 있습니다.')
+      return
+    }
 
     const validationErrors = validateForm()
     if (validationErrors.length > 0) {
@@ -464,6 +538,80 @@ const CampaignApplicationUpdated = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* 프로필 미완성 모달 */}
+      {showProfileIncompleteModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+            {/* 상단 그라데이션 헤더 */}
+            <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 p-6 text-white text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-white/20 backdrop-blur mb-4">
+                <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold mb-1">
+                프로필 설정이 필요합니다
+              </h3>
+              <p className="text-white/80 text-sm">
+                캠페인 지원을 위해 프로필을 완성해주세요
+              </p>
+            </div>
+
+            <div className="p-6">
+              {/* 프로필 완성도 */}
+              <div className="mb-6">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-600">현재 프로필 완성도</span>
+                  <span className="font-bold text-orange-600">{profileCompleteness}%</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 h-3 rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${profileCompleteness}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* 미완성 항목 체크리스트 */}
+              {missingProfileFields.length > 0 && (
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+                  <p className="text-sm font-semibold text-orange-800 mb-3">
+                    아래 항목을 완성해주세요
+                  </p>
+                  <div className="space-y-2">
+                    {missingProfileFields.map((field, index) => (
+                      <div key={index} className="flex items-center text-sm">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center mr-3 bg-orange-300">
+                          <span className="text-white text-xs font-bold">{index + 1}</span>
+                        </div>
+                        <span className="text-orange-700">{field}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 버튼 */}
+              <button
+                onClick={() => navigate('/mypage')}
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                지금 프로필 설정하기
+              </button>
+              <button
+                onClick={() => {
+                  setShowProfileIncompleteModal(false)
+                  navigate('/')
+                }}
+                className="w-full mt-3 py-3 text-gray-500 text-sm hover:text-gray-700 transition-colors"
+              >
+                나중에 하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* 헤더 */}
         <div className="mb-8">
@@ -478,6 +626,40 @@ const CampaignApplicationUpdated = () => {
           </button>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t.title}</h1>
         </div>
+
+        {/* 프로필 미완성 경고 배너 */}
+        {!isProfileComplete(userProfile) && (
+          <div className="mb-6 bg-gradient-to-r from-orange-100 to-red-100 border-l-4 border-orange-500 rounded-lg p-4 shadow-sm">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-semibold text-orange-800">
+                  프로필 완성이 필요합니다
+                </h3>
+                <p className="text-sm text-orange-700 mt-1">
+                  캠페인에 지원하려면 먼저 프로필을 완성해주세요.
+                  {missingProfileFields.length > 0 && (
+                    <span className="block mt-1 font-medium">
+                      누락된 항목: {missingProfileFields.join(', ')}
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div className="ml-4">
+                <button
+                  onClick={() => navigate('/mypage')}
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                >
+                  프로필 설정
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* 캠페인 정보 */}
@@ -1563,28 +1745,41 @@ const CampaignApplicationUpdated = () => {
 
               {/* 제출 버튼 */}
               <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submitting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {t.submitting}
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                      </svg>
-                      {t.submit}
-                    </>
-                  )}
-                </button>
+                {!isProfileComplete(userProfile) ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowProfileIncompleteModal(true)}
+                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    프로필 완성 후 신청 가능
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {t.submitting}
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                        {t.submit}
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </form>
           </div>
