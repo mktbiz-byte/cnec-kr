@@ -33,6 +33,7 @@ const HomePageExactReplica = () => {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
   const [detailModal, setDetailModal] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [gridColumns, setGridColumns] = useState(2) // 기본 2개 보기
 
   useEffect(() => {
     loadPageData()
@@ -408,6 +409,57 @@ const HomePageExactReplica = () => {
             >
               4주 챌린지
             </button>
+
+            {/* 보기 옵션 */}
+            <div className="flex items-center gap-1 ml-auto bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setGridColumns(1)}
+                className={`p-2 rounded-md transition-all ${
+                  gridColumns === 1
+                    ? 'bg-white shadow-sm text-indigo-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                title="1개 보기"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <rect x="3" y="3" width="14" height="14" rx="2" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setGridColumns(2)}
+                className={`p-2 rounded-md transition-all ${
+                  gridColumns === 2
+                    ? 'bg-white shadow-sm text-indigo-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                title="2개 보기"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <rect x="2" y="3" width="6" height="14" rx="1" />
+                  <rect x="12" y="3" width="6" height="14" rx="1" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setGridColumns(4)}
+                className={`p-2 rounded-md transition-all ${
+                  gridColumns === 4
+                    ? 'bg-white shadow-sm text-indigo-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                title="4개 보기"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <rect x="2" y="2" width="3" height="7" rx="0.5" />
+                  <rect x="7" y="2" width="3" height="7" rx="0.5" />
+                  <rect x="12" y="2" width="3" height="7" rx="0.5" />
+                  <rect x="17" y="2" width="1" height="7" rx="0.5" />
+                  <rect x="2" y="11" width="3" height="7" rx="0.5" />
+                  <rect x="7" y="11" width="3" height="7" rx="0.5" />
+                  <rect x="12" y="11" width="3" height="7" rx="0.5" />
+                  <rect x="17" y="11" width="1" height="7" rx="0.5" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -426,7 +478,13 @@ const HomePageExactReplica = () => {
               <p className="text-gray-500 text-sm md:text-base">새로운 캠페인이 시작될 때까지 기다려주세요.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 max-w-6xl mx-auto">
+            <div className={`grid gap-4 md:gap-5 max-w-6xl mx-auto ${
+              gridColumns === 1
+                ? 'grid-cols-1 max-w-xl'
+                : gridColumns === 2
+                  ? 'grid-cols-1 sm:grid-cols-2'
+                  : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
+            }`}>
               {campaigns
                 .filter(campaign => {
                   if (selectedCategory === 'all') return true
