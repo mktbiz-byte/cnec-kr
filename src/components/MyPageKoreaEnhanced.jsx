@@ -1086,9 +1086,49 @@ const MyPageKoreaEnhanced = () => {
               </div>
 
               {/* 영상 레퍼런스 섹션 */}
-              <div className="mt-8">
+              <div className="mt-8 pb-24">
                 <VideoReferencesSection userId={user?.id} />
               </div>
+
+              {/* 편집 모드 하단 고정 저장 버튼 */}
+              {isEditing && (
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
+                        편집 중 - 변경사항을 저장해주세요
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => {
+                            setIsEditing(false)
+                            fetchUserData() // 원래 데이터로 복원
+                          }}
+                          className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                        >
+                          취소
+                        </button>
+                        <button
+                          onClick={handleProfileSave}
+                          disabled={processing}
+                          className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 font-medium transition-all disabled:opacity-50 shadow-md hover:shadow-lg"
+                        >
+                          {processing ? (
+                            <span className="flex items-center">
+                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              저장 중...
+                            </span>
+                          ) : '저장하기'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
