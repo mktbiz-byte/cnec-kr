@@ -119,21 +119,41 @@ const MyPageKoreaEnhanced = () => {
     '중성'
   ]
 
-  // 프로필 완성도 계산
+  // 프로필 완성도 계산 (합리적인 기준)
   const calculateProfileCompleteness = (profileData) => {
     if (!profileData) return 0
-    
-    const fields = [
-      profileData.name,
-      profileData.phone,
-      profileData.instagram_url || profileData.youtube_url,
-      profileData.profile_photo_url,
-      profileData.skin_type,
-      profileData.region
+
+    // 필수 항목 (각 25점, 총 100점)
+    const requiredFields = [
+      { field: profileData.name, weight: 25 },                                    // 이름 (필수)
+      { field: profileData.phone, weight: 25 },                                   // 연락처 (필수)
+      { field: profileData.instagram_url || profileData.youtube_url || profileData.tiktok_url, weight: 25 }, // SNS URL 최소 1개 (필수)
+      { field: profileData.address || profileData.postcode, weight: 25 }          // 주소 또는 우편번호 (필수)
     ]
-    
-    const filledFields = fields.filter(field => field && field !== '').length
-    return Math.round((filledFields / fields.length) * 100)
+
+    let score = 0
+    requiredFields.forEach(item => {
+      if (item.field && item.field !== '') {
+        score += item.weight
+      }
+    })
+
+    return Math.round(score)
+  }
+
+  // 프로필이 캠페인 신청 가능한 상태인지 확인
+  const isProfileComplete = (profileData) => {
+    if (!profileData) return false
+
+    const hasName = profileData.name && profileData.name.trim() !== ''
+    const hasPhone = profileData.phone && profileData.phone.trim() !== ''
+    const hasSnsUrl = (profileData.instagram_url && profileData.instagram_url.trim() !== '') ||
+                      (profileData.youtube_url && profileData.youtube_url.trim() !== '') ||
+                      (profileData.tiktok_url && profileData.tiktok_url.trim() !== '')
+    const hasAddress = (profileData.address && profileData.address.trim() !== '') ||
+                       (profileData.postcode && profileData.postcode.trim() !== '')
+
+    return hasName && hasPhone && hasSnsUrl && hasAddress
   }
 
   useEffect(() => {
@@ -187,8 +207,9 @@ const MyPageKoreaEnhanced = () => {
       const completeness = calculateProfileCompleteness(profileData)
       setProfileCompleteness(completeness)
 
-      // 프로필이 70% 미만이면 프로필 설정 필수 모달 표시
-      if (completeness < 70) {
+      // 프로필이 100% 미만이면 프로필 설정 필수 모달 표시
+      // (필수 항목: 이름, 연락처, SNS URL, 주소)
+      if (completeness < 100) {
         setShowWelcomeModal(true)
       }
       
@@ -543,7 +564,7 @@ const MyPageKoreaEnhanced = () => {
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 mt-2 text-center">
-                    70% 이상 완성 시 캠페인 지원이 가능합니다
+                    모든 필수 항목 완성 시 캠페인 지원이 가능합니다
                   </p>
                 </div>
 
@@ -564,16 +585,16 @@ const MyPageKoreaEnhanced = () => {
                       <span className={profile?.phone ? 'text-gray-500 line-through' : 'text-gray-700'}>연락처</span>
                     </div>
                     <div className="flex items-center text-sm">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${(profile?.instagram_url || profile?.youtube_url) ? 'bg-green-500' : 'bg-gray-300'}`}>
-                        {(profile?.instagram_url || profile?.youtube_url) ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">3</span>}
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${(profile?.instagram_url || profile?.youtube_url || profile?.tiktok_url) ? 'bg-green-500' : 'bg-gray-300'}`}>
+                        {(profile?.instagram_url || profile?.youtube_url || profile?.tiktok_url) ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">3</span>}
                       </div>
-                      <span className={(profile?.instagram_url || profile?.youtube_url) ? 'text-gray-500 line-through' : 'text-gray-700'}>SNS 계정 (인스타그램/유튜브)</span>
+                      <span className={(profile?.instagram_url || profile?.youtube_url || profile?.tiktok_url) ? 'text-gray-500 line-through' : 'text-gray-700'}>SNS 계정 (인스타/유튜브/틱톡 중 1개)</span>
                     </div>
                     <div className="flex items-center text-sm">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${profile?.profile_photo_url ? 'bg-green-500' : 'bg-gray-300'}`}>
-                        {profile?.profile_photo_url ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">4</span>}
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${(profile?.address || profile?.postcode) ? 'bg-green-500' : 'bg-gray-300'}`}>
+                        {(profile?.address || profile?.postcode) ? <span className="text-white text-xs">✓</span> : <span className="text-white text-xs">4</span>}
                       </div>
-                      <span className={profile?.profile_photo_url ? 'text-gray-500 line-through' : 'text-gray-700'}>프로필 사진</span>
+                      <span className={(profile?.address || profile?.postcode) ? 'text-gray-500 line-through' : 'text-gray-700'}>배송 주소</span>
                     </div>
                   </div>
                 </div>
