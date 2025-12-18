@@ -54,22 +54,20 @@ const ApplicationsPage = () => {
         console.error('Applications 로드 오류:', appsError)
       }
 
-      // 캠페인 정보 별도 조회 (가이드 관련 필드 포함)
+      // 캠페인 정보 별도 조회
       let applicationsData = appsData || []
       if (applicationsData.length > 0) {
         const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
         if (campaignIds.length > 0) {
-          const { data: campaignsData } = await supabase
+          // 기본 필드만 먼저 조회 (안전한 쿼리)
+          const { data: campaignsData, error: campaignsError } = await supabase
             .from('campaigns')
-            .select(`
-              id, title, brand, image_url, reward_points, creator_points_override,
-              application_deadline, content_submission_deadline, campaign_type, product_shipping_date,
-              ai_generated_guide, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai,
-              challenge_weekly_guides_ai, step1_deadline, step2_deadline, step3_deadline,
-              week1_deadline, week2_deadline, week3_deadline, week4_deadline,
-              start_date, end_date
-            `)
+            .select('*')
             .in('id', campaignIds)
+
+          if (campaignsError) {
+            console.error('캠페인 데이터 로드 오류:', campaignsError)
+          }
 
           // 캠페인 데이터 병합
           applicationsData = applicationsData.map(app => ({
