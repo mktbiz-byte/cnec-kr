@@ -8,6 +8,23 @@ import {
   Eye, X, BookOpen, Video
 } from 'lucide-react'
 
+// 안전하게 값을 문자열로 변환하는 헬퍼 함수
+const renderValue = (value) => {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (Array.isArray(value)) {
+    return value.map(item => renderValue(item)).join('\n• ')
+  }
+  if (typeof value === 'object') {
+    // 객체인 경우 각 키-값을 문자열로 변환
+    return Object.entries(value)
+      .map(([k, v]) => `${k}: ${renderValue(v)}`)
+      .join('\n')
+  }
+  return String(value)
+}
+
 const ApplicationsPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -546,22 +563,22 @@ const ApplicationsPage = () => {
               {/* 기획형 가이드 내용 */}
               {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
                 <div className="space-y-3">
-                  {typeof selectedGuide.personalized_guide === 'object' ? (
+                  {typeof selectedGuide.personalized_guide === 'object' && selectedGuide.personalized_guide !== null ? (
                     Object.entries(selectedGuide.personalized_guide).map(([key, value]) => (
                       <div key={key} className="bg-purple-50 rounded-xl p-3">
                         <p className="text-xs font-semibold text-purple-700 mb-1">{key}</p>
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{value}</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(value)}</p>
                       </div>
                     ))
                   ) : (
                     <div className="bg-purple-50 rounded-xl p-3">
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.personalized_guide}</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.personalized_guide)}</p>
                     </div>
                   )}
                   {selectedGuide.additional_message && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
                       <p className="text-xs font-semibold text-yellow-700 mb-1">💬 추가 메시지</p>
-                      <p className="text-sm text-gray-800">{selectedGuide.additional_message}</p>
+                      <p className="text-sm text-gray-800">{renderValue(selectedGuide.additional_message)}</p>
                     </div>
                   )}
                 </div>
@@ -573,7 +590,7 @@ const ApplicationsPage = () => {
                   {selectedGuide.campaigns?.oliveyoung_step1_guide_ai && (
                     <div className="bg-green-50 rounded-xl p-3">
                       <p className="text-xs font-semibold text-green-700 mb-1">📹 1차 촬영 가이드</p>
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.campaigns.oliveyoung_step1_guide_ai}</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.campaigns.oliveyoung_step1_guide_ai)}</p>
                       {selectedGuide.campaigns?.step1_deadline && (
                         <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step1_deadline).toLocaleDateString('ko-KR')}</p>
                       )}
@@ -582,7 +599,7 @@ const ApplicationsPage = () => {
                   {selectedGuide.campaigns?.oliveyoung_step2_guide_ai && (
                     <div className="bg-blue-50 rounded-xl p-3">
                       <p className="text-xs font-semibold text-blue-700 mb-1">📱 2차 촬영 가이드</p>
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.campaigns.oliveyoung_step2_guide_ai}</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.campaigns.oliveyoung_step2_guide_ai)}</p>
                       {selectedGuide.campaigns?.step2_deadline && (
                         <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step2_deadline).toLocaleDateString('ko-KR')}</p>
                       )}
@@ -591,7 +608,7 @@ const ApplicationsPage = () => {
                   {selectedGuide.campaigns?.oliveyoung_step3_guide_ai && (
                     <div className="bg-purple-50 rounded-xl p-3">
                       <p className="text-xs font-semibold text-purple-700 mb-1">📱 3차 촬영 가이드</p>
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.campaigns.oliveyoung_step3_guide_ai}</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.campaigns.oliveyoung_step3_guide_ai)}</p>
                       {selectedGuide.campaigns?.step3_deadline && (
                         <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step3_deadline).toLocaleDateString('ko-KR')}</p>
                       )}
@@ -623,14 +640,14 @@ const ApplicationsPage = () => {
                         <p className={`text-xs font-semibold ${weekColors[idx]?.split(' ')[1] || 'text-gray-700'} mb-1`}>
                           📅 {idx + 1}주차 가이드
                         </p>
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{guide}</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(guide)}</p>
                         {weekDeadlines[idx] && (
                           <p className="text-xs text-red-600 mt-2">마감: {new Date(weekDeadlines[idx]).toLocaleDateString('ko-KR')}</p>
                         )}
                       </div>
                     )) : (
                       <div className="bg-indigo-50 rounded-xl p-3">
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{JSON.stringify(guides)}</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(guides)}</p>
                       </div>
                     )
                   })()}
@@ -651,14 +668,14 @@ const ApplicationsPage = () => {
                         <div key={key} className="bg-gray-50 rounded-xl p-3">
                           <p className="text-xs font-semibold text-gray-700 mb-1">{key}</p>
                           <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                            {Array.isArray(value) ? value.join('\n• ') : value}
+                            {renderValue(value)}
                           </p>
                         </div>
                       ))
                     }
                     return (
                       <div className="bg-gray-50 rounded-xl p-3">
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{guide}</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(guide)}</p>
                       </div>
                     )
                   })()}
