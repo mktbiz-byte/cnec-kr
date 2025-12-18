@@ -95,11 +95,12 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
     }
 
     // 질문 답변 체크
-    if (campaign?.questions && Array.isArray(campaign.questions)) {
+    if (campaign?.questions && Array.isArray(campaign.questions) && campaign.questions.length > 0) {
       campaign.questions.forEach((q, idx) => {
         const answerKey = `answer_${idx + 1}`
         if (!applicationData[answerKey]?.trim()) {
-          errors.push(`질문 ${idx + 1}에 답변해주세요`)
+          const questionText = typeof q === 'string' ? q : (q?.text || q?.question || `질문 ${idx + 1}`)
+          errors.push(`"${questionText.substring(0, 20)}..." 에 답변해주세요`)
         }
       })
     }
@@ -219,7 +220,14 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
                 <FileText size={40} className="text-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">이미 지원한 캠페인입니다</h3>
-              <p className="text-gray-500">현재 상태: {existingApplication.status === 'pending' ? '검토중' : existingApplication.status}</p>
+              <p className="text-gray-500">현재 상태: {
+                existingApplication.status === 'pending' ? '검토중' :
+                existingApplication.status === 'selected' ? '선정됨' :
+                existingApplication.status === 'approved' ? '승인됨' :
+                existingApplication.status === 'rejected' ? '미선정' :
+                existingApplication.status === 'completed' ? '완료' :
+                String(existingApplication.status || '확인중')
+              }</p>
             </div>
           ) : showApplicationForm ? (
             /* 지원 폼 */
@@ -315,25 +323,32 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
               </div>
 
               {/* 질문 답변 */}
-              {campaign.questions && campaign.questions.length > 0 && (
+              {campaign.questions && Array.isArray(campaign.questions) && campaign.questions.length > 0 && (
                 <div>
                   <h3 className="font-bold text-gray-900 mb-3">질문 답변</h3>
                   <div className="space-y-4">
-                    {campaign.questions.map((question, idx) => (
-                      <div key={idx}>
-                        <p className="text-sm text-gray-700 mb-2">{question}</p>
-                        <textarea
-                          placeholder="답변을 입력해주세요"
-                          value={applicationData[`answer_${idx + 1}`] || ''}
-                          onChange={(e) => setApplicationData({
-                            ...applicationData,
-                            [`answer_${idx + 1}`]: e.target.value
-                          })}
-                          rows={3}
-                          className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                        />
-                      </div>
-                    ))}
+                    {campaign.questions.map((question, idx) => {
+                      // question이 객체인 경우 text나 question 속성 추출
+                      const questionText = typeof question === 'string'
+                        ? question
+                        : (question?.text || question?.question || question?.content || JSON.stringify(question))
+
+                      return (
+                        <div key={idx}>
+                          <p className="text-sm text-gray-700 mb-2">{questionText}</p>
+                          <textarea
+                            placeholder="답변을 입력해주세요"
+                            value={applicationData[`answer_${idx + 1}`] || ''}
+                            onChange={(e) => setApplicationData({
+                              ...applicationData,
+                              [`answer_${idx + 1}`]: e.target.value
+                            })}
+                            rows={3}
+                            className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                          />
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}
