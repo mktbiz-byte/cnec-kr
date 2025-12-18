@@ -41,28 +41,27 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
       <div className="w-full max-w-md bg-white min-h-screen shadow-2xl relative overflow-hidden">
 
         {/* Header */}
-        <header className="bg-white px-5 py-4 sticky top-0 z-30 flex justify-between items-center border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <img src={cnecLogo} alt="CNEC" className="h-7" />
-            <span className="text-xs text-gray-400 font-medium">Creator</span>
-          </div>
+        <header className="bg-white px-6 py-4 sticky top-0 z-30 flex justify-between items-center shadow-sm">
+          <h1 className="text-xl font-extrabold text-purple-600 tracking-tighter">
+            C·NEC <span className="text-xs text-gray-400 font-normal ml-1">Creator</span>
+          </h1>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {/* 알림 버튼 */}
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 hover:bg-gray-50 rounded-full transition-colors"
+              className="relative"
             >
-              <Bell className="text-gray-400" size={22} />
+              <Bell className="text-gray-400" size={24} />
               {notifications.length > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
               )}
             </button>
 
             {/* 프로필 버튼 */}
             <button
               onClick={() => handleTabChange('my')}
-              className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md"
+              className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm"
             >
               {userInitial}
             </button>
@@ -98,14 +97,12 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
         </main>
 
         {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 z-30 safe-area-bottom">
-          <div className="flex justify-around items-center py-2 px-6 pb-6">
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 z-30">
+          <div className="flex justify-between items-center py-3 px-8 pb-6">
             <button
               onClick={() => handleTabChange('home')}
-              className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-all ${
-                activeTab === 'home'
-                  ? 'text-purple-600'
-                  : 'text-gray-400 hover:text-gray-600'
+              className={`flex flex-col items-center gap-1 transition-colors ${
+                activeTab === 'home' ? 'text-gray-900' : 'text-gray-300'
               }`}
             >
               <Home size={24} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
@@ -114,10 +111,8 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
 
             <button
               onClick={() => handleTabChange('search')}
-              className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-all ${
-                activeTab === 'search'
-                  ? 'text-purple-600'
-                  : 'text-gray-400 hover:text-gray-600'
+              className={`flex flex-col items-center gap-1 transition-colors ${
+                activeTab === 'search' ? 'text-gray-900' : 'text-gray-300'
               }`}
             >
               <Search size={24} strokeWidth={activeTab === 'search' ? 2.5 : 2} />
@@ -126,10 +121,8 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
 
             <button
               onClick={() => handleTabChange('my')}
-              className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-all ${
-                activeTab === 'my'
-                  ? 'text-purple-600'
-                  : 'text-gray-400 hover:text-gray-600'
+              className={`flex flex-col items-center gap-1 transition-colors ${
+                activeTab === 'my' ? 'text-purple-600' : 'text-gray-300'
               }`}
             >
               <User size={24} strokeWidth={activeTab === 'my' ? 2.5 : 2} />

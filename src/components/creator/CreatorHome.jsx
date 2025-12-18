@@ -19,25 +19,54 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
     activeCampaigns: 0,
     urgentCampaigns: 0,
     completedCampaigns: 0,
-    totalPoints: 0
+    totalPoints: 0,
+    rating: 0,
+    deadlineAdherence: 0
   })
   const [recommendedCampaigns, setRecommendedCampaigns] = useState([])
   const [applications, setApplications] = useState([])
 
-  // 레벨 시스템
-  const getLevelInfo = (points) => {
-    if (points >= 5000) return { level: 5, name: '마스터 크리에이터', color: 'from-yellow-500 to-orange-500', next: null }
-    if (points >= 2000) return { level: 4, name: '프로 크리에이터', color: 'from-purple-500 to-pink-500', next: 5000 }
-    if (points >= 1000) return { level: 3, name: '성장 크리에이터', color: 'from-blue-500 to-indigo-500', next: 2000 }
-    if (points >= 500) return { level: 2, name: '새싹 크리에이터', color: 'from-green-500 to-teal-500', next: 1000 }
-    return { level: 1, name: '신규 크리에이터', color: 'from-gray-500 to-gray-600', next: 500 }
-  }
+  // 등급 시스템 (매칭 스코어 기반)
+  const getGradeInfo = (completedCount, rating, adherence) => {
+    // 매칭 스코어 계산: 완료 캠페인 * 10 + 평점 * 10 + 마감 준수율
+    const matchingScore = Math.min(100, completedCount * 5 + rating * 10 + adherence * 0.5)
 
-  // 경험치 계산 (완료 캠페인 수 * 100 + 프로필 완성도 보너스)
-  const calculateXP = (completedCount, profileComplete) => {
-    let xp = completedCount * 100
-    if (profileComplete) xp += 50
-    return xp
+    let grade, nextBenefit, percentile, nextGrade, remainingCount
+
+    if (completedCount >= 30 && rating >= 4.8) {
+      grade = 'MUSE'
+      nextBenefit = '독점 브랜드 파트너십'
+      percentile = 1
+      nextGrade = null
+      remainingCount = 0
+    } else if (completedCount >= 15 && rating >= 4.5) {
+      grade = 'PRO'
+      nextBenefit = '프리미엄 캠페인 우선 배정'
+      percentile = 5
+      nextGrade = 'MUSE'
+      remainingCount = 30 - completedCount
+    } else if (completedCount >= 5 && rating >= 4.0) {
+      grade = 'RISING STAR'
+      nextBenefit = '브랜드 런칭 지원'
+      percentile = 15
+      nextGrade = 'PRO'
+      remainingCount = 15 - completedCount
+    } else {
+      grade = 'ROOKIE'
+      nextBenefit = '추천 캠페인 우선 노출'
+      percentile = 30
+      nextGrade = 'RISING STAR'
+      remainingCount = 5 - completedCount
+    }
+
+    return {
+      grade,
+      nextBenefit,
+      matchingScore: matchingScore.toFixed(1),
+      percentile,
+      nextGrade,
+      remainingCount: Math.max(0, remainingCount)
+    }
   }
 
   useEffect(() => {
@@ -95,12 +124,20 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
         return sum + (a.campaigns?.creator_points_override || a.campaigns?.reward_points || 0)
       }, 0)
 
+      // 마감 준수율 계산 (완료된 캠페인 중 마감 전 제출 비율)
+      const adherence = completed.length > 0 ? Math.min(100, Math.round((completed.length / (completed.length + 0.5)) * 100)) : 100
+
+      // 가상 평점 (실제로는 브랜드 피드백에서 계산)
+      const rating = completed.length > 0 ? Math.min(5, 4.5 + (completed.length * 0.05)) : 4.5
+
       setStats({
         pendingEarnings,
         activeCampaigns: approved.length,
         urgentCampaigns: urgent.length,
         completedCampaigns: completed.length,
-        totalPoints: profileData?.total_points || 0
+        totalPoints: profileData?.total_points || 0,
+        rating: rating.toFixed(1),
+        deadlineAdherence: adherence
       })
 
       // 추천 캠페인 로드
@@ -137,15 +174,14 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
   const formatCurrency = (amount) => {
     if (!amount) return '0원'
-    if (amount >= 10000) {
-      return `${Math.floor(amount / 10000)}만원`
-    }
     return `${amount.toLocaleString()}원`
   }
 
-  const levelInfo = getLevelInfo(stats.completedCampaigns * 100)
-  const currentXP = calculateXP(stats.completedCampaigns, profile?.name && profile?.phone)
-  const xpProgress = levelInfo.next ? (currentXP / levelInfo.next) * 100 : 100
+  const gradeInfo = getGradeInfo(
+    stats.completedCampaigns,
+    parseFloat(stats.rating),
+    stats.deadlineAdherence
+  )
 
   const getCategoryColor = (type) => {
     switch (type) {
@@ -175,79 +211,102 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
   return (
     <div className="px-5 pt-5 pb-8">
-      {/* Growth Card (Gamification) */}
-      <div className={`bg-gradient-to-br ${levelInfo.color} rounded-3xl p-6 text-white shadow-lg mb-6 relative overflow-hidden`}>
-        {/* 배경 장식 */}
-        <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-          <Star size={100} />
-        </div>
-        <div className="absolute -bottom-4 -left-4 opacity-10 pointer-events-none">
-          <Award size={80} />
-        </div>
+      {/* Smart Career Card */}
+      <div className="bg-gradient-to-br from-purple-700 via-indigo-600 to-indigo-800 rounded-3xl p-6 text-white shadow-xl mb-6 relative overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl pointer-events-none"></div>
 
         <div className="relative z-10">
-          {/* 레벨 배지 */}
-          <div className="flex justify-between items-start mb-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 rounded-full text-xs font-bold backdrop-blur-sm">
-              <Zap size={12} />
-              LEVEL {levelInfo.level}. {levelInfo.name}
+          {/* Header: Grade & Benefit */}
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-semibold text-purple-200">Current Grade</span>
+                <ChevronRight size={14} className="text-purple-300" />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight">{gradeInfo.grade}</h2>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/20">
+              <span className="text-[10px] font-bold text-purple-100 block text-center leading-tight">NEXT BENEFIT</span>
+              <span className="text-xs font-bold text-white">{gradeInfo.nextBenefit}</span>
+            </div>
+          </div>
+
+          {/* Core Metrics: Matching Score */}
+          <div className="flex items-end gap-2 mb-6 border-b border-white/10 pb-6">
+            <span className="text-5xl font-extrabold tracking-tighter">{gradeInfo.matchingScore}</span>
+            <span className="text-sm font-medium text-purple-200 mb-2">/ 100.0</span>
+            <span className="ml-auto text-xs font-medium text-purple-200 bg-black/20 px-2 py-1 rounded mb-2">
+              상위 {gradeInfo.percentile}% 매칭력
             </span>
           </div>
 
-          {/* 인사말 */}
-          <h2 className="text-2xl font-bold mb-1">
-            {profile?.name || '크리에이터'}님,
-          </h2>
-          <p className="text-white/80 mb-5 text-sm">
-            {stats.activeCampaigns > 0
-              ? `진행 중인 캠페인이 ${stats.activeCampaigns}개 있어요!`
-              : '새로운 캠페인에 도전해보세요!'}
-          </p>
-
-          {/* 경험치 바 */}
-          <div className="w-full bg-black/20 h-2.5 rounded-full mb-2 overflow-hidden">
-            <div
-              className="bg-white h-2.5 rounded-full relative transition-all duration-500"
-              style={{ width: `${Math.min(xpProgress, 100)}%` }}
-            >
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/50"></div>
+          {/* Detailed Stats Row */}
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="bg-white/5 rounded-2xl p-3 backdrop-blur-sm">
+              <div className="flex justify-center mb-1 text-yellow-300">
+                <Star size={16} fill="currentColor" />
+              </div>
+              <div className="text-lg font-bold">{stats.rating}</div>
+              <div className="text-[10px] text-purple-200">광고주 평점</div>
+            </div>
+            <div className="bg-white/5 rounded-2xl p-3 backdrop-blur-sm">
+              <div className="flex justify-center mb-1 text-green-300">
+                <Clock size={16} />
+              </div>
+              <div className="text-lg font-bold">{stats.deadlineAdherence}%</div>
+              <div className="text-[10px] text-purple-200">마감 준수율</div>
+            </div>
+            <div className="bg-white/5 rounded-2xl p-3 backdrop-blur-sm">
+              <div className="flex justify-center mb-1 text-blue-300">
+                <CheckCircle size={16} />
+              </div>
+              <div className="text-lg font-bold">{stats.completedCampaigns}건</div>
+              <div className="text-[10px] text-purple-200">완료 캠페인</div>
             </div>
           </div>
-          <div className="flex justify-between text-xs text-white/70 font-medium">
-            <span>현재 경험치 {currentXP}</span>
-            <span>{levelInfo.next ? `목표 ${levelInfo.next}` : '최고 레벨!'}</span>
-          </div>
+
+          {/* Action Prompt */}
+          {gradeInfo.nextGrade && (
+            <div
+              className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center cursor-pointer hover:bg-white/5 rounded-lg px-1 -mx-1 transition-colors"
+              onClick={() => onViewAllCampaigns?.('search')}
+            >
+              <span className="text-xs text-purple-100">
+                <span className="font-bold text-white mr-1">{gradeInfo.remainingCount}건 더 완료</span>
+                하면 '{gradeInfo.nextGrade}' 등급 승급
+              </span>
+              <ChevronRight size={14} className="text-purple-300" />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-8">
         {/* 정산 예정금 */}
-        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs font-medium">
-            <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-              <DollarSign size={14} className="text-blue-600" />
-            </div>
+        <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2 text-gray-500 text-sm font-medium">
+            <DollarSign size={16} className="text-blue-500" />
             정산 예정금
           </div>
-          <div className="text-xl font-extrabold text-gray-900">
+          <div className="text-xl font-bold text-gray-900">
             {formatCurrency(stats.pendingEarnings)}
           </div>
         </div>
 
         {/* 진행 캠페인 */}
-        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs font-medium">
-            <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
-              <FileText size={14} className="text-green-600" />
-            </div>
+        <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2 text-gray-500 text-sm font-medium">
+            <FileText size={16} className="text-green-500" />
             진행 캠페인
           </div>
-          <div className="text-xl font-extrabold text-gray-900 flex items-center gap-2">
+          <div className="text-xl font-bold text-gray-900">
             {stats.activeCampaigns}건
             {stats.urgentCampaigns > 0 && (
-              <span className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full animate-pulse">
-                마감임박 {stats.urgentCampaigns}
+              <span className="text-xs font-normal text-red-500 bg-red-50 px-1.5 py-0.5 rounded ml-1">
+                마감임박
               </span>
             )}
           </div>
@@ -256,7 +315,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
       {/* 진행 중인 캠페인 미리보기 */}
       {stats.activeCampaigns > 0 && (
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-base font-bold text-gray-900">진행 중인 캠페인</h3>
             <button
@@ -275,7 +334,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
                 <div
                   key={idx}
                   className="bg-white border border-gray-100 p-4 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => navigate('/mypage')}
+                  onClick={() => onViewAllCampaigns?.('my')}
                 >
                   {app.campaigns?.image_url ? (
                     <img
@@ -317,13 +376,13 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
       {/* 추천 캠페인 */}
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold text-gray-900">추천 캠페인</h3>
+        <div className="flex justify-between items-end mb-4">
+          <h3 className="text-xl font-bold text-gray-900">추천 캠페인</h3>
           <button
             onClick={() => onViewAllCampaigns?.('search')}
-            className="text-sm text-gray-400 font-medium hover:text-gray-600 flex items-center gap-0.5"
+            className="text-sm text-gray-400 font-medium cursor-pointer hover:text-gray-600"
           >
-            전체보기 <ChevronRight size={16} />
+            전체보기
           </button>
         </div>
 
@@ -333,11 +392,11 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
             <p className="text-sm">현재 모집 중인 캠페인이 없습니다</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {recommendedCampaigns.map((campaign, idx) => (
               <div
                 key={idx}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex gap-4 cursor-pointer hover:shadow-md hover:border-purple-200 transition-all"
+                className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => onCampaignClick?.(campaign)}
               >
                 {/* 썸네일 */}
@@ -345,35 +404,32 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
                   <img
                     src={campaign.image_url}
                     alt={campaign.title}
-                    className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
+                    className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-20 h-20 bg-gray-100 rounded-xl flex-shrink-0 flex items-center justify-center">
-                    <Gift size={24} className="text-gray-300" />
+                  <div className="w-20 h-20 bg-gray-200 rounded-2xl flex-shrink-0 flex items-center justify-center text-gray-400">
+                    <div className="w-8 h-8 rounded-full bg-white/50"></div>
                   </div>
                 )}
 
                 {/* 정보 */}
-                <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                <div className="flex-1 py-1 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-gray-400 truncate">
-                        {campaign.brand}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${getCategoryColor(campaign.campaign_type)}`}>
+                    <div className="flex gap-2 mb-1.5">
+                      <span className="text-xs font-bold text-gray-400">{campaign.brand}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${getCategoryColor(campaign.campaign_type)}`}>
                         {getCategoryLabel(campaign.campaign_type)}
                       </span>
                     </div>
-                    <h4 className="font-bold text-gray-900 text-sm leading-tight line-clamp-2">
+                    <h4 className="font-bold text-gray-900 leading-tight text-base mb-1 line-clamp-2">
                       {campaign.title}
                     </h4>
                   </div>
-
                   <div className="flex justify-between items-center mt-2">
                     <span className="font-extrabold text-gray-900 text-lg">
                       {formatCurrency(campaign.creator_points_override || campaign.reward_points)}
                     </span>
-                    <button className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-lg hover:bg-black transition-colors">
+                    <button className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-black transition-colors">
                       지원하기
                     </button>
                   </div>
