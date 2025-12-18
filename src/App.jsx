@@ -6,7 +6,13 @@ import emailScheduler from './lib/emailScheduler';
 import './App.css';
 
 // 크리에이터 앱 컴포넌트 (새 디자인)
-import { CreatorApp } from './components/creator';
+import {
+  CreatorApp,
+  GradeDetailPage,
+  PointsPage,
+  ApplicationsPage,
+  WelcomeScreen
+} from './components/creator';
 import LandingPage from './components/creator/LandingPage';
 
 // 인증 관련
@@ -69,6 +75,10 @@ const AppContent = () => {
 
         {/* 크리에이터 앱 (새 디자인) */}
         <Route path="/creator" element={<CreatorApp />} />
+        <Route path="/my/grade" element={<GradeDetailPage />} />
+        <Route path="/my/points" element={<PointsPage />} />
+        <Route path="/my/applications" element={<ApplicationsPage />} />
+        <Route path="/welcome" element={<WelcomeScreen />} />
 
         {/* 인증 관련 */}
         <Route path="/login" element={<LoginPageExactReplica />} />

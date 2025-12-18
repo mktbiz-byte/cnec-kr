@@ -132,14 +132,44 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
     }
   }
 
-  // 프로필 완성 여부 체크
-  const isProfileComplete = () => {
-    if (!userProfile) return false
-    const hasSkinType = !!userProfile.skin_type
-    const hasAddress = !!userProfile.address
-    const hasSNS = !!(userProfile.instagram_url || userProfile.youtube_url || userProfile.tiktok_url)
-    return hasSkinType && hasAddress && hasSNS
+  // 프로필 완성 여부 체크 (누락 항목도 반환)
+  const getProfileStatus = () => {
+    if (!userProfile) {
+      return {
+        isComplete: false,
+        missing: ['프로필 미등록'],
+        missingDetails: { all: true }
+      }
+    }
+
+    const missing = []
+    const missingDetails = {}
+
+    if (!userProfile.skin_type) {
+      missing.push('피부타입 미입력')
+      missingDetails.skinType = true
+    }
+    if (!userProfile.address) {
+      missing.push('주소 미입력')
+      missingDetails.address = true
+    }
+    if (!userProfile.instagram_url && !userProfile.youtube_url && !userProfile.tiktok_url) {
+      missing.push('SNS 미등록')
+      missingDetails.sns = true
+    }
+    if (!userProfile.phone) {
+      missing.push('연락처 미입력')
+      missingDetails.phone = true
+    }
+
+    return {
+      isComplete: missing.length === 0,
+      missing,
+      missingDetails
+    }
   }
+
+  const isProfileComplete = () => getProfileStatus().isComplete
 
   const handleApplyClick = () => {
     if (!isProfileComplete()) {
@@ -274,21 +304,37 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
 
   // 프로필 필요 알림 모달
   if (showProfileAlert) {
+    const profileStatus = getProfileStatus()
+
     return (
       <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5">
         <div className="w-full max-w-sm bg-white rounded-2xl p-6 text-center">
           <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertTriangle size={28} className="text-amber-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">프로필 등록 필요</h3>
-          <p className="text-sm text-gray-500 mb-5">
-            프로필이 등록되어야 캠페인에 지원할 수 있습니다.
+          <h3 className="text-lg font-bold text-gray-900 mb-2">프로필 완성 후 지원 가능</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            캠페인 지원을 위해 아래 항목을 완성해 주세요.
           </p>
+
+          {/* 누락 항목 뱃지 */}
+          <div className="flex flex-wrap justify-center gap-2 mb-5">
+            {profileStatus.missing.map((item, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-xs font-medium"
+              >
+                <AlertCircle size={12} />
+                {item}
+              </span>
+            ))}
+          </div>
+
           <button
             onClick={handleProfileAlertConfirm}
             className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
           >
-            프로필 등록하기
+            프로필 완성하기
           </button>
           <button
             onClick={() => setShowProfileAlert(false)}
