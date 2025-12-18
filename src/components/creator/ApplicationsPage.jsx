@@ -5,7 +5,8 @@ import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, ArrowRight, Clock, CheckCircle, FileText,
   Upload, Target, Loader2, Calendar, Truck, Camera,
-  Eye, X, BookOpen, Video
+  Eye, X, BookOpen, Video, CheckCircle2, AlertCircle,
+  Play, Copy, Gift
 } from 'lucide-react'
 
 // 안전하게 값을 문자열로 변환하는 헬퍼 함수
@@ -530,88 +531,204 @@ const ApplicationsPage = () => {
         </div>
       </div>
 
-      {/* 가이드 모달 */}
+      {/* 가이드 모달 - 새로운 디자인 */}
       {showGuideModal && selectedGuide && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between">
-              <h3 className="font-bold text-gray-900">
-                {selectedGuide.type === 'planned' && '📝 기획형 촬영 가이드'}
-                {selectedGuide.type === 'oliveyoung' && '🛒 올리브영 촬영 가이드'}
-                {selectedGuide.type === '4week_challenge' && '📅 4주 챌린지 가이드'}
-                {selectedGuide.type === 'general' && '📋 촬영 가이드'}
-              </h3>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center">
+          <div className="bg-white w-full max-w-md max-h-[90vh] overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col">
+
+            {/* 히어로 헤더 */}
+            <div className="relative bg-gradient-to-br from-purple-600 to-indigo-700 p-6 pb-8">
               <button
                 onClick={() => {
                   setShowGuideModal(false)
                   setSelectedGuide(null)
                 }}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors"
               >
-                <X size={20} className="text-gray-500" />
+                <X size={20} className="text-white" />
               </button>
+
+              <div className="flex items-center gap-2 mb-3">
+                <span className="bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-md text-[11px] font-bold text-white">
+                  {selectedGuide.type === 'planned' && '기획형'}
+                  {selectedGuide.type === 'oliveyoung' && '올리브영'}
+                  {selectedGuide.type === '4week_challenge' && '4주 챌린지'}
+                  {selectedGuide.type === 'general' && '일반'}
+                </span>
+              </div>
+
+              <h2 className="text-xl font-extrabold text-white leading-tight mb-1">
+                촬영 가이드
+              </h2>
+              <p className="text-white/70 text-sm">{selectedGuide.campaigns?.brand}</p>
+
+              {/* 캠페인 제목 뱃지 */}
+              <div className="mt-4 inline-flex items-center gap-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-1 pr-4">
+                <div className="bg-gradient-to-br from-purple-300 to-purple-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+                  <Video size={18} className="text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] text-white/60 font-medium">캠페인</span>
+                  <p className="text-sm font-bold text-white truncate">{selectedGuide.campaigns?.title}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="p-4 space-y-4">
-              {/* 캠페인 정보 */}
-              <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-xs text-gray-500">캠페인</p>
-                <p className="font-semibold text-gray-900">{selectedGuide.campaigns?.title}</p>
-                <p className="text-sm text-gray-600">{selectedGuide.campaigns?.brand}</p>
-              </div>
+            {/* 스크롤 콘텐츠 영역 */}
+            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 bg-gray-50">
 
               {/* 기획형 가이드 내용 */}
               {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
-                <div className="space-y-3">
-                  {typeof selectedGuide.personalized_guide === 'object' && selectedGuide.personalized_guide !== null ? (
-                    Object.entries(selectedGuide.personalized_guide).map(([key, value]) => (
-                      <div key={key} className="bg-purple-50 rounded-xl p-3">
-                        <p className="text-xs font-semibold text-purple-700 mb-1">{key}</p>
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(value)}</p>
+                <>
+                  {(() => {
+                    const guideData = selectedGuide.personalized_guide
+                    const isObject = typeof guideData === 'object' && guideData !== null
+
+                    // 가이드 섹션들을 카드로 분리
+                    const renderGuideSection = (key, value, colorScheme) => {
+                      const colors = {
+                        blue: { bg: 'bg-blue-50', border: 'border-blue-100', icon: 'bg-blue-500', title: 'text-blue-900', bullet: 'bg-blue-400' },
+                        green: { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900', bullet: 'bg-green-400' },
+                        purple: { bg: 'bg-purple-50', border: 'border-purple-100', icon: 'bg-purple-500', title: 'text-purple-900', bullet: 'bg-purple-400' },
+                        orange: { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900', bullet: 'bg-orange-400' },
+                      }
+                      const c = colors[colorScheme] || colors.purple
+                      const valueStr = renderValue(value)
+                      const lines = valueStr.split('\n').filter(l => l.trim())
+
+                      return (
+                        <div key={key} className={`relative group overflow-hidden rounded-3xl ${c.bg} border ${c.border} p-5`}>
+                          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <Video size={80} className="text-gray-900" />
+                          </div>
+                          <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`${c.icon} text-white p-1.5 rounded-lg shadow-sm`}>
+                                <CheckCircle2 size={16} strokeWidth={3} />
+                              </div>
+                              <span className={`font-bold ${c.title} text-base`}>{key}</span>
+                            </div>
+                            <ul className="space-y-2.5">
+                              {lines.map((line, i) => (
+                                <li key={i} className="flex items-start gap-3 text-sm text-gray-700 font-medium">
+                                  <span className={`mt-1.5 w-1.5 h-1.5 ${c.bullet} rounded-full flex-shrink-0`} />
+                                  <span className="whitespace-pre-wrap">{line.replace(/^[•\-]\s*/, '')}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    if (isObject) {
+                      const entries = Object.entries(guideData)
+                      const colorOrder = ['blue', 'green', 'purple', 'orange']
+                      return entries.map(([key, value], idx) =>
+                        renderGuideSection(key, value, colorOrder[idx % colorOrder.length])
+                      )
+                    }
+
+                    return (
+                      <div className="relative overflow-hidden rounded-3xl bg-purple-50 border border-purple-100 p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="bg-purple-500 text-white p-1.5 rounded-lg shadow-sm">
+                            <CheckCircle2 size={16} strokeWidth={3} />
+                          </div>
+                          <span className="font-bold text-purple-900 text-base">촬영 가이드</span>
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(guideData)}</p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="bg-purple-50 rounded-xl p-3">
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.personalized_guide)}</p>
-                    </div>
-                  )}
+                    )
+                  })()}
+
+                  {/* 추가 메시지 */}
                   {selectedGuide.additional_message && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
-                      <p className="text-xs font-semibold text-yellow-700 mb-1">💬 추가 메시지</p>
-                      <p className="text-sm text-gray-800">{renderValue(selectedGuide.additional_message)}</p>
+                    <div className="rounded-3xl bg-yellow-50 border border-yellow-200 p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="bg-yellow-500 text-white p-1.5 rounded-lg shadow-sm">
+                          <AlertCircle size={16} strokeWidth={3} />
+                        </div>
+                        <span className="font-bold text-yellow-900 text-base">추가 메시지</span>
+                      </div>
+                      <p className="text-sm text-yellow-800/80 font-medium">{renderValue(selectedGuide.additional_message)}</p>
                     </div>
                   )}
-                </div>
+                </>
               )}
 
               {/* 올리브영 가이드 내용 */}
               {selectedGuide.type === 'oliveyoung' && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {selectedGuide.campaigns?.oliveyoung_step1_guide_ai && (
-                    <div className="bg-green-50 rounded-xl p-3">
-                      <p className="text-xs font-semibold text-green-700 mb-1">📹 1차 촬영 가이드</p>
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.campaigns.oliveyoung_step1_guide_ai)}</p>
-                      {selectedGuide.campaigns?.step1_deadline && (
-                        <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step1_deadline).toLocaleDateString('ko-KR')}</p>
-                      )}
+                    <div className="relative overflow-hidden rounded-3xl bg-green-50 border border-green-100 p-5">
+                      <div className="absolute top-0 right-0 p-4 opacity-5">
+                        <Video size={80} className="text-green-900" />
+                      </div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-green-500 text-white p-1.5 rounded-lg shadow-sm">
+                              <Play size={16} fill="white" />
+                            </div>
+                            <span className="font-bold text-green-900 text-base">1차 촬영 가이드</span>
+                          </div>
+                          {selectedGuide.campaigns?.step1_deadline && (
+                            <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-lg">
+                              ~ {new Date(selectedGuide.campaigns.step1_deadline).toLocaleDateString('ko-KR', {month: 'short', day: 'numeric'})}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step1_guide_ai)}</p>
+                      </div>
                     </div>
                   )}
+
                   {selectedGuide.campaigns?.oliveyoung_step2_guide_ai && (
-                    <div className="bg-blue-50 rounded-xl p-3">
-                      <p className="text-xs font-semibold text-blue-700 mb-1">📱 2차 촬영 가이드</p>
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.campaigns.oliveyoung_step2_guide_ai)}</p>
-                      {selectedGuide.campaigns?.step2_deadline && (
-                        <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step2_deadline).toLocaleDateString('ko-KR')}</p>
-                      )}
+                    <div className="relative overflow-hidden rounded-3xl bg-blue-50 border border-blue-100 p-5">
+                      <div className="absolute top-0 right-0 p-4 opacity-5">
+                        <Video size={80} className="text-blue-900" />
+                      </div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-blue-500 text-white p-1.5 rounded-lg shadow-sm">
+                              <Play size={16} fill="white" />
+                            </div>
+                            <span className="font-bold text-blue-900 text-base">2차 촬영 가이드</span>
+                          </div>
+                          {selectedGuide.campaigns?.step2_deadline && (
+                            <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-lg">
+                              ~ {new Date(selectedGuide.campaigns.step2_deadline).toLocaleDateString('ko-KR', {month: 'short', day: 'numeric'})}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step2_guide_ai)}</p>
+                      </div>
                     </div>
                   )}
+
                   {selectedGuide.campaigns?.oliveyoung_step3_guide_ai && (
-                    <div className="bg-purple-50 rounded-xl p-3">
-                      <p className="text-xs font-semibold text-purple-700 mb-1">📱 3차 촬영 가이드</p>
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(selectedGuide.campaigns.oliveyoung_step3_guide_ai)}</p>
-                      {selectedGuide.campaigns?.step3_deadline && (
-                        <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step3_deadline).toLocaleDateString('ko-KR')}</p>
-                      )}
+                    <div className="relative overflow-hidden rounded-3xl bg-purple-50 border border-purple-100 p-5">
+                      <div className="absolute top-0 right-0 p-4 opacity-5">
+                        <Video size={80} className="text-purple-900" />
+                      </div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-purple-500 text-white p-1.5 rounded-lg shadow-sm">
+                              <Play size={16} fill="white" />
+                            </div>
+                            <span className="font-bold text-purple-900 text-base">3차 촬영 가이드</span>
+                          </div>
+                          {selectedGuide.campaigns?.step3_deadline && (
+                            <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-lg">
+                              ~ {new Date(selectedGuide.campaigns.step3_deadline).toLocaleDateString('ko-KR', {month: 'short', day: 'numeric'})}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step3_guide_ai)}</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -619,15 +736,20 @@ const ApplicationsPage = () => {
 
               {/* 4주 챌린지 가이드 내용 */}
               {selectedGuide.type === '4week_challenge' && selectedGuide.campaigns?.challenge_weekly_guides_ai && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {(() => {
                     let guides = selectedGuide.campaigns.challenge_weekly_guides_ai
                     if (typeof guides === 'string') {
                       try { guides = JSON.parse(guides) } catch(e) { guides = null }
                     }
-                    if (!guides) return <p className="text-sm text-gray-500">가이드 정보를 불러올 수 없습니다.</p>
+                    if (!guides) return <p className="text-sm text-gray-500 text-center py-8">가이드 정보를 불러올 수 없습니다.</p>
 
-                    const weekColors = ['bg-red-50 text-red-700', 'bg-orange-50 text-orange-700', 'bg-yellow-50 text-yellow-700', 'bg-green-50 text-green-700']
+                    const weekStyles = [
+                      { bg: 'bg-red-50', border: 'border-red-100', icon: 'bg-red-500', title: 'text-red-900' },
+                      { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900' },
+                      { bg: 'bg-yellow-50', border: 'border-yellow-100', icon: 'bg-yellow-500', title: 'text-yellow-900' },
+                      { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900' }
+                    ]
                     const weekDeadlines = [
                       selectedGuide.campaigns?.week1_deadline,
                       selectedGuide.campaigns?.week2_deadline,
@@ -635,19 +757,34 @@ const ApplicationsPage = () => {
                       selectedGuide.campaigns?.week4_deadline
                     ]
 
-                    return Array.isArray(guides) ? guides.map((guide, idx) => (
-                      <div key={idx} className={`${weekColors[idx]?.split(' ')[0] || 'bg-gray-50'} rounded-xl p-3`}>
-                        <p className={`text-xs font-semibold ${weekColors[idx]?.split(' ')[1] || 'text-gray-700'} mb-1`}>
-                          📅 {idx + 1}주차 가이드
-                        </p>
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(guide)}</p>
-                        {weekDeadlines[idx] && (
-                          <p className="text-xs text-red-600 mt-2">마감: {new Date(weekDeadlines[idx]).toLocaleDateString('ko-KR')}</p>
-                        )}
-                      </div>
-                    )) : (
-                      <div className="bg-indigo-50 rounded-xl p-3">
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(guides)}</p>
+                    return Array.isArray(guides) ? guides.map((guide, idx) => {
+                      const style = weekStyles[idx] || weekStyles[3]
+                      return (
+                        <div key={idx} className={`relative overflow-hidden rounded-3xl ${style.bg} border ${style.border} p-5`}>
+                          <div className="absolute top-0 right-0 p-4 opacity-5">
+                            <Calendar size={80} className="text-gray-900" />
+                          </div>
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className={`${style.icon} text-white p-1.5 rounded-lg shadow-sm`}>
+                                  <span className="text-xs font-black">{idx + 1}</span>
+                                </div>
+                                <span className={`font-bold ${style.title} text-base`}>{idx + 1}주차 가이드</span>
+                              </div>
+                              {weekDeadlines[idx] && (
+                                <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-lg">
+                                  ~ {new Date(weekDeadlines[idx]).toLocaleDateString('ko-KR', {month: 'short', day: 'numeric'})}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(guide)}</p>
+                          </div>
+                        </div>
+                      )
+                    }) : (
+                      <div className="rounded-3xl bg-indigo-50 border border-indigo-100 p-5">
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{renderValue(guides)}</p>
                       </div>
                     )
                   })()}
@@ -656,7 +793,7 @@ const ApplicationsPage = () => {
 
               {/* 일반 가이드 내용 */}
               {selectedGuide.type === 'general' && selectedGuide.ai_generated_guide && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {(() => {
                     let guide = selectedGuide.ai_generated_guide
                     if (typeof guide === 'string') {
@@ -664,39 +801,78 @@ const ApplicationsPage = () => {
                     }
 
                     if (typeof guide === 'object' && guide !== null) {
-                      return Object.entries(guide).map(([key, value]) => (
-                        <div key={key} className="bg-gray-50 rounded-xl p-3">
-                          <p className="text-xs font-semibold text-gray-700 mb-1">{key}</p>
-                          <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                            {renderValue(value)}
-                          </p>
-                        </div>
-                      ))
+                      const colorOrder = ['blue', 'green', 'purple', 'orange']
+                      const colors = {
+                        blue: { bg: 'bg-blue-50', border: 'border-blue-100', icon: 'bg-blue-500', title: 'text-blue-900' },
+                        green: { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900' },
+                        purple: { bg: 'bg-purple-50', border: 'border-purple-100', icon: 'bg-purple-500', title: 'text-purple-900' },
+                        orange: { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900' },
+                      }
+
+                      return Object.entries(guide).map(([key, value], idx) => {
+                        const c = colors[colorOrder[idx % colorOrder.length]]
+                        return (
+                          <div key={key} className={`relative overflow-hidden rounded-3xl ${c.bg} border ${c.border} p-5`}>
+                            <div className="absolute top-0 right-0 p-4 opacity-5">
+                              <Video size={80} className="text-gray-900" />
+                            </div>
+                            <div className="relative z-10">
+                              <div className="flex items-center gap-2 mb-3">
+                                <div className={`${c.icon} text-white p-1.5 rounded-lg shadow-sm`}>
+                                  <CheckCircle2 size={16} strokeWidth={3} />
+                                </div>
+                                <span className={`font-bold ${c.title} text-base`}>{key}</span>
+                              </div>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(value)}</p>
+                            </div>
+                          </div>
+                        )
+                      })
                     }
                     return (
-                      <div className="bg-gray-50 rounded-xl p-3">
-                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{renderValue(guide)}</p>
+                      <div className="rounded-3xl bg-gray-100 border border-gray-200 p-5">
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{renderValue(guide)}</p>
                       </div>
                     )
                   })()}
                 </div>
               )}
 
-              {/* 마감일 정보 */}
-              {(selectedGuide.campaigns?.start_date || selectedGuide.campaigns?.end_date) && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3">
-                  <p className="text-xs font-semibold text-red-700 mb-2">⏰ 마감일 안내</p>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+              {/* 마감일 정보 카드 */}
+              {(selectedGuide.campaigns?.content_submission_deadline || selectedGuide.campaigns?.start_date || selectedGuide.campaigns?.end_date) && (
+                <div className="rounded-3xl bg-red-50 border border-red-100 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="bg-red-500 text-white p-1.5 rounded-lg shadow-sm">
+                      <AlertCircle size={16} strokeWidth={3} />
+                    </div>
+                    <span className="font-bold text-red-900 text-base">마감일 안내</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedGuide.campaigns?.content_submission_deadline && (
+                      <div className="bg-white rounded-2xl p-3 text-center border border-red-100">
+                        <div className="text-red-400 mb-1"><Calendar size={18} className="mx-auto" /></div>
+                        <div className="text-xs text-gray-500 mb-0.5">콘텐츠 제출</div>
+                        <div className="text-sm font-bold text-red-600">
+                          {new Date(selectedGuide.campaigns.content_submission_deadline).toLocaleDateString('ko-KR', {month: 'short', day: 'numeric'})}
+                        </div>
+                      </div>
+                    )}
                     {selectedGuide.campaigns?.start_date && (
-                      <div>
-                        <p className="text-gray-500 text-xs">영상 촬영 마감</p>
-                        <p className="font-semibold text-red-600">{new Date(selectedGuide.campaigns.start_date).toLocaleDateString('ko-KR')}</p>
+                      <div className="bg-white rounded-2xl p-3 text-center border border-red-100">
+                        <div className="text-orange-400 mb-1"><Video size={18} className="mx-auto" /></div>
+                        <div className="text-xs text-gray-500 mb-0.5">영상 촬영</div>
+                        <div className="text-sm font-bold text-orange-600">
+                          {new Date(selectedGuide.campaigns.start_date).toLocaleDateString('ko-KR', {month: 'short', day: 'numeric'})}
+                        </div>
                       </div>
                     )}
                     {selectedGuide.campaigns?.end_date && (
-                      <div>
-                        <p className="text-gray-500 text-xs">SNS 업로드 마감</p>
-                        <p className="font-semibold text-orange-600">{new Date(selectedGuide.campaigns.end_date).toLocaleDateString('ko-KR')}</p>
+                      <div className="bg-white rounded-2xl p-3 text-center border border-red-100">
+                        <div className="text-purple-400 mb-1"><Upload size={18} className="mx-auto" /></div>
+                        <div className="text-xs text-gray-500 mb-0.5">SNS 업로드</div>
+                        <div className="text-sm font-bold text-purple-600">
+                          {new Date(selectedGuide.campaigns.end_date).toLocaleDateString('ko-KR', {month: 'short', day: 'numeric'})}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -704,15 +880,17 @@ const ApplicationsPage = () => {
               )}
             </div>
 
-            <div className="sticky bottom-0 bg-white border-t p-4">
+            {/* 하단 고정 버튼 */}
+            <div className="bg-white border-t border-gray-100 p-4 safe-area-bottom">
               <button
                 onClick={() => {
                   setShowGuideModal(false)
                   setSelectedGuide(null)
                 }}
-                className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800"
+                className="w-full bg-gray-900 text-white font-bold text-base py-4 rounded-2xl shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
-                확인
+                확인했어요
+                <ArrowRight size={18} />
               </button>
             </div>
           </div>
