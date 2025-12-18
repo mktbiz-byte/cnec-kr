@@ -289,18 +289,28 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
     }
   }
 
-  const formatDeadline = (deadline) => {
-    if (!deadline) return ''
-    const date = new Date(deadline)
-    return `${date.getMonth() + 1}/${date.getDate()} 오전 4시 ~ 7시`
-  }
-
   if (!isOpen || !campaign) return null
 
   const reward = campaign.creator_points_override || campaign.reward_points || 0
-  const originalPrice = campaign.product_price || Math.round(reward * 1.5)
-  const paybackPercent = originalPrice > 0 ? Math.round((reward / originalPrice) * 100) : 0
-  const actualPrice = originalPrice - reward
+
+  // D-Day 계산
+  const getDDay = (dateStr) => {
+    if (!dateStr) return null
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const target = new Date(dateStr)
+    target.setHours(0, 0, 0, 0)
+    const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24))
+    if (diff < 0) return '마감'
+    if (diff === 0) return 'D-Day'
+    return `D-${diff}`
+  }
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-'
+    const date = new Date(dateStr)
+    return `${date.getMonth() + 1}월 ${date.getDate()}일`
+  }
 
   // 프로필 필요 알림 모달
   if (showProfileAlert) {
@@ -584,34 +594,79 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
                   </p>
                 )}
 
-                {/* 구매 정보 박스 */}
+                {/* 캠페인 정보 박스 */}
                 <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                  {campaign.application_deadline && (
+                  {/* 브랜드 */}
+                  {campaign.brand && (
                     <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="text-sm text-gray-600">구매 시간</span>
-                      <span className="text-sm font-medium text-gray-900">{formatDeadline(campaign.application_deadline)}</span>
+                      <span className="text-sm text-gray-600">브랜드</span>
+                      <span className="text-sm font-medium text-gray-900">{campaign.brand}</span>
                     </div>
                   )}
+
+                  {/* 원고료 */}
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                    <span className="text-sm text-gray-600">구매가</span>
-                    <span className="text-sm text-gray-900">{formatPrice(originalPrice)}</span>
+                    <span className="text-sm text-gray-600">원고료</span>
+                    <span className="text-lg font-bold text-violet-600">{formatPrice(reward)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                    <span className="text-sm text-gray-600 flex items-center gap-1">
-                      페이백 <span className="w-4 h-4 rounded-full bg-gray-300 text-white text-xs flex items-center justify-center">i</span>
-                    </span>
-                    <span className="text-sm">
-                      <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-xs font-bold mr-2">{paybackPercent}%</span>
-                      <span className="font-bold text-blue-600">{formatPrice(reward)}</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-sm text-gray-600 flex items-center gap-1">
-                      실구매가
-                      <span className="bg-gray-800 text-white text-xs px-2 py-0.5 rounded">여기서 구매해야 성공!</span>
-                    </span>
-                    <span className="text-lg font-bold text-gray-900">{formatPrice(actualPrice > 0 ? actualPrice : 0)}</span>
-                  </div>
+
+                  {/* 지원 마감일 */}
+                  {campaign.application_deadline && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                      <span className="text-sm text-gray-600">지원 마감</span>
+                      <span className="text-sm text-gray-900 flex items-center gap-2">
+                        {formatDate(campaign.application_deadline)}
+                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                          getDDay(campaign.application_deadline) === '마감'
+                            ? 'bg-gray-200 text-gray-500'
+                            : getDDay(campaign.application_deadline) === 'D-Day' || parseInt(getDDay(campaign.application_deadline)?.replace('D-', '')) <= 3
+                              ? 'bg-red-100 text-red-600'
+                              : 'bg-blue-100 text-blue-600'
+                        }`}>
+                          {getDDay(campaign.application_deadline)}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* 선정 발표일 */}
+                  {campaign.selection_date && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                      <span className="text-sm text-gray-600">선정 발표</span>
+                      <span className="text-sm text-gray-900">{formatDate(campaign.selection_date)}</span>
+                    </div>
+                  )}
+
+                  {/* 제품 발송일 */}
+                  {campaign.product_shipping_date && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                      <span className="text-sm text-gray-600 flex items-center gap-1">
+                        <Truck size={14} />
+                        제품 발송
+                      </span>
+                      <span className="text-sm text-gray-900">{formatDate(campaign.product_shipping_date)}</span>
+                    </div>
+                  )}
+
+                  {/* 촬영/업로드 마감일 */}
+                  {campaign.content_submission_deadline && (
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm text-gray-600 flex items-center gap-1">
+                        <Camera size={14} />
+                        촬영 마감
+                      </span>
+                      <span className="text-sm text-gray-900 flex items-center gap-2">
+                        {formatDate(campaign.content_submission_deadline)}
+                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                          getDDay(campaign.content_submission_deadline) === '마감'
+                            ? 'bg-gray-200 text-gray-500'
+                            : 'bg-orange-100 text-orange-600'
+                        }`}>
+                          {getDDay(campaign.content_submission_deadline)}
+                        </span>
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* 상품 상세 이미지 - 더보기 버튼 */}

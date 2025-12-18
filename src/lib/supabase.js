@@ -709,35 +709,64 @@ export const database = {
     async upsert(profileData) {
       return safeQuery(async () => {
         console.log('Upsert 시작:', profileData)
-        
+
+        // id 필드가 반드시 있어야 함 (auth user id)
+        if (!profileData.id) {
+          throw new Error('프로필 저장에 id(사용자 ID)가 필요합니다')
+        }
+
+        // user_profiles 테이블 스키마에 맞는 필드만 추출
+        const cleanData = {
+          id: profileData.id,
+          name: profileData.name || null,
+          email: profileData.email || null,
+          age: profileData.age || null,
+          skin_type: profileData.skin_type || null,
+          phone: profileData.phone || null,
+          address: profileData.address || null,
+          detail_address: profileData.detail_address || null,
+          postcode: profileData.postcode || null,
+          instagram_url: profileData.instagram_url || null,
+          youtube_url: profileData.youtube_url || null,
+          tiktok_url: profileData.tiktok_url || null,
+          other_sns_url: profileData.other_sns_url || null,
+          bio: profileData.bio || null,
+          bank_name: profileData.bank_name || null,
+          bank_account: profileData.bank_account || null,
+          bank_holder: profileData.bank_holder || null,
+          updated_at: new Date().toISOString()
+        }
+
         const { data: existingProfile } = await supabase
           .from('user_profiles')
           .select('id')
-          .eq('id', profileData.id)
+          .eq('id', cleanData.id)
           .single()
-        
+
         if (existingProfile) {
           // 업데이트
+          console.log('기존 프로필 업데이트')
           const { data, error } = await supabase
             .from('user_profiles')
-            .update(profileData)
-            .eq('id', profileData.id)
+            .update(cleanData)
+            .eq('id', cleanData.id)
             .select()
             .single()
-          
+
           if (error) throw error
           return data
         } else {
+          // 새 프로필 생성
           console.log('새 프로필 생성')
           const { data, error } = await supabase
             .from('user_profiles')
             .insert([{
-              ...profileData,
-              email: profileData.email || 'unknown@example.com'
+              ...cleanData,
+              created_at: new Date().toISOString()
             }])
             .select()
             .single()
-          
+
           if (error) throw error
           return data
         }

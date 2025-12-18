@@ -162,8 +162,9 @@ const ProfileSettings = () => {
       console.log('프로필 저장 시작:', profile)
 
       // 실제 데이터베이스 스키마에 맞춘 데이터만 전송
+      // user_profiles 테이블은 id가 auth user id를 PK로 사용
       const profileData = {
-        user_id: user.id,
+        id: user.id,
         name: profile.name.trim(),
         email: profile.email.trim(),
         age: profile.age ? parseInt(profile.age) : null,
