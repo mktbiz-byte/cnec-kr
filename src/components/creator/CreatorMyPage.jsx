@@ -82,20 +82,36 @@ const CreatorMyPage = () => {
         bank_account_holder: profileData?.bank_account_holder || ''
       })
 
-      const { data: apps } = await supabase
+      // 지원 내역 가져오기 (조인 대신 별도 쿼리)
+      const { data: appsData, error: appsError } = await supabase
         .from('applications')
-        .select(`
-          *,
-          campaigns (
-            id, title, brand, image_url, reward_points,
-            creator_points_override, content_submission_deadline,
-            campaign_type
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      setApplications(apps || [])
+      if (appsError) {
+        console.error('Applications 로드 오류:', appsError)
+      }
+
+      // 캠페인 정보 별도 조회
+      let apps = appsData || []
+      if (apps.length > 0) {
+        const campaignIds = [...new Set(apps.map(a => a.campaign_id).filter(Boolean))]
+        if (campaignIds.length > 0) {
+          const { data: campaignsData } = await supabase
+            .from('campaigns')
+            .select('id, title, brand, image_url, reward_points, creator_points_override, content_submission_deadline, campaign_type')
+            .in('id', campaignIds)
+
+          // 캠페인 데이터 병합
+          apps = apps.map(app => ({
+            ...app,
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
+          }))
+        }
+      }
+
+      setApplications(apps)
 
     } catch (error) {
       console.error('데이터 로드 오류:', error)
@@ -321,14 +337,17 @@ const CreatorMyPage = () => {
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-gray-900">나의 캠페인</h3>
               <button
-                onClick={() => setActiveSection('applications')}
+                onClick={() => navigate('/my/applications')}
                 className="text-sm text-violet-600 font-medium flex items-center gap-1"
               >
                 전체보기 <ChevronRight size={16} />
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <div
+              className="bg-white rounded-2xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate('/my/applications')}
+            >
               <div className="flex items-center justify-between">
                 <div className="text-center flex-1">
                   <p className="text-2xl font-bold text-gray-900">{counts.pending}</p>
@@ -396,7 +415,7 @@ const CreatorMyPage = () => {
             </button>
 
             <button
-              onClick={() => setActiveSection('applications')}
+              onClick={() => navigate('/my/applications')}
               className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
             >
               <div className="flex items-center gap-3">

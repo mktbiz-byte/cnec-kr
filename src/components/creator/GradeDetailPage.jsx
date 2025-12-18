@@ -55,16 +55,33 @@ const GradeDetailPage = () => {
 
       setProfile(profileData)
 
-      // 지원 내역 가져오기
-      const { data: applicationsData } = await supabase
+      // 지원 내역 가져오기 (조인 대신 별도 쿼리)
+      const { data: appsData, error: appsError } = await supabase
         .from('applications')
-        .select(`
-          *,
-          campaigns (
-            id, brand_id, content_submission_deadline
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
+
+      if (appsError) {
+        console.error('Applications 로드 오류:', appsError)
+      }
+
+      // 캠페인 정보 별도 조회
+      let applicationsData = appsData || []
+      if (applicationsData.length > 0) {
+        const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
+        if (campaignIds.length > 0) {
+          const { data: campaignsData } = await supabase
+            .from('campaigns')
+            .select('id, brand_id, content_submission_deadline')
+            .in('id', campaignIds)
+
+          // 캠페인 데이터 병합
+          applicationsData = applicationsData.map(app => ({
+            ...app,
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
+          }))
+        }
+      }
 
       const completed = applicationsData?.filter(a => a.status === 'completed' || a.status === 'paid') || []
 

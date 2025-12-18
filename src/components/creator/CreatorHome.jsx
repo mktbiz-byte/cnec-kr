@@ -188,21 +188,36 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
       setProfile(profileData)
 
-      // 지원 내역 가져오기
-      const { data: applicationsData } = await supabase
+      // 지원 내역 가져오기 (조인 대신 별도 쿼리로 수정)
+      const { data: appsData, error: appsError } = await supabase
         .from('applications')
-        .select(`
-          *,
-          campaigns (
-            id, title, brand, brand_id, image_url, reward_points,
-            creator_points_override, application_deadline,
-            content_submission_deadline, campaign_type, category
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      setApplications(applicationsData || [])
+      if (appsError) {
+        console.error('Applications 로드 오류:', appsError)
+      }
+
+      // 캠페인 정보 별도 조회
+      let applicationsData = appsData || []
+      if (applicationsData.length > 0) {
+        const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
+        if (campaignIds.length > 0) {
+          const { data: campaignsData } = await supabase
+            .from('campaigns')
+            .select('id, title, brand, brand_id, image_url, reward_points, creator_points_override, application_deadline, content_submission_deadline, campaign_type, category')
+            .in('id', campaignIds)
+
+          // 캠페인 데이터 병합
+          applicationsData = applicationsData.map(app => ({
+            ...app,
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
+          }))
+        }
+      }
+
+      setApplications(applicationsData)
 
       // 통계 계산
       const approved = applicationsData?.filter(a => a.status === 'approved' || a.status === 'selected') || []
