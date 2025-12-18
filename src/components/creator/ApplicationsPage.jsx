@@ -4,7 +4,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, ArrowRight, Clock, CheckCircle, FileText,
-  Upload, Target, Loader2, Calendar, Truck, Camera
+  Upload, Target, Loader2, Calendar, Truck, Camera,
+  Eye, X, BookOpen, Video
 } from 'lucide-react'
 
 const ApplicationsPage = () => {
@@ -21,6 +22,8 @@ const ApplicationsPage = () => {
     inProgress: 0,
     completed: 0
   })
+  const [showGuideModal, setShowGuideModal] = useState(false)
+  const [selectedGuide, setSelectedGuide] = useState(null)
 
   const filters = [
     { id: 'all', label: '전체' },
@@ -51,14 +54,21 @@ const ApplicationsPage = () => {
         console.error('Applications 로드 오류:', appsError)
       }
 
-      // 캠페인 정보 별도 조회
+      // 캠페인 정보 별도 조회 (가이드 관련 필드 포함)
       let applicationsData = appsData || []
       if (applicationsData.length > 0) {
         const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
         if (campaignIds.length > 0) {
           const { data: campaignsData } = await supabase
             .from('campaigns')
-            .select('id, title, brand, image_url, reward_points, creator_points_override, application_deadline, content_submission_deadline, campaign_type, product_shipping_date')
+            .select(`
+              id, title, brand, image_url, reward_points, creator_points_override,
+              application_deadline, content_submission_deadline, campaign_type, product_shipping_date,
+              ai_generated_guide, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai,
+              challenge_weekly_guides_ai, step1_deadline, step2_deadline, step3_deadline,
+              week1_deadline, week2_deadline, week3_deadline, week4_deadline,
+              start_date, end_date
+            `)
             .in('id', campaignIds)
 
           // 캠페인 데이터 병합
@@ -342,14 +352,161 @@ const ApplicationsPage = () => {
                     </div>
                   </div>
 
-                  {/* 진행중 상태일 때 업로드 버튼 */}
-                  {app.status === 'filming' && (
-                    <button
-                      onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
-                      className="w-full mt-3 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors"
-                    >
-                      영상 업로드하기
-                    </button>
+                  {/* 선정됨/진행중 상태일 때 가이드 및 액션 버튼 */}
+                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
+                    <div className="mt-3 space-y-2">
+                      {/* 기획형 캠페인 가이드 */}
+                      {app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-purple-600" />
+                            <span className="text-xs font-semibold text-purple-900">촬영 가이드가 전달되었습니다</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                let guideData = app.personalized_guide
+                                if (typeof guideData === 'string') {
+                                  try { guideData = JSON.parse(guideData) } catch(e) {}
+                                }
+                                setSelectedGuide({
+                                  type: 'planned',
+                                  personalized_guide: guideData,
+                                  additional_message: app.additional_message,
+                                  campaigns: app.campaigns
+                                })
+                                setShowGuideModal(true)
+                              }}
+                              className="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 flex items-center justify-center gap-1"
+                            >
+                              <Eye size={12} /> 가이드 보기
+                            </button>
+                            {app.status === 'filming' && (
+                              <button
+                                onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                                className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                              >
+                                <Video size={12} /> 영상 업로드
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 올리브영 캠페인 가이드 */}
+                      {app.campaigns?.campaign_type === 'oliveyoung' && (app.campaigns?.oliveyoung_step1_guide_ai || app.campaigns?.oliveyoung_step2_guide_ai) && (
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-green-600" />
+                            <span className="text-xs font-semibold text-green-900">올리브영 촬영 가이드</span>
+                          </div>
+                          <div className="flex gap-2 flex-wrap">
+                            <button
+                              onClick={() => {
+                                setSelectedGuide({
+                                  type: 'oliveyoung',
+                                  campaigns: app.campaigns
+                                })
+                                setShowGuideModal(true)
+                              }}
+                              className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                            >
+                              <Eye size={12} /> 가이드 보기
+                            </button>
+                            {['filming', 'approved', 'selected'].includes(app.status) && (
+                              <button
+                                onClick={() => navigate(`/submit-oliveyoung-video/${app.campaigns?.id}?step=1`)}
+                                className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700"
+                              >
+                                영상 업로드
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 4주 챌린지 캠페인 가이드 */}
+                      {app.campaigns?.campaign_type === '4week_challenge' && app.campaigns?.challenge_weekly_guides_ai && (
+                        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-indigo-600" />
+                            <span className="text-xs font-semibold text-indigo-900">4주 챌린지 가이드</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedGuide({
+                                  type: '4week_challenge',
+                                  campaigns: app.campaigns
+                                })
+                                setShowGuideModal(true)
+                              }}
+                              className="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center justify-center gap-1"
+                            >
+                              <Eye size={12} /> 가이드 보기
+                            </button>
+                            {['filming', 'approved', 'selected'].includes(app.status) && (
+                              <button
+                                onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                                className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                              >
+                                <Video size={12} /> 영상 업로드
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 일반 캠페인 - 가이드가 없는 경우 기본 버튼 */}
+                      {!app.personalized_guide &&
+                       !app.campaigns?.oliveyoung_step1_guide_ai &&
+                       !app.campaigns?.challenge_weekly_guides_ai &&
+                       app.campaigns?.ai_generated_guide && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-gray-600" />
+                            <span className="text-xs font-semibold text-gray-900">촬영 가이드</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedGuide({
+                                  type: 'general',
+                                  ai_generated_guide: app.campaigns?.ai_generated_guide,
+                                  campaigns: app.campaigns
+                                })
+                                setShowGuideModal(true)
+                              }}
+                              className="flex-1 py-2 bg-gray-700 text-white rounded-lg text-xs font-bold hover:bg-gray-800 flex items-center justify-center gap-1"
+                            >
+                              <Eye size={12} /> 가이드 보기
+                            </button>
+                            {app.status === 'filming' && (
+                              <button
+                                onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                                className="flex-1 py-2 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 flex items-center justify-center gap-1"
+                              >
+                                <Video size={12} /> 영상 업로드
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 가이드 없이 filming 상태인 경우 기본 업로드 버튼 */}
+                      {app.status === 'filming' &&
+                       !app.personalized_guide &&
+                       !app.campaigns?.oliveyoung_step1_guide_ai &&
+                       !app.campaigns?.challenge_weekly_guides_ai &&
+                       !app.campaigns?.ai_generated_guide && (
+                        <button
+                          onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                          className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-1"
+                        >
+                          <Video size={14} /> 영상 업로드하기
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               )
@@ -357,6 +514,195 @@ const ApplicationsPage = () => {
           )}
         </div>
       </div>
+
+      {/* 가이드 모달 */}
+      {showGuideModal && selectedGuide && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between">
+              <h3 className="font-bold text-gray-900">
+                {selectedGuide.type === 'planned' && '📝 기획형 촬영 가이드'}
+                {selectedGuide.type === 'oliveyoung' && '🛒 올리브영 촬영 가이드'}
+                {selectedGuide.type === '4week_challenge' && '📅 4주 챌린지 가이드'}
+                {selectedGuide.type === 'general' && '📋 촬영 가이드'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowGuideModal(false)
+                  setSelectedGuide(null)
+                }}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              {/* 캠페인 정보 */}
+              <div className="bg-gray-50 rounded-xl p-3">
+                <p className="text-xs text-gray-500">캠페인</p>
+                <p className="font-semibold text-gray-900">{selectedGuide.campaigns?.title}</p>
+                <p className="text-sm text-gray-600">{selectedGuide.campaigns?.brand}</p>
+              </div>
+
+              {/* 기획형 가이드 내용 */}
+              {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
+                <div className="space-y-3">
+                  {typeof selectedGuide.personalized_guide === 'object' ? (
+                    Object.entries(selectedGuide.personalized_guide).map(([key, value]) => (
+                      <div key={key} className="bg-purple-50 rounded-xl p-3">
+                        <p className="text-xs font-semibold text-purple-700 mb-1">{key}</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{value}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="bg-purple-50 rounded-xl p-3">
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.personalized_guide}</p>
+                    </div>
+                  )}
+                  {selectedGuide.additional_message && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-yellow-700 mb-1">💬 추가 메시지</p>
+                      <p className="text-sm text-gray-800">{selectedGuide.additional_message}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 올리브영 가이드 내용 */}
+              {selectedGuide.type === 'oliveyoung' && (
+                <div className="space-y-3">
+                  {selectedGuide.campaigns?.oliveyoung_step1_guide_ai && (
+                    <div className="bg-green-50 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-green-700 mb-1">📹 1차 촬영 가이드</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.campaigns.oliveyoung_step1_guide_ai}</p>
+                      {selectedGuide.campaigns?.step1_deadline && (
+                        <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step1_deadline).toLocaleDateString('ko-KR')}</p>
+                      )}
+                    </div>
+                  )}
+                  {selectedGuide.campaigns?.oliveyoung_step2_guide_ai && (
+                    <div className="bg-blue-50 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-blue-700 mb-1">📱 2차 촬영 가이드</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.campaigns.oliveyoung_step2_guide_ai}</p>
+                      {selectedGuide.campaigns?.step2_deadline && (
+                        <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step2_deadline).toLocaleDateString('ko-KR')}</p>
+                      )}
+                    </div>
+                  )}
+                  {selectedGuide.campaigns?.oliveyoung_step3_guide_ai && (
+                    <div className="bg-purple-50 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-purple-700 mb-1">📱 3차 촬영 가이드</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{selectedGuide.campaigns.oliveyoung_step3_guide_ai}</p>
+                      {selectedGuide.campaigns?.step3_deadline && (
+                        <p className="text-xs text-red-600 mt-2">마감: {new Date(selectedGuide.campaigns.step3_deadline).toLocaleDateString('ko-KR')}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 4주 챌린지 가이드 내용 */}
+              {selectedGuide.type === '4week_challenge' && selectedGuide.campaigns?.challenge_weekly_guides_ai && (
+                <div className="space-y-3">
+                  {(() => {
+                    let guides = selectedGuide.campaigns.challenge_weekly_guides_ai
+                    if (typeof guides === 'string') {
+                      try { guides = JSON.parse(guides) } catch(e) { guides = null }
+                    }
+                    if (!guides) return <p className="text-sm text-gray-500">가이드 정보를 불러올 수 없습니다.</p>
+
+                    const weekColors = ['bg-red-50 text-red-700', 'bg-orange-50 text-orange-700', 'bg-yellow-50 text-yellow-700', 'bg-green-50 text-green-700']
+                    const weekDeadlines = [
+                      selectedGuide.campaigns?.week1_deadline,
+                      selectedGuide.campaigns?.week2_deadline,
+                      selectedGuide.campaigns?.week3_deadline,
+                      selectedGuide.campaigns?.week4_deadline
+                    ]
+
+                    return Array.isArray(guides) ? guides.map((guide, idx) => (
+                      <div key={idx} className={`${weekColors[idx]?.split(' ')[0] || 'bg-gray-50'} rounded-xl p-3`}>
+                        <p className={`text-xs font-semibold ${weekColors[idx]?.split(' ')[1] || 'text-gray-700'} mb-1`}>
+                          📅 {idx + 1}주차 가이드
+                        </p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{guide}</p>
+                        {weekDeadlines[idx] && (
+                          <p className="text-xs text-red-600 mt-2">마감: {new Date(weekDeadlines[idx]).toLocaleDateString('ko-KR')}</p>
+                        )}
+                      </div>
+                    )) : (
+                      <div className="bg-indigo-50 rounded-xl p-3">
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{JSON.stringify(guides)}</p>
+                      </div>
+                    )
+                  })()}
+                </div>
+              )}
+
+              {/* 일반 가이드 내용 */}
+              {selectedGuide.type === 'general' && selectedGuide.ai_generated_guide && (
+                <div className="space-y-3">
+                  {(() => {
+                    let guide = selectedGuide.ai_generated_guide
+                    if (typeof guide === 'string') {
+                      try { guide = JSON.parse(guide) } catch(e) {}
+                    }
+
+                    if (typeof guide === 'object' && guide !== null) {
+                      return Object.entries(guide).map(([key, value]) => (
+                        <div key={key} className="bg-gray-50 rounded-xl p-3">
+                          <p className="text-xs font-semibold text-gray-700 mb-1">{key}</p>
+                          <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                            {Array.isArray(value) ? value.join('\n• ') : value}
+                          </p>
+                        </div>
+                      ))
+                    }
+                    return (
+                      <div className="bg-gray-50 rounded-xl p-3">
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">{guide}</p>
+                      </div>
+                    )
+                  })()}
+                </div>
+              )}
+
+              {/* 마감일 정보 */}
+              {(selectedGuide.campaigns?.start_date || selectedGuide.campaigns?.end_date) && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                  <p className="text-xs font-semibold text-red-700 mb-2">⏰ 마감일 안내</p>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {selectedGuide.campaigns?.start_date && (
+                      <div>
+                        <p className="text-gray-500 text-xs">영상 촬영 마감</p>
+                        <p className="font-semibold text-red-600">{new Date(selectedGuide.campaigns.start_date).toLocaleDateString('ko-KR')}</p>
+                      </div>
+                    )}
+                    {selectedGuide.campaigns?.end_date && (
+                      <div>
+                        <p className="text-gray-500 text-xs">SNS 업로드 마감</p>
+                        <p className="font-semibold text-orange-600">{new Date(selectedGuide.campaigns.end_date).toLocaleDateString('ko-KR')}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t p-4">
+              <button
+                onClick={() => {
+                  setShowGuideModal(false)
+                  setSelectedGuide(null)
+                }}
+                className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
