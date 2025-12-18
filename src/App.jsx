@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import emailScheduler from './lib/emailScheduler';
@@ -94,10 +94,10 @@ const AppContent = () => {
 
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/mypage" element={<MyPageKoreaEnhanced />} />
-        <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/mypage" element={<Navigate to="/creator" replace />} />
+        <Route path="/profile" element={<Navigate to="/creator" replace />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
-        <Route path="/profile-settings" element={<ProfileSettings />} />
+        <Route path="/profile-settings" element={<Navigate to="/creator" replace />} />
         <Route path="/submit-video/:campaignId" element={<VideoSubmissionPage />} />
         <Route path="/submit-oliveyoung-video/:campaignId" element={<OliveyoungVideoSubmissionPage />} />
         <Route path="/submit-4week-video/:campaignId" element={<FourWeekVideoSubmissionPage />} />

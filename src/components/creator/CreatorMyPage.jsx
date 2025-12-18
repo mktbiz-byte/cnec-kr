@@ -124,41 +124,66 @@ const CreatorMyPage = () => {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // 파일 크기 체크 (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('파일 크기는 10MB 이하여야 합니다')
+      return
+    }
+
     try {
       setUploadingPhoto(true)
+      setError('')
 
+      // 이미지 압축
       let uploadFile = file
       if (isImageFile(file)) {
-        uploadFile = await compressImage(file, { maxWidth: 400, quality: 0.8 })
+        try {
+          uploadFile = await compressImage(file, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 800,
+            quality: 0.8
+          })
+        } catch (compressionError) {
+          console.error('이미지 압축 실패:', compressionError)
+          // 압축 실패 시 원본 파일 사용
+        }
       }
 
       const fileExt = file.name.split('.').pop()
       const fileName = `${user.id}-${Date.now()}.${fileExt}`
-      const filePath = `profile-photos/${fileName}`
+      const filePath = `${user.id}/${fileName}`
 
+      // profile-photos 버킷 사용 (기존 마이페이지와 동일)
       const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(filePath, uploadFile, { upsert: true })
+        .from('profile-photos')
+        .upload(filePath, uploadFile, {
+          cacheControl: '3600',
+          upsert: true
+        })
 
       if (uploadError) throw uploadError
 
+      // Public URL 가져오기
       const { data: { publicUrl } } = supabase.storage
-        .from('uploads')
+        .from('profile-photos')
         .getPublicUrl(filePath)
 
-      setPhotoPreview(publicUrl)
-
-      await supabase
+      // 데이터베이스 업데이트
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update({ profile_photo_url: publicUrl })
         .eq('id', user.id)
 
+      if (updateError) throw updateError
+
+      setPhotoPreview(publicUrl)
+      setProfile(prev => ({ ...prev, profile_photo_url: publicUrl }))
       setSuccess('프로필 사진이 업데이트되었습니다')
       setTimeout(() => setSuccess(''), 3000)
 
     } catch (error) {
       console.error('사진 업로드 오류:', error)
-      setError('사진 업로드에 실패했습니다')
+      setError('사진 업로드에 실패했습니다: ' + (error.message || '알 수 없는 오류'))
     } finally {
       setUploadingPhoto(false)
     }
