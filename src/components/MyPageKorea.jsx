@@ -155,24 +155,32 @@ const MyPageKorea = () => {
         resident_number: '' // 보안상 빈 값으로 시작
       })
 
-      // 캠페인 지원 내역
-      const { data: applicationsData, error: applicationsError } = await database
+      // 캠페인 지원 내역 (조인 대신 별도 쿼리)
+      const { data: appsData, error: applicationsError } = await supabase
         .from('applications')
-        .select(`
-          *,
-          campaigns (
-            id,
-            title,
-            image_url,
-            reward_points,
-            campaign_type,
-            is_oliveyoung_sale
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
       if (applicationsError) throw applicationsError
+
+      // 캠페인 정보 별도 조회
+      let applicationsData = appsData || []
+      if (applicationsData.length > 0) {
+        const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
+        if (campaignIds.length > 0) {
+          const { data: campaignsData } = await supabase
+            .from('campaigns')
+            .select('id, title, image_url, reward_points, campaign_type, is_oliveyoung_sale')
+            .in('id', campaignIds)
+
+          // 캠페인 데이터 병합
+          applicationsData = applicationsData.map(app => ({
+            ...app,
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
+          }))
+        }
+      }
       setApplications(applicationsData || [])
 
       // 출금 내역

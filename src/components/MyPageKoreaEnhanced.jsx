@@ -240,58 +240,10 @@ const MyPageKoreaEnhanced = () => {
       
       setPhotoPreview(profileData?.profile_photo_url)
 
-      // 캠페인 지원 내역
-      const { data: applicationsData, error: applicationsError } = await supabase
+      // 캠페인 지원 내역 (조인 대신 별도 쿼리)
+      const { data: appsData, error: applicationsError } = await supabase
         .from('applications')
-        .select(`
-          id,
-          user_id,
-          campaign_id,
-          applicant_name,
-          status,
-          created_at,
-          updated_at,
-          tracking_number,
-          shipping_company,
-          personalized_guide,
-          additional_message,
-          custom_guide,
-          campaigns (
-            id,
-            title,
-            brand,
-            image_url,
-            reward_points,
-            creator_points_override,
-            recruitment_deadline,
-            application_deadline,
-            content_submission_deadline,
-            campaign_type,
-            start_date,
-            end_date,
-            step1_deadline,
-            step2_deadline,
-            step3_deadline,
-            week1_deadline,
-            week2_deadline,
-            week3_deadline,
-            week4_deadline,
-            oliveyoung_step1_guide_ai,
-            oliveyoung_step2_guide_ai,
-            oliveyoung_step3_guide_ai,
-            challenge_weekly_guides,
-            challenge_weekly_guides_ai
-          ),
-          video_submissions (
-            id,
-            status,
-            video_file_url,
-            created_at,
-            video_review_comments (
-              id
-            )
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
@@ -299,6 +251,33 @@ const MyPageKoreaEnhanced = () => {
         console.error('Applications fetch error:', applicationsError)
         throw applicationsError
       }
+
+      // 캠페인 정보 별도 조회
+      let applicationsData = appsData || []
+      if (applicationsData.length > 0) {
+        const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
+        if (campaignIds.length > 0) {
+          const { data: campaignsData } = await supabase
+            .from('campaigns')
+            .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, challenge_weekly_guides, challenge_weekly_guides_ai')
+            .in('id', campaignIds)
+
+          // 비디오 제출 내역 조회
+          const applicationIds = applicationsData.map(a => a.id)
+          const { data: videoSubmissionsData } = await supabase
+            .from('video_submissions')
+            .select('id, status, video_file_url, created_at, application_id')
+            .in('application_id', applicationIds)
+
+          // 캠페인 및 비디오 데이터 병합
+          applicationsData = applicationsData.map(app => ({
+            ...app,
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null,
+            video_submissions: videoSubmissionsData?.filter(v => v.application_id === app.id) || []
+          }))
+        }
+      }
+
       console.log('Fetched applications:', applicationsData)
       setApplications(applicationsData || [])
 
