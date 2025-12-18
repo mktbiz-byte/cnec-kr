@@ -5,17 +5,24 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import emailScheduler from './lib/emailScheduler';
 import './App.css';
 
-// 페이지 컴포넌트
-import HomePageExactReplica from './components/HomePageExactReplica';
+// 크리에이터 앱 컴포넌트 (새 디자인)
+import { CreatorApp } from './components/creator';
+import LandingPage from './components/creator/LandingPage';
+
+// 인증 관련
 import LoginPageExactReplica from './components/LoginPageExactReplica';
 import SignupPageExactReplica from './components/SignupPageExactReplica';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
-import CampaignApplicationPage from './components/CampaignApplicationPage';
-import CompanyReportNew from './components/CompanyReportNew';
+import AuthCallbackSafe from './components/AuthCallbackSafe';
+
+// 레거시 페이지 (호환성 유지)
+import HomePageExactReplica from './components/HomePageExactReplica';
 import MyPageKoreaEnhanced from './components/MyPageKoreaEnhanced';
 import ProfileSettings from './components/ProfileSettings';
-import AuthCallbackSafe from './components/AuthCallbackSafe';
+import CampaignApplicationUpdated from './components/CampaignApplicationUpdated';
+import CompanyReportNew from './components/CompanyReportNew';
+import CNECPlusPageEnhanced from './components/CNECPlusPageEnhanced';
 import VideoSubmissionPage from './components/VideoSubmissionPage';
 import VideoReviewView from './components/VideoReviewView';
 import OliveyoungVideoSubmissionPage from './components/OliveyoungVideoSubmissionPage';
@@ -25,7 +32,6 @@ import FourWeekVideoSubmissionPage from './components/FourWeekVideoSubmissionPag
 import AdminDashboardSimple from './components/admin/AdminDashboardSimple';
 import AdminCampaignsWithQuestions from './components/admin/AdminCampaignsWithQuestions';
 import CampaignCreationKorea from './components/admin/CampaignCreationKorea';
-import CNECPlusPageEnhanced from './components/CNECPlusPageEnhanced'
 import ApplicationsReportSimple from './components/admin/ApplicationsReportSimple_final';
 import AdminConfirmedCreators from './components/admin/AdminConfirmedCreators';
 import ConfirmedCreatorsNew from './components/admin/ConfirmedCreatorsNew';
@@ -40,7 +46,6 @@ import EmailSettings from './components/admin/EmailSettings';
 // 관리자 로그인
 import SecretAdminLogin from './components/SecretAdminLogin';
 import TestAdminLogin from './components/TestAdminLogin';
-import CampaignApplicationUpdated from './components/CampaignApplicationUpdated';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const AppContent = () => {
@@ -49,7 +54,7 @@ const AppContent = () => {
   useEffect(() => {
     // 이메일 스케줄러 시작
     emailScheduler.start();
-    
+
     // 컴포넌트 언마운트 시 스케줄러 중지
     return () => {
       emailScheduler.stop();
@@ -59,18 +64,24 @@ const AppContent = () => {
   return (
     <div className="App">
       <Routes>
-        {/* 메인 페이지 */}
-        <Route path="/" element={<HomePageExactReplica />} />
-        
+        {/* 메인 페이지 - 로그인 여부에 따라 분기 */}
+        <Route path="/" element={user ? <CreatorApp /> : <LandingPage />} />
+
+        {/* 크리에이터 앱 (새 디자인) */}
+        <Route path="/creator" element={<CreatorApp />} />
+
         {/* 인증 관련 */}
         <Route path="/login" element={<LoginPageExactReplica />} />
         <Route path="/signup" element={<SignupPageExactReplica />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackSafe />} />
+
+        {/* 레거시 페이지 (호환성 유지) */}
+        <Route path="/home-legacy" element={<HomePageExactReplica />} />
         <Route path="/cnecplus" element={<CNECPlusPageEnhanced />} />
         <Route path="/cnec-plus" element={<CNECPlusPageEnhanced />} />
-        <Route path="/auth/callback" element={<AuthCallbackSafe />} />
-        
+
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
         <Route path="/mypage" element={<MyPageKoreaEnhanced />} />
@@ -81,7 +92,7 @@ const AppContent = () => {
         <Route path="/submit-oliveyoung-video/:campaignId" element={<OliveyoungVideoSubmissionPage />} />
         <Route path="/submit-4week-video/:campaignId" element={<FourWeekVideoSubmissionPage />} />
         <Route path="/video-review/:submissionId" element={<VideoReviewView />} />
-        
+
         {/* 관리자 페이지 */}
         <Route path="/secret-admin-login" element={<SecretAdminLogin />} />
         <Route path="/test-admin-login" element={<TestAdminLogin />} />
@@ -118,4 +129,3 @@ function App() {
 }
 
 export default App;
-
