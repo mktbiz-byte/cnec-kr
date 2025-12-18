@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { database, supabase } from '../../lib/supabase'
 import {
@@ -6,13 +6,22 @@ import {
   Loader2, X, ChevronDown, Instagram, Youtube, Hash
 } from 'lucide-react'
 
+const ITEMS_PER_PAGE = 10
+
 const CreatorSearch = ({ onCampaignClick }) => {
   const { user } = useAuth()
 
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [campaigns, setCampaigns] = useState([])
   const [filteredCampaigns, setFilteredCampaigns] = useState([])
+  const [visibleCampaigns, setVisibleCampaigns] = useState([])
   const [appliedCampaignIds, setAppliedCampaignIds] = useState([])
+  const [hasMore, setHasMore] = useState(true)
+
+  // 무한 스크롤용 ref
+  const observerRef = useRef(null)
+  const loadMoreRef = useRef(null)
 
   // 필터 상태
   const [searchQuery, setSearchQuery] = useState('')
@@ -42,6 +51,59 @@ const CreatorSearch = ({ onCampaignClick }) => {
   useEffect(() => {
     filterCampaigns()
   }, [campaigns, searchQuery, selectedCategory, selectedPlatform, sortBy, appliedCampaignIds])
+
+  // 필터 변경 시 visibleCampaigns 리셋
+  useEffect(() => {
+    setVisibleCampaigns(filteredCampaigns.slice(0, ITEMS_PER_PAGE))
+    setHasMore(filteredCampaigns.length > ITEMS_PER_PAGE)
+  }, [filteredCampaigns])
+
+  // 무한 스크롤 Intersection Observer
+  useEffect(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+          loadMoreCampaigns()
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current)
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+    }
+  }, [hasMore, loadingMore, loading, visibleCampaigns.length])
+
+  const loadMoreCampaigns = useCallback(() => {
+    if (loadingMore || !hasMore) return
+
+    setLoadingMore(true)
+
+    // 약간의 딜레이로 자연스러운 로딩 효과
+    setTimeout(() => {
+      const currentLength = visibleCampaigns.length
+      const nextItems = filteredCampaigns.slice(currentLength, currentLength + ITEMS_PER_PAGE)
+
+      if (nextItems.length > 0) {
+        setVisibleCampaigns(prev => [...prev, ...nextItems])
+        setHasMore(currentLength + nextItems.length < filteredCampaigns.length)
+      } else {
+        setHasMore(false)
+      }
+
+      setLoadingMore(false)
+    }, 300)
+  }, [loadingMore, hasMore, visibleCampaigns.length, filteredCampaigns])
 
   const loadCampaigns = async () => {
     try {
@@ -294,7 +356,7 @@ const CreatorSearch = ({ onCampaignClick }) => {
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredCampaigns.map((campaign, idx) => {
+          {visibleCampaigns.map((campaign, idx) => {
             const isApplied = appliedCampaignIds.includes(campaign.id)
             const daysLeft = getDaysUntilDeadline(campaign.application_deadline)
 
@@ -388,6 +450,21 @@ const CreatorSearch = ({ onCampaignClick }) => {
               </div>
             )
           })}
+
+          {/* 무한 스크롤 트리거 */}
+          <div ref={loadMoreRef} className="py-4">
+            {loadingMore && (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+                <span className="ml-2 text-sm text-gray-500">더 불러오는 중...</span>
+              </div>
+            )}
+            {!hasMore && visibleCampaigns.length > 0 && (
+              <p className="text-center text-sm text-gray-400 py-4">
+                모든 캠페인을 확인했습니다
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
