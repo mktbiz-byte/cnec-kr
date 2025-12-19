@@ -183,9 +183,9 @@ const MyPageKorea = () => {
       }
       setApplications(applicationsData || [])
 
-      // 출금 내역
+      // 출금 내역 (Master DB 표준: withdrawal_requests)
       const { data: withdrawalsData, error: withdrawalsError } = await database
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -341,20 +341,16 @@ const MyPageKorea = () => {
         return
       }
 
-      // 출금 신청 생성
+      // 출금 신청 생성 (Master DB 표준: withdrawal_requests)
       const { error: withdrawalError } = await database
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .insert({
           user_id: user.id,
           amount: amount,
           bank_name: withdrawForm.bankName,
           account_number: withdrawForm.bankAccountNumber,
           account_holder: withdrawForm.bankAccountHolder,
-          resident_number_encrypted: encryptedResident,
-          reason: withdrawForm.reason,
-          status: 'pending',
-          platform_region: 'kr',
-          country_code: 'KR'
+          status: 'pending'
         })
 
       if (withdrawalError) throw withdrawalError

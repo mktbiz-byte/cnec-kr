@@ -241,7 +241,6 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
         answer_3: applicationData.answer_3 || null,
         answer_4: applicationData.answer_4 || null,
         additional_info: applicationData.additional_info || null,
-        portrait_rights_consent: true,
         status: 'pending',
         created_at: new Date().toISOString()
       }

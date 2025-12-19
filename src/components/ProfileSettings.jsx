@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
 import { database, supabase } from '../lib/supabase'
+import { compressImage, isImageFile } from '../lib/imageCompression'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,18 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
-import { 
-  Loader2, Save, User, Lock, 
+import {
+  Loader2, Save, User, Lock,
   Instagram, Youtube, Hash, Globe, CheckCircle,
-  AlertCircle, Home, ArrowLeft
+  AlertCircle, Home, ArrowLeft, Camera, AlertTriangle, X, LogOut
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const ProfileSettings = () => {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const { language } = useLanguage()
   
-  // 실제 데이터베이스 스키마에 맞춘 최소한의 필드만 사용
+  // 프로필 필드 (레거시 호환 확장)
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -30,8 +31,22 @@ const ProfileSettings = () => {
     instagram_url: '',
     youtube_url: '',
     tiktok_url: '',
-    bio: ''
+    blog_url: '',
+    bio: '',
+    profile_image: '',
+    // 주소 정보
+    postcode: '',
+    address: '',
+    detail_address: '',
+    // SNS 팔로워 수
+    instagram_followers: '',
+    youtube_followers: '',
+    tiktok_followers: ''
   })
+
+  // 프로필 사진 업로드 상태
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState(null)
   
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -43,6 +58,13 @@ const ProfileSettings = () => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // 회원 탈퇴 관련 상태
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletionReason, setDeletionReason] = useState('')
+  const [deletionDetails, setDeletionDetails] = useState('')
+  const [confirmText, setConfirmText] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   // 다국어 텍스트
   const texts = {
@@ -131,8 +153,22 @@ const ProfileSettings = () => {
           instagram_url: profileData.instagram_url || '',
           youtube_url: profileData.youtube_url || '',
           tiktok_url: profileData.tiktok_url || '',
-          bio: profileData.bio || ''
+          blog_url: profileData.blog_url || '',
+          bio: profileData.bio || '',
+          profile_image: profileData.profile_image || '',
+          // 주소 정보
+          postcode: profileData.postcode || '',
+          address: profileData.address || '',
+          detail_address: profileData.detail_address || '',
+          // SNS 팔로워 수
+          instagram_followers: profileData.instagram_followers || '',
+          youtube_followers: profileData.youtube_followers || '',
+          tiktok_followers: profileData.tiktok_followers || ''
         })
+        // 기존 프로필 사진이 있으면 미리보기에 설정
+        if (profileData.profile_image) {
+          setPhotoPreview(profileData.profile_image)
+        }
       } else {
         // 프로필이 없으면 기본값으로 설정
         setProfile(prev => ({
@@ -172,7 +208,16 @@ const ProfileSettings = () => {
         instagram_url: profile.instagram_url.trim() || null,
         youtube_url: profile.youtube_url.trim() || null,
         tiktok_url: profile.tiktok_url.trim() || null,
-        bio: profile.bio.trim() || null
+        blog_url: profile.blog_url?.trim() || null,
+        bio: profile.bio.trim() || null,
+        // 주소 정보
+        postcode: profile.postcode?.trim() || null,
+        address: profile.address?.trim() || null,
+        detail_address: profile.detail_address?.trim() || null,
+        // SNS 팔로워 수
+        instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
+        youtube_followers: profile.youtube_followers ? parseInt(profile.youtube_followers) : null,
+        tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null
       }
 
       console.log('저장할 프로필 데이터:', profileData)
@@ -242,6 +287,117 @@ const ProfileSettings = () => {
     }
   }
 
+  // 회원 탈퇴 처리
+  const handleAccountDeletion = async () => {
+    try {
+      if (confirmText !== '회원탈퇴') {
+        setError('확인 텍스트를 정확히 입력해주세요.')
+        return
+      }
+
+      setDeleting(true)
+      setError('')
+
+      // 사용자 계정 삭제 (Supabase Auth)
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
+
+      if (deleteError) throw deleteError
+
+      setSuccess('회원 탈퇴가 완료되었습니다.')
+      setTimeout(() => {
+        signOut()
+      }, 2000)
+    } catch (err) {
+      console.error('회원 탈퇴 오류:', err)
+      setError('회원 탈퇴 처리 중 오류가 발생했습니다.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  // 프로필 사진 업로드
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 파일 크기 체크 (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('파일 크기는 10MB 이하여야 합니다.')
+      return
+    }
+
+    // 파일 타입 체크
+    if (!file.type.startsWith('image/')) {
+      setError('이미지 파일만 업로드 가능합니다.')
+      return
+    }
+
+    try {
+      setUploadingPhoto(true)
+      setError('')
+
+      // 미리보기 생성
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+
+      // 이미지 압축
+      let fileToUpload = file
+      if (isImageFile(file)) {
+        try {
+          fileToUpload = await compressImage(file, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 1920,
+            quality: 0.8
+          })
+        } catch (compressionError) {
+          console.error('이미지 압축 실패:', compressionError)
+          // 압축 실패 시 원본 파일 사용
+        }
+      }
+
+      // Supabase Storage에 업로드
+      const fileExt = fileToUpload.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `${user.id}/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-photos')
+        .upload(filePath, fileToUpload, {
+          cacheControl: '3600',
+          upsert: true
+        })
+
+      if (uploadError) throw uploadError
+
+      // Public URL 가져오기
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(filePath)
+
+      // 데이터베이스 업데이트
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ profile_image: publicUrl })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+
+      // 로컬 상태 업데이트
+      setProfile(prev => ({ ...prev, profile_image: publicUrl }))
+      setSuccess('프로필 사진이 업데이트되었습니다.')
+
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('사진 업로드 오류:', err)
+      setError('사진 업로드 중 오류가 발생했습니다.')
+    } finally {
+      setUploadingPhoto(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -303,6 +459,48 @@ const ProfileSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* 프로필 사진 */}
+              <div className="space-y-2">
+                <Label>프로필 사진</Label>
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="h-24 w-24 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                      {photoPreview ? (
+                        <img
+                          src={photoPreview}
+                          alt="Profile"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
+                          <User className="h-12 w-12 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <label className="absolute bottom-0 right-0 h-8 w-8 bg-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-purple-700 transition-colors shadow-lg">
+                      {uploadingPhoto ? (
+                        <Loader2 className="h-4 w-4 text-white animate-spin" />
+                      ) : (
+                        <Camera className="h-4 w-4 text-white" />
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                        disabled={uploadingPhoto}
+                      />
+                    </label>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    <p>JPG, PNG 파일 (최대 10MB)</p>
+                    <p className="text-xs mt-1">권장 크기: 400x400px</p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
               {/* 이름 */}
               <div className="space-y-2">
                 <Label htmlFor="name">{t.name}</Label>
@@ -412,6 +610,107 @@ const ProfileSettings = () => {
                     placeholder="https://tiktok.com/@username"
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="blog_url" className="flex items-center">
+                    <Globe className="h-4 w-4 mr-2" />
+                    블로그 URL
+                  </Label>
+                  <Input
+                    id="blog_url"
+                    value={profile.blog_url}
+                    onChange={(e) => setProfile(prev => ({ ...prev, blog_url: e.target.value }))}
+                    placeholder="https://blog.naver.com/username"
+                  />
+                </div>
+
+                <Separator className="my-4" />
+
+                {/* SNS 팔로워 수 */}
+                <h4 className="text-sm font-medium text-gray-700">SNS 팔로워 수</h4>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="instagram_followers" className="text-xs flex items-center">
+                      <Instagram className="h-3 w-3 mr-1" />
+                      인스타
+                    </Label>
+                    <Input
+                      id="instagram_followers"
+                      type="number"
+                      value={profile.instagram_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, instagram_followers: e.target.value }))}
+                      placeholder="0"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="youtube_followers" className="text-xs flex items-center">
+                      <Youtube className="h-3 w-3 mr-1" />
+                      유튜브
+                    </Label>
+                    <Input
+                      id="youtube_followers"
+                      type="number"
+                      value={profile.youtube_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, youtube_followers: e.target.value }))}
+                      placeholder="0"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="tiktok_followers" className="text-xs flex items-center">
+                      <Hash className="h-3 w-3 mr-1" />
+                      틱톡
+                    </Label>
+                    <Input
+                      id="tiktok_followers"
+                      type="number"
+                      value={profile.tiktok_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, tiktok_followers: e.target.value }))}
+                      placeholder="0"
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* 주소 정보 */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center">
+                  <Home className="h-5 w-5 mr-2" />
+                  배송 주소
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="postcode">우편번호</Label>
+                    <Input
+                      id="postcode"
+                      value={profile.postcode}
+                      onChange={(e) => setProfile(prev => ({ ...prev, postcode: e.target.value }))}
+                      placeholder="12345"
+                    />
+                  </div>
+                  <div className="col-span-2 space-y-2">
+                    <Label htmlFor="address">주소</Label>
+                    <Input
+                      id="address"
+                      value={profile.address}
+                      onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
+                      placeholder="시/도 구/군 동/읍/면"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="detail_address">상세주소</Label>
+                  <Input
+                    id="detail_address"
+                    value={profile.detail_address}
+                    onChange={(e) => setProfile(prev => ({ ...prev, detail_address: e.target.value }))}
+                    placeholder="아파트/건물명, 동/호수"
+                  />
+                </div>
               </div>
 
               <Separator />
@@ -496,7 +795,7 @@ const ProfileSettings = () => {
                   />
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleChangePassword}
                   disabled={saving}
                   variant="outline"
@@ -515,10 +814,129 @@ const ProfileSettings = () => {
                   )}
                 </Button>
               </div>
+
+              <Separator className="my-6" />
+
+              {/* 회원 탈퇴 */}
+              <div className="border border-red-200 rounded-lg p-4 bg-red-50">
+                <div className="flex items-start">
+                  <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                  <div className="ml-3 flex-1">
+                    <h3 className="text-base font-semibold text-red-900">회원 탈퇴</h3>
+                    <p className="mt-1 text-sm text-red-700">
+                      회원 탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.
+                      보유 중인 포인트는 모두 소멸됩니다.
+                    </p>
+                    <Button
+                      onClick={() => setShowDeleteModal(true)}
+                      variant="destructive"
+                      size="sm"
+                      className="mt-3"
+                    >
+                      회원 탈퇴하기
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* 로그아웃 */}
+              <Button
+                onClick={signOut}
+                variant="ghost"
+                className="w-full justify-start text-gray-700 hover:text-gray-900"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                로그아웃
+              </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* 회원 탈퇴 모달 */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-red-600">회원 탈퇴</h3>
+              <button onClick={() => setShowDeleteModal(false)}>
+                <X className="w-6 h-6 text-gray-400 hover:text-gray-600" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-sm text-red-800">
+                  회원 탈퇴 시 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  탈퇴 사유
+                </label>
+                <select
+                  value={deletionReason}
+                  onChange={(e) => setDeletionReason(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="">선택하세요</option>
+                  <option value="서비스 불만족">서비스 불만족</option>
+                  <option value="사용 빈도 낮음">사용 빈도 낮음</option>
+                  <option value="개인정보 보호">개인정보 보호</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  상세 사유 <span className="text-xs text-gray-500">(선택사항)</span>
+                </label>
+                <textarea
+                  value={deletionDetails}
+                  onChange={(e) => setDeletionDetails(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  rows="3"
+                  placeholder="탈퇴 사유를 자세히 입력해주세요"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  확인을 위해 <strong>"회원탈퇴"</strong>를 입력하세요
+                </label>
+                <input
+                  type="text"
+                  value={confirmText}
+                  onChange={(e) => setConfirmText(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="회원탈퇴"
+                />
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => setShowDeleteModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  취소
+                </Button>
+                <Button
+                  onClick={handleAccountDeletion}
+                  disabled={deleting || confirmText !== '회원탈퇴'}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  {deleting ? '처리중...' : '탈퇴하기'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

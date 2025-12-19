@@ -79,7 +79,7 @@ const PointsPage = () => {
         return sum + (a.campaigns?.creator_points_override || a.campaigns?.reward_points || 0)
       }, 0)
 
-      // 출금 대기중인 금액 계산
+      // 출금 내역 가져오기 (withdrawal_requests 테이블 - Master DB 표준)
       const { data: withdrawalsData } = await supabase
         .from('withdrawal_requests')
         .select('*')
@@ -92,7 +92,7 @@ const PointsPage = () => {
 
       const pendingWithdrawalAmount = pendingWithdrawals.reduce((sum, w) => sum + (w.amount || 0), 0)
 
-      const totalPoints = profileData?.total_points || 0
+      const totalPoints = profileData?.points || 0
       const withdrawablePoints = Math.max(0, totalPoints - pendingWithdrawalAmount)
 
       setPointStats({
@@ -101,18 +101,20 @@ const PointsPage = () => {
         withdrawablePoints
       })
 
-      // 포인트 내역 (임시 - point_transactions 테이블이 있다면 연동)
-      // 현재는 applications에서 completed 상태인 것들을 포인트 적립 내역으로 표시
-      const completed = applicationsData?.filter(a =>
-        a.status === 'completed' || a.status === 'paid'
-      ) || []
+      // 포인트 거래 내역 가져오기 (point_transactions 테이블 - 레거시 표준)
+      const { data: transactionsData } = await supabase
+        .from('point_transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
 
-      const pointHistoryData = completed.map(a => ({
-        id: a.id,
-        type: 'credit',
-        amount: a.campaigns?.creator_points_override || a.campaigns?.reward_points || 0,
-        description: a.campaigns?.title || '캠페인 완료',
-        date: a.updated_at || a.created_at
+      const pointHistoryData = (transactionsData || []).map(t => ({
+        id: t.id,
+        type: t.amount > 0 ? 'credit' : 'debit',
+        amount: Math.abs(t.amount),
+        description: t.description || (t.type === 'earn' ? '포인트 적립' : t.type === 'withdraw' ? '출금' : t.type),
+        date: t.created_at
       }))
 
       setPointHistory(pointHistoryData)
@@ -125,11 +127,18 @@ const PointsPage = () => {
     }
   }
 
+  // 출금 신청 - 레거시 MyPageKorea.jsx 로직 적용
   const handleWithdrawRequest = async () => {
     const amount = parseInt(withdrawAmount)
 
     if (!amount || amount <= 0) {
       setError('올바른 금액을 입력해주세요')
+      return
+    }
+
+    // 최소 출금 금액 검증 (레거시 기준: 10,000)
+    if (amount < 10000) {
+      setError('최소 출금 금액은 10,000원입니다')
       return
     }
 
@@ -147,21 +156,40 @@ const PointsPage = () => {
       setProcessing(true)
       setError('')
 
-      const { error: insertError } = await supabase
+      // 1. 출금 신청 생성 (withdrawal_requests 테이블 - Master DB 표준)
+      const { error: withdrawalError } = await supabase
         .from('withdrawal_requests')
-        .insert([{
+        .insert({
           user_id: user.id,
-          amount,
+          amount: amount,
           bank_name: profile.bank_name,
           account_number: profile.account_number,
           account_holder: profile.account_holder,
-          status: 'pending',
-          created_at: new Date().toISOString()
-        }])
+          status: 'pending'
+        })
 
-      if (insertError) throw insertError
+      if (withdrawalError) throw withdrawalError
 
-      setSuccess('출금 신청이 완료되었습니다. 다음 주 월요일에 지급됩니다.')
+      // 2. 포인트 차감 (레거시 로직)
+      const newPoints = (profile.points || 0) - amount
+      const { error: pointsError } = await supabase
+        .from('user_profiles')
+        .update({ points: newPoints })
+        .eq('id', user.id)
+
+      if (pointsError) throw pointsError
+
+      // 3. 포인트 거래 내역 추가 (레거시 로직)
+      await supabase.from('point_transactions').insert({
+        user_id: user.id,
+        amount: -amount,
+        type: 'withdraw',
+        description: `출금 신청: ${amount.toLocaleString()}원 (${profile.bank_name} ${profile.account_number})`,
+        platform_region: 'kr',
+        country_code: 'KR'
+      })
+
+      setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내에 처리됩니다.')
       setShowWithdrawModal(false)
       setWithdrawAmount('')
       loadPointsData()

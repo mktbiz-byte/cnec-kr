@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { database, supabase } from '../../lib/supabase'
-import { compressImage, isImageFile } from '../../lib/imageCompression'
 import {
   User, Settings, FileText, DollarSign, LogOut, ChevronRight,
-  Camera, Edit3, Phone, Mail, MapPin, Instagram, Youtube, Hash,
+  Edit3, Phone, Mail, MapPin, Instagram, Youtube, Hash,
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
   ArrowRight, Bell, HelpCircle, Wallet, TrendingUp
@@ -35,16 +34,31 @@ const CreatorMyPage = () => {
   // 프로필 편집 관련
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({})
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  const [photoPreview, setPhotoPreview] = useState(null)
 
   // 출금 관련
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [withdrawAmount, setWithdrawAmount] = useState('')
 
+  // 한국 주요 은행 목록 (레거시 18개 은행)
   const koreanBanks = [
-    'KB국민은행', '신한은행', '우리은행', 'NH농협은행', '하나은행',
-    'IBK기업은행', 'SC제일은행', '카카오뱅크', '케이뱅크', '토스뱅크'
+    'KB국민은행',
+    '신한은행',
+    '우리은행',
+    'NH농협은행',
+    '하나은행',
+    'IBK기업은행',
+    'SC제일은행',
+    '한국씨티은행',
+    'KDB산업은행',
+    '경남은행',
+    '광주은행',
+    '대구은행',
+    '부산은행',
+    '전북은행',
+    '제주은행',
+    '카카오뱅크',
+    '케이뱅크',
+    '토스뱅크'
   ]
 
   useEffect(() => {
@@ -64,7 +78,6 @@ const CreatorMyPage = () => {
         .single()
 
       setProfile(profileData)
-      setPhotoPreview(profileData?.profile_image)
       setEditForm({
         name: profileData?.name || '',
         phone: profileData?.phone || '',
@@ -117,50 +130,6 @@ const CreatorMyPage = () => {
       console.error('데이터 로드 오류:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handlePhotoUpload = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    try {
-      setUploadingPhoto(true)
-
-      let uploadFile = file
-      if (isImageFile(file)) {
-        uploadFile = await compressImage(file, { maxWidth: 400, quality: 0.8 })
-      }
-
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`
-      const filePath = `profile-photos/${fileName}`
-
-      const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(filePath, uploadFile, { upsert: true })
-
-      if (uploadError) throw uploadError
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('uploads')
-        .getPublicUrl(filePath)
-
-      setPhotoPreview(publicUrl)
-
-      await supabase
-        .from('user_profiles')
-        .update({ profile_image: publicUrl })
-        .eq('id', user.id)
-
-      setSuccess('프로필 사진이 업데이트되었습니다')
-      setTimeout(() => setSuccess(''), 3000)
-
-    } catch (error) {
-      console.error('사진 업로드 오류:', error)
-      setError('사진 업로드에 실패했습니다')
-    } finally {
-      setUploadingPhoto(false)
     }
   }
 
@@ -289,25 +258,18 @@ const CreatorMyPage = () => {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
 
               <div className="flex items-center gap-4 mb-4">
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-full overflow-hidden bg-white/20 border-2 border-white/30">
-                    {photoPreview ? (
-                      <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <User size={24} className="text-white/60" />
-                      </div>
-                    )}
-                  </div>
-                  <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center cursor-pointer shadow-lg">
-                    <Camera size={12} className="text-gray-700" />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                    />
-                  </label>
+                {/* 프로필 사진 - 수정은 /profile 페이지에서 */}
+                <div
+                  className="w-16 h-16 rounded-full overflow-hidden bg-white/20 border-2 border-white/30 cursor-pointer"
+                  onClick={() => navigate('/profile')}
+                >
+                  {profile?.profile_image ? (
+                    <img src={profile.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <User size={24} className="text-white/60" />
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -387,7 +349,7 @@ const CreatorMyPage = () => {
                   <span className="font-bold text-gray-900">보유 포인트</span>
                 </div>
                 <p className="text-2xl font-bold text-violet-600">
-                  {formatCurrency(profile?.total_points || 0)}
+                  {formatCurrency(profile?.points || 0)}
                 </p>
               </div>
               <button
@@ -692,7 +654,7 @@ const CreatorMyPage = () => {
 
           <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-5 text-white mb-4">
             <p className="text-sm text-violet-200 mb-1">보유 포인트</p>
-            <p className="text-3xl font-bold">{formatCurrency(profile?.total_points || 0)}</p>
+            <p className="text-3xl font-bold">{formatCurrency(profile?.points || 0)}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 shadow-sm">

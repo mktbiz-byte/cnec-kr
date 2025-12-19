@@ -4,12 +4,11 @@ import OliveYoungGuideViewer from './OliveYoungGuideViewer'
 import FourWeekGuideViewer from './FourWeekGuideViewer'
 import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
-import { compressImage, isImageFile } from '../lib/imageCompression'
-import { 
-  User, Mail, Phone, MapPin, Calendar, Award, 
-  CreditCard, Download, Settings, LogOut, 
+import {
+  User, Mail, Phone, MapPin, Calendar, Award,
+  CreditCard, Download, Settings, LogOut,
   AlertTriangle, Trash2, Shield, Eye, EyeOff, X, Building2,
-  Camera, Upload, Instagram, Youtube
+  Instagram, Youtube
 } from 'lucide-react'
 
 const MyPageKoreaEnhanced = () => {
@@ -26,9 +25,6 @@ const MyPageKoreaEnhanced = () => {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false)
   const [profileCompleteness, setProfileCompleteness] = useState(0)
   
-  // 프로필 사진 업로드
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  const [photoPreview, setPhotoPreview] = useState(null)
   
   // 회원 탈퇴 관련 상태
   const [showWithdrawalModal, setShowWithdrawalModal] = useState(false)
@@ -237,8 +233,6 @@ const MyPageKoreaEnhanced = () => {
         resident_number: '' // 보안상 빈 값으로 시작
         })
       }
-      
-      setPhotoPreview(profileData?.profile_image)
 
       // 캠페인 지원 내역 (조인 대신 별도 쿼리)
       const { data: appsData, error: applicationsError } = await supabase
@@ -281,9 +275,9 @@ const MyPageKoreaEnhanced = () => {
       console.log('Fetched applications:', applicationsData)
       setApplications(applicationsData || [])
 
-      // 출금 내역
+      // 출금 내역 (Master DB 표준: withdrawal_requests)
       const { data: withdrawalsData, error: withdrawalsError } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -306,88 +300,6 @@ const MyPageKoreaEnhanced = () => {
       setError('데이터를 불러오는 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
-    }
-  }
-
-  // 프로필 사진 업로드
-  const handlePhotoUpload = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // 파일 크기 체크 (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setError('파일 크기는 10MB 이하여야 합니다.')
-      return
-    }
-
-    // 파일 타입 체크
-    if (!file.type.startsWith('image/')) {
-      setError('이미지 파일만 업로드 가능합니다.')
-      return
-    }
-
-    try {
-      setUploadingPhoto(true)
-      setError('')
-
-      // 미리보기 생성
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result)
-      }
-      reader.readAsDataURL(file)
-
-      // 이미지 압축
-      let fileToUpload = file
-      if (isImageFile(file)) {
-        try {
-          fileToUpload = await compressImage(file, {
-            maxSizeMB: 2,
-            maxWidthOrHeight: 1920,
-            quality: 0.8
-          })
-        } catch (compressionError) {
-          console.error('이미지 압축 실패:', compressionError)
-          // 압축 실패 시 원본 파일 사용
-        }
-      }
-
-      // Supabase Storage에 업로드
-      const fileExt = fileToUpload.name.split('.').pop()
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`
-      const filePath = `${user.id}/${fileName}`
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('profile-photos')
-        .upload(filePath, fileToUpload, {
-          cacheControl: '3600',
-          upsert: true
-        })
-
-      if (uploadError) throw uploadError
-
-      // Public URL 가져오기
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile-photos')
-        .getPublicUrl(filePath)
-
-      // 데이터베이스 업데이트
-      const { error: updateError } = await supabase
-        .from('user_profiles')
-        .update({ profile_image: publicUrl })
-        .eq('id', user.id)
-
-      if (updateError) throw updateError
-
-      setSuccess('프로필 사진이 업데이트되었습니다.')
-      await fetchUserData()
-      
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err) {
-      console.error('사진 업로드 오류:', err)
-      setError('사진 업로드 중 오류가 발생했습니다.')
-    } finally {
-      setUploadingPhoto(false)
     }
   }
 
@@ -604,31 +516,19 @@ const MyPageKoreaEnhanced = () => {
         <div className="bg-white rounded-lg shadow mb-6 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              {/* 프로필 사진 */}
-              <div className="relative">
-                <div className="h-20 w-20 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
-                  {photoPreview ? (
-                    <img
-                      src={photoPreview}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
-                      <User className="h-10 w-10 text-white" />
-                    </div>
-                  )}
-                </div>
-                <label className="absolute bottom-0 right-0 h-7 w-7 bg-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-purple-700 transition-colors shadow-lg">
-                  <Camera className="h-4 w-4 text-white" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    disabled={uploadingPhoto}
+              {/* 프로필 사진 (읽기 전용 - 수정은 /profile 페이지에서) */}
+              <div className="h-20 w-20 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                {profile?.profile_image ? (
+                  <img
+                    src={profile.profile_image}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
                   />
-                </label>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
+                    <User className="h-10 w-10 text-white" />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -767,41 +667,25 @@ const MyPageKoreaEnhanced = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700">프로필 사진</label>
-                    {isEditing ? (
-                      <div className="mt-2 space-y-2">
-                        {(photoPreview || profile?.profile_image) && (
-                          <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
-                            <img
-                              src={photoPreview || profile?.profile_image}
-                              alt="프로필 사진"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePhotoUpload}
-                          disabled={uploadingPhoto}
-                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                        />
-                        {uploadingPhoto && <p className="text-sm text-gray-500">업로드 중...</p>}
-                      </div>
-                    ) : (
-                      <div className="mt-2">
-                        {profile?.profile_image ? (
-                          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
-                            <img
-                              src={profile.profile_image}
-                              alt="프로필 사진"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <p className="text-sm text-gray-500">등록되지 않음</p>
-                        )}
-                      </div>
-                    )}
+                    <div className="mt-2">
+                      {profile?.profile_image ? (
+                        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
+                          <img
+                            src={profile.profile_image}
+                            alt="프로필 사진"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500">등록되지 않음</p>
+                      )}
+                      <a
+                        href="/profile"
+                        className="mt-2 inline-block text-sm text-purple-600 hover:text-purple-700 underline"
+                      >
+                        프로필 설정에서 사진 변경하기
+                      </a>
+                    </div>
                   </div>
                   
                   <div>

@@ -1,18 +1,18 @@
 // PayPal 출금 시스템 API
 import { database } from './supabase'
 
-// withdrawals 테이블 API 추가
+// withdrawal_requests 테이블 API (Master DB 표준)
 const withdrawalAPI = {
   // 모든 출금 요청 조회
   async getAll() {
     return database.safeQuery(async () => {
       const { data, error } = await database.supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select(`
           *,
-          user_profiles!withdrawals_user_id_fkey(name, email)
+          user_profiles!withdrawal_requests_user_id_fkey(name, email)
         `)
-        .order('requested_at', { ascending: false })
+        .order('created_at', { ascending: false })
       if (error) throw error
       return data
     })
@@ -22,10 +22,10 @@ const withdrawalAPI = {
   async getByUser(userId) {
     return database.safeQuery(async () => {
       const { data, error } = await database.supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select('*')
         .eq('user_id', userId)
-        .order('requested_at', { ascending: false })
+        .order('created_at', { ascending: false })
       if (error) throw error
       return data
     })
@@ -35,16 +35,14 @@ const withdrawalAPI = {
   async create(withdrawalData) {
     return database.safeQuery(async () => {
       const { data, error } = await database.supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .insert([{
           user_id: withdrawalData.user_id,
           amount: withdrawalData.amount,
-          bank_info: {
-            paypal_email: withdrawalData.paypal_email,
-            paypal_name: withdrawalData.paypal_name
-          },
-          status: 'pending',
-          requested_at: new Date().toISOString()
+          bank_name: withdrawalData.bank_name,
+          account_number: withdrawalData.account_number,
+          account_holder: withdrawalData.account_holder,
+          status: 'pending'
         }])
         .select()
         .single()
@@ -60,16 +58,16 @@ const withdrawalAPI = {
         status,
         updated_at: new Date().toISOString()
       }
-      
+
       if (status === 'completed' || status === 'rejected') {
         updateData.processed_at = new Date().toISOString()
         if (processedBy) updateData.processed_by = processedBy
       }
-      
+
       if (notes) updateData.notes = notes
 
       const { data, error } = await database.supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .update(updateData)
         .eq('id', id)
         .select()
@@ -83,7 +81,7 @@ const withdrawalAPI = {
   async delete(id) {
     return database.safeQuery(async () => {
       const { error } = await database.supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .delete()
         .eq('id', id)
       if (error) throw error
@@ -91,20 +89,19 @@ const withdrawalAPI = {
   }
 }
 
-// user_points 테이블 API 추가
+// point_transactions 테이블 API (Master DB 표준)
 const userPointsAPI = {
   // 사용자 총 포인트 조회
   async getUserTotalPoints(userId) {
     return database.safeQuery(async () => {
       const { data, error } = await database.supabase
-        .from('user_points')
-        .select('points')
+        .from('point_transactions')
+        .select('amount')
         .eq('user_id', userId)
-        .eq('status', 'approved')
-      
+
       if (error) throw error
-      
-      const totalPoints = data.reduce((sum, record) => sum + record.points, 0)
+
+      const totalPoints = data.reduce((sum, record) => sum + record.amount, 0)
       return totalPoints
     })
   },
@@ -113,11 +110,8 @@ const userPointsAPI = {
   async getUserPoints(userId) {
     return database.safeQuery(async () => {
       const { data, error } = await database.supabase
-        .from('user_points')
-        .select(`
-          *,
-          campaigns!user_points_campaign_id_fkey(title)
-        `)
+        .from('point_transactions')
+        .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
       if (error) throw error
@@ -129,13 +123,12 @@ const userPointsAPI = {
   async deductPoints(userId, amount, reason = '출금 신청') {
     return database.safeQuery(async () => {
       const { data, error } = await database.supabase
-        .from('user_points')
+        .from('point_transactions')
         .insert([{
           user_id: userId,
-          points: -amount,
-          reason: reason,
-          status: 'approved',
-          approved_at: new Date().toISOString()
+          amount: -amount,
+          type: 'withdraw',
+          description: reason
         }])
         .select()
         .single()
