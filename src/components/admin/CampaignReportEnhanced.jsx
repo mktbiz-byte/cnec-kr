@@ -226,7 +226,7 @@ const CampaignReportEnhanced = () => {
       app.instagram_url || '-',
       app.tiktok_url || '-',
       app.youtube_url || '-',
-      app.other_sns_url || '-',
+      app.blog_url || '-',
       app.question1_answer || '-',
       app.question2_answer || '-',
       app.question3_answer || '-',
@@ -567,13 +567,13 @@ const CampaignReportEnhanced = () => {
                               <Youtube className="h-4 w-4" />
                             </a>
                           )}
-                          {application.other_sns_url && (
+                          {application.blog_url && (
                             <a
-                              href={application.other_sns_url}
+                              href={application.blog_url}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-600 hover:text-blue-800"
-                              title="기타 SNS"
+                              title="블로그"
                             >
                               <ExternalLink className="h-4 w-4" />
                             </a>

@@ -298,7 +298,7 @@ const UserApprovalManagerEnhanced = () => {
         .insert({
           user_id: selectedUser.user_id,
           amount: finalAmount,
-          transaction_type: isAdd ? 'admin_add' : 'admin_subtract',
+          type: 'adjustment',
           description: description,
           created_at: new Date().toISOString()
         })

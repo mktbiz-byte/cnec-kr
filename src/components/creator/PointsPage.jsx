@@ -138,7 +138,7 @@ const PointsPage = () => {
       return
     }
 
-    if (!profile?.bank_name || !profile?.bank_account_number) {
+    if (!profile?.bank_name || !profile?.account_number) {
       setError('계좌 정보를 먼저 등록해주세요')
       return
     }
@@ -153,8 +153,8 @@ const PointsPage = () => {
           user_id: user.id,
           amount,
           bank_name: profile.bank_name,
-          bank_account_number: profile.bank_account_number,
-          bank_account_holder: profile.bank_account_holder,
+          account_number: profile.account_number,
+          account_holder: profile.account_holder,
           status: 'pending',
           created_at: new Date().toISOString()
         }])
@@ -263,16 +263,16 @@ const PointsPage = () => {
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <h3 className="font-bold text-gray-900 mb-4">출금 신청</h3>
 
-          {profile?.bank_name && profile?.bank_account_number ? (
+          {profile?.bank_name && profile?.account_number ? (
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">등록된 계좌</p>
                     <p className="font-medium text-gray-900">
-                      {profile.bank_name} {profile.bank_account_number}
+                      {profile.bank_name} {profile.account_number}
                     </p>
-                    <p className="text-sm text-gray-600">{profile.bank_account_holder}</p>
+                    <p className="text-sm text-gray-600">{profile.account_holder}</p>
                   </div>
                   <button
                     onClick={() => navigate('/profile')}
@@ -392,7 +392,7 @@ const PointsPage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-600">
-                          {item.bank_name} {item.bank_account_number?.slice(-4)}
+                          {item.bank_name} {item.account_number?.slice(-4)}
                         </p>
                       </div>
                       <p className="font-bold text-gray-900">{formatCurrency(item.amount)}</p>
@@ -436,9 +436,9 @@ const PointsPage = () => {
             <div className="bg-gray-50 rounded-xl p-4 mb-6">
               <p className="text-xs text-gray-500 mb-1">입금 계좌</p>
               <p className="font-medium text-gray-900">
-                {profile?.bank_name} {profile?.bank_account_number}
+                {profile?.bank_name} {profile?.account_number}
               </p>
-              <p className="text-sm text-gray-600">{profile?.bank_account_holder}</p>
+              <p className="text-sm text-gray-600">{profile?.account_holder}</p>
             </div>
 
             <div className="flex gap-3">

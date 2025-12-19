@@ -36,7 +36,7 @@ const ProfileManagement = () => {
     instagram_url: '',
     tiktok_url: '',
     youtube_url: '',
-    other_sns_url: ''
+    blog_url: ''
   })
   
   const [privacy, setPrivacy] = useState({
@@ -617,18 +617,18 @@ const ProfileManagement = () => {
                   />
                 </div>
 
-                {/* 기타 SNS */}
+                {/* ブログ */}
                 <div className="space-y-2">
-                  <Label htmlFor="other_sns_url">
+                  <Label htmlFor="blog_url">
                     <div className="flex items-center space-x-2">
                       <Globe className="h-4 w-4 text-blue-600" />
-                      <span>その他SNS</span>
+                      <span>ブログ</span>
                     </div>
                   </Label>
                   <Input
-                    id="other_sns_url"
-                    value={profile.other_sns_url}
-                    onChange={(e) => setProfile(prev => ({ ...prev, other_sns_url: e.target.value }))}
+                    id="blog_url"
+                    value={profile.blog_url}
+                    onChange={(e) => setProfile(prev => ({ ...prev, blog_url: e.target.value }))}
                     placeholder="https://..."
                   />
                 </div>

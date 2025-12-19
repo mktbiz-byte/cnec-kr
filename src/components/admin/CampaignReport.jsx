@@ -280,15 +280,15 @@ const CampaignReport = () => {
                               </a>
                             </div>
                           )}
-                          {application.other_sns_url && (
+                          {application.blog_url && (
                             <div>
-                              <a href={application.other_sns_url} target="_blank" rel="noopener noreferrer" 
+                              <a href={application.blog_url} target="_blank" rel="noopener noreferrer"
                                  className="text-blue-600 hover:text-blue-800">
-                                기타 SNS
+                                블로그
                               </a>
                             </div>
                           )}
-                          {!application.instagram_url && !application.tiktok_url && !application.youtube_url && !application.other_sns_url && '-'}
+                          {!application.instagram_url && !application.tiktok_url && !application.youtube_url && !application.blog_url && '-'}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
