@@ -425,7 +425,7 @@ export const database = {
                 instagram_url: userProfile?.instagram_url || application.instagram_url || '',
                 tiktok_url: userProfile?.tiktok_url || application.tiktok_url || '',
                 youtube_url: userProfile?.youtube_url || application.youtube_url || '',
-                other_sns_url: userProfile?.other_sns_url || application.other_sns_url || '',
+                blog_url: userProfile?.blog_url || application.blog_url || '',
                 // 사용자 프로필 정보 추가
                 user_profiles: userProfile
               }
@@ -649,7 +649,7 @@ export const database = {
             instagram_url: userProfile?.instagram_url || application.instagram_url || '',
             tiktok_url: userProfile?.tiktok_url || application.tiktok_url || '',
             youtube_url: userProfile?.youtube_url || application.youtube_url || '',
-            other_sns_url: userProfile?.other_sns_url || application.other_sns_url || ''
+            blog_url: userProfile?.blog_url || application.blog_url || ''
           }
         })
         
@@ -729,11 +729,11 @@ export const database = {
           instagram_url: profileData.instagram_url || null,
           youtube_url: profileData.youtube_url || null,
           tiktok_url: profileData.tiktok_url || null,
-          other_sns_url: profileData.other_sns_url || null,
+          blog_url: profileData.blog_url || null,
           bio: profileData.bio || null,
           bank_name: profileData.bank_name || null,
-          bank_account: profileData.bank_account || null,
-          bank_holder: profileData.bank_holder || null,
+          account_number: profileData.account_number || null,
+          account_holder: profileData.account_holder || null,
           updated_at: new Date().toISOString()
         }
 

@@ -89,7 +89,7 @@ const MyPageWithWithdrawal = () => {
     instagram_url: '',
     tiktok_url: '',
     youtube_url: '',
-    other_sns_url: '',
+    blog_url: '',
     instagram_followers: '',
     tiktok_followers: '',
     youtube_subscribers: ''
@@ -312,7 +312,7 @@ const MyPageWithWithdrawal = () => {
           instagram_url: profileData.instagram_url || '',
           tiktok_url: profileData.tiktok_url || '',
           youtube_url: profileData.youtube_url || '',
-          other_sns_url: profileData.other_sns_url || '',
+          blog_url: profileData.blog_url || '',
           instagram_followers: profileData.instagram_followers || '',
           tiktok_followers: profileData.tiktok_followers || '',
           youtube_subscribers: profileData.youtube_subscribers || ''
@@ -514,7 +514,7 @@ const MyPageWithWithdrawal = () => {
       if (editForm.instagram_url !== undefined) updateData.instagram_url = editForm.instagram_url?.trim() || null
       if (editForm.tiktok_url !== undefined) updateData.tiktok_url = editForm.tiktok_url?.trim() || null
       if (editForm.youtube_url !== undefined) updateData.youtube_url = editForm.youtube_url?.trim() || null
-      if (editForm.other_sns_url !== undefined) updateData.other_sns_url = editForm.other_sns_url?.trim() || null
+      if (editForm.blog_url !== undefined) updateData.blog_url = editForm.blog_url?.trim() || null
       
       // SNS 팔로워 수 필드들 (숫자 검증, 빈 값 허용)
       if (editForm.instagram_followers !== undefined) {
@@ -1234,20 +1234,20 @@ const MyPageWithWithdrawal = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">{language === 'ja' ? 'その他のSNS' : '기타 SNS'}</label>
+                    <label className="block text-sm font-medium text-gray-700">{language === 'ja' ? 'ブログ' : '블로그'}</label>
                     {isEditing ? (
                       <input
                         type="url"
-                        value={editForm.other_sns_url}
-                        onChange={(e) => setEditForm({...editForm, other_sns_url: e.target.value})}
+                        value={editForm.blog_url}
+                        onChange={(e) => setEditForm({...editForm, blog_url: e.target.value})}
                         className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="https://other-sns.com/username"
+                        placeholder="https://blog.example.com"
                       />
                     ) : (
                       <p className="mt-1 text-sm text-gray-900">
-                        {profile?.other_sns_url ? (
-                          <a href={profile.other_sns_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            {profile.other_sns_url}
+                        {profile?.blog_url ? (
+                          <a href={profile.blog_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            {profile.blog_url}
                           </a>
                         ) : (language === 'ja' ? '未登録' : '등록되지 않음')}
                       </p>

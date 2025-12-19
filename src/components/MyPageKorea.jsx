@@ -74,14 +74,14 @@ const MyPageKorea = () => {
     instagram_url: '',
     tiktok_url: '',
     youtube_url: '',
-    other_sns_url: '',
+    blog_url: '',
     instagram_followers: '',
     tiktok_followers: '',
     youtube_subscribers: '',
     // 은행 정보
     bank_name: '',
-    bank_account_number: '',
-    bank_account_holder: '',
+    account_number: '',
+    account_holder: '',
     resident_number: ''
   })
 
@@ -145,13 +145,13 @@ const MyPageKorea = () => {
         instagram_url: profileData?.instagram_url || '',
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
-        other_sns_url: profileData?.other_sns_url || '',
+        blog_url: profileData?.blog_url || '',
         instagram_followers: profileData?.instagram_followers || '',
         tiktok_followers: profileData?.tiktok_followers || '',
         youtube_subscribers: profileData?.youtube_subscribers || '',
         bank_name: profileData?.bank_name || '',
-        bank_account_number: profileData?.bank_account_number || '',
-        bank_account_holder: profileData?.bank_account_holder || '',
+        account_number: profileData?.account_number || '',
+        account_holder: profileData?.account_holder || '',
         resident_number: '' // 보안상 빈 값으로 시작
       })
 
@@ -228,13 +228,13 @@ const MyPageKorea = () => {
         instagram_url: editForm.instagram_url,
         tiktok_url: editForm.tiktok_url,
         youtube_url: editForm.youtube_url,
-        other_sns_url: editForm.other_sns_url,
+        blog_url: editForm.blog_url,
         instagram_followers: editForm.instagram_followers ? parseInt(editForm.instagram_followers) : 0,
         tiktok_followers: editForm.tiktok_followers ? parseInt(editForm.tiktok_followers) : 0,
         youtube_subscribers: editForm.youtube_subscribers ? parseInt(editForm.youtube_subscribers) : 0,
         bank_name: editForm.bank_name,
-        bank_account_number: editForm.bank_account_number,
-        bank_account_holder: editForm.bank_account_holder,
+        account_number: editForm.account_number,
+        account_holder: editForm.account_holder,
         updated_at: new Date().toISOString()
       }
 
@@ -348,8 +348,8 @@ const MyPageKorea = () => {
           user_id: user.id,
           amount: amount,
           bank_name: withdrawForm.bankName,
-          bank_account_number: withdrawForm.bankAccountNumber,
-          bank_account_holder: withdrawForm.bankAccountHolder,
+          account_number: withdrawForm.bankAccountNumber,
+          account_holder: withdrawForm.bankAccountHolder,
           resident_number_encrypted: encryptedResident,
           reason: withdrawForm.reason,
           status: 'pending',
@@ -956,28 +956,28 @@ const MyPageKorea = () => {
                     {isEditing ? (
                       <input
                         type="text"
-                        value={editForm.bank_account_number}
-                        onChange={(e) => setEditForm({...editForm, bank_account_number: e.target.value})}
+                        value={editForm.account_number}
+                        onChange={(e) => setEditForm({...editForm, account_number: e.target.value})}
                         className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="123-456-789012"
                       />
                     ) : (
-                      <p className="mt-1 text-sm text-gray-900">{profile?.bank_account_number || '미등록'}</p>
+                      <p className="mt-1 text-sm text-gray-900">{profile?.account_number || '미등록'}</p>
                     )}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">예금주명</label>
                     {isEditing ? (
                       <input
                         type="text"
-                        value={editForm.bank_account_holder}
-                        onChange={(e) => setEditForm({...editForm, bank_account_holder: e.target.value})}
+                        value={editForm.account_holder}
+                        onChange={(e) => setEditForm({...editForm, account_holder: e.target.value})}
                         className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="홍길동"
                       />
                     ) : (
-                      <p className="mt-1 text-sm text-gray-900">{profile?.bank_account_holder || '미등록'}</p>
+                      <p className="mt-1 text-sm text-gray-900">{profile?.account_holder || '미등록'}</p>
                     )}
                   </div>
                   
@@ -1104,8 +1104,8 @@ const MyPageKorea = () => {
                           </div>
                           <div className="mt-2 space-y-1 text-sm text-gray-600">
                             <p>은행: {withdrawal.bank_name}</p>
-                            <p>계좌: {withdrawal.bank_account_number}</p>
-                            <p>예금주: {withdrawal.bank_account_holder}</p>
+                            <p>계좌: {withdrawal.account_number}</p>
+                            <p>예금주: {withdrawal.account_holder}</p>
                             <p>신청일: {new Date(withdrawal.created_at).toLocaleDateString('ko-KR')}</p>
                             {withdrawal.processed_at && (
                               <p>처리일: {new Date(withdrawal.processed_at).toLocaleDateString('ko-KR')}</p>

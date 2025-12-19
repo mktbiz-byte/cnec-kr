@@ -78,8 +78,8 @@ const CreatorMyPage = () => {
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
         bank_name: profileData?.bank_name || '',
-        bank_account_number: profileData?.bank_account_number || '',
-        bank_account_holder: profileData?.bank_account_holder || ''
+        account_number: profileData?.account_number || '',
+        account_holder: profileData?.account_holder || ''
       })
 
       // 지원 내역 가져오기 (조인 대신 별도 쿼리)
@@ -181,8 +181,8 @@ const CreatorMyPage = () => {
         tiktok_url: editForm.tiktok_url,
         youtube_url: editForm.youtube_url,
         bank_name: editForm.bank_name,
-        bank_account_number: editForm.bank_account_number,
-        bank_account_holder: editForm.bank_account_holder,
+        account_number: editForm.account_number,
+        account_holder: editForm.account_holder,
         updated_at: new Date().toISOString()
       }
 
@@ -594,15 +594,15 @@ const CreatorMyPage = () => {
               </div>
               <input
                 type="text"
-                value={editForm.bank_account_number}
-                onChange={(e) => setEditForm({...editForm, bank_account_number: e.target.value})}
+                value={editForm.account_number}
+                onChange={(e) => setEditForm({...editForm, account_number: e.target.value})}
                 className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                 placeholder="계좌번호 ('-' 없이)"
               />
               <input
                 type="text"
-                value={editForm.bank_account_holder}
-                onChange={(e) => setEditForm({...editForm, bank_account_holder: e.target.value})}
+                value={editForm.account_holder}
+                onChange={(e) => setEditForm({...editForm, account_holder: e.target.value})}
                 className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                 placeholder="예금주명"
               />
@@ -697,12 +697,12 @@ const CreatorMyPage = () => {
 
           <div className="bg-white rounded-2xl p-5 shadow-sm">
             <h3 className="font-bold text-gray-900 mb-4">정산 신청</h3>
-            {profile?.bank_name && profile?.bank_account_number ? (
+            {profile?.bank_name && profile?.account_number ? (
               <div className="space-y-3">
                 <div className="bg-gray-50 rounded-xl p-4">
                   <p className="text-xs text-gray-500 mb-1">등록된 계좌</p>
-                  <p className="font-medium text-gray-900">{profile.bank_name} {profile.bank_account_number}</p>
-                  <p className="text-sm text-gray-600">{profile.bank_account_holder}</p>
+                  <p className="font-medium text-gray-900">{profile.bank_name} {profile.account_number}</p>
+                  <p className="text-sm text-gray-600">{profile.account_holder}</p>
                 </div>
                 <button className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors">
                   출금 신청하기
@@ -753,8 +753,8 @@ const CreatorMyPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">계좌번호</label>
               <input
                 type="text"
-                value={editForm.bank_account_number}
-                onChange={(e) => setEditForm({...editForm, bank_account_number: e.target.value})}
+                value={editForm.account_number}
+                onChange={(e) => setEditForm({...editForm, account_number: e.target.value})}
                 className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                 placeholder="'-' 없이 입력"
               />
@@ -763,8 +763,8 @@ const CreatorMyPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">예금주</label>
               <input
                 type="text"
-                value={editForm.bank_account_holder}
-                onChange={(e) => setEditForm({...editForm, bank_account_holder: e.target.value})}
+                value={editForm.account_holder}
+                onChange={(e) => setEditForm({...editForm, account_holder: e.target.value})}
                 className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                 placeholder="예금주명"
               />

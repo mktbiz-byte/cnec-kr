@@ -77,14 +77,14 @@ const MyPageKoreaEnhanced = () => {
     instagram_url: '',
     tiktok_url: '',
     youtube_url: '',
-    other_sns_url: '',
+    blog_url: '',
     instagram_followers: '',
     tiktok_followers: '',
     youtube_subscribers: '',
     // 은행 정보
     bank_name: '',
-    bank_account_number: '',
-    bank_account_holder: '',
+    account_number: '',
+    account_holder: '',
     resident_number: ''
   })
 
@@ -227,13 +227,13 @@ const MyPageKoreaEnhanced = () => {
         instagram_url: profileData?.instagram_url || '',
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
-        other_sns_url: profileData?.other_sns_url || '',
+        blog_url: profileData?.blog_url || '',
         instagram_followers: profileData?.instagram_followers || '',
         tiktok_followers: profileData?.tiktok_followers || '',
         youtube_subscribers: profileData?.youtube_subscribers || '',
         bank_name: profileData?.bank_name || '',
-        bank_account_number: profileData?.bank_account_number || '',
-        bank_account_holder: profileData?.bank_account_holder || '',
+        account_number: profileData?.account_number || '',
+        account_holder: profileData?.account_holder || '',
         resident_number: '' // 보안상 빈 값으로 시작
         })
       }
@@ -410,13 +410,13 @@ const MyPageKoreaEnhanced = () => {
         instagram_url: editForm.instagram_url,
         tiktok_url: editForm.tiktok_url,
         youtube_url: editForm.youtube_url,
-        other_sns_url: editForm.other_sns_url,
+        blog_url: editForm.blog_url,
         instagram_followers: editForm.instagram_followers ? parseInt(editForm.instagram_followers) : 0,
         tiktok_followers: editForm.tiktok_followers ? parseInt(editForm.tiktok_followers) : 0,
         youtube_subscribers: editForm.youtube_subscribers ? parseInt(editForm.youtube_subscribers) : 0,
         bank_name: editForm.bank_name,
-        bank_account_number: editForm.bank_account_number,
-        bank_account_holder: editForm.bank_account_holder,
+        account_number: editForm.account_number,
+        account_holder: editForm.account_holder,
         updated_at: new Date().toISOString()
       }
 
@@ -1026,20 +1026,20 @@ const MyPageKoreaEnhanced = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">기타 SNS URL</label>
+                    <label className="block text-sm font-medium text-gray-700">블로그 URL</label>
                     {isEditing ? (
                       <input
                         type="url"
-                        value={editForm.other_sns_url}
-                        onChange={(e) => setEditForm({...editForm, other_sns_url: e.target.value})}
+                        value={editForm.blog_url}
+                        onChange={(e) => setEditForm({...editForm, blog_url: e.target.value})}
                         className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                         placeholder="https://..."
                       />
                     ) : (
                       <p className="mt-1 text-sm text-gray-900 break-all">
-                        {profile?.other_sns_url ? (
-                          <a href={profile.other_sns_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            {profile.other_sns_url}
+                        {profile?.blog_url ? (
+                          <a href={profile.blog_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            {profile.blog_url}
                           </a>
                         ) : '미등록'}
                       </p>
@@ -1571,7 +1571,7 @@ const MyPageKoreaEnhanced = () => {
                             {new Date(withdrawal.created_at).toLocaleDateString('ko-KR')}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {withdrawal.bank_name} {withdrawal.bank_account_number}
+                            {withdrawal.bank_name} {withdrawal.account_number}
                           </p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
