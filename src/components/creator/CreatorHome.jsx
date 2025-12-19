@@ -281,7 +281,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
         activeCampaigns: approved.length,
         urgentCampaigns: urgent.length,
         completedCampaigns: completed.length,
-        totalPoints: profileData?.total_points || 0,
+        totalPoints: profileData?.points || 0,
         totalScore: scores.totalScore
       })
 

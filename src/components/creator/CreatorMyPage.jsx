@@ -349,7 +349,7 @@ const CreatorMyPage = () => {
                   <span className="font-bold text-gray-900">보유 포인트</span>
                 </div>
                 <p className="text-2xl font-bold text-violet-600">
-                  {formatCurrency(profile?.total_points || 0)}
+                  {formatCurrency(profile?.points || 0)}
                 </p>
               </div>
               <button
@@ -654,7 +654,7 @@ const CreatorMyPage = () => {
 
           <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-5 text-white mb-4">
             <p className="text-sm text-violet-200 mb-1">보유 포인트</p>
-            <p className="text-3xl font-bold">{formatCurrency(profile?.total_points || 0)}</p>
+            <p className="text-3xl font-bold">{formatCurrency(profile?.points || 0)}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 shadow-sm">
