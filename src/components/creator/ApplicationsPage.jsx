@@ -191,6 +191,25 @@ const ApplicationsPage = () => {
     return `${amount.toLocaleString()}원`
   }
 
+  // 영상 업로드 페이지 이동 (캠페인 데이터 검증 포함)
+  const handleVideoUpload = (app, type = 'regular') => {
+    if (!app.campaigns?.id) {
+      alert('캠페인 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+      return
+    }
+
+    switch (type) {
+      case 'oliveyoung':
+        navigate(`/submit-oliveyoung-video/${app.campaigns.id}?step=1`)
+        break
+      case '4week':
+        navigate(`/submit-4week-video/${app.campaigns.id}`)
+        break
+      default:
+        navigate(`/submit-video/${app.campaigns.id}`)
+    }
+  }
+
   const filteredApps = getFilteredApplications()
 
   if (loading) {
@@ -399,7 +418,7 @@ const ApplicationsPage = () => {
                             </button>
                             {app.status === 'filming' && (
                               <button
-                                onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                                onClick={() => handleVideoUpload(app)}
                                 className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
                               >
                                 <Video size={12} /> 영상 업로드
@@ -431,7 +450,7 @@ const ApplicationsPage = () => {
                             </button>
                             {['filming', 'approved', 'selected'].includes(app.status) && (
                               <button
-                                onClick={() => navigate(`/submit-oliveyoung-video/${app.campaigns?.id}?step=1`)}
+                                onClick={() => handleVideoUpload(app, 'oliveyoung')}
                                 className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700"
                               >
                                 영상 업로드
@@ -463,7 +482,7 @@ const ApplicationsPage = () => {
                             </button>
                             {['filming', 'approved', 'selected'].includes(app.status) && (
                               <button
-                                onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                                onClick={() => handleVideoUpload(app)}
                                 className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
                               >
                                 <Video size={12} /> 영상 업로드
@@ -499,7 +518,7 @@ const ApplicationsPage = () => {
                             </button>
                             {app.status === 'filming' && (
                               <button
-                                onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                                onClick={() => handleVideoUpload(app)}
                                 className="flex-1 py-2 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 flex items-center justify-center gap-1"
                               >
                                 <Video size={12} /> 영상 업로드
@@ -516,7 +535,7 @@ const ApplicationsPage = () => {
                        !app.campaigns?.challenge_weekly_guides_ai &&
                        !app.campaigns?.ai_generated_guide && (
                         <button
-                          onClick={() => navigate(`/submit-video/${app.campaigns?.id}`)}
+                          onClick={() => handleVideoUpload(app)}
                           className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-1"
                         >
                           <Video size={14} /> 영상 업로드하기
