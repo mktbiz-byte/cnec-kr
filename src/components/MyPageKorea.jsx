@@ -372,7 +372,7 @@ const MyPageKorea = () => {
       await database.from('point_transactions').insert({
         user_id: user.id,
         amount: -amount,
-        transaction_type: 'withdrawal',
+        type: 'withdraw',
         description: `출금 신청: ${amount.toLocaleString()}포인트 (${withdrawForm.bankName} ${withdrawForm.bankAccountNumber})`,
         platform_region: 'kr',
         country_code: 'KR'

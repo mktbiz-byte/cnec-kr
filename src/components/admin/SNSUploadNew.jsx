@@ -298,7 +298,7 @@ const SNSUploadNew = () => {
           user_id: application.user_id,
           campaign_id: application.campaign_id,
           application_id: application.id,
-          transaction_type: 'campaign_reward',
+          type: 'earn',
           amount: rewardPoints,
           description: `캠페인 완료 보상: ${application.campaigns.title}`,
           status: 'completed',
@@ -318,7 +318,7 @@ const SNSUploadNew = () => {
           updated_at: new Date().toISOString()
         })
         .eq('application_id', application.id)
-        .eq('transaction_type', 'pending_reward')
+        .eq('type', 'bonus')
 
       if (updatePendingError) {
         console.warn('기존 거래 상태 업데이트 실패:', updatePendingError)

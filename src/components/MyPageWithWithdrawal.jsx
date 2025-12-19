@@ -642,7 +642,7 @@ const MyPageWithWithdrawal = () => {
         .insert([{
           user_id: user.id,
           amount: -requestAmount,
-          transaction_type: 'spent',
+          type: 'withdraw',
           description: language === 'ja' ? `ポイント使用: 出金申請` : `포인트 사용: 출금 신청`,
           created_at: new Date().toISOString()
         }])
@@ -726,7 +726,7 @@ const MyPageWithWithdrawal = () => {
             user_id: user.id,
             campaign_id: selectedApplication.campaign_id,
             application_id: selectedApplication.id,
-            transaction_type: 'pending',
+            type: 'bonus',
             amount: 0, // 승인 전이므로 0
             description: `SNS 업로드 포인트 신청: ${snsUploadForm.sns_upload_url}`,
             created_at: new Date().toISOString()
@@ -1518,14 +1518,14 @@ const MyPageWithWithdrawal = () => {
                                 {/* SNS 업로드 및 포인트 신청 버튼 */}
                                 <div className="mt-2">
                                   {/* video_links가 있고 point_transactions에 승인된 기록이 있으면 완료 상태 */}
-                                  {application.video_links && pointTransactions.some(pt => 
-                                    pt.application_id === application.id && pt.transaction_type === 'reward'
+                                  {application.video_links && pointTransactions.some(pt =>
+                                    pt.application_id === application.id && pt.type === 'earn'
                                   ) ? (
                                     <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800">
                                       ✅ {t.pointRequestApproved}
                                     </span>
-                                  ) : application.video_links && pointTransactions.some(pt => 
-                                    pt.application_id === application.id && pt.transaction_type === 'pending'
+                                  ) : application.video_links && pointTransactions.some(pt =>
+                                    pt.application_id === application.id && pt.type === 'bonus'
                                   ) ? (
                                     <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
                                       ⏳ {t.pointRequestPending}
@@ -1727,8 +1727,8 @@ const MyPageWithWithdrawal = () => {
                       pointTransactions.map((transaction) => (
                         <tr key={transaction.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`text-sm font-medium ${getTransactionTypeColor(transaction.transaction_type)}`}>
-                              {getTransactionTypeText(transaction.transaction_type)}
+                            <span className={`text-sm font-medium ${getTransactionTypeColor(transaction.type)}`}>
+                              {getTransactionTypeText(transaction.type)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
