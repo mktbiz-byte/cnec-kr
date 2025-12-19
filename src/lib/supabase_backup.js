@@ -528,62 +528,37 @@ export const database = {
     }
   },
 
-  // 포인트 관련
+  // 포인트 관련 (Master DB 표준: point_transactions)
   points: {
-    // 사용자 포인트 잔액 가져오기
+    // 사용자 포인트 잔액 가져오기 (point_transactions 합산)
     async getBalance(userId) {
       return safeQuery(async () => {
         const { data, error } = await supabase
-          .from('user_points')
-          .select('balance')
+          .from('point_transactions')
+          .select('amount')
           .eq('user_id', userId)
-          .single()
-        
-        if (error && error.code === 'PGRST116') {
-          // 포인트 레코드가 없으면 0 반환
-          return 0
-        }
+
         if (error) throw error
-        return data?.balance || 0
+        return data?.reduce((sum, t) => sum + t.amount, 0) || 0
       })
     },
 
     // 포인트 추가
     async add(userId, amount, description = '') {
       return safeQuery(async () => {
-        // 현재 잔액 가져오기
-        const currentBalance = await this.getBalance(userId)
-        const newBalance = currentBalance + amount
-
-        // 포인트 잔액 업데이트
-        const { data: balanceData, error: balanceError } = await supabase
-          .from('user_points')
-          .upsert([{
-            user_id: userId,
-            balance: newBalance,
-            updated_at: new Date().toISOString()
-          }])
-          .select()
-          .single()
-
-        if (balanceError) throw balanceError
-
-        // 포인트 히스토리 추가
-        const { data: historyData, error: historyError } = await supabase
-          .from('point_history')
+        const { data, error } = await supabase
+          .from('point_transactions')
           .insert([{
             user_id: userId,
             amount: amount,
-            type: 'earned',
-            description: description,
-            created_at: new Date().toISOString()
+            type: 'earn',
+            description: description
           }])
           .select()
           .single()
 
-        if (historyError) throw historyError
-
-        return { balance: balanceData, history: historyData }
+        if (error) throw error
+        return data
       })
     },
 
@@ -591,42 +566,24 @@ export const database = {
     async subtract(userId, amount, description = '') {
       return safeQuery(async () => {
         const currentBalance = await this.getBalance(userId)
-        
+
         if (currentBalance < amount) {
           throw new Error('Insufficient points')
         }
 
-        const newBalance = currentBalance - amount
-
-        // 포인트 잔액 업데이트
-        const { data: balanceData, error: balanceError } = await supabase
-          .from('user_points')
-          .update({
-            balance: newBalance,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', userId)
-          .select()
-          .single()
-
-        if (balanceError) throw balanceError
-
-        // 포인트 히스토리 추가
-        const { data: historyData, error: historyError } = await supabase
-          .from('point_history')
+        const { data, error } = await supabase
+          .from('point_transactions')
           .insert([{
             user_id: userId,
             amount: -amount,
-            type: 'spent',
-            description: description,
-            created_at: new Date().toISOString()
+            type: 'withdraw',
+            description: description
           }])
           .select()
           .single()
 
-        if (historyError) throw historyError
-
-        return { balance: balanceData, history: historyData }
+        if (error) throw error
+        return data
       })
     }
   },

@@ -79,9 +79,9 @@ const PointsPage = () => {
         return sum + (a.campaigns?.creator_points_override || a.campaigns?.reward_points || 0)
       }, 0)
 
-      // 출금 내역 가져오기 (withdrawals 테이블 - 레거시 표준)
+      // 출금 내역 가져오기 (withdrawal_requests 테이블 - Master DB 표준)
       const { data: withdrawalsData } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -156,18 +156,16 @@ const PointsPage = () => {
       setProcessing(true)
       setError('')
 
-      // 1. 출금 신청 생성 (withdrawals 테이블 - 레거시 표준)
+      // 1. 출금 신청 생성 (withdrawal_requests 테이블 - Master DB 표준)
       const { error: withdrawalError } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .insert({
           user_id: user.id,
           amount: amount,
           bank_name: profile.bank_name,
           account_number: profile.account_number,
           account_holder: profile.account_holder,
-          status: 'pending',
-          platform_region: 'kr',
-          country_code: 'KR'
+          status: 'pending'
         })
 
       if (withdrawalError) throw withdrawalError

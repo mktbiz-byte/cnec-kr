@@ -393,16 +393,16 @@ const supabaseAPI = {
     async getCreators() {
         try {
             console.log('📋 크리에이터 목록 조회 시작');
-            
+
             const client = await getSupabaseClient();
             const { data, error } = await client
-                .from('creators')
+                .from('user_profiles')
                 .select('*')
                 .order('created_at', { ascending: false });
-            
+
             console.log('📋 크리에이터 목록 조회 결과:', { data, error });
             return { data, error };
-            
+
         } catch (error) {
             console.error('❌ getCreators 오류:', error);
             return { data: null, error };
@@ -413,17 +413,17 @@ const supabaseAPI = {
     async getCreatorById(id) {
         try {
             console.log('📋 크리에이터 조회 시작, ID:', id);
-            
+
             const client = await getSupabaseClient();
             const { data, error } = await client
-                .from('creators')
+                .from('user_profiles')
                 .select('*')
                 .eq('id', id)
                 .single();
-            
+
             console.log('📋 크리에이터 조회 결과:', { data, error });
             return { data, error };
-            
+
         } catch (error) {
             console.error('❌ getCreatorById 오류:', error);
             return { data: null, error };
@@ -437,10 +437,10 @@ const supabaseAPI = {
             
             const client = await getSupabaseClient();
             const { data, error } = await client
-                .from('withdrawals')
+                .from('withdrawal_requests')
                 .select(`
                     *,
-                    creators (
+                    user_profiles (
                         id,
                         name,
                         email
@@ -474,7 +474,7 @@ const supabaseAPI = {
             }
             
             const { data, error } = await client
-                .from('withdrawals')
+                .from('withdrawal_requests')
                 .update(updateData)
                 .eq('id', withdrawalId)
                 .select()
@@ -500,8 +500,8 @@ const supabaseAPI = {
             const [campaignsResult, applicationsResult, creatorsResult, withdrawalsResult] = await Promise.all([
                 client.from('campaigns').select('id, status, reward_amount'),
                 client.from('applications').select('id, status'),
-                client.from('creators').select('id'),
-                client.from('withdrawals').select('id, status, amount')
+                client.from('user_profiles').select('id'),
+                client.from('withdrawal_requests').select('id, status, amount')
             ]);
             
             const stats = {

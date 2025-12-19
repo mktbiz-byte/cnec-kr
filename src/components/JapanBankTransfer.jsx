@@ -175,7 +175,7 @@ const JapanBankTransfer = ({ withdrawalId, onClose, onSuccess }) => {
       setError('')
       
       const { data, error } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select(`
           *,
           user_profiles (

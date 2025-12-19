@@ -292,53 +292,53 @@ export const database = {
     }
   },
   
-  // 출금 요청 관련 함수
+  // 출금 요청 관련 함수 (Master DB 표준: withdrawal_requests)
   withdrawals: {
     // 모든 출금 요청 가져오기
     async getAll() {
       const { data, error } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select(`
           *,
           user_profiles:user_id (*)
         `)
         .order('created_at', { ascending: false })
-      
+
       if (error) throw error
       return data
     },
-    
+
     // 특정 사용자의 출금 요청 가져오기
     async getByUser(userId) {
       const { data, error } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-      
+
       if (error) throw error
       return data
     },
-    
+
     // 출금 요청 생성
     async create(withdrawalData) {
       const { data, error } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .insert([withdrawalData])
         .select()
-      
+
       if (error) throw error
       return data[0]
     },
-    
+
     // 출금 요청 상태 업데이트
     async updateStatus(withdrawalId, status) {
       const { data, error } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', withdrawalId)
         .select()
-      
+
       if (error) throw error
       return data[0]
     }

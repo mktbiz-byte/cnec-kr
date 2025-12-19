@@ -275,9 +275,9 @@ const MyPageKoreaEnhanced = () => {
       console.log('Fetched applications:', applicationsData)
       setApplications(applicationsData || [])
 
-      // 출금 내역
+      // 출금 내역 (Master DB 표준: withdrawal_requests)
       const { data: withdrawalsData, error: withdrawalsError } = await supabase
-        .from('withdrawals')
+        .from('withdrawal_requests')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
