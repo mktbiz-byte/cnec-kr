@@ -1050,7 +1050,7 @@ export const database = {
           .insert([{
             user_id: userId,
             amount: -amount, // 차감이므로 음수
-            transaction_type: 'admin_add',
+            type: 'withdraw',
             description: reason,
             created_at: new Date().toISOString()
           }])

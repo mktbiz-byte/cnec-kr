@@ -238,7 +238,7 @@ const MyPageKoreaEnhanced = () => {
         })
       }
       
-      setPhotoPreview(profileData?.profile_photo_url)
+      setPhotoPreview(profileData?.profile_image)
 
       // 캠페인 지원 내역 (조인 대신 별도 쿼리)
       const { data: appsData, error: applicationsError } = await supabase
@@ -374,7 +374,7 @@ const MyPageKoreaEnhanced = () => {
       // 데이터베이스 업데이트
       const { error: updateError } = await supabase
         .from('user_profiles')
-        .update({ profile_photo_url: publicUrl })
+        .update({ profile_image: publicUrl })
         .eq('id', user.id)
 
       if (updateError) throw updateError
@@ -769,10 +769,10 @@ const MyPageKoreaEnhanced = () => {
                     <label className="block text-sm font-medium text-gray-700">프로필 사진</label>
                     {isEditing ? (
                       <div className="mt-2 space-y-2">
-                        {(photoPreview || profile?.profile_photo_url) && (
+                        {(photoPreview || profile?.profile_image) && (
                           <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
                             <img
-                              src={photoPreview || profile?.profile_photo_url}
+                              src={photoPreview || profile?.profile_image}
                               alt="프로필 사진"
                               className="w-full h-full object-cover"
                             />
@@ -789,10 +789,10 @@ const MyPageKoreaEnhanced = () => {
                       </div>
                     ) : (
                       <div className="mt-2">
-                        {profile?.profile_photo_url ? (
+                        {profile?.profile_image ? (
                           <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
                             <img
-                              src={profile.profile_photo_url}
+                              src={profile.profile_image}
                               alt="프로필 사진"
                               className="w-full h-full object-cover"
                             />

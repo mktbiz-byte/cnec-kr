@@ -64,7 +64,7 @@ const CreatorMyPage = () => {
         .single()
 
       setProfile(profileData)
-      setPhotoPreview(profileData?.profile_photo_url)
+      setPhotoPreview(profileData?.profile_image)
       setEditForm({
         name: profileData?.name || '',
         phone: profileData?.phone || '',
@@ -150,7 +150,7 @@ const CreatorMyPage = () => {
 
       await supabase
         .from('user_profiles')
-        .update({ profile_photo_url: publicUrl })
+        .update({ profile_image: publicUrl })
         .eq('id', user.id)
 
       setSuccess('프로필 사진이 업데이트되었습니다')
