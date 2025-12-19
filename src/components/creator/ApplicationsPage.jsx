@@ -210,6 +210,24 @@ const ApplicationsPage = () => {
     }
   }
 
+  // 지원 취소 (레거시 코드 기반)
+  const handleCancelApplication = async (applicationId) => {
+    if (!confirm('정말로 지원을 취소하시겠습니까?')) return
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', applicationId)
+        .eq('user_id', user.id) // 보안: 자신의 지원만 삭제 가능
+      if (error) throw error
+      alert('지원이 취소되었습니다.')
+      loadApplications() // 데이터 새로고침
+    } catch (error) {
+      console.error('Error canceling application:', error)
+      alert('지원 취소에 실패했습니다.')
+    }
+  }
+
   const filteredApps = getFilteredApplications()
 
   if (loading) {
@@ -345,9 +363,20 @@ const ApplicationsPage = () => {
 
                       {/* 상태별 추가 정보 */}
                       {app.status === 'pending' && (
-                        <p className="text-xs text-gray-400">
-                          지원일: {formatDate(app.created_at)}
-                        </p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-gray-400">
+                            지원일: {formatDate(app.created_at)}
+                          </p>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleCancelApplication(app.id)
+                            }}
+                            className="text-xs text-red-500 hover:text-red-600 font-medium"
+                          >
+                            지원취소
+                          </button>
+                        </div>
                       )}
 
                       {['approved', 'selected', 'virtual_selected'].includes(app.status) && (

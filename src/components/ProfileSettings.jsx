@@ -14,12 +14,12 @@ import { Separator } from '@/components/ui/separator'
 import {
   Loader2, Save, User, Lock,
   Instagram, Youtube, Hash, Globe, CheckCircle,
-  AlertCircle, Home, ArrowLeft, Camera
+  AlertCircle, Home, ArrowLeft, Camera, AlertTriangle, X, LogOut
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const ProfileSettings = () => {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const { language } = useLanguage()
   
   // 실제 데이터베이스 스키마에 맞춘 최소한의 필드만 사용
@@ -49,6 +49,13 @@ const ProfileSettings = () => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // 회원 탈퇴 관련 상태
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletionReason, setDeletionReason] = useState('')
+  const [deletionDetails, setDeletionDetails] = useState('')
+  const [confirmText, setConfirmText] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   // 다국어 텍스트
   const texts = {
@@ -250,6 +257,34 @@ const ProfileSettings = () => {
       setError(`비밀번호 변경에 실패했습니다: ${error.message}`)
     } finally {
       setSaving(false)
+    }
+  }
+
+  // 회원 탈퇴 처리
+  const handleAccountDeletion = async () => {
+    try {
+      if (confirmText !== '회원탈퇴') {
+        setError('확인 텍스트를 정확히 입력해주세요.')
+        return
+      }
+
+      setDeleting(true)
+      setError('')
+
+      // 사용자 계정 삭제 (Supabase Auth)
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
+
+      if (deleteError) throw deleteError
+
+      setSuccess('회원 탈퇴가 완료되었습니다.')
+      setTimeout(() => {
+        signOut()
+      }, 2000)
+    } catch (err) {
+      console.error('회원 탈퇴 오류:', err)
+      setError('회원 탈퇴 처리 중 오류가 발생했습니다.')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -632,7 +667,7 @@ const ProfileSettings = () => {
                   />
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleChangePassword}
                   disabled={saving}
                   variant="outline"
@@ -651,10 +686,129 @@ const ProfileSettings = () => {
                   )}
                 </Button>
               </div>
+
+              <Separator className="my-6" />
+
+              {/* 회원 탈퇴 */}
+              <div className="border border-red-200 rounded-lg p-4 bg-red-50">
+                <div className="flex items-start">
+                  <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                  <div className="ml-3 flex-1">
+                    <h3 className="text-base font-semibold text-red-900">회원 탈퇴</h3>
+                    <p className="mt-1 text-sm text-red-700">
+                      회원 탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.
+                      보유 중인 포인트는 모두 소멸됩니다.
+                    </p>
+                    <Button
+                      onClick={() => setShowDeleteModal(true)}
+                      variant="destructive"
+                      size="sm"
+                      className="mt-3"
+                    >
+                      회원 탈퇴하기
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* 로그아웃 */}
+              <Button
+                onClick={signOut}
+                variant="ghost"
+                className="w-full justify-start text-gray-700 hover:text-gray-900"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                로그아웃
+              </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* 회원 탈퇴 모달 */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-red-600">회원 탈퇴</h3>
+              <button onClick={() => setShowDeleteModal(false)}>
+                <X className="w-6 h-6 text-gray-400 hover:text-gray-600" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-sm text-red-800">
+                  회원 탈퇴 시 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  탈퇴 사유
+                </label>
+                <select
+                  value={deletionReason}
+                  onChange={(e) => setDeletionReason(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="">선택하세요</option>
+                  <option value="서비스 불만족">서비스 불만족</option>
+                  <option value="사용 빈도 낮음">사용 빈도 낮음</option>
+                  <option value="개인정보 보호">개인정보 보호</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  상세 사유 <span className="text-xs text-gray-500">(선택사항)</span>
+                </label>
+                <textarea
+                  value={deletionDetails}
+                  onChange={(e) => setDeletionDetails(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  rows="3"
+                  placeholder="탈퇴 사유를 자세히 입력해주세요"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  확인을 위해 <strong>"회원탈퇴"</strong>를 입력하세요
+                </label>
+                <input
+                  type="text"
+                  value={confirmText}
+                  onChange={(e) => setConfirmText(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="회원탈퇴"
+                />
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => setShowDeleteModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  취소
+                </Button>
+                <Button
+                  onClick={handleAccountDeletion}
+                  disabled={deleting || confirmText !== '회원탈퇴'}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  {deleting ? '처리중...' : '탈퇴하기'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
