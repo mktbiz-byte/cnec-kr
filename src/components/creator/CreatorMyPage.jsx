@@ -39,9 +39,26 @@ const CreatorMyPage = () => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [withdrawAmount, setWithdrawAmount] = useState('')
 
+  // 한국 주요 은행 목록 (레거시 18개 은행)
   const koreanBanks = [
-    'KB국민은행', '신한은행', '우리은행', 'NH농협은행', '하나은행',
-    'IBK기업은행', 'SC제일은행', '카카오뱅크', '케이뱅크', '토스뱅크'
+    'KB국민은행',
+    '신한은행',
+    '우리은행',
+    'NH농협은행',
+    '하나은행',
+    'IBK기업은행',
+    'SC제일은행',
+    '한국씨티은행',
+    'KDB산업은행',
+    '경남은행',
+    '광주은행',
+    '대구은행',
+    '부산은행',
+    '전북은행',
+    '제주은행',
+    '카카오뱅크',
+    '케이뱅크',
+    '토스뱅크'
   ]
 
   useEffect(() => {

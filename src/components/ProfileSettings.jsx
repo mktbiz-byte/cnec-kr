@@ -22,7 +22,7 @@ const ProfileSettings = () => {
   const { user, signOut } = useAuth()
   const { language } = useLanguage()
   
-  // 실제 데이터베이스 스키마에 맞춘 최소한의 필드만 사용
+  // 프로필 필드 (레거시 호환 확장)
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -31,8 +31,17 @@ const ProfileSettings = () => {
     instagram_url: '',
     youtube_url: '',
     tiktok_url: '',
+    blog_url: '',
     bio: '',
-    profile_image: ''
+    profile_image: '',
+    // 주소 정보
+    postcode: '',
+    address: '',
+    detail_address: '',
+    // SNS 팔로워 수
+    instagram_followers: '',
+    youtube_followers: '',
+    tiktok_followers: ''
   })
 
   // 프로필 사진 업로드 상태
@@ -144,8 +153,17 @@ const ProfileSettings = () => {
           instagram_url: profileData.instagram_url || '',
           youtube_url: profileData.youtube_url || '',
           tiktok_url: profileData.tiktok_url || '',
+          blog_url: profileData.blog_url || '',
           bio: profileData.bio || '',
-          profile_image: profileData.profile_image || ''
+          profile_image: profileData.profile_image || '',
+          // 주소 정보
+          postcode: profileData.postcode || '',
+          address: profileData.address || '',
+          detail_address: profileData.detail_address || '',
+          // SNS 팔로워 수
+          instagram_followers: profileData.instagram_followers || '',
+          youtube_followers: profileData.youtube_followers || '',
+          tiktok_followers: profileData.tiktok_followers || ''
         })
         // 기존 프로필 사진이 있으면 미리보기에 설정
         if (profileData.profile_image) {
@@ -190,7 +208,16 @@ const ProfileSettings = () => {
         instagram_url: profile.instagram_url.trim() || null,
         youtube_url: profile.youtube_url.trim() || null,
         tiktok_url: profile.tiktok_url.trim() || null,
-        bio: profile.bio.trim() || null
+        blog_url: profile.blog_url?.trim() || null,
+        bio: profile.bio.trim() || null,
+        // 주소 정보
+        postcode: profile.postcode?.trim() || null,
+        address: profile.address?.trim() || null,
+        detail_address: profile.detail_address?.trim() || null,
+        // SNS 팔로워 수
+        instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
+        youtube_followers: profile.youtube_followers ? parseInt(profile.youtube_followers) : null,
+        tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null
       }
 
       console.log('저장할 프로필 데이터:', profileData)
@@ -581,6 +608,107 @@ const ProfileSettings = () => {
                     value={profile.tiktok_url}
                     onChange={(e) => setProfile(prev => ({ ...prev, tiktok_url: e.target.value }))}
                     placeholder="https://tiktok.com/@username"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="blog_url" className="flex items-center">
+                    <Globe className="h-4 w-4 mr-2" />
+                    블로그 URL
+                  </Label>
+                  <Input
+                    id="blog_url"
+                    value={profile.blog_url}
+                    onChange={(e) => setProfile(prev => ({ ...prev, blog_url: e.target.value }))}
+                    placeholder="https://blog.naver.com/username"
+                  />
+                </div>
+
+                <Separator className="my-4" />
+
+                {/* SNS 팔로워 수 */}
+                <h4 className="text-sm font-medium text-gray-700">SNS 팔로워 수</h4>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="instagram_followers" className="text-xs flex items-center">
+                      <Instagram className="h-3 w-3 mr-1" />
+                      인스타
+                    </Label>
+                    <Input
+                      id="instagram_followers"
+                      type="number"
+                      value={profile.instagram_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, instagram_followers: e.target.value }))}
+                      placeholder="0"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="youtube_followers" className="text-xs flex items-center">
+                      <Youtube className="h-3 w-3 mr-1" />
+                      유튜브
+                    </Label>
+                    <Input
+                      id="youtube_followers"
+                      type="number"
+                      value={profile.youtube_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, youtube_followers: e.target.value }))}
+                      placeholder="0"
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="tiktok_followers" className="text-xs flex items-center">
+                      <Hash className="h-3 w-3 mr-1" />
+                      틱톡
+                    </Label>
+                    <Input
+                      id="tiktok_followers"
+                      type="number"
+                      value={profile.tiktok_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, tiktok_followers: e.target.value }))}
+                      placeholder="0"
+                      className="text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* 주소 정보 */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center">
+                  <Home className="h-5 w-5 mr-2" />
+                  배송 주소
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="postcode">우편번호</Label>
+                    <Input
+                      id="postcode"
+                      value={profile.postcode}
+                      onChange={(e) => setProfile(prev => ({ ...prev, postcode: e.target.value }))}
+                      placeholder="12345"
+                    />
+                  </div>
+                  <div className="col-span-2 space-y-2">
+                    <Label htmlFor="address">주소</Label>
+                    <Input
+                      id="address"
+                      value={profile.address}
+                      onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
+                      placeholder="시/도 구/군 동/읍/면"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="detail_address">상세주소</Label>
+                  <Input
+                    id="detail_address"
+                    value={profile.detail_address}
+                    onChange={(e) => setProfile(prev => ({ ...prev, detail_address: e.target.value }))}
+                    placeholder="아파트/건물명, 동/호수"
                   />
                 </div>
               </div>
