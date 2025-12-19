@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
 import { database, supabase } from '../lib/supabase'
+import { compressImage, isImageFile } from '../lib/imageCompression'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,10 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
-import { 
-  Loader2, Save, User, Lock, 
+import {
+  Loader2, Save, User, Lock,
   Instagram, Youtube, Hash, Globe, CheckCircle,
-  AlertCircle, Home, ArrowLeft
+  AlertCircle, Home, ArrowLeft, Camera
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -30,8 +31,13 @@ const ProfileSettings = () => {
     instagram_url: '',
     youtube_url: '',
     tiktok_url: '',
-    bio: ''
+    bio: '',
+    profile_image: ''
   })
+
+  // 프로필 사진 업로드 상태
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState(null)
   
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -131,8 +137,13 @@ const ProfileSettings = () => {
           instagram_url: profileData.instagram_url || '',
           youtube_url: profileData.youtube_url || '',
           tiktok_url: profileData.tiktok_url || '',
-          bio: profileData.bio || ''
+          bio: profileData.bio || '',
+          profile_image: profileData.profile_image || ''
         })
+        // 기존 프로필 사진이 있으면 미리보기에 설정
+        if (profileData.profile_image) {
+          setPhotoPreview(profileData.profile_image)
+        }
       } else {
         // 프로필이 없으면 기본값으로 설정
         setProfile(prev => ({
@@ -242,6 +253,89 @@ const ProfileSettings = () => {
     }
   }
 
+  // 프로필 사진 업로드
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 파일 크기 체크 (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('파일 크기는 10MB 이하여야 합니다.')
+      return
+    }
+
+    // 파일 타입 체크
+    if (!file.type.startsWith('image/')) {
+      setError('이미지 파일만 업로드 가능합니다.')
+      return
+    }
+
+    try {
+      setUploadingPhoto(true)
+      setError('')
+
+      // 미리보기 생성
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+
+      // 이미지 압축
+      let fileToUpload = file
+      if (isImageFile(file)) {
+        try {
+          fileToUpload = await compressImage(file, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 1920,
+            quality: 0.8
+          })
+        } catch (compressionError) {
+          console.error('이미지 압축 실패:', compressionError)
+          // 압축 실패 시 원본 파일 사용
+        }
+      }
+
+      // Supabase Storage에 업로드
+      const fileExt = fileToUpload.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `${user.id}/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-photos')
+        .upload(filePath, fileToUpload, {
+          cacheControl: '3600',
+          upsert: true
+        })
+
+      if (uploadError) throw uploadError
+
+      // Public URL 가져오기
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(filePath)
+
+      // 데이터베이스 업데이트
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ profile_image: publicUrl })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+
+      // 로컬 상태 업데이트
+      setProfile(prev => ({ ...prev, profile_image: publicUrl }))
+      setSuccess('프로필 사진이 업데이트되었습니다.')
+
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('사진 업로드 오류:', err)
+      setError('사진 업로드 중 오류가 발생했습니다.')
+    } finally {
+      setUploadingPhoto(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -303,6 +397,48 @@ const ProfileSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* 프로필 사진 */}
+              <div className="space-y-2">
+                <Label>프로필 사진</Label>
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="h-24 w-24 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                      {photoPreview ? (
+                        <img
+                          src={photoPreview}
+                          alt="Profile"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
+                          <User className="h-12 w-12 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <label className="absolute bottom-0 right-0 h-8 w-8 bg-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-purple-700 transition-colors shadow-lg">
+                      {uploadingPhoto ? (
+                        <Loader2 className="h-4 w-4 text-white animate-spin" />
+                      ) : (
+                        <Camera className="h-4 w-4 text-white" />
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                        disabled={uploadingPhoto}
+                      />
+                    </label>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    <p>JPG, PNG 파일 (최대 10MB)</p>
+                    <p className="text-xs mt-1">권장 크기: 400x400px</p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
               {/* 이름 */}
               <div className="space-y-2">
                 <Label htmlFor="name">{t.name}</Label>
