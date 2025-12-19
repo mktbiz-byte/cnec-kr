@@ -86,7 +86,7 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+# public - Vite 프로젝트에서는 static assets 폴더로 사용
 
 # Storybook build outputs
 .out
