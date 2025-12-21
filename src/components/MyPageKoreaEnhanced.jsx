@@ -410,7 +410,7 @@ const MyPageKoreaEnhanced = () => {
             </div>
             <div className="flex items-center space-x-4">
               <a href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">홈</a>
-              <a href="/mypage" className="text-purple-600 px-3 py-2 rounded-md text-sm font-medium">마이페이지</a>
+              <a href="/profile" className="text-purple-600 px-3 py-2 rounded-md text-sm font-medium">마이페이지</a>
               <button
                 onClick={signOut}
                 className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"

@@ -44,7 +44,7 @@ const AuthCallbackSafe = () => {
               const { data: sessionData } = await supabase.auth.getSession()
               if (sessionData?.session) {
                 console.log('Session established after email verification')
-                navigate('/mypage', { replace: true })
+                navigate('/profile', { replace: true })
               } else {
                 // 세션이 없으면 로그인 페이지로
                 navigate('/login', { replace: true })
@@ -88,8 +88,8 @@ const AuthCallbackSafe = () => {
                 console.log('Admin user - redirecting to /dashboard')
                 navigate('/dashboard', { replace: true })
               } else {
-                console.log('Regular user - redirecting to /mypage')
-                navigate('/mypage', { replace: true })
+                console.log('Regular user - redirecting to /profile')
+                navigate('/profile', { replace: true })
               }
             }, 1500)
           } else if (hashAccessToken) {
@@ -115,15 +115,15 @@ const AuthCallbackSafe = () => {
                     console.log('Admin user - redirecting to /dashboard')
                     navigate('/dashboard', { replace: true })
                   } else {
-                    console.log('Regular user - redirecting to /mypage')
-                    navigate('/mypage', { replace: true })
+                    console.log('Regular user - redirecting to /profile')
+                    navigate('/profile', { replace: true })
                   }
                 } else {
-                  navigate('/mypage', { replace: true })
+                  navigate('/profile', { replace: true })
                 }
               } catch (err) {
                 console.error('Session recheck error:', err)
-                navigate('/mypage', { replace: true })
+                navigate('/profile', { replace: true })
               }
             }, 1500)
           } else {
@@ -151,7 +151,7 @@ const AuthCallbackSafe = () => {
   useEffect(() => {
     if (user && status === 'loading') {
       console.log('User already logged in, redirecting to mypage')
-      navigate('/mypage', { replace: true })
+      navigate('/profile', { replace: true })
     }
   }, [user, status, navigate])
 

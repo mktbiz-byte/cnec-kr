@@ -206,7 +206,7 @@ const HomePageExactReplica = () => {
             <div className="hidden md:flex items-center gap-3">
               {user ? (
                 <>
-                  <Link to="/mypage" className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-all">
+                  <Link to="/profile" className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-all">
                     마이페이지
                   </Link>
                   <button
@@ -256,7 +256,7 @@ const HomePageExactReplica = () => {
                 <div className="pt-4 mt-4 border-t border-gray-100 flex flex-col space-y-2">
                   {user ? (
                     <>
-                      <Link to="/mypage" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-base font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all text-center">
+                      <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-base font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all text-center">
                         마이페이지
                       </Link>
                       <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="px-4 py-3 text-base font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all">

@@ -593,7 +593,7 @@ const CampaignApplicationUpdated = () => {
 
               {/* 버튼 */}
               <button
-                onClick={() => navigate('/mypage')}
+                onClick={() => navigate('/profile')}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 지금 프로필 설정하기
@@ -651,7 +651,7 @@ const CampaignApplicationUpdated = () => {
               </div>
               <div className="ml-4">
                 <button
-                  onClick={() => navigate('/mypage')}
+                  onClick={() => navigate('/profile')}
                   className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
                 >
                   프로필 설정

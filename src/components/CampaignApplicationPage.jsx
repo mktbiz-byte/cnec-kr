@@ -204,7 +204,7 @@ const CampaignApplicationPage = () => {
       
       // 3초 후 마이페이지로 이동
       setTimeout(() => {
-        navigate('/mypage')
+        navigate('/profile')
       }, 3000)
       
     } catch (error) {
@@ -260,7 +260,7 @@ const CampaignApplicationPage = () => {
             <p className="text-gray-600 mb-6">
               캠페인 신청이 성공적으로 완료되었습니다. 검토 후 연락드리겠습니다.
             </p>
-            <Button onClick={() => navigate('/mypage')} className="bg-purple-600 hover:bg-purple-700">
+            <Button onClick={() => navigate('/profile')} className="bg-purple-600 hover:bg-purple-700">
               마이페이지로 이동
             </Button>
           </CardContent>
