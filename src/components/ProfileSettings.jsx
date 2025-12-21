@@ -659,13 +659,13 @@ const ProfileSettings = () => {
                     <SelectValue placeholder="카테고리 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="beauty">뷰티</SelectItem>
-                    <SelectItem value="fashion">패션</SelectItem>
-                    <SelectItem value="lifestyle">라이프스타일</SelectItem>
-                    <SelectItem value="food">푸드</SelectItem>
-                    <SelectItem value="travel">여행</SelectItem>
-                    <SelectItem value="fitness">피트니스</SelectItem>
-                    <SelectItem value="tech">테크</SelectItem>
+                    <SelectItem value="skincare">기초</SelectItem>
+                    <SelectItem value="makeup">메이크업</SelectItem>
+                    <SelectItem value="maskpack">마스크팩</SelectItem>
+                    <SelectItem value="suncare">선케어</SelectItem>
+                    <SelectItem value="haircare">헤어</SelectItem>
+                    <SelectItem value="bodycare">바디케어</SelectItem>
+                    <SelectItem value="fragrance">향수</SelectItem>
                     <SelectItem value="other">기타</SelectItem>
                   </SelectContent>
                 </Select>
@@ -770,19 +770,6 @@ const ProfileSettings = () => {
                     value={profile.tiktok_url}
                     onChange={(e) => setProfile(prev => ({ ...prev, tiktok_url: e.target.value }))}
                     placeholder="https://tiktok.com/@username"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="blog_url" className="flex items-center">
-                    <Globe className="h-4 w-4 mr-2" />
-                    블로그 URL
-                  </Label>
-                  <Input
-                    id="blog_url"
-                    value={profile.blog_url}
-                    onChange={(e) => setProfile(prev => ({ ...prev, blog_url: e.target.value }))}
-                    placeholder="https://blog.naver.com/username"
                   />
                 </div>
 
