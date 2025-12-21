@@ -22,7 +22,7 @@ const ProfileSettings = () => {
   const { user, signOut } = useAuth()
   const { language } = useLanguage()
   
-  // 프로필 필드 (Master DB 스키마 기준)
+  // 프로필 필드 (Master DB 스키마 기준 - 브랜드 사이트 연동)
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -30,6 +30,12 @@ const ProfileSettings = () => {
     age: '',
     skin_type: '',
     category: '',
+    // 대표 채널 정보 (브랜드 사이트 검색용)
+    channel_name: '',
+    followers: '',
+    avg_views: '',
+    target_audience: '',
+    // SNS URL
     instagram_url: '',
     youtube_url: '',
     tiktok_url: '',
@@ -40,7 +46,7 @@ const ProfileSettings = () => {
     postcode: '',
     address: '',
     detail_address: '',
-    // SNS 팔로워/구독자 수 (Master DB 필드명)
+    // SNS 개별 팔로워/구독자 수
     instagram_followers: '',
     youtube_subscribers: '',
     tiktok_followers: ''
@@ -154,6 +160,12 @@ const ProfileSettings = () => {
           age: profileData.age || '',
           skin_type: profileData.skin_type || '',
           category: profileData.category || '',
+          // 대표 채널 정보 (브랜드 사이트 검색용)
+          channel_name: profileData.channel_name || '',
+          followers: profileData.followers || '',
+          avg_views: profileData.avg_views || '',
+          target_audience: profileData.target_audience || '',
+          // SNS URL
           instagram_url: profileData.instagram_url || '',
           youtube_url: profileData.youtube_url || '',
           tiktok_url: profileData.tiktok_url || '',
@@ -164,7 +176,7 @@ const ProfileSettings = () => {
           postcode: profileData.postcode || '',
           address: profileData.address || '',
           detail_address: profileData.detail_address || '',
-          // SNS 팔로워/구독자 수 (Master DB 필드명)
+          // SNS 개별 팔로워/구독자 수
           instagram_followers: profileData.instagram_followers || '',
           youtube_subscribers: profileData.youtube_subscribers || '',
           tiktok_followers: profileData.tiktok_followers || ''
@@ -201,26 +213,34 @@ const ProfileSettings = () => {
 
       console.log('프로필 저장 시작:', profile)
 
-      // Master DB 스키마에 맞춘 데이터 전송
+      // Master DB 스키마에 맞춘 데이터 전송 (브랜드 사이트 연동)
       // user_profiles 테이블은 id가 auth user id를 PK로 사용
       const profileData = {
         id: user.id,
+        role: 'creator', // 필수! 브랜드 사이트 검색에 필요
         name: profile.name.trim(),
         email: profile.email.trim(),
         phone: profile.phone?.trim() || null,
         age: profile.age ? parseInt(profile.age) : null,
         skin_type: profile.skin_type || null,
         category: profile.category || null,
+        // 대표 채널 정보 (브랜드 사이트 크리에이터 선택 시 사용)
+        channel_name: profile.channel_name?.trim() || null,
+        followers: profile.followers ? parseInt(profile.followers) : null,
+        avg_views: profile.avg_views ? parseInt(profile.avg_views) : null,
+        target_audience: profile.target_audience?.trim() || null,
+        // SNS URL
         instagram_url: profile.instagram_url.trim() || null,
         youtube_url: profile.youtube_url.trim() || null,
         tiktok_url: profile.tiktok_url.trim() || null,
         blog_url: profile.blog_url?.trim() || null,
         bio: profile.bio.trim() || null,
+        profile_image: profile.profile_image || null,
         // 주소 정보
         postcode: profile.postcode?.trim() || null,
         address: profile.address?.trim() || null,
         detail_address: profile.detail_address?.trim() || null,
-        // SNS 팔로워/구독자 수 (Master DB 필드명)
+        // SNS 개별 팔로워/구독자 수
         instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
         youtube_subscribers: profile.youtube_subscribers ? parseInt(profile.youtube_subscribers) : null,
         tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null
@@ -602,6 +622,60 @@ const ProfileSettings = () => {
                     <SelectItem value="other">기타</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <Separator />
+
+              {/* 대표 채널 정보 (브랜드 사이트 연동용) */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center">
+                  <Youtube className="h-5 w-5 mr-2" />
+                  대표 채널 정보
+                </h3>
+                <p className="text-sm text-gray-500">브랜드 사이트에서 크리에이터 검색 시 사용됩니다</p>
+
+                <div className="space-y-2">
+                  <Label htmlFor="channel_name">채널명</Label>
+                  <Input
+                    id="channel_name"
+                    value={profile.channel_name}
+                    onChange={(e) => setProfile(prev => ({ ...prev, channel_name: e.target.value }))}
+                    placeholder="대표 채널명"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="followers">팔로워/구독자 수</Label>
+                    <Input
+                      id="followers"
+                      type="number"
+                      value={profile.followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, followers: e.target.value }))}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="avg_views">평균 조회수</Label>
+                    <Input
+                      id="avg_views"
+                      type="number"
+                      value={profile.avg_views}
+                      onChange={(e) => setProfile(prev => ({ ...prev, avg_views: e.target.value }))}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="target_audience">타겟 오디언스</Label>
+                  <Input
+                    id="target_audience"
+                    value={profile.target_audience}
+                    onChange={(e) => setProfile(prev => ({ ...prev, target_audience: e.target.value }))}
+                    placeholder="예: 20-30대 여성, 뷰티에 관심있는 MZ세대"
+                  />
+                </div>
               </div>
 
               <Separator />

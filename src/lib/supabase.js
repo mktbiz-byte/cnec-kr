@@ -715,26 +715,37 @@ export const database = {
           throw new Error('프로필 저장에 id(사용자 ID)가 필요합니다')
         }
 
-        // user_profiles 테이블 스키마에 맞는 필드만 추출 (Master DB 표준)
+        // user_profiles 테이블 스키마 (Master DB + 브랜드 사이트 연동)
         const cleanData = {
           id: profileData.id,
+          role: profileData.role || 'creator', // 필수! 브랜드 사이트 검색용
           name: profileData.name || null,
           email: profileData.email || null,
           phone: profileData.phone || null,
           age: profileData.age || null,
           skin_type: profileData.skin_type || null,
           category: profileData.category || null,
+          // 대표 채널 정보 (브랜드 사이트 크리에이터 선택 시 사용)
+          channel_name: profileData.channel_name || null,
+          followers: profileData.followers || null,
+          avg_views: profileData.avg_views || null,
+          target_audience: profileData.target_audience || null,
+          // 주소 정보
           address: profileData.address || null,
           detail_address: profileData.detail_address || null,
           postcode: profileData.postcode || null,
+          // SNS URL
           instagram_url: profileData.instagram_url || null,
-          instagram_followers: profileData.instagram_followers || null,
           youtube_url: profileData.youtube_url || null,
-          youtube_subscribers: profileData.youtube_subscribers || null,
           tiktok_url: profileData.tiktok_url || null,
-          tiktok_followers: profileData.tiktok_followers || null,
           blog_url: profileData.blog_url || null,
+          // SNS 개별 팔로워/구독자
+          instagram_followers: profileData.instagram_followers || null,
+          youtube_subscribers: profileData.youtube_subscribers || null,
+          tiktok_followers: profileData.tiktok_followers || null,
+          // 기타
           bio: profileData.bio || null,
+          profile_image: profileData.profile_image || null,
           bank_name: profileData.bank_name || null,
           account_number: profileData.account_number || null,
           account_holder: profileData.account_holder || null,
