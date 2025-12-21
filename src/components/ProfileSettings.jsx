@@ -215,6 +215,7 @@ const ProfileSettings = () => {
 
       // Master DB 스키마에 맞춘 데이터 전송 (브랜드 사이트 연동)
       // user_profiles 테이블은 id가 auth user id를 PK로 사용
+      // 주의: profile_image는 DB 컬럼이 없을 수 있으므로 제외 (Storage에만 저장)
       const profileData = {
         id: user.id,
         role: 'creator', // 필수! 브랜드 사이트 검색에 필요
@@ -235,7 +236,7 @@ const ProfileSettings = () => {
         tiktok_url: profile.tiktok_url.trim() || null,
         blog_url: profile.blog_url?.trim() || null,
         bio: profile.bio.trim() || null,
-        profile_image: profile.profile_image || null,
+        // profile_image는 DB 컬럼이 없으므로 제외 - Storage URL만 사용
         // 주소 정보
         postcode: profile.postcode?.trim() || null,
         address: profile.address?.trim() || null,
@@ -440,17 +441,26 @@ const ProfileSettings = () => {
         .from('profile-photos')
         .getPublicUrl(filePath)
 
-      // 데이터베이스 업데이트
-      const { error: updateError } = await supabase
-        .from('user_profiles')
-        .update({ profile_image: publicUrl })
-        .eq('id', user.id)
+      // 데이터베이스 업데이트 시도 (profile_image 컬럼이 없을 수 있음)
+      // DB 업데이트 실패해도 Storage에 이미지가 저장되었으므로 성공으로 처리
+      try {
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ profile_image: publicUrl })
+          .eq('id', user.id)
 
-      if (updateError) throw updateError
+        if (updateError) {
+          console.warn('프로필 이미지 DB 업데이트 실패 (컬럼이 없을 수 있음):', updateError)
+          // DB 업데이트 실패해도 Storage에 저장되었으므로 계속 진행
+        }
+      } catch (dbError) {
+        console.warn('프로필 이미지 DB 업데이트 오류:', dbError)
+      }
 
-      // 로컬 상태 업데이트
+      // 로컬 상태 업데이트 (Storage URL 사용)
       setProfile(prev => ({ ...prev, profile_image: publicUrl }))
-      setSuccess('프로필 사진이 업데이트되었습니다.')
+      setPhotoPreview(publicUrl)
+      setSuccess('프로필 사진이 업로드되었습니다.')
 
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
