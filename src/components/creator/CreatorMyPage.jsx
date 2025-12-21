@@ -364,7 +364,7 @@ const CreatorMyPage = () => {
           {/* 메뉴 리스트 */}
           <div className="mx-5 mt-5 space-y-2">
             <button
-              onClick={() => { setActiveSection('profile'); setIsEditing(true); }}
+              onClick={() => navigate('/profile')}
               className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
@@ -390,7 +390,7 @@ const CreatorMyPage = () => {
             </button>
 
             <button
-              onClick={() => setActiveSection('points')}
+              onClick={() => navigate('/my/points')}
               className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
@@ -403,7 +403,7 @@ const CreatorMyPage = () => {
             </button>
 
             <button
-              onClick={() => setActiveSection('account')}
+              onClick={() => navigate('/profile')}
               className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
@@ -415,7 +415,10 @@ const CreatorMyPage = () => {
               <ChevronRight size={20} className="text-gray-300" />
             </button>
 
-            <button className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+            <button
+              onClick={() => window.open('https://pf.kakao.com/_xnxlxaK', '_blank')}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
                   <HelpCircle size={20} className="text-gray-600" />
