@@ -103,7 +103,12 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 z-30">
           <div className="flex justify-between items-center py-3 px-8 pb-6">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => {
+                handleTabChange('home')
+                if (location.pathname !== '/') {
+                  navigate('/')
+                }
+              }}
               className={`flex flex-col items-center gap-1 transition-colors ${
                 activeTab === 'home' ? 'text-gray-900' : 'text-gray-300'
               }`}
@@ -123,7 +128,12 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
             </button>
 
             <button
-              onClick={() => navigate('/mypage')}
+              onClick={() => {
+                handleTabChange('my')
+                if (location.pathname !== '/mypage') {
+                  navigate('/mypage')
+                }
+              }}
               className={`flex flex-col items-center gap-1 transition-colors ${
                 activeTab === 'my' ? 'text-purple-600' : 'text-gray-300'
               }`}
