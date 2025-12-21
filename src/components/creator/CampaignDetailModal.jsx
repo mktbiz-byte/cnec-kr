@@ -93,11 +93,16 @@ const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplySuccess }) => {
 
   useEffect(() => {
     if (isOpen && user && campaign) {
+      // 모든 상태 초기화 (다른 캠페인 클릭 시 이전 상태가 남아있는 버그 수정)
+      setSuccess(false)
+      setError('')
+      setExistingApplication(null)
       setViewMode('detail')
       setShowDetailImages(false)
+      setExpandedFaq(null)
       loadUserData()
     }
-  }, [isOpen, user, campaign])
+  }, [isOpen, user, campaign?.id])
 
   const loadUserData = async () => {
     try {
