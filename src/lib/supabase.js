@@ -716,6 +716,8 @@ export const database = {
         }
 
         // user_profiles 테이블 스키마 (Master DB + 브랜드 사이트 연동)
+        // 주의: profile_image 컬럼은 DB에 존재하지 않을 수 있으므로 upsert에서 제외
+        // 프로필 사진은 Storage에만 저장하고, DB 업데이트는 별도 처리 필요
         const cleanData = {
           id: profileData.id,
           role: profileData.role || 'creator', // 필수! 브랜드 사이트 검색용
@@ -745,7 +747,7 @@ export const database = {
           tiktok_followers: profileData.tiktok_followers || null,
           // 기타
           bio: profileData.bio || null,
-          profile_image: profileData.profile_image || null,
+          // profile_image는 DB 컬럼이 없을 수 있으므로 upsert에서 제외
           // 은행 정보는 user_profiles에 저장하지 않음 (브랜드 사이트 스키마에 없음)
           // bank_name, account_number, account_holder는 withdrawal_requests 테이블에서 관리
           updated_at: new Date().toISOString()
