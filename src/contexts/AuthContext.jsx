@@ -173,15 +173,16 @@ export const AuthProvider = ({ children }) => {
         options: {
           data: {
             name: name
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
-      
+
       if (error) {
         console.error("Email sign up error:", error);
         throw error;
       }
-      
+
       return data;
     } catch (error) {
       console.error("Sign up error:", error);
