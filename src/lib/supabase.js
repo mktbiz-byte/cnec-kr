@@ -715,20 +715,24 @@ export const database = {
           throw new Error('프로필 저장에 id(사용자 ID)가 필요합니다')
         }
 
-        // user_profiles 테이블 스키마에 맞는 필드만 추출
+        // user_profiles 테이블 스키마에 맞는 필드만 추출 (Master DB 표준)
         const cleanData = {
           id: profileData.id,
           name: profileData.name || null,
           email: profileData.email || null,
+          phone: profileData.phone || null,
           age: profileData.age || null,
           skin_type: profileData.skin_type || null,
-          phone: profileData.phone || null,
+          category: profileData.category || null,
           address: profileData.address || null,
           detail_address: profileData.detail_address || null,
           postcode: profileData.postcode || null,
           instagram_url: profileData.instagram_url || null,
+          instagram_followers: profileData.instagram_followers || null,
           youtube_url: profileData.youtube_url || null,
+          youtube_subscribers: profileData.youtube_subscribers || null,
           tiktok_url: profileData.tiktok_url || null,
+          tiktok_followers: profileData.tiktok_followers || null,
           blog_url: profileData.blog_url || null,
           bio: profileData.bio || null,
           bank_name: profileData.bank_name || null,
