@@ -342,6 +342,41 @@ const ProfileSettings = () => {
     }
   }
 
+  // 다음 우편번호 검색
+  const handleAddressSearch = () => {
+    if (typeof window === 'undefined') return
+
+    // 다음 우편번호 스크립트 로드
+    const script = document.createElement('script')
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+    script.onload = () => {
+      new window.daum.Postcode({
+        oncomplete: function(data) {
+          // 우편번호와 주소 정보 설정
+          let fullAddress = data.address
+          let extraAddress = ''
+
+          if (data.addressType === 'R') {
+            if (data.bname !== '') {
+              extraAddress += data.bname
+            }
+            if (data.buildingName !== '') {
+              extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName)
+            }
+            fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '')
+          }
+
+          setProfile(prev => ({
+            ...prev,
+            postcode: data.zonecode,
+            address: fullAddress
+          }))
+        }
+      }).open()
+    }
+    document.head.appendChild(script)
+  }
+
   // 프로필 사진 업로드
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0]
@@ -831,25 +866,39 @@ const ProfileSettings = () => {
                   <Home className="h-5 w-5 mr-2" />
                   배송 주소
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-2">
+                <div className="flex gap-2">
+                  <div className="flex-1">
                     <Label htmlFor="postcode">우편번호</Label>
                     <Input
                       id="postcode"
                       value={profile.postcode}
                       onChange={(e) => setProfile(prev => ({ ...prev, postcode: e.target.value }))}
-                      placeholder="12345"
+                      placeholder="우편번호"
+                      readOnly
+                      className="bg-gray-50"
                     />
                   </div>
-                  <div className="col-span-2 space-y-2">
-                    <Label htmlFor="address">주소</Label>
-                    <Input
-                      id="address"
-                      value={profile.address}
-                      onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
-                      placeholder="시/도 구/군 동/읍/면"
-                    />
+                  <div className="flex items-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddressSearch}
+                      className="whitespace-nowrap"
+                    >
+                      주소 검색
+                    </Button>
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">주소</Label>
+                  <Input
+                    id="address"
+                    value={profile.address}
+                    onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="주소 검색 버튼을 클릭하세요"
+                    readOnly
+                    className="bg-gray-50"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="detail_address">상세주소</Label>
