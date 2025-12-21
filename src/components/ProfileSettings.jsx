@@ -352,9 +352,10 @@ const ProfileSettings = () => {
       return
     }
 
-    // 파일 타입 체크
-    if (!file.type.startsWith('image/')) {
-      setError('이미지 파일만 업로드 가능합니다.')
+    // 파일 타입 체크 (JPG, PNG만 허용 - GIF 불가)
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+    if (!allowedTypes.includes(file.type)) {
+      setError('JPG 또는 PNG 파일만 업로드 가능합니다. (GIF 불가)')
       return
     }
 
@@ -511,7 +512,7 @@ const ProfileSettings = () => {
                       )}
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png"
                         onChange={handlePhotoUpload}
                         className="hidden"
                         disabled={uploadingPhoto}
