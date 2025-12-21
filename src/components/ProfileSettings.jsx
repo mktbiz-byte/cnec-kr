@@ -22,12 +22,14 @@ const ProfileSettings = () => {
   const { user, signOut } = useAuth()
   const { language } = useLanguage()
   
-  // 프로필 필드 (레거시 호환 확장)
+  // 프로필 필드 (Master DB 스키마 기준)
   const [profile, setProfile] = useState({
     name: '',
     email: '',
+    phone: '',
     age: '',
     skin_type: '',
+    category: '',
     instagram_url: '',
     youtube_url: '',
     tiktok_url: '',
@@ -38,9 +40,9 @@ const ProfileSettings = () => {
     postcode: '',
     address: '',
     detail_address: '',
-    // SNS 팔로워 수
+    // SNS 팔로워/구독자 수 (Master DB 필드명)
     instagram_followers: '',
-    youtube_followers: '',
+    youtube_subscribers: '',
     tiktok_followers: ''
   })
 
@@ -148,8 +150,10 @@ const ProfileSettings = () => {
         setProfile({
           name: profileData.name || '',
           email: profileData.email || user.email || '',
+          phone: profileData.phone || '',
           age: profileData.age || '',
           skin_type: profileData.skin_type || '',
+          category: profileData.category || '',
           instagram_url: profileData.instagram_url || '',
           youtube_url: profileData.youtube_url || '',
           tiktok_url: profileData.tiktok_url || '',
@@ -160,9 +164,9 @@ const ProfileSettings = () => {
           postcode: profileData.postcode || '',
           address: profileData.address || '',
           detail_address: profileData.detail_address || '',
-          // SNS 팔로워 수
+          // SNS 팔로워/구독자 수 (Master DB 필드명)
           instagram_followers: profileData.instagram_followers || '',
-          youtube_followers: profileData.youtube_followers || '',
+          youtube_subscribers: profileData.youtube_subscribers || '',
           tiktok_followers: profileData.tiktok_followers || ''
         })
         // 기존 프로필 사진이 있으면 미리보기에 설정
@@ -197,14 +201,16 @@ const ProfileSettings = () => {
 
       console.log('프로필 저장 시작:', profile)
 
-      // 실제 데이터베이스 스키마에 맞춘 데이터만 전송
+      // Master DB 스키마에 맞춘 데이터 전송
       // user_profiles 테이블은 id가 auth user id를 PK로 사용
       const profileData = {
         id: user.id,
         name: profile.name.trim(),
         email: profile.email.trim(),
+        phone: profile.phone?.trim() || null,
         age: profile.age ? parseInt(profile.age) : null,
         skin_type: profile.skin_type || null,
+        category: profile.category || null,
         instagram_url: profile.instagram_url.trim() || null,
         youtube_url: profile.youtube_url.trim() || null,
         tiktok_url: profile.tiktok_url.trim() || null,
@@ -214,9 +220,9 @@ const ProfileSettings = () => {
         postcode: profile.postcode?.trim() || null,
         address: profile.address?.trim() || null,
         detail_address: profile.detail_address?.trim() || null,
-        // SNS 팔로워 수
+        // SNS 팔로워/구독자 수 (Master DB 필드명)
         instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
-        youtube_followers: profile.youtube_followers ? parseInt(profile.youtube_followers) : null,
+        youtube_subscribers: profile.youtube_subscribers ? parseInt(profile.youtube_subscribers) : null,
         tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null
       }
 
@@ -529,6 +535,18 @@ const ProfileSettings = () => {
                 </p>
               </div>
 
+              {/* 전화번호 */}
+              <div className="space-y-2">
+                <Label htmlFor="phone">전화번호</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={profile.phone}
+                  onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="010-1234-5678"
+                />
+              </div>
+
               {/* 나이 */}
               <div className="space-y-2">
                 <Label htmlFor="age">{t.age}</Label>
@@ -559,6 +577,29 @@ const ProfileSettings = () => {
                     <SelectItem value="combination">{t.skinTypes.combination}</SelectItem>
                     <SelectItem value="sensitive">{t.skinTypes.sensitive}</SelectItem>
                     <SelectItem value="normal">{t.skinTypes.normal}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 카테고리 */}
+              <div className="space-y-2">
+                <Label htmlFor="category">카테고리</Label>
+                <Select
+                  value={profile.category}
+                  onValueChange={(value) => setProfile(prev => ({ ...prev, category: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="카테고리 선택" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beauty">뷰티</SelectItem>
+                    <SelectItem value="fashion">패션</SelectItem>
+                    <SelectItem value="lifestyle">라이프스타일</SelectItem>
+                    <SelectItem value="food">푸드</SelectItem>
+                    <SelectItem value="travel">여행</SelectItem>
+                    <SelectItem value="fitness">피트니스</SelectItem>
+                    <SelectItem value="tech">테크</SelectItem>
+                    <SelectItem value="other">기타</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -644,15 +685,15 @@ const ProfileSettings = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="youtube_followers" className="text-xs flex items-center">
+                    <Label htmlFor="youtube_subscribers" className="text-xs flex items-center">
                       <Youtube className="h-3 w-3 mr-1" />
                       유튜브
                     </Label>
                     <Input
-                      id="youtube_followers"
+                      id="youtube_subscribers"
                       type="number"
-                      value={profile.youtube_followers}
-                      onChange={(e) => setProfile(prev => ({ ...prev, youtube_followers: e.target.value }))}
+                      value={profile.youtube_subscribers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, youtube_subscribers: e.target.value }))}
                       placeholder="0"
                       className="text-sm"
                     />
