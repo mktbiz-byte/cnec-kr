@@ -79,8 +79,15 @@ const SignupPageExactReplica = () => {
       setLoading(true)
       setError('')
 
-      await signUpWithEmail(formData.email, formData.password, formData.name)
-      
+      const result = await signUpWithEmail(formData.email, formData.password, formData.name)
+
+      // 이메일 확인이 비활성화된 경우 세션이 바로 반환됨 - 자동 로그인 처리
+      if (result?.session) {
+        // 세션이 있으면 바로 마이페이지로 이동
+        navigate('/mypage')
+        return
+      }
+
       setSuccess(true)
     } catch (error) {
       console.error('Signup error:', error)

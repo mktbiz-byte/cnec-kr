@@ -746,9 +746,8 @@ export const database = {
           // 기타
           bio: profileData.bio || null,
           profile_image: profileData.profile_image || null,
-          bank_name: profileData.bank_name || null,
-          account_number: profileData.account_number || null,
-          account_holder: profileData.account_holder || null,
+          // 은행 정보는 user_profiles에 저장하지 않음 (브랜드 사이트 스키마에 없음)
+          // bank_name, account_number, account_holder는 withdrawal_requests 테이블에서 관리
           updated_at: new Date().toISOString()
         }
 
