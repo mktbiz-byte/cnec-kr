@@ -96,7 +96,7 @@ const ProfileSettings = () => {
       confirmPassword: '비밀번호 확인',
       save: '저장',
       saving: '저장 중...',
-      backToHome: '홈으로 돌아가기',
+      backToHome: '마이페이지로',
       skinTypes: {
         dry: '건성',
         oily: '지성',
@@ -523,8 +523,8 @@ const ProfileSettings = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-4 mb-4">
-            <Link 
-              to="/" 
+            <Link
+              to="/mypage"
               className="flex items-center text-purple-600 hover:text-purple-700 transition-colors"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />

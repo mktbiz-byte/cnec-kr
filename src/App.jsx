@@ -8,6 +8,7 @@ import './App.css';
 // 크리에이터 앱 컴포넌트 (새 디자인)
 import {
   CreatorApp,
+  CreatorMyPage,
   GradeDetailPage,
   PointsPage,
   ApplicationsPage,
@@ -94,7 +95,7 @@ const AppContent = () => {
 
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/mypage" element={<Navigate to="/profile" replace />} />
+        <Route path="/mypage" element={<CreatorApp initialTab="my" />} />
         <Route path="/profile" element={<ProfileSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />

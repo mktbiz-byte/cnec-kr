@@ -8,11 +8,11 @@ import CreatorMyPage from './CreatorMyPage'
 import CampaignDetailModal from './CampaignDetailModal'
 import { Loader2 } from 'lucide-react'
 
-const CreatorApp = () => {
+const CreatorApp = ({ initialTab = 'home' }) => {
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
 
-  const [activeTab, setActiveTab] = useState('home')
+  const [activeTab, setActiveTab] = useState(initialTab)
   const [selectedCampaign, setSelectedCampaign] = useState(null)
   const [showCampaignModal, setShowCampaignModal] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
