@@ -42,9 +42,12 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
 
         {/* Header */}
         <header className="bg-white px-6 py-4 sticky top-0 z-30 flex justify-between items-center shadow-sm">
-          <h1 className="text-xl font-extrabold text-purple-600 tracking-tighter">
+          <button
+            onClick={() => navigate('/')}
+            className="text-xl font-extrabold text-purple-600 tracking-tighter hover:opacity-80 transition-opacity"
+          >
             C·NEC <span className="text-xs text-gray-400 font-normal ml-1">Creator</span>
-          </h1>
+          </button>
 
           <div className="flex items-center gap-4">
             {/* 알림 버튼 */}
@@ -58,10 +61,10 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
               )}
             </button>
 
-            {/* 프로필 버튼 */}
+            {/* 프로필 버튼 - /profile로 이동 */}
             <button
-              onClick={() => handleTabChange('my')}
-              className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm"
+              onClick={() => navigate('/profile')}
+              className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm hover:bg-purple-200 transition-colors"
             >
               {userInitial}
             </button>

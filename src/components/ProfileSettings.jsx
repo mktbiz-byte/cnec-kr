@@ -342,6 +342,41 @@ const ProfileSettings = () => {
     }
   }
 
+  // 다음 우편번호 검색
+  const handleAddressSearch = () => {
+    if (typeof window === 'undefined') return
+
+    // 다음 우편번호 스크립트 로드
+    const script = document.createElement('script')
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+    script.onload = () => {
+      new window.daum.Postcode({
+        oncomplete: function(data) {
+          // 우편번호와 주소 정보 설정
+          let fullAddress = data.address
+          let extraAddress = ''
+
+          if (data.addressType === 'R') {
+            if (data.bname !== '') {
+              extraAddress += data.bname
+            }
+            if (data.buildingName !== '') {
+              extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName)
+            }
+            fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '')
+          }
+
+          setProfile(prev => ({
+            ...prev,
+            postcode: data.zonecode,
+            address: fullAddress
+          }))
+        }
+      }).open()
+    }
+    document.head.appendChild(script)
+  }
+
   // 프로필 사진 업로드
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0]
@@ -659,13 +694,13 @@ const ProfileSettings = () => {
                     <SelectValue placeholder="카테고리 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="beauty">뷰티</SelectItem>
-                    <SelectItem value="fashion">패션</SelectItem>
-                    <SelectItem value="lifestyle">라이프스타일</SelectItem>
-                    <SelectItem value="food">푸드</SelectItem>
-                    <SelectItem value="travel">여행</SelectItem>
-                    <SelectItem value="fitness">피트니스</SelectItem>
-                    <SelectItem value="tech">테크</SelectItem>
+                    <SelectItem value="skincare">기초</SelectItem>
+                    <SelectItem value="makeup">메이크업</SelectItem>
+                    <SelectItem value="maskpack">마스크팩</SelectItem>
+                    <SelectItem value="suncare">선케어</SelectItem>
+                    <SelectItem value="haircare">헤어</SelectItem>
+                    <SelectItem value="bodycare">바디케어</SelectItem>
+                    <SelectItem value="fragrance">향수</SelectItem>
                     <SelectItem value="other">기타</SelectItem>
                   </SelectContent>
                 </Select>
@@ -773,19 +808,6 @@ const ProfileSettings = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="blog_url" className="flex items-center">
-                    <Globe className="h-4 w-4 mr-2" />
-                    블로그 URL
-                  </Label>
-                  <Input
-                    id="blog_url"
-                    value={profile.blog_url}
-                    onChange={(e) => setProfile(prev => ({ ...prev, blog_url: e.target.value }))}
-                    placeholder="https://blog.naver.com/username"
-                  />
-                </div>
-
                 <Separator className="my-4" />
 
                 {/* SNS 팔로워 수 */}
@@ -844,25 +866,39 @@ const ProfileSettings = () => {
                   <Home className="h-5 w-5 mr-2" />
                   배송 주소
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-2">
+                <div className="flex gap-2">
+                  <div className="flex-1">
                     <Label htmlFor="postcode">우편번호</Label>
                     <Input
                       id="postcode"
                       value={profile.postcode}
                       onChange={(e) => setProfile(prev => ({ ...prev, postcode: e.target.value }))}
-                      placeholder="12345"
+                      placeholder="우편번호"
+                      readOnly
+                      className="bg-gray-50"
                     />
                   </div>
-                  <div className="col-span-2 space-y-2">
-                    <Label htmlFor="address">주소</Label>
-                    <Input
-                      id="address"
-                      value={profile.address}
-                      onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
-                      placeholder="시/도 구/군 동/읍/면"
-                    />
+                  <div className="flex items-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddressSearch}
+                      className="whitespace-nowrap"
+                    >
+                      주소 검색
+                    </Button>
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">주소</Label>
+                  <Input
+                    id="address"
+                    value={profile.address}
+                    onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="주소 검색 버튼을 클릭하세요"
+                    readOnly
+                    className="bg-gray-50"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="detail_address">상세주소</Label>
