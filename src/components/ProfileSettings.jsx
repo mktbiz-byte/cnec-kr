@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
 import { database, supabase } from '../lib/supabase'
-import { compressImage, isImageFile } from '../lib/imageCompression'
+// imageCompression import 제거 - 인라인 canvas 압축 사용
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -370,25 +370,61 @@ const ProfileSettings = () => {
       }
       reader.readAsDataURL(file)
 
-      // 이미지 압축
-      let fileToUpload = file
-      if (isImageFile(file)) {
-        try {
-          fileToUpload = await compressImage(file, {
-            maxSizeMB: 2,
-            maxWidthOrHeight: 1920,
-            quality: 0.8
-          })
-        } catch (compressionError) {
-          console.error('이미지 압축 실패:', compressionError)
-          // 압축 실패 시 원본 파일 사용
+      // 이미지를 JPEG로 변환 및 압축
+      let fileToUpload
+      try {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        const img = new Image()
+
+        await new Promise((resolve, reject) => {
+          img.onload = resolve
+          img.onerror = reject
+          img.src = URL.createObjectURL(file)
+        })
+
+        // 최대 1920px로 리사이즈
+        const maxSize = 1920
+        let width = img.width
+        let height = img.height
+
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = (height * maxSize) / width
+            width = maxSize
+          } else {
+            width = (width * maxSize) / height
+            height = maxSize
+          }
         }
+
+        canvas.width = width
+        canvas.height = height
+        ctx.drawImage(img, 0, 0, width, height)
+
+        // 항상 JPEG로 변환
+        const blob = await new Promise(resolve =>
+          canvas.toBlob(resolve, 'image/jpeg', 0.85)
+        )
+
+        const fileName = `${user.id}-${Date.now()}.jpg`
+        fileToUpload = new File([blob], fileName, { type: 'image/jpeg' })
+
+        URL.revokeObjectURL(img.src)
+
+        console.log('이미지 압축 완료:', {
+          원본: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+          압축: `${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`
+        })
+      } catch (compressionError) {
+        console.error('이미지 압축 실패:', compressionError)
+        setError('이미지 처리 중 오류가 발생했습니다.')
+        setUploadingPhoto(false)
+        return
       }
 
       // Supabase Storage에 업로드
-      const fileExt = fileToUpload.name.split('.').pop()
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`
-      const filePath = `${user.id}/${fileName}`
+      const filePath = `${user.id}/${fileToUpload.name}`
 
       const { error: uploadError } = await supabase.storage
         .from('profile-photos')
