@@ -55,7 +55,7 @@
     "cmdk": "^1.1.1",
     "combined-stream": "^1.0.8",
     "crypto-browserify": "^3.12.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "^3.6.0",
     "define-data-property": "^1.1.4",
     "delayed-stream": "^1.0.0",
     "dotenv": "^17.2.3",
