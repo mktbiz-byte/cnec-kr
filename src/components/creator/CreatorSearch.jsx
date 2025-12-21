@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { database, supabase } from '../../lib/supabase'
 import {
@@ -11,6 +12,7 @@ const ITEMS_PER_PAGE = 10
 
 const CreatorSearch = ({ onCampaignClick }) => {
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -278,7 +280,7 @@ const CreatorSearch = ({ onCampaignClick }) => {
                 className={`flex gap-3 p-4 bg-white ${
                   isApplied ? 'opacity-60' : 'active:bg-gray-50 cursor-pointer'
                 }`}
-                onClick={() => !isApplied && onCampaignClick?.(campaign)}
+                onClick={() => !isApplied && navigate(`/campaign/${campaign.id}`)}
               >
                 {/* 썸네일 - 정사각형 */}
                 <div className="relative flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
