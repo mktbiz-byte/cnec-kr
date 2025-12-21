@@ -15,6 +15,8 @@ import {
   WelcomeScreen
 } from './components/creator';
 import LandingPage from './components/creator/LandingPage';
+import CampaignDetailPage from './components/creator/CampaignDetailPage';
+import CampaignApplyPage from './components/creator/CampaignApplyPage';
 
 // 인증 관련
 import LoginPageExactReplica from './components/LoginPageExactReplica';
@@ -76,6 +78,8 @@ const AppContent = () => {
 
         {/* 크리에이터 앱 (새 디자인) */}
         <Route path="/creator" element={<CreatorApp />} />
+        <Route path="/campaign/:id" element={<CampaignDetailPage />} />
+        <Route path="/campaign/:id/apply" element={<CampaignApplyPage />} />
         <Route path="/my/grade" element={<GradeDetailPage />} />
         <Route path="/my/points" element={<PointsPage />} />
         <Route path="/my/applications" element={<ApplicationsPage />} />

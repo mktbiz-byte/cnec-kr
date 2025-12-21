@@ -544,7 +544,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
               <div
                 key={idx}
                 className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => onCampaignClick?.(campaign)}
+                onClick={() => navigate(`/campaign/${campaign.id}`)}
               >
                 {campaign.image_url ? (
                   <img
