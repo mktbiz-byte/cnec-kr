@@ -7,7 +7,8 @@ import {
   CheckCircle, AlertCircle, Loader2, Star, FileText,
   Share2, Heart, Truck, Camera, ExternalLink, Users,
   Clock, Package, DollarSign, ChevronDown, ChevronUp,
-  AlertTriangle, Info
+  AlertTriangle, Info, Play, Ban, Tag, Video, Zap,
+  MessageSquare, ShoppingBag, Store, Sparkles
 } from 'lucide-react'
 
 const CampaignDetailPage = () => {
@@ -20,8 +21,8 @@ const CampaignDetailPage = () => {
   const [error, setError] = useState('')
   const [existingApplication, setExistingApplication] = useState(null)
   const [userProfile, setUserProfile] = useState(null)
-  const [showAllDetails, setShowAllDetails] = useState(false)
   const [liked, setLiked] = useState(false)
+  const [showGuide, setShowGuide] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -120,6 +121,25 @@ const CampaignDetailPage = () => {
     }
   }
 
+  const getVideoLengthLabel = (length) => {
+    switch (length) {
+      case '30sec': return '30초'
+      case '45sec': return '45초'
+      case '60sec': return '60초'
+      case '90sec': return '90초'
+      default: return length || '-'
+    }
+  }
+
+  const getVideoTempoLabel = (tempo) => {
+    switch (tempo) {
+      case 'slow': return '느림'
+      case 'normal': return '보통'
+      case 'fast': return '빠름'
+      default: return tempo || '-'
+    }
+  }
+
   const handleApply = () => {
     if (!user) {
       navigate('/login', { state: { from: `/campaign/${id}` } })
@@ -155,6 +175,9 @@ const CampaignDetailPage = () => {
   const dDay = getDDay(campaign.application_deadline)
   const isDeadlinePassed = dDay === '마감'
   const isFull = campaign.remaining_slots !== null && campaign.remaining_slots <= 0
+
+  // ai_generated_guide 파싱
+  const guide = campaign.ai_generated_guide || {}
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -225,7 +248,7 @@ const CampaignDetailPage = () => {
           )}
 
           {/* 제목 */}
-          <h2 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
+          <h2 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
             {campaign.title}
           </h2>
 
@@ -466,61 +489,215 @@ const CampaignDetailPage = () => {
           </>
         )}
 
-        {/* 제품 특징 / 핵심 포인트 (AI 가이드) */}
-        {(campaign.product_features || campaign.product_key_points) && (
+        {/* 크리에이터 가이드 (ai_generated_guide) */}
+        {guide && (guide.hookingPoint || guide.coreMessage || guide.missions) && (
           <>
             <div className="p-4">
-              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Star size={18} />
-                촬영 가이드
-              </h3>
+              <button
+                onClick={() => setShowGuide(!showGuide)}
+                className="w-full flex items-center justify-between"
+              >
+                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                  <Sparkles size={18} className="text-violet-500" />
+                  크리에이터 촬영 가이드
+                </h3>
+                <ChevronDown size={20} className={`text-gray-400 transition-transform ${showGuide ? 'rotate-180' : ''}`} />
+              </button>
 
-              {campaign.product_features && (
-                <div className="mb-3">
-                  <p className="text-xs text-gray-500 mb-1">제품 특징</p>
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                      {campaign.product_features}
-                    </p>
-                  </div>
+              {showGuide && (
+                <div className="mt-4 space-y-4">
+                  {/* 후킹 포인트 */}
+                  {guide.hookingPoint && (
+                    <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Zap size={16} className="text-violet-600" />
+                        <span className="text-sm font-bold text-violet-600">⚡ 1초 후킹 포인트</span>
+                      </div>
+                      <p className="text-base font-medium text-gray-900">"{guide.hookingPoint}"</p>
+                    </div>
+                  )}
+
+                  {/* 핵심 메시지 */}
+                  {guide.coreMessage && (
+                    <div className="bg-blue-50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <MessageSquare size={16} className="text-blue-600" />
+                        <span className="text-sm font-bold text-blue-600">💬 핵심 메시지</span>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed">{guide.coreMessage}</p>
+                    </div>
+                  )}
+
+                  {/* 영상 설정 */}
+                  {(guide.videoLength || guide.videoTempo) && (
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Video size={16} className="text-gray-600" />
+                        <span className="text-sm font-bold text-gray-700">🎬 영상 설정</span>
+                      </div>
+                      <div className="flex gap-4">
+                        {guide.videoLength && (
+                          <div className="flex items-center gap-2">
+                            <Clock size={14} className="text-gray-400" />
+                            <span className="text-sm text-gray-600">길이: <strong>{getVideoLengthLabel(guide.videoLength)}</strong></span>
+                          </div>
+                        )}
+                        {guide.videoTempo && (
+                          <div className="flex items-center gap-2">
+                            <Play size={14} className="text-gray-400" />
+                            <span className="text-sm text-gray-600">템포: <strong>{getVideoTempoLabel(guide.videoTempo)}</strong></span>
+                          </div>
+                        )}
+                      </div>
+                      {guide.hasNarration !== undefined && (
+                        <p className="text-sm text-gray-600 mt-2">
+                          나레이션: <strong>{guide.hasNarration ? '포함' : '미포함'}</strong>
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 필수 촬영 미션 */}
+                  {guide.missions && (
+                    <div className="bg-green-50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-sm font-bold text-green-700">✅ 필수 촬영 미션</span>
+                      </div>
+                      <ul className="space-y-2">
+                        {guide.missions.beforeAfter && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <CheckCircle size={14} className="text-green-500" />
+                            Before & After 보여주기
+                          </li>
+                        )}
+                        {guide.missions.productCloseup && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <CheckCircle size={14} className="text-green-500" />
+                            제품 사용 장면 클로즈업
+                          </li>
+                        )}
+                        {guide.missions.productTexture && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <CheckCircle size={14} className="text-green-500" />
+                            제품 텍스처 보여주기
+                          </li>
+                        )}
+                        {guide.missions.storeVisit && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Store size={14} className="text-green-500" />
+                            올리브영 매장 방문 인증
+                          </li>
+                        )}
+                        {guide.missions.weeklyReview && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Calendar size={14} className="text-green-500" />
+                            7일 사용 후기 기록
+                          </li>
+                        )}
+                        {guide.missions.priceInfo && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Tag size={14} className="text-green-500" />
+                            가격/혜택 정보 언급
+                          </li>
+                        )}
+                        {guide.missions.purchaseLink && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <ShoppingBag size={14} className="text-green-500" />
+                            구매 링크 유도
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 금지 사항 */}
+                  {guide.prohibitions && (
+                    <div className="bg-red-50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Ban size={16} className="text-red-600" />
+                        <span className="text-sm font-bold text-red-700">🚫 금지 사항</span>
+                      </div>
+                      <ul className="space-y-2">
+                        {guide.prohibitions.competitorMention && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Ban size={14} className="text-red-500" />
+                            경쟁사 제품 언급 금지
+                          </li>
+                        )}
+                        {guide.prohibitions.exaggeratedClaims && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Ban size={14} className="text-red-500" />
+                            과장된 효능/효과 표현 금지
+                          </li>
+                        )}
+                        {guide.prohibitions.medicalMisrepresentation && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Ban size={14} className="text-red-500" />
+                            의약품 오인 표현 금지
+                          </li>
+                        )}
+                        {guide.prohibitions.priceOutOfSale && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Ban size={14} className="text-red-500" />
+                            세일 기간 외 가격 언급 금지
+                          </li>
+                        )}
+                        {guide.prohibitions.negativeExpression && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Ban size={14} className="text-red-500" />
+                            부정적 표현 사용 금지
+                          </li>
+                        )}
+                        {guide.prohibitions.other && guide.prohibitionOtherText && (
+                          <li className="flex items-center gap-2 text-sm text-gray-700">
+                            <Ban size={14} className="text-red-500" />
+                            {guide.prohibitionOtherText}
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 필수 해시태그 */}
+                  {guide.hashtags && guide.hashtags.length > 0 && (
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Hash size={16} className="text-gray-600" />
+                        <span className="text-sm font-bold text-gray-700">#️⃣ 필수 해시태그</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {guide.hashtags.map((tag, idx) => (
+                          <span key={idx} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                            {tag.startsWith('#') ? tag : `#${tag}`}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 참고 영상 URL */}
+                  {guide.referenceUrl && (
+                    <a
+                      href={guide.referenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-200"
+                    >
+                      <Play size={16} />
+                      참고 영상 보기
+                    </a>
+                  )}
+
+                  {/* 유료광고 표시 */}
+                  {guide.needsPartnershipCode && (
+                    <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 rounded-xl p-3">
+                      <AlertTriangle size={16} />
+                      <span>유료광고 표시 필요</span>
+                    </div>
+                  )}
                 </div>
               )}
-
-              {campaign.product_key_points && (
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">핵심 소구 포인트</p>
-                  <div className="bg-violet-50 rounded-xl p-4">
-                    <p className="text-sm text-violet-800 leading-relaxed whitespace-pre-line">
-                      {campaign.product_key_points}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {campaign.creator_autonomy && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-green-600">
-                  <CheckCircle size={16} />
-                  <span>크리에이터 자율 촬영 가능</span>
-                </div>
-              )}
-            </div>
-            <div className="h-2 bg-gray-100" />
-          </>
-        )}
-
-        {/* AI 생성 가이드 */}
-        {campaign.ai_generated_guide && (
-          <>
-            <div className="p-4">
-              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Info size={18} />
-                AI 촬영 가이드
-              </h3>
-              <div className="bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl p-4">
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                  {campaign.ai_generated_guide}
-                </p>
-              </div>
             </div>
             <div className="h-2 bg-gray-100" />
           </>
@@ -531,7 +708,7 @@ const CampaignDetailPage = () => {
           <>
             <div className="p-4">
               <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Gift size={18} />
+                <Store size={18} className="text-emerald-500" />
                 올리브영 정보
               </h3>
               <div className="bg-emerald-50 rounded-xl p-4 space-y-2">
@@ -557,26 +734,29 @@ const CampaignDetailPage = () => {
 
         {/* 지원 질문 미리보기 */}
         {campaign.questions && Array.isArray(campaign.questions) && campaign.questions.length > 0 && (
-          <div className="p-4">
-            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <FileText size={18} />
-              지원 시 질문 ({campaign.questions.length}개)
-            </h3>
-            <div className="space-y-2">
-              {campaign.questions.map((question, idx) => {
-                const questionText = typeof question === 'string'
-                  ? question
-                  : (question?.text || question?.question || question?.content || '')
-                return (
-                  <div key={idx} className="bg-gray-50 rounded-xl p-3">
-                    <p className="text-sm text-gray-700">
-                      <span className="font-medium text-blue-600">Q{idx + 1}.</span> {questionText}
-                    </p>
-                  </div>
-                )
-              })}
+          <>
+            <div className="p-4">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <FileText size={18} />
+                지원 시 질문 ({campaign.questions.length}개)
+              </h3>
+              <div className="space-y-2">
+                {campaign.questions.map((question, idx) => {
+                  const questionText = typeof question === 'string'
+                    ? question
+                    : (question?.text || question?.question || question?.content || '')
+                  return (
+                    <div key={idx} className="bg-gray-50 rounded-xl p-3">
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium text-blue-600">Q{idx + 1}.</span> {questionText}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+            <div className="h-2 bg-gray-100" />
+          </>
         )}
 
         {/* 유의사항 */}
