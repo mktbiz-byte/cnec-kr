@@ -403,20 +403,7 @@ const CreatorMyPage = () => {
             </button>
 
             <button
-              onClick={() => navigate('/profile')}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                  <CreditCard size={20} className="text-amber-600" />
-                </div>
-                <span className="font-medium text-gray-900">계좌 관리</span>
-              </div>
-              <ChevronRight size={20} className="text-gray-300" />
-            </button>
-
-            <button
-              onClick={() => window.open('https://pf.kakao.com/_xnxlxaK', '_blank')}
+              onClick={() => window.open('https://pf.kakao.com/_TjhGG', '_blank')}
               className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
