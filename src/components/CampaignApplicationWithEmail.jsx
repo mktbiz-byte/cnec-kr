@@ -294,7 +294,7 @@ const CampaignApplicationWithEmail = () => {
       
       // 3초 후 마이페이지로 이동
       setTimeout(() => {
-        navigate('/mypage')
+        navigate('/profile')
       }, 3000)
       
     } catch (error) {

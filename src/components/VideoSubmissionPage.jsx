@@ -365,7 +365,7 @@ export default function VideoSubmissionPage() {
       setSuccess('SNS 업로드 정보가 저장되었습니다!')
       
       setTimeout(() => {
-        navigate('/mypage')
+        navigate('/profile')
       }, 2000)
 
     } catch (err) {
@@ -423,7 +423,7 @@ export default function VideoSubmissionPage() {
                 {campaign?.title}
               </p>
             </div>
-            <Button variant="outline" onClick={() => navigate('/mypage')}>
+            <Button variant="outline" onClick={() => navigate('/profile')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               마이페이지
             </Button>
@@ -700,7 +700,7 @@ export default function VideoSubmissionPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate('/mypage')}
+                    onClick={() => navigate('/profile')}
                   >
                     나중에 하기
                   </Button>

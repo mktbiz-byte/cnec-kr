@@ -273,7 +273,7 @@ const ProfileSettings = () => {
               <p className="text-gray-600 mt-2">{t.subtitle}</p>
             </div>
             <div className="flex space-x-4">
-              <Link to="/mypage">
+              <Link to="/profile">
                 <Button variant="outline" className="flex items-center space-x-2">
                   <ArrowLeft className="h-4 w-4" />
                   <span>{t.backToMyPage}</span>

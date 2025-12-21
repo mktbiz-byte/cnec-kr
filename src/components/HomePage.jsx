@@ -107,7 +107,7 @@ const HomePage = () => {
               {user ? (
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-600">{user.email}</span>
-                  <Link to="/mypage">
+                  <Link to="/profile">
                     <Button variant="outline" size="sm">
                       マイページ
                     </Button>

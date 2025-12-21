@@ -343,7 +343,7 @@ export default function OliveyoungVideoSubmissionPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Button
         variant="ghost"
-        onClick={() => navigate('/mypage')}
+        onClick={() => navigate('/profile')}
         className="mb-6"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />

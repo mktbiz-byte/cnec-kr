@@ -59,7 +59,7 @@ const EMAIL_TEMPLATES_KO = {
             <div style="text-align: center;">
                 ${data.googleDriveLink ? `<a href="${data.googleDriveLink}" class="button">📁 Google Drive</a>` : ''}
                 ${data.googleSlidesLink ? `<a href="${data.googleSlidesLink}" class="button">📊 Google Slides</a>` : ''}
-                <a href="https://cnec.co.kr/mypage" class="button">📱 마이페이지</a>
+                <a href="https://cnec.co.kr/profile" class="button">📱 마이페이지</a>
             </div>
 
             <h3>⚠️ 중요 주의사항</h3>
