@@ -8,7 +8,7 @@ import {
   Share2, Heart, Truck, Camera, ExternalLink, Users,
   Clock, Package, DollarSign, ChevronDown, ChevronUp,
   AlertTriangle, Info, Play, Ban, Tag, Video, Zap,
-  MessageSquare, ShoppingBag, Store, Sparkles
+  MessageSquare, ShoppingBag, Store, Sparkles, X
 } from 'lucide-react'
 
 const CampaignDetailPage = () => {
@@ -23,6 +23,7 @@ const CampaignDetailPage = () => {
   const [userProfile, setUserProfile] = useState(null)
   const [liked, setLiked] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
+  const [showDetailImage, setShowDetailImage] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -345,6 +346,24 @@ const CampaignDetailPage = () => {
               </div>
             )}
 
+            {/* 촬영 마감일 */}
+            {campaign.content_submission_deadline && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600 flex items-center gap-1">
+                  <Camera size={14} />
+                  촬영 마감
+                </span>
+                <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                  {formatDate(campaign.content_submission_deadline)}
+                  {getDDay(campaign.content_submission_deadline) && (
+                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-purple-100 text-purple-600">
+                      {getDDay(campaign.content_submission_deadline)}
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+
             {/* 업로드 마감일 */}
             {campaign.end_date && (
               <div className="flex justify-between items-center">
@@ -427,13 +446,15 @@ const CampaignDetailPage = () => {
           </h3>
 
           <div className="space-y-4">
-            {/* 상품 상세 이미지 */}
+            {/* 상품 상세 이미지 - 클릭해서 보기 */}
             {campaign.product_detail_file_url && (
-              <img
-                src={campaign.product_detail_file_url}
-                alt="상품 상세"
-                className="w-full rounded-xl"
-              />
+              <button
+                onClick={() => setShowDetailImage(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-violet-50 border border-violet-200 rounded-xl text-sm font-medium text-violet-700 hover:bg-violet-100"
+              >
+                <FileText size={16} />
+                상품 상세 이미지 보기
+              </button>
             )}
 
             {/* 상품 설명 */}
@@ -817,6 +838,28 @@ const CampaignDetailPage = () => {
           )}
         </div>
       </div>
+
+      {/* 상품 상세 이미지 모달 */}
+      {showDetailImage && campaign.product_detail_file_url && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setShowDetailImage(false)}
+        >
+          <button
+            onClick={() => setShowDetailImage(false)}
+            className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full z-10"
+          >
+            <X size={24} className="text-white" />
+          </button>
+          <div className="w-full h-full overflow-auto p-4" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={campaign.product_detail_file_url}
+              alt="상품 상세 이미지"
+              className="w-full max-w-lg mx-auto rounded-lg"
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
