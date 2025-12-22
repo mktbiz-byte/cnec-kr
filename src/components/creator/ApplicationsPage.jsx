@@ -6,7 +6,8 @@ import {
   ArrowLeft, ArrowRight, Clock, CheckCircle, FileText,
   Upload, Target, Loader2, Calendar, Truck, Camera,
   Eye, X, BookOpen, Video, CheckCircle2, AlertCircle,
-  Play, Copy, Gift
+  Play, Copy, Gift, Zap, MessageSquare, Ban, Hash, Tag,
+  ShoppingBag, Store, ExternalLink
 } from 'lucide-react'
 
 // 안전하게 값을 문자열로 변환하는 헬퍼 함수
@@ -1037,7 +1038,7 @@ const ApplicationsPage = () => {
                 </div>
               )}
 
-              {/* 일반 가이드 내용 */}
+              {/* 일반 가이드 내용 - ai_generated_guide JSONB 구조 */}
               {selectedGuide.type === 'general' && selectedGuide.ai_generated_guide && (
                 <div className="space-y-4">
                   {(() => {
@@ -1047,36 +1048,232 @@ const ApplicationsPage = () => {
                     }
 
                     if (typeof guide === 'object' && guide !== null) {
-                      const colorOrder = ['blue', 'green', 'purple', 'orange']
-                      const colors = {
-                        blue: { bg: 'bg-blue-50', border: 'border-blue-100', icon: 'bg-blue-500', title: 'text-blue-900' },
-                        green: { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900' },
-                        purple: { bg: 'bg-purple-50', border: 'border-purple-100', icon: 'bg-purple-500', title: 'text-purple-900' },
-                        orange: { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900' },
-                      }
-
-                      return Object.entries(guide).map(([key, value], idx) => {
-                        const c = colors[colorOrder[idx % colorOrder.length]]
-                        return (
-                          <div key={key} className={`relative overflow-hidden rounded-3xl ${c.bg} border ${c.border} p-5`}>
-                            <div className="absolute top-0 right-0 p-4 opacity-5">
-                              <Video size={80} className="text-gray-900" />
-                            </div>
-                            <div className="relative z-10">
-                              <div className="flex items-center gap-2 mb-3">
-                                <div className={`${c.icon} text-white p-1.5 rounded-lg shadow-sm`}>
-                                  <CheckCircle2 size={16} strokeWidth={3} />
-                                </div>
-                                <span className={`font-bold ${c.title} text-base`}>{key}</span>
+                      return (
+                        <>
+                          {/* 1초 후킹 포인트 */}
+                          {guide.hookingPoint && (
+                            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 p-5 shadow-lg">
+                              <div className="absolute top-0 right-0 p-3 opacity-10">
+                                <Zap size={60} className="text-white" />
                               </div>
-                              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(value)}</p>
+                              <div className="relative z-10">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
+                                    <Zap size={18} className="text-white" />
+                                  </div>
+                                  <span className="font-bold text-white text-sm">⚡ 1초 후킹 포인트</span>
+                                </div>
+                                <p className="text-lg font-bold text-white leading-snug">"{guide.hookingPoint}"</p>
+                              </div>
                             </div>
-                          </div>
-                        )
-                      })
+                          )}
+
+                          {/* 핵심 메시지 */}
+                          {guide.coreMessage && (
+                            <div className="relative overflow-hidden rounded-2xl bg-blue-50 border border-blue-100 p-5">
+                              <div className="flex items-center gap-2 mb-3">
+                                <div className="bg-blue-500 p-2 rounded-lg">
+                                  <MessageSquare size={16} className="text-white" />
+                                </div>
+                                <span className="font-bold text-blue-900 text-sm">💬 핵심 메시지</span>
+                              </div>
+                              <p className="text-sm text-gray-700 leading-relaxed">{guide.coreMessage}</p>
+                            </div>
+                          )}
+
+                          {/* 영상 설정 */}
+                          {(guide.videoLength || guide.videoTempo) && (
+                            <div className="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="bg-gray-700 p-2 rounded-lg">
+                                  <Video size={16} className="text-white" />
+                                </div>
+                                <span className="font-bold text-gray-900 text-sm">🎬 영상 설정</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                {guide.videoLength && (
+                                  <div className="bg-white rounded-xl p-3 text-center border border-gray-100">
+                                    <p className="text-xs text-gray-500 mb-1">영상 길이</p>
+                                    <p className="font-bold text-gray-900">
+                                      {guide.videoLength === '30sec' ? '30초' :
+                                       guide.videoLength === '45sec' ? '45초' :
+                                       guide.videoLength === '60sec' ? '60초' :
+                                       guide.videoLength === '90sec' ? '90초' : guide.videoLength}
+                                    </p>
+                                  </div>
+                                )}
+                                {guide.videoTempo && (
+                                  <div className="bg-white rounded-xl p-3 text-center border border-gray-100">
+                                    <p className="text-xs text-gray-500 mb-1">영상 템포</p>
+                                    <p className="font-bold text-gray-900">
+                                      {guide.videoTempo === 'slow' ? '느림' :
+                                       guide.videoTempo === 'normal' ? '보통' :
+                                       guide.videoTempo === 'fast' ? '빠름' : guide.videoTempo}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                              {guide.hasNarration !== undefined && (
+                                <p className="text-sm text-gray-600 mt-3 text-center">
+                                  나레이션: <strong>{guide.hasNarration ? '포함' : '미포함'}</strong>
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* 필수 촬영 미션 */}
+                          {guide.missions && Object.values(guide.missions).some(v => v) && (
+                            <div className="rounded-2xl bg-green-50 border border-green-100 p-5">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="bg-green-500 p-2 rounded-lg">
+                                  <CheckCircle2 size={16} className="text-white" />
+                                </div>
+                                <span className="font-bold text-green-900 text-sm">✅ 필수 촬영 미션</span>
+                              </div>
+                              <ul className="space-y-2.5">
+                                {guide.missions.beforeAfter && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-green-100">
+                                    <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+                                    <span>Before & After 보여주기</span>
+                                  </li>
+                                )}
+                                {guide.missions.productCloseup && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-green-100">
+                                    <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+                                    <span>제품 사용 장면 클로즈업</span>
+                                  </li>
+                                )}
+                                {guide.missions.productTexture && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-green-100">
+                                    <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+                                    <span>제품 텍스처 보여주기</span>
+                                  </li>
+                                )}
+                                {guide.missions.storeVisit && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-green-100">
+                                    <Store size={16} className="text-green-500 flex-shrink-0" />
+                                    <span>올리브영 매장 방문 인증</span>
+                                  </li>
+                                )}
+                                {guide.missions.weeklyReview && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-green-100">
+                                    <Calendar size={16} className="text-green-500 flex-shrink-0" />
+                                    <span>7일 사용 후기 기록</span>
+                                  </li>
+                                )}
+                                {guide.missions.priceInfo && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-green-100">
+                                    <Tag size={16} className="text-green-500 flex-shrink-0" />
+                                    <span>가격/혜택 정보 언급</span>
+                                  </li>
+                                )}
+                                {guide.missions.purchaseLink && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-green-100">
+                                    <ShoppingBag size={16} className="text-green-500 flex-shrink-0" />
+                                    <span>구매 링크 유도</span>
+                                  </li>
+                                )}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* 금지 사항 */}
+                          {guide.prohibitions && Object.values(guide.prohibitions).some(v => v) && (
+                            <div className="rounded-2xl bg-red-50 border border-red-100 p-5">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="bg-red-500 p-2 rounded-lg">
+                                  <Ban size={16} className="text-white" />
+                                </div>
+                                <span className="font-bold text-red-900 text-sm">🚫 금지 사항</span>
+                              </div>
+                              <ul className="space-y-2.5">
+                                {guide.prohibitions.competitorMention && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-red-100">
+                                    <Ban size={16} className="text-red-500 flex-shrink-0" />
+                                    <span>경쟁사 제품 언급 금지</span>
+                                  </li>
+                                )}
+                                {guide.prohibitions.exaggeratedClaims && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-red-100">
+                                    <Ban size={16} className="text-red-500 flex-shrink-0" />
+                                    <span>과장된 효능/효과 표현 금지</span>
+                                  </li>
+                                )}
+                                {guide.prohibitions.medicalMisrepresentation && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-red-100">
+                                    <Ban size={16} className="text-red-500 flex-shrink-0" />
+                                    <span>의약품 오인 표현 금지</span>
+                                  </li>
+                                )}
+                                {guide.prohibitions.priceOutOfSale && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-red-100">
+                                    <Ban size={16} className="text-red-500 flex-shrink-0" />
+                                    <span>세일 기간 외 가격 언급 금지</span>
+                                  </li>
+                                )}
+                                {guide.prohibitions.negativeExpression && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-red-100">
+                                    <Ban size={16} className="text-red-500 flex-shrink-0" />
+                                    <span>부정적 표현 사용 금지</span>
+                                  </li>
+                                )}
+                                {guide.prohibitions.other && guide.prohibitionOtherText && (
+                                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-white rounded-xl px-4 py-2.5 border border-red-100">
+                                    <Ban size={16} className="text-red-500 flex-shrink-0" />
+                                    <span>{guide.prohibitionOtherText}</span>
+                                  </li>
+                                )}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* 필수 해시태그 */}
+                          {guide.hashtags && guide.hashtags.length > 0 && (
+                            <div className="rounded-2xl bg-indigo-50 border border-indigo-100 p-5">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="bg-indigo-500 p-2 rounded-lg">
+                                  <Hash size={16} className="text-white" />
+                                </div>
+                                <span className="font-bold text-indigo-900 text-sm">#️⃣ 필수 해시태그</span>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {guide.hashtags.map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-3 py-1.5 bg-white text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
+                                  >
+                                    {tag.startsWith('#') ? tag : `#${tag}`}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 참고 영상 */}
+                          {guide.referenceUrl && (
+                            <a
+                              href={guide.referenceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-2 w-full py-3.5 bg-gray-100 rounded-2xl text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                            >
+                              <ExternalLink size={16} />
+                              참고 영상 보기
+                            </a>
+                          )}
+
+                          {/* 유료광고 표시 */}
+                          {guide.needsPartnershipCode && (
+                            <div className="flex items-center gap-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                              <AlertCircle size={18} className="flex-shrink-0" />
+                              <span className="font-medium">유료광고 표시 필요</span>
+                            </div>
+                          )}
+                        </>
+                      )
                     }
                     return (
-                      <div className="rounded-3xl bg-gray-100 border border-gray-200 p-5">
+                      <div className="rounded-2xl bg-gray-100 border border-gray-200 p-5">
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">{renderValue(guide)}</p>
                       </div>
                     )
