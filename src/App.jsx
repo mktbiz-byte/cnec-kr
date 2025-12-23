@@ -12,7 +12,10 @@ import {
   GradeDetailPage,
   PointsPage,
   ApplicationsPage,
-  WelcomeScreen
+  WelcomeScreen,
+  HomePage,
+  CampaignsPage,
+  MyPageWrapper
 } from './components/creator';
 import LandingPage from './components/creator/LandingPage';
 import CampaignDetailPage from './components/creator/CampaignDetailPage';
@@ -74,16 +77,20 @@ const AppContent = () => {
     <div className="App">
       <Routes>
         {/* 메인 페이지 - 로그인 여부에 따라 분기 */}
-        <Route path="/" element={user ? <CreatorApp /> : <LandingPage />} />
+        <Route path="/" element={user ? <HomePage /> : <LandingPage />} />
 
-        {/* 크리에이터 앱 (새 디자인) */}
-        <Route path="/creator" element={<CreatorApp />} />
+        {/* 크리에이터 앱 - 개별 라우트 */}
+        <Route path="/campaigns" element={<CampaignsPage />} />
+        <Route path="/mypage" element={<MyPageWrapper />} />
         <Route path="/campaign/:id" element={<CampaignDetailPage />} />
         <Route path="/campaign/:id/apply" element={<CampaignApplyPage />} />
         <Route path="/my/grade" element={<GradeDetailPage />} />
         <Route path="/my/points" element={<PointsPage />} />
         <Route path="/my/applications" element={<ApplicationsPage />} />
         <Route path="/welcome" element={<WelcomeScreen />} />
+
+        {/* 레거시 - 호환성 */}
+        <Route path="/creator" element={<HomePage />} />
 
         {/* 인증 관련 */}
         <Route path="/login" element={<LoginPageExactReplica />} />
@@ -99,7 +106,6 @@ const AppContent = () => {
 
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/mypage" element={<CreatorApp initialTab="my" />} />
         <Route path="/profile" element={<ProfileSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />

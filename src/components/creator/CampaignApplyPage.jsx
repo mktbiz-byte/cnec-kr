@@ -202,8 +202,10 @@ const CampaignApplyPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
       </div>
     )
   }
@@ -211,28 +213,30 @@ const CampaignApplyPage = () => {
   // 성공 화면
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle size={48} className="text-green-600" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">지원 완료!</h2>
-        <p className="text-gray-500 text-center mb-8">
-          캠페인 지원이 완료되었습니다.<br />
-          선정 결과는 마이페이지에서 확인해주세요.
-        </p>
-        <div className="flex gap-3">
-          <button
-            onClick={() => navigate('/my/applications')}
-            className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium"
-          >
-            지원 내역 보기
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
-          >
-            홈으로
-          </button>
+      <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col items-center justify-center p-4">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <CheckCircle size={48} className="text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">지원 완료!</h2>
+          <p className="text-gray-500 text-center mb-8">
+            캠페인 지원이 완료되었습니다.<br />
+            선정 결과는 마이페이지에서 확인해주세요.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate('/my/applications')}
+              className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium"
+            >
+              지원 내역 보기
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            >
+              홈으로
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -241,33 +245,35 @@ const CampaignApplyPage = () => {
   // 이미 지원한 경우
   if (existingApplication) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle size={48} className="text-blue-600" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">이미 지원한 캠페인입니다</h2>
-        <p className="text-gray-500 text-center mb-2">
-          현재 상태: {
-            existingApplication.status === 'pending' ? '검토중' :
-            existingApplication.status === 'selected' ? '선정됨' :
-            existingApplication.status === 'approved' ? '승인됨' :
-            existingApplication.status === 'rejected' ? '미선정' :
-            '확인중'
-          }
-        </p>
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={() => navigate('/my/applications')}
-            className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium"
-          >
-            지원 내역 보기
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
-          >
-            홈으로
-          </button>
+      <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col items-center justify-center p-4">
+          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+            <CheckCircle size={48} className="text-blue-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">이미 지원한 캠페인입니다</h2>
+          <p className="text-gray-500 text-center mb-2">
+            현재 상태: {
+              existingApplication.status === 'pending' ? '검토중' :
+              existingApplication.status === 'selected' ? '선정됨' :
+              existingApplication.status === 'approved' ? '승인됨' :
+              existingApplication.status === 'rejected' ? '미선정' :
+              '확인중'
+            }
+          </p>
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => navigate('/my/applications')}
+              className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium"
+            >
+              지원 내역 보기
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            >
+              홈으로
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -277,31 +283,33 @@ const CampaignApplyPage = () => {
   const profileStatus = getProfileStatus()
   if (!profileStatus.isComplete) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
-          <AlertTriangle size={48} className="text-amber-600" />
+      <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col items-center justify-center p-4">
+          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+            <AlertTriangle size={48} className="text-amber-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">프로필 완성 필요</h2>
+          <p className="text-gray-500 text-center mb-4">
+            캠페인 지원을 위해 프로필을 완성해주세요.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {profileStatus.missing.map((item, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-sm font-medium"
+              >
+                <AlertCircle size={14} />
+                {item}
+              </span>
+            ))}
+          </div>
+          <button
+            onClick={() => navigate('/profile')}
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold"
+          >
+            프로필 완성하기
+          </button>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">프로필 완성 필요</h2>
-        <p className="text-gray-500 text-center mb-4">
-          캠페인 지원을 위해 프로필을 완성해주세요.
-        </p>
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
-          {profileStatus.missing.map((item, idx) => (
-            <span
-              key={idx}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-sm font-medium"
-            >
-              <AlertCircle size={14} />
-              {item}
-            </span>
-          ))}
-        </div>
-        <button
-          onClick={() => navigate('/profile')}
-          className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold"
-        >
-          프로필 완성하기
-        </button>
       </div>
     )
   }
@@ -309,10 +317,12 @@ const CampaignApplyPage = () => {
   const reward = campaign?.creator_points_override || campaign?.reward_points || 0
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* 헤더 */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
-        <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+      <div className="w-full max-w-md bg-white min-h-screen shadow-2xl relative">
+        <div className="pb-24">
+          {/* 헤더 */}
+          <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
+            <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={() => navigate(`/campaign/${id}`)}
             className="p-1 hover:bg-gray-100 rounded-full"
@@ -529,10 +539,10 @@ const CampaignApplyPage = () => {
           </label>
         </div>
       </div>
+        </div>
 
-      {/* 하단 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 pb-6 z-40">
-        <div className="max-w-md mx-auto">
+        {/* 하단 버튼 */}
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 p-4 pb-6 z-40">
           <button
             onClick={handleSubmit}
             disabled={submitting}

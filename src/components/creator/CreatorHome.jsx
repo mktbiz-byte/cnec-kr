@@ -311,8 +311,8 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
   }
 
   const formatCurrency = (amount) => {
-    if (!amount) return '0원'
-    return `${amount.toLocaleString()}원`
+    if (!amount) return '0P'
+    return `${amount.toLocaleString()}P`
   }
 
   const getCategoryColor = (type) => {
@@ -526,7 +526,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
         <div className="flex justify-between items-end mb-4">
           <h3 className="text-xl font-bold text-gray-900">추천 캠페인</h3>
           <button
-            onClick={() => onViewAllCampaigns?.('search')}
+            onClick={() => navigate('/campaigns')}
             className="text-sm text-gray-400 font-medium cursor-pointer hover:text-gray-600"
           >
             전체보기

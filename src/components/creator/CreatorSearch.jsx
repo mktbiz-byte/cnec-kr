@@ -175,8 +175,8 @@ const CreatorSearch = ({ onCampaignClick }) => {
   }
 
   const formatPrice = (amount) => {
-    if (!amount) return '0원'
-    return `${amount.toLocaleString()}원`
+    if (!amount) return '0P'
+    return `${amount.toLocaleString()}P`
   }
 
   const getCategoryLabel = (type) => {
@@ -335,22 +335,11 @@ const CreatorSearch = ({ onCampaignClick }) => {
                     {campaign.title}
                   </h4>
 
-                  {/* 페이백 정보 */}
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-sm font-bold text-blue-600">{paybackPercent}%</span>
-                    <span className="text-xs text-gray-400">페이백</span>
-                  </div>
-
-                  {/* 가격 */}
+                  {/* 포인트 */}
                   <div className="flex items-baseline gap-2">
-                    <span className="text-base font-bold text-gray-900">
+                    <span className="text-lg font-bold text-violet-600">
                       {formatPrice(reward)}
                     </span>
-                    {originalPrice > reward && (
-                      <span className="text-xs text-gray-400 line-through">
-                        {formatPrice(Math.round(originalPrice))}
-                      </span>
-                    )}
                   </div>
 
                   {/* 기간 */}

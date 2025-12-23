@@ -4,13 +4,22 @@ import { useAuth } from '../../contexts/AuthContext'
 import { Home, Search, User, Bell, Menu, X } from 'lucide-react'
 import cnecLogo from '../../assets/cnec-logo-final.png'
 
-const CreatorLayout = ({ children, activeTab, onTabChange }) => {
+const CreatorLayout = ({ children }) => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState([])
   const [userInitial, setUserInitial] = useState('C')
+
+  // 현재 경로에 따라 활성 탭 결정
+  const getActiveTab = () => {
+    const path = location.pathname
+    if (path === '/campaigns') return 'search'
+    if (path === '/mypage' || path.startsWith('/my/')) return 'my'
+    return 'home'
+  }
+  const activeTab = getActiveTab()
 
   useEffect(() => {
     // 사용자 이니셜 설정
@@ -20,12 +29,6 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
       setUserInitial(user.email.charAt(0).toUpperCase())
     }
   }, [user])
-
-  const handleTabChange = (tab) => {
-    if (onTabChange) {
-      onTabChange(tab)
-    }
-  }
 
   const handleLogout = async () => {
     try {
@@ -103,12 +106,7 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 z-30">
           <div className="flex justify-between items-center py-3 px-8 pb-6">
             <button
-              onClick={() => {
-                handleTabChange('home')
-                if (location.pathname !== '/') {
-                  navigate('/')
-                }
-              }}
+              onClick={() => navigate('/')}
               className={`flex flex-col items-center gap-1 transition-colors ${
                 activeTab === 'home' ? 'text-gray-900' : 'text-gray-300'
               }`}
@@ -118,7 +116,7 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
             </button>
 
             <button
-              onClick={() => handleTabChange('search')}
+              onClick={() => navigate('/campaigns')}
               className={`flex flex-col items-center gap-1 transition-colors ${
                 activeTab === 'search' ? 'text-gray-900' : 'text-gray-300'
               }`}
@@ -128,12 +126,7 @@ const CreatorLayout = ({ children, activeTab, onTabChange }) => {
             </button>
 
             <button
-              onClick={() => {
-                handleTabChange('my')
-                if (location.pathname !== '/mypage') {
-                  navigate('/mypage')
-                }
-              }}
+              onClick={() => navigate('/mypage')}
               className={`flex flex-col items-center gap-1 transition-colors ${
                 activeTab === 'my' ? 'text-purple-600' : 'text-gray-300'
               }`}
