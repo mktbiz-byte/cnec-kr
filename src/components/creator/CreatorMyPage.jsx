@@ -1052,6 +1052,12 @@ const CreatorMyPage = () => {
                   }}
                   placeholder="000000-0000000"
                   maxLength={14}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  data-lpignore="true"
+                  data-form-type="other"
                   className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
               </div>
