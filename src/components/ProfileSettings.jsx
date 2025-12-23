@@ -73,6 +73,7 @@ const ProfileSettings = () => {
   const [deletionDetails, setDeletionDetails] = useState('')
   const [confirmText, setConfirmText] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [showPostcodeLayer, setShowPostcodeLayer] = useState(false)
 
   // 다국어 텍스트
   const texts = {
@@ -342,11 +343,16 @@ const ProfileSettings = () => {
     }
   }
 
-  // 다음 우편번호 검색
+  // 다음 우편번호 검색 - 레이어 방식 (모바일 호환)
   const handleAddressSearch = () => {
     if (typeof window === 'undefined') return
 
+    setShowPostcodeLayer(true)
+
     const executePostcode = () => {
+      const container = document.getElementById('postcode-layer')
+      if (!container) return
+
       new window.daum.Postcode({
         oncomplete: function(data) {
           // 우편번호와 주소 정보 설정
@@ -368,25 +374,24 @@ const ProfileSettings = () => {
             postcode: data.zonecode,
             address: fullAddress
           }))
+          setShowPostcodeLayer(false)
         },
-        // 모바일 최적화 옵션
+        onclose: function() {
+          setShowPostcodeLayer(false)
+        },
         width: '100%',
         height: '100%'
-      }).open({
-        // 모바일에서 팝업 대신 현재 창에서 열기
-        popupKey: 'postcodePopup',
-        autoClose: true
-      })
+      }).embed(container)
     }
 
     // 스크립트가 이미 로드되어 있는지 확인
     if (window.daum && window.daum.Postcode) {
-      executePostcode()
+      setTimeout(executePostcode, 100) // 레이어가 렌더링된 후 실행
     } else {
       // 다음 우편번호 스크립트 로드
       const script = document.createElement('script')
       script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
-      script.onload = executePostcode
+      script.onload = () => setTimeout(executePostcode, 100)
       document.head.appendChild(script)
     }
   }
@@ -1146,6 +1151,24 @@ const ProfileSettings = () => {
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 우편번호 검색 레이어 */}
+      {showPostcodeLayer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-full max-w-md mx-4 rounded-lg overflow-hidden shadow-xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h3 className="font-medium text-gray-900">주소 검색</h3>
+              <button
+                onClick={() => setShowPostcodeLayer(false)}
+                className="p-1 hover:bg-gray-100 rounded-full"
+              >
+                <span className="text-xl text-gray-500">&times;</span>
+              </button>
+            </div>
+            <div id="postcode-layer" style={{ height: '400px' }}></div>
           </div>
         </div>
       )}
