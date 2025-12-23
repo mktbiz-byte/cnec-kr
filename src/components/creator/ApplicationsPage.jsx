@@ -27,6 +27,95 @@ const renderValue = (value) => {
   return String(value)
 }
 
+// 촬영 장면 구성 테이블 렌더링 컴포넌트
+const ShootingScenesTable = ({ scenes }) => {
+  if (!scenes || !Array.isArray(scenes) || scenes.length === 0) return null
+
+  return (
+    <div className="rounded-2xl bg-purple-50 border border-purple-100 p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="bg-purple-500 p-2 rounded-lg">
+          <Video size={16} className="text-white" />
+        </div>
+        <span className="font-bold text-purple-900 text-sm">🎬 촬영 장면 구성 ({scenes.length}개)</span>
+      </div>
+      <p className="text-xs text-red-600 font-medium mb-4">본 대사와 촬영 장면은 크리에이터의 스타일에 맞게 변경하여 촬영해 주세요.</p>
+
+      {/* 테이블 형태로 표시 (데스크톱) */}
+      <div className="overflow-x-auto hidden md:block">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-purple-200/50">
+              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200 whitespace-nowrap">순서</th>
+              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200 whitespace-nowrap">장면 유형</th>
+              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200">촬영 장면</th>
+              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200">대사 및 자막</th>
+              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200">촬영 팁</th>
+            </tr>
+          </thead>
+          <tbody>
+            {scenes.map((scene, idx) => (
+              <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-purple-50/50'}>
+                <td className="px-3 py-3 border-b border-purple-100 font-bold text-purple-600 whitespace-nowrap">
+                  {scene.order || idx + 1}
+                </td>
+                <td className="px-3 py-3 border-b border-purple-100 whitespace-nowrap">
+                  <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-md text-xs font-medium">
+                    {scene.scene_type || '-'}
+                  </span>
+                </td>
+                <td className="px-3 py-3 border-b border-purple-100 text-gray-700 min-w-[150px]">
+                  {scene.scene_description || '-'}
+                </td>
+                <td className="px-3 py-3 border-b border-purple-100 text-gray-700 min-w-[150px]">
+                  {scene.dialogue ? (
+                    <span className="italic">"{scene.dialogue}"</span>
+                  ) : '-'}
+                </td>
+                <td className="px-3 py-3 border-b border-purple-100 text-green-700 min-w-[150px]">
+                  {scene.shooting_tip || '-'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 모바일 카드 형태 (작은 화면용) */}
+      <div className="md:hidden space-y-3">
+        {scenes.map((scene, idx) => (
+          <div key={idx} className="bg-white rounded-xl p-4 border border-purple-100 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block px-3 py-1 bg-purple-600 text-white rounded-full text-xs font-bold">
+                장면 {scene.order || idx + 1}
+              </span>
+              <span className="font-semibold text-purple-900">{scene.scene_type || ''}</span>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="text-gray-500 text-xs">촬영 장면:</span>
+                <p className="text-gray-800">{scene.scene_description || '-'}</p>
+              </div>
+              {scene.dialogue && (
+                <div className="bg-yellow-50 p-2 rounded border-l-2 border-yellow-400">
+                  <span className="text-gray-500 text-xs">💬 대사:</span>
+                  <p className="text-gray-800 italic">"{scene.dialogue}"</p>
+                </div>
+              )}
+              {scene.shooting_tip && (
+                <div className="bg-green-50 p-2 rounded border-l-2 border-green-400">
+                  <span className="text-gray-500 text-xs">💡 촬영 팁:</span>
+                  <p className="text-green-700">{scene.shooting_tip}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const ApplicationsPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -871,9 +960,17 @@ const ApplicationsPage = () => {
                     if (isObject) {
                       const entries = Object.entries(guideData)
                       const colorOrder = ['blue', 'green', 'purple', 'orange']
-                      return entries.map(([key, value], idx) =>
-                        renderGuideSection(key, value, colorOrder[idx % colorOrder.length])
-                      )
+                      let colorIdx = 0
+                      return entries.map(([key, value], idx) => {
+                        // shooting_scenes는 특별한 테이블로 렌더링
+                        if (key === 'shooting_scenes' && Array.isArray(value)) {
+                          return <ShootingScenesTable key={key} scenes={value} />
+                        }
+                        // 다른 섹션은 기존 방식으로 렌더링
+                        const color = colorOrder[colorIdx % colorOrder.length]
+                        colorIdx++
+                        return renderGuideSection(key, value, color)
+                      })
                     }
 
                     return (
@@ -978,6 +1075,42 @@ const ApplicationsPage = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* 올리브영 가이드 내 shooting_scenes 테이블 */}
+                  {(() => {
+                    // 각 스텝 가이드에서 shooting_scenes 찾기
+                    const allScenes = []
+                    const guides = [
+                      selectedGuide.campaigns?.oliveyoung_step1_guide_ai,
+                      selectedGuide.campaigns?.oliveyoung_step2_guide_ai,
+                      selectedGuide.campaigns?.oliveyoung_step3_guide_ai
+                    ]
+                    guides.forEach((guideStr) => {
+                      if (guideStr) {
+                        try {
+                          const parsed = typeof guideStr === 'string' ? JSON.parse(guideStr) : guideStr
+                          if (parsed?.shooting_scenes && Array.isArray(parsed.shooting_scenes)) {
+                            allScenes.push(...parsed.shooting_scenes)
+                          }
+                        } catch (e) {}
+                      }
+                    })
+                    // ai_generated_guide에서도 확인
+                    if (selectedGuide.campaigns?.ai_generated_guide) {
+                      try {
+                        const aiGuide = typeof selectedGuide.campaigns.ai_generated_guide === 'string'
+                          ? JSON.parse(selectedGuide.campaigns.ai_generated_guide)
+                          : selectedGuide.campaigns.ai_generated_guide
+                        if (aiGuide?.shooting_scenes && Array.isArray(aiGuide.shooting_scenes)) {
+                          allScenes.push(...aiGuide.shooting_scenes)
+                        }
+                      } catch (e) {}
+                    }
+                    if (allScenes.length > 0) {
+                      return <ShootingScenesTable scenes={allScenes} />
+                    }
+                    return null
+                  })()}
                 </div>
               )}
 
@@ -1034,6 +1167,38 @@ const ApplicationsPage = () => {
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">{renderValue(guides)}</p>
                       </div>
                     )
+                  })()}
+
+                  {/* 4주 챌린지 가이드 내 shooting_scenes 테이블 */}
+                  {(() => {
+                    const allScenes = []
+                    // 주차별 가이드에서 shooting_scenes 찾기
+                    let weeklyGuides = selectedGuide.campaigns?.challenge_weekly_guides_ai
+                    if (typeof weeklyGuides === 'string') {
+                      try { weeklyGuides = JSON.parse(weeklyGuides) } catch (e) { weeklyGuides = null }
+                    }
+                    if (Array.isArray(weeklyGuides)) {
+                      weeklyGuides.forEach((g) => {
+                        if (typeof g === 'object' && g?.shooting_scenes && Array.isArray(g.shooting_scenes)) {
+                          allScenes.push(...g.shooting_scenes)
+                        }
+                      })
+                    }
+                    // ai_generated_guide에서도 확인
+                    if (selectedGuide.campaigns?.ai_generated_guide) {
+                      try {
+                        const aiGuide = typeof selectedGuide.campaigns.ai_generated_guide === 'string'
+                          ? JSON.parse(selectedGuide.campaigns.ai_generated_guide)
+                          : selectedGuide.campaigns.ai_generated_guide
+                        if (aiGuide?.shooting_scenes && Array.isArray(aiGuide.shooting_scenes)) {
+                          allScenes.push(...aiGuide.shooting_scenes)
+                        }
+                      } catch (e) {}
+                    }
+                    if (allScenes.length > 0) {
+                      return <ShootingScenesTable scenes={allScenes} />
+                    }
+                    return null
                   })()}
                 </div>
               )}
@@ -1268,6 +1433,11 @@ const ApplicationsPage = () => {
                               <AlertCircle size={18} className="flex-shrink-0" />
                               <span className="font-medium">유료광고 표시 필요</span>
                             </div>
+                          )}
+
+                          {/* 촬영 장면 구성 (ai_generated_guide에 포함된 경우) */}
+                          {guide.shooting_scenes && Array.isArray(guide.shooting_scenes) && guide.shooting_scenes.length > 0 && (
+                            <ShootingScenesTable scenes={guide.shooting_scenes} />
                           )}
                         </>
                       )
