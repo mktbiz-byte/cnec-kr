@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
 import { ArrowLeft, Bell, Mail, MessageSquare, Loader2 } from 'lucide-react'
+
+const STORAGE_KEY = 'cnec_notification_settings'
 
 const NotificationSettings = () => {
   const { user } = useAuth()
@@ -28,18 +29,18 @@ const NotificationSettings = () => {
   const loadSettings = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('sms_notifications, kakao_notifications, email_notifications, marketing_notifications')
-        .eq('id', user.id)
-        .single()
 
-      if (!error && data) {
+      // localStorage에서 사용자별 설정 로드
+      const storageKey = `${STORAGE_KEY}_${user.id}`
+      const saved = localStorage.getItem(storageKey)
+
+      if (saved) {
+        const parsed = JSON.parse(saved)
         setSettings({
-          sms_notifications: data.sms_notifications ?? true,
-          kakao_notifications: data.kakao_notifications ?? true,
-          email_notifications: data.email_notifications ?? true,
-          marketing_notifications: data.marketing_notifications ?? false
+          sms_notifications: parsed.sms_notifications ?? true,
+          kakao_notifications: parsed.kakao_notifications ?? true,
+          email_notifications: parsed.email_notifications ?? true,
+          marketing_notifications: parsed.marketing_notifications ?? false
         })
       }
     } catch (error) {
@@ -51,19 +52,18 @@ const NotificationSettings = () => {
 
   const handleToggle = async (key) => {
     const newValue = !settings[key]
-    setSettings(prev => ({ ...prev, [key]: newValue }))
+    const newSettings = { ...settings, [key]: newValue }
+    setSettings(newSettings)
 
     try {
       setSaving(true)
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          [key]: newValue,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
 
-      if (error) throw error
+      // localStorage에 저장
+      const storageKey = `${STORAGE_KEY}_${user.id}`
+      localStorage.setItem(storageKey, JSON.stringify({
+        ...newSettings,
+        updated_at: new Date().toISOString()
+      }))
 
       setSuccess('저장되었습니다')
       setTimeout(() => setSuccess(''), 2000)
