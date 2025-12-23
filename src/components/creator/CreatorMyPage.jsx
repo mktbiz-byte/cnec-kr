@@ -272,6 +272,29 @@ const CreatorMyPage = () => {
     return true
   }
 
+  // 팝빌 알림톡 발송 함수
+  const sendAlimtalk = async (templateCode, receiverNum, receiverName, variables) => {
+    try {
+      const response = await fetch('/.netlify/functions/send-alimtalk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templateCode,
+          receiverNum: receiverNum.replace(/-/g, ''),
+          receiverName,
+          variables
+        })
+      })
+
+      const result = await response.json()
+      console.log('알림톡 발송 결과:', result)
+      return result
+    } catch (error) {
+      console.error('알림톡 발송 오류:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
   // 출금 신청 처리
   const handleWithdrawSubmit = async () => {
     try {
@@ -308,24 +331,39 @@ const CreatorMyPage = () => {
       // 주민번호 암호화
       const encryptedResidentNum = await encryptResidentNumber(residentNumber.replace(/-/g, ''))
 
-      // 출금 신청 데이터
-      const withdrawalData = {
-        user_id: user.id,
-        amount: amount,
-        bank_name: profile.bank_name,
-        account_number: profile.account_number,
-        account_holder: profile.account_holder,
-        resident_number_encrypted: encryptedResidentNum,
-        status: 'pending',
-        created_at: new Date().toISOString()
-      }
+      // 현재 날짜 포맷
+      const today = new Date()
+      const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-      // Supabase에 저장
+      // point_transactions 테이블에 출금 기록 저장 (음수 금액)
+      // description에 계좌 정보 및 암호화된 주민번호 저장
+      const description = `출금 신청: ${amount.toLocaleString()}원 (은행: ${profile.bank_name}, 계좌: ${profile.account_number}, 예금주: ${profile.account_holder}) [주민번호:${encryptedResidentNum}]`
+
       const { error: dbError } = await supabase
-        .from('withdrawal_requests')
-        .insert([withdrawalData])
+        .from('point_transactions')
+        .insert([{
+          user_id: user.id,
+          amount: -amount, // 출금은 음수로 저장
+          type: 'withdraw',
+          description: description,
+          created_at: new Date().toISOString()
+        }])
 
       if (dbError) throw dbError
+
+      // 팝빌 알림톡 발송 (출금 접수 완료)
+      if (profile?.phone) {
+        await sendAlimtalk(
+          '025100001019', // 출금 접수 완료 템플릿
+          profile.phone,
+          profile.name || '크리에이터',
+          {
+            '크리에이터명': profile.name || '크리에이터',
+            '출금금액': amount.toLocaleString(),
+            '신청일': dateStr
+          }
+        )
+      }
 
       // 성공 처리
       setShowWithdrawModal(false)
@@ -334,7 +372,8 @@ const CreatorMyPage = () => {
       setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내 입금됩니다.')
       setTimeout(() => setSuccess(''), 5000)
 
-      // 포인트 차감은 관리자 승인 후 처리되므로 여기서는 하지 않음
+      // 데이터 새로고침
+      loadUserData()
 
     } catch (error) {
       console.error('출금 신청 오류:', error)
