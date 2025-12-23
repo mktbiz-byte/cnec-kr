@@ -38,7 +38,11 @@ const ProfileSettings = () => {
     // SNS 개별 팔로워/구독자 수
     instagram_followers: '',
     youtube_subscribers: '',
-    tiktok_followers: ''
+    tiktok_followers: '',
+    // 은행 정보
+    bank_name: '',
+    account_number: '',
+    account_holder: ''
   })
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -110,7 +114,10 @@ const ProfileSettings = () => {
           detail_address: profileData.detail_address || '',
           instagram_followers: profileData.instagram_followers || '',
           youtube_subscribers: profileData.youtube_subscribers || '',
-          tiktok_followers: profileData.tiktok_followers || ''
+          tiktok_followers: profileData.tiktok_followers || '',
+          bank_name: profileData.bank_name || '',
+          account_number: profileData.account_number || '',
+          account_holder: profileData.account_holder || ''
         })
         if (profileData.profile_image) {
           setPhotoPreview(profileData.profile_image)
@@ -164,7 +171,10 @@ const ProfileSettings = () => {
         detail_address: profile.detail_address?.trim() || null,
         instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
         youtube_subscribers: profile.youtube_subscribers ? parseInt(profile.youtube_subscribers) : null,
-        tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null
+        tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null,
+        bank_name: profile.bank_name?.trim() || null,
+        account_number: profile.account_number?.trim() || null,
+        account_holder: profile.account_holder?.trim() || null
       }
 
       await database.userProfiles.upsert(profileData)
@@ -708,6 +718,39 @@ const ProfileSettings = () => {
             placeholder="간단한 자기소개를 작성해주세요"
             rows={4}
           />
+        </div>
+
+        {/* 정산 계좌 정보 */}
+        <div>
+          <h2 className="text-base font-bold text-gray-900 mb-4">정산 계좌 정보</h2>
+          <div className="space-y-3">
+            <select
+              value={profile.bank_name}
+              onChange={(e) => setProfile(prev => ({ ...prev, bank_name: e.target.value }))}
+              className="w-full px-4 py-3 bg-gray-100 rounded-xl text-[15px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+            >
+              <option value="">은행 선택</option>
+              {['KB국민은행', '신한은행', '우리은행', 'NH농협은행', '하나은행', 'IBK기업은행',
+                'SC제일은행', '한국씨티은행', 'KDB산업은행', '경남은행', '광주은행', '대구은행',
+                '부산은행', '전북은행', '제주은행', '카카오뱅크', '케이뱅크', '토스뱅크'].map(bank => (
+                <option key={bank} value={bank}>{bank}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={profile.account_number}
+              onChange={(e) => setProfile(prev => ({ ...prev, account_number: e.target.value }))}
+              className="w-full px-4 py-3 bg-gray-100 rounded-xl text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              placeholder="계좌번호 ('-' 없이)"
+            />
+            <input
+              type="text"
+              value={profile.account_holder}
+              onChange={(e) => setProfile(prev => ({ ...prev, account_holder: e.target.value }))}
+              className="w-full px-4 py-3 bg-gray-100 rounded-xl text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              placeholder="예금주명"
+            />
+          </div>
         </div>
 
         {/* 하단 저장 버튼 */}

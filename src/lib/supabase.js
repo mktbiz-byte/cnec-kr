@@ -747,9 +747,10 @@ export const database = {
           tiktok_followers: profileData.tiktok_followers || null,
           // 기타
           bio: profileData.bio || null,
-          // profile_image는 DB 컬럼이 없을 수 있으므로 upsert에서 제외
-          // 은행 정보는 user_profiles에 저장하지 않음 (브랜드 사이트 스키마에 없음)
-          // bank_name, account_number, account_holder는 withdrawal_requests 테이블에서 관리
+          // 은행 정보
+          bank_name: profileData.bank_name || null,
+          account_number: profileData.account_number || null,
+          account_holder: profileData.account_holder || null,
           updated_at: new Date().toISOString()
         }
 
