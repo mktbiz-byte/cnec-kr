@@ -367,26 +367,13 @@ const CreatorMyPage = () => {
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <button
                 onClick={() => navigate('/my/applications')}
-                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
+                className="w-full px-4 py-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
                     <FileText size={18} className="text-violet-600" />
                   </div>
                   <span className="text-[15px] text-gray-900">지원 내역</span>
-                </div>
-                <ChevronRight size={18} className="text-gray-300" />
-              </button>
-
-              <button
-                onClick={() => navigate('/my/favorites')}
-                className="w-full px-4 py-4 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
-                    <Star size={18} className="text-amber-500" />
-                  </div>
-                  <span className="text-[15px] text-gray-900">찜한 캠페인</span>
                 </div>
                 <ChevronRight size={18} className="text-gray-300" />
               </button>
