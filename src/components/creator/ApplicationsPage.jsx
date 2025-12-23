@@ -27,85 +27,69 @@ const renderValue = (value) => {
   return String(value)
 }
 
-// 촬영 장면 구성 테이블 렌더링 컴포넌트
+// 촬영 장면 구성 카드 렌더링 컴포넌트 (모바일 최적화)
 const ShootingScenesTable = ({ scenes }) => {
   if (!scenes || !Array.isArray(scenes) || scenes.length === 0) return null
 
   return (
-    <div className="rounded-2xl bg-purple-50 border border-purple-100 p-5">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="bg-purple-500 p-2 rounded-lg">
-          <Video size={16} className="text-white" />
+    <div className="rounded-2xl bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100 p-4">
+      {/* 헤더 */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="bg-purple-600 p-1.5 rounded-lg">
+          <Video size={14} className="text-white" />
         </div>
-        <span className="font-bold text-purple-900 text-sm">🎬 촬영 장면 구성 ({scenes.length}개)</span>
-      </div>
-      <p className="text-xs text-red-600 font-medium mb-4">본 대사와 촬영 장면은 크리에이터의 스타일에 맞게 변경하여 촬영해 주세요.</p>
-
-      {/* 테이블 형태로 표시 (데스크톱) */}
-      <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="bg-purple-200/50">
-              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200 whitespace-nowrap">순서</th>
-              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200 whitespace-nowrap">장면 유형</th>
-              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200">촬영 장면</th>
-              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200">대사 및 자막</th>
-              <th className="px-3 py-2 text-left font-bold text-purple-900 border-b border-purple-200">촬영 팁</th>
-            </tr>
-          </thead>
-          <tbody>
-            {scenes.map((scene, idx) => (
-              <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-purple-50/50'}>
-                <td className="px-3 py-3 border-b border-purple-100 font-bold text-purple-600 whitespace-nowrap">
-                  {scene.order || idx + 1}
-                </td>
-                <td className="px-3 py-3 border-b border-purple-100 whitespace-nowrap">
-                  <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-md text-xs font-medium">
-                    {scene.scene_type || '-'}
-                  </span>
-                </td>
-                <td className="px-3 py-3 border-b border-purple-100 text-gray-700 min-w-[150px]">
-                  {scene.scene_description || '-'}
-                </td>
-                <td className="px-3 py-3 border-b border-purple-100 text-gray-700 min-w-[150px]">
-                  {scene.dialogue ? (
-                    <span className="italic">"{scene.dialogue}"</span>
-                  ) : '-'}
-                </td>
-                <td className="px-3 py-3 border-b border-purple-100 text-green-700 min-w-[150px]">
-                  {scene.shooting_tip || '-'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <span className="font-bold text-purple-900 text-sm">촬영 장면 구성</span>
+        <span className="ml-auto text-xs text-purple-600 font-medium bg-purple-100 px-2 py-0.5 rounded-full">
+          {scenes.length}개
+        </span>
       </div>
 
-      {/* 모바일 카드 형태 (작은 화면용) */}
-      <div className="md:hidden space-y-3">
+      {/* 안내 문구 */}
+      <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-4">
+        <p className="text-xs text-red-600 font-medium leading-relaxed">
+          💡 본 대사와 촬영 장면은 크리에이터님의 스타일에 맞게 자유롭게 변경하여 촬영해 주세요!
+        </p>
+      </div>
+
+      {/* 장면 카드 리스트 */}
+      <div className="space-y-3">
         {scenes.map((scene, idx) => (
-          <div key={idx} className="bg-white rounded-xl p-4 border border-purple-100 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="inline-block px-3 py-1 bg-purple-600 text-white rounded-full text-xs font-bold">
-                장면 {scene.order || idx + 1}
+          <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-sm border border-purple-100">
+            {/* 장면 헤더 */}
+            <div className="bg-gradient-to-r from-purple-600 to-violet-600 px-3 py-2 flex items-center gap-2">
+              <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded">
+                {scene.order || idx + 1}
               </span>
-              <span className="font-semibold text-purple-900">{scene.scene_type || ''}</span>
+              <span className="text-white font-medium text-sm">{scene.scene_type || '장면'}</span>
             </div>
-            <div className="space-y-2 text-sm">
+
+            {/* 장면 내용 */}
+            <div className="p-3 space-y-2.5">
+              {/* 촬영 장면 설명 */}
               <div>
-                <span className="text-gray-500 text-xs">촬영 장면:</span>
-                <p className="text-gray-800">{scene.scene_description || '-'}</p>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">촬영 장면</span>
+                </div>
+                <p className="text-sm text-gray-800 leading-relaxed">{scene.scene_description || '-'}</p>
               </div>
+
+              {/* 대사 */}
               {scene.dialogue && (
-                <div className="bg-yellow-50 p-2 rounded border-l-2 border-yellow-400">
-                  <span className="text-gray-500 text-xs">💬 대사:</span>
-                  <p className="text-gray-800 italic">"{scene.dialogue}"</p>
+                <div className="bg-amber-50 rounded-lg p-2.5 border-l-3 border-amber-400">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">💬 대사/자막</span>
+                  </div>
+                  <p className="text-sm text-amber-900 italic leading-relaxed">"{scene.dialogue}"</p>
                 </div>
               )}
+
+              {/* 촬영 팁 */}
               {scene.shooting_tip && (
-                <div className="bg-green-50 p-2 rounded border-l-2 border-green-400">
-                  <span className="text-gray-500 text-xs">💡 촬영 팁:</span>
-                  <p className="text-green-700">{scene.shooting_tip}</p>
+                <div className="bg-emerald-50 rounded-lg p-2.5 border-l-3 border-emerald-400">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">💡 촬영 팁</span>
+                  </div>
+                  <p className="text-sm text-emerald-800 leading-relaxed">{scene.shooting_tip}</p>
                 </div>
               )}
             </div>
