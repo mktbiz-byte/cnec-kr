@@ -361,72 +361,113 @@ const CreatorMyPage = () => {
             </div>
           </div>
 
-          {/* 메뉴 리스트 */}
-          <div className="mx-5 mt-5 space-y-2">
-            <button
-              onClick={() => navigate('/profile')}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-                  <User size={20} className="text-violet-600" />
+          {/* 캠페인 관리 섹션 */}
+          <div className="mx-5 mt-6">
+            <p className="text-xs text-gray-500 font-medium mb-2 px-1">캠페인 관리</p>
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <button
+                onClick={() => navigate('/my/applications')}
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
+                    <FileText size={18} className="text-violet-600" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">지원 내역</span>
                 </div>
-                <span className="font-medium text-gray-900">프로필 설정</span>
-              </div>
-              <ChevronRight size={20} className="text-gray-300" />
-            </button>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
 
-            <button
-              onClick={() => navigate('/my/applications')}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <FileText size={20} className="text-blue-600" />
+              <button
+                onClick={() => navigate('/my/favorites')}
+                className="w-full px-4 py-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <Star size={18} className="text-amber-500" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">찜한 캠페인</span>
                 </div>
-                <span className="font-medium text-gray-900">지원 내역</span>
-              </div>
-              <ChevronRight size={20} className="text-gray-300" />
-            </button>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+            </div>
+          </div>
 
-            <button
-              onClick={() => navigate('/my/points')}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                  <DollarSign size={20} className="text-emerald-600" />
+          {/* 계정 및 설정 섹션 */}
+          <div className="mx-5 mt-6">
+            <p className="text-xs text-gray-500 font-medium mb-2 px-1">계정 및 설정</p>
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <button
+                onClick={() => navigate('/profile')}
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <User size={18} className="text-blue-600" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">프로필 설정</span>
                 </div>
-                <span className="font-medium text-gray-900">출금 내역</span>
-              </div>
-              <ChevronRight size={20} className="text-gray-300" />
-            </button>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
 
-            <button
-              onClick={() => window.open('https://pf.kakao.com/_TjhGG', '_blank')}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <HelpCircle size={20} className="text-gray-600" />
+              <button
+                onClick={() => setActiveSection('account')}
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <CreditCard size={18} className="text-emerald-600" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">계좌 정보 관리</span>
                 </div>
-                <span className="font-medium text-gray-900">고객센터</span>
-              </div>
-              <ChevronRight size={20} className="text-gray-300" />
-            </button>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
 
-            <button
-              onClick={handleLogout}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                  <LogOut size={20} className="text-red-500" />
+              <button
+                onClick={() => navigate('/settings/notifications')}
+                className="w-full px-4 py-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-pink-100 rounded-xl flex items-center justify-center">
+                    <Bell size={18} className="text-pink-500" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">알림 설정</span>
                 </div>
-                <span className="font-medium text-red-500">로그아웃</span>
-              </div>
-              <ChevronRight size={20} className="text-gray-300" />
-            </button>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+            </div>
+          </div>
+
+          {/* 기타 섹션 */}
+          <div className="mx-5 mt-6 mb-8">
+            <p className="text-xs text-gray-500 font-medium mb-2 px-1">기타</p>
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <button
+                onClick={() => window.open('https://pf.kakao.com/_TjhGG', '_blank')}
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <HelpCircle size={18} className="text-gray-600" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">고객센터</span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="w-full px-4 py-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
+                    <LogOut size={18} className="text-red-400" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">로그아웃</span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+            </div>
           </div>
         </>
       )}
