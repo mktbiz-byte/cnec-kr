@@ -1,0 +1,25 @@
+# Block all search engines
+User-agent: *
+Disallow: /
+
+# Block specific bots
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Yeti
+Disallow: /
+
+User-agent: Naverbot
+Disallow: /
+
+User-agent: Daumoa
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
