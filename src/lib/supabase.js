@@ -747,10 +747,6 @@ export const database = {
           tiktok_followers: profileData.tiktok_followers || null,
           // 기타
           bio: profileData.bio || null,
-          // 은행 정보
-          bank_name: profileData.bank_name || null,
-          account_number: profileData.account_number || null,
-          account_holder: profileData.account_holder || null,
           updated_at: new Date().toISOString()
         }
 
