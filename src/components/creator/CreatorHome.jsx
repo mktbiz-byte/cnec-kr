@@ -311,8 +311,8 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
   }
 
   const formatCurrency = (amount) => {
-    if (!amount) return '0원'
-    return `${amount.toLocaleString()}원`
+    if (!amount) return '0P'
+    return `${amount.toLocaleString()}P`
   }
 
   const getCategoryColor = (type) => {
