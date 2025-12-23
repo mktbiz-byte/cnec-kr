@@ -7,7 +7,7 @@ import {
   Edit3, Phone, Mail, MapPin, Instagram, Youtube, Hash,
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
-  ArrowRight, Bell, HelpCircle, Wallet, TrendingUp
+  ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift
 } from 'lucide-react'
 
 // 등급 설정
@@ -40,6 +40,10 @@ const CreatorMyPage = () => {
   const [withdrawAmount, setWithdrawAmount] = useState('')
   const [residentNumber, setResidentNumber] = useState('')
   const [withdrawProcessing, setWithdrawProcessing] = useState(false)
+
+  // 찜한 캠페인 관련
+  const [wishlistCampaigns, setWishlistCampaigns] = useState([])
+  const [wishlistLoading, setWishlistLoading] = useState(false)
 
   // 한국 주요 은행 목록 (레거시 18개 은행)
   const koreanBanks = [
@@ -142,6 +146,46 @@ const CreatorMyPage = () => {
       console.error('데이터 로드 오류:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // 찜한 캠페인 로드
+  const loadWishlist = async () => {
+    if (!user) return
+
+    try {
+      setWishlistLoading(true)
+      const storageKey = `cnec_wishlist_${user.id}`
+      const saved = localStorage.getItem(storageKey)
+
+      if (saved) {
+        const wishlistIds = JSON.parse(saved)
+        if (wishlistIds.length > 0) {
+          const { data: campaigns } = await supabase
+            .from('campaigns')
+            .select('id, title, brand, image_url, reward_points, creator_points_override, application_deadline, campaign_type')
+            .in('id', wishlistIds)
+
+          setWishlistCampaigns(campaigns || [])
+        } else {
+          setWishlistCampaigns([])
+        }
+      }
+    } catch (error) {
+      console.error('찜 목록 로드 오류:', error)
+    } finally {
+      setWishlistLoading(false)
+    }
+  }
+
+  // 찜하기 해제
+  const removeFromWishlist = (campaignId) => {
+    const storageKey = `cnec_wishlist_${user.id}`
+    const saved = localStorage.getItem(storageKey)
+    if (saved) {
+      const wishlistIds = JSON.parse(saved).filter(id => id !== campaignId)
+      localStorage.setItem(storageKey, JSON.stringify(wishlistIds))
+      setWishlistCampaigns(prev => prev.filter(c => c.id !== campaignId))
     }
   }
 
@@ -574,13 +618,26 @@ const CreatorMyPage = () => {
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <button
                 onClick={() => navigate('/my/applications')}
-                className="w-full px-4 py-4 flex items-center justify-between"
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
                     <FileText size={18} className="text-violet-600" />
                   </div>
                   <span className="text-[15px] text-gray-900">지원 내역</span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+
+              <button
+                onClick={() => { setActiveSection('wishlist'); loadWishlist(); }}
+                className="w-full px-4 py-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center">
+                    <Heart size={18} className="text-red-500" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">찜한 캠페인</span>
                 </div>
                 <ChevronRight size={18} className="text-gray-300" />
               </button>
@@ -967,6 +1024,83 @@ const CreatorMyPage = () => {
               {processing ? '저장 중...' : '계좌 정보 저장'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* 찜한 캠페인 */}
+      {activeSection === 'wishlist' && (
+        <div className="px-5 pt-5 pb-8">
+          <div className="flex items-center justify-between mb-4">
+            <button onClick={() => setActiveSection('dashboard')} className="p-2 -ml-2">
+              <ArrowRight size={20} className="text-gray-700 rotate-180" />
+            </button>
+            <h2 className="font-bold text-lg">찜한 캠페인</h2>
+            <div className="w-10" />
+          </div>
+
+          {wishlistLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-violet-600" />
+            </div>
+          ) : wishlistCampaigns.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-2xl">
+              <Heart size={48} className="mx-auto mb-4 text-gray-200" />
+              <p className="text-gray-500 mb-2">찜한 캠페인이 없습니다</p>
+              <p className="text-sm text-gray-400">캠페인 목록에서 하트를 눌러 찜해보세요</p>
+              <button
+                onClick={() => navigate('/campaigns')}
+                className="mt-4 px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-medium"
+              >
+                캠페인 둘러보기
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {wishlistCampaigns.map((campaign) => {
+                const reward = campaign.creator_points_override || campaign.reward_points || 0
+                return (
+                  <div
+                    key={campaign.id}
+                    className="bg-white rounded-2xl p-4 shadow-sm flex gap-3 cursor-pointer active:bg-gray-50"
+                    onClick={() => navigate(`/campaign/${campaign.id}`)}
+                  >
+                    {/* 썸네일 */}
+                    <div className="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gray-100">
+                      {campaign.image_url ? (
+                        <img
+                          src={campaign.image_url}
+                          alt={campaign.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Gift size={24} className="text-gray-300" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 캠페인 정보 */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 text-sm line-clamp-2 mb-1">{campaign.title}</p>
+                      <p className="text-xs text-gray-400 mb-2">{campaign.brand}</p>
+                      <p className="text-base font-bold text-violet-600">{reward.toLocaleString()}P</p>
+                    </div>
+
+                    {/* 찜 해제 버튼 */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeFromWishlist(campaign.id)
+                      }}
+                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                    >
+                      <Heart size={20} className="text-red-500 fill-red-500" />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
 
