@@ -151,23 +151,27 @@ const CampaignDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
       </div>
     )
   }
 
   if (error || !campaign) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <AlertCircle size={48} className="text-gray-400 mb-4" />
-        <p className="text-gray-600 mb-4">{error || '캠페인을 찾을 수 없습니다.'}</p>
-        <button
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-        >
-          홈으로 돌아가기
-        </button>
+      <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col items-center justify-center p-4">
+          <AlertCircle size={48} className="text-gray-400 mb-4" />
+          <p className="text-gray-600 mb-4">{error || '캠페인을 찾을 수 없습니다.'}</p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+          >
+            홈으로 돌아가기
+          </button>
+        </div>
       </div>
     )
   }
@@ -181,10 +185,12 @@ const CampaignDetailPage = () => {
   const guide = campaign.ai_generated_guide || {}
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* 헤더 */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
-        <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+      <div className="w-full max-w-md bg-white min-h-screen shadow-2xl relative">
+        <div className="pb-24">
+          {/* 헤더 */}
+          <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
+            <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={() => navigate(-1)}
             className="p-1 hover:bg-gray-100 rounded-full"
@@ -808,10 +814,10 @@ const CampaignDetailPage = () => {
           </div>
         </div>
       </div>
+        </div>
 
-      {/* 하단 고정 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 pb-6 z-40">
-        <div className="max-w-md mx-auto">
+        {/* 하단 고정 버튼 */}
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 p-4 pb-6 z-40">
           {existingApplication ? (
             <div className="w-full py-3.5 bg-gray-100 text-gray-500 rounded-xl font-bold text-center">
               {existingApplication.status === 'pending' ? '검토중' :
@@ -837,29 +843,29 @@ const CampaignDetailPage = () => {
             </button>
           )}
         </div>
-      </div>
 
-      {/* 상품 상세 이미지 모달 */}
-      {showDetailImage && campaign.product_detail_file_url && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-          onClick={() => setShowDetailImage(false)}
-        >
-          <button
+        {/* 상품 상세 이미지 모달 */}
+        {showDetailImage && campaign.product_detail_file_url && (
+          <div
+            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
             onClick={() => setShowDetailImage(false)}
-            className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full z-10"
           >
-            <X size={24} className="text-white" />
-          </button>
-          <div className="w-full h-full overflow-auto p-4" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={campaign.product_detail_file_url}
-              alt="상품 상세 이미지"
-              className="w-full max-w-lg mx-auto rounded-lg"
-            />
+            <button
+              onClick={() => setShowDetailImage(false)}
+              className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full z-10"
+            >
+              <X size={24} className="text-white" />
+            </button>
+            <div className="w-full h-full overflow-auto p-4" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={campaign.product_detail_file_url}
+                alt="상품 상세 이미지"
+                className="w-full max-w-lg mx-auto rounded-lg"
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
