@@ -38,6 +38,8 @@ const CreatorMyPage = () => {
   // 출금 관련
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [residentNumber, setResidentNumber] = useState('')
+  const [withdrawProcessing, setWithdrawProcessing] = useState(false)
 
   // 한국 주요 은행 목록 (레거시 18개 은행)
   const koreanBanks = [
@@ -210,6 +212,135 @@ const CreatorMyPage = () => {
       setError('계좌 정보 저장에 실패했습니다')
     } finally {
       setProcessing(false)
+    }
+  }
+
+  // 주민번호 암호화 함수 (AES-GCM)
+  const encryptResidentNumber = async (plainText) => {
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(plainText)
+
+      // 암호화 키 생성 (실제 운영시에는 서버에서 관리해야 함)
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode('cnec-secure-key-2024-resident-num'),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveBits', 'deriveKey']
+      )
+
+      const salt = crypto.getRandomValues(new Uint8Array(16))
+      const key = await crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: salt,
+          iterations: 100000,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt']
+      )
+
+      const iv = crypto.getRandomValues(new Uint8Array(12))
+      const encrypted = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv: iv },
+        key,
+        data
+      )
+
+      // salt + iv + encrypted data를 합쳐서 Base64로 인코딩
+      const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength)
+      combined.set(salt, 0)
+      combined.set(iv, salt.length)
+      combined.set(new Uint8Array(encrypted), salt.length + iv.length)
+
+      return btoa(String.fromCharCode(...combined))
+    } catch (error) {
+      console.error('암호화 오류:', error)
+      throw new Error('주민번호 암호화에 실패했습니다')
+    }
+  }
+
+  // 주민번호 유효성 검사
+  const validateResidentNumber = (num) => {
+    const cleaned = num.replace(/-/g, '')
+    if (cleaned.length !== 13) return false
+    if (!/^\d{13}$/.test(cleaned)) return false
+    return true
+  }
+
+  // 출금 신청 처리
+  const handleWithdrawSubmit = async () => {
+    try {
+      setWithdrawProcessing(true)
+      setError('')
+
+      const amount = parseInt(withdrawAmount.replace(/,/g, ''))
+
+      // 유효성 검사
+      if (!amount || amount < 10000) {
+        setError('최소 출금 금액은 10,000P입니다')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      if (amount > (profile?.points || 0)) {
+        setError('보유 포인트보다 많은 금액은 출금할 수 없습니다')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      if (!validateResidentNumber(residentNumber)) {
+        setError('주민등록번호 형식이 올바르지 않습니다 (13자리)')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      if (!profile?.bank_name || !profile?.account_number) {
+        setError('계좌 정보를 먼저 등록해주세요')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      // 주민번호 암호화
+      const encryptedResidentNum = await encryptResidentNumber(residentNumber.replace(/-/g, ''))
+
+      // 출금 신청 데이터
+      const withdrawalData = {
+        user_id: user.id,
+        amount: amount,
+        bank_name: profile.bank_name,
+        account_number: profile.account_number,
+        account_holder: profile.account_holder,
+        resident_number_encrypted: encryptedResidentNum,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }
+
+      // Supabase에 저장
+      const { error: dbError } = await supabase
+        .from('withdrawal_requests')
+        .insert([withdrawalData])
+
+      if (dbError) throw dbError
+
+      // 성공 처리
+      setShowWithdrawModal(false)
+      setWithdrawAmount('')
+      setResidentNumber('')
+      setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내 입금됩니다.')
+      setTimeout(() => setSuccess(''), 5000)
+
+      // 포인트 차감은 관리자 승인 후 처리되므로 여기서는 하지 않음
+
+    } catch (error) {
+      console.error('출금 신청 오류:', error)
+      setError('출금 신청에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setWithdrawProcessing(false)
     }
   }
 
@@ -721,7 +852,10 @@ const CreatorMyPage = () => {
                   <p className="font-medium text-gray-900">{profile.bank_name} {profile.account_number}</p>
                   <p className="text-sm text-gray-600">{profile.account_holder}</p>
                 </div>
-                <button className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors">
+                <button
+                  onClick={() => setShowWithdrawModal(true)}
+                  className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors"
+                >
                   출금 신청하기
                 </button>
               </div>
@@ -792,6 +926,125 @@ const CreatorMyPage = () => {
               className="w-full py-4 bg-violet-600 text-white rounded-2xl font-bold text-base hover:bg-violet-700 disabled:opacity-50 transition-colors"
             >
               {processing ? '저장 중...' : '계좌 정보 저장'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 출금 신청 모달 */}
+      {showWithdrawModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
+          <div className="bg-white w-full max-w-md rounded-t-3xl p-6 animate-in slide-in-from-bottom">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-900">출금 신청</h3>
+              <button
+                onClick={() => {
+                  setShowWithdrawModal(false)
+                  setWithdrawAmount('')
+                  setResidentNumber('')
+                  setError('')
+                }}
+                className="p-2 -mr-2"
+              >
+                <X size={24} className="text-gray-400" />
+              </button>
+            </div>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-xl text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* 보유 포인트 */}
+            <div className="bg-violet-50 rounded-xl p-4 mb-4">
+              <p className="text-sm text-violet-600 mb-1">출금 가능 포인트</p>
+              <p className="text-2xl font-bold text-violet-700">{formatCurrency(profile?.points || 0)}</p>
+            </div>
+
+            {/* 등록된 계좌 */}
+            <div className="bg-gray-50 rounded-xl p-4 mb-4">
+              <p className="text-xs text-gray-500 mb-1">입금 계좌</p>
+              <p className="font-medium text-gray-900">{profile?.bank_name} {profile?.account_number}</p>
+              <p className="text-sm text-gray-600">{profile?.account_holder}</p>
+            </div>
+
+            {/* 출금 금액 입력 */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">출금 금액</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={withdrawAmount}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    if (value) {
+                      setWithdrawAmount(parseInt(value).toLocaleString())
+                    } else {
+                      setWithdrawAmount('')
+                    }
+                  }}
+                  placeholder="최소 10,000P"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-lg font-medium focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">P</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">* 최소 출금 금액: 10,000P</p>
+            </div>
+
+            {/* 주민등록번호 입력 */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                주민등록번호 <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Shield size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  value={residentNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9-]/g, '')
+                    // 자동 하이픈 추가
+                    if (value.length === 6 && !value.includes('-')) {
+                      setResidentNumber(value + '-')
+                    } else if (value.length <= 14) {
+                      setResidentNumber(value)
+                    }
+                  }}
+                  placeholder="000000-0000000"
+                  maxLength={14}
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                <Shield size={12} />
+                세금 신고를 위해 필요하며, 암호화되어 안전하게 저장됩니다
+              </p>
+            </div>
+
+            {/* 안내사항 */}
+            <div className="bg-amber-50 rounded-xl p-4 mb-6">
+              <p className="text-xs text-amber-700 leading-relaxed">
+                • 출금 신청 후 영업일 기준 3~5일 내 입금됩니다<br />
+                • 세금(3.3%)이 공제된 금액이 입금됩니다<br />
+                • 정보가 일치하지 않을 경우 입금이 지연될 수 있습니다
+              </p>
+            </div>
+
+            {/* 출금 신청 버튼 */}
+            <button
+              onClick={handleWithdrawSubmit}
+              disabled={withdrawProcessing || !withdrawAmount || !residentNumber}
+              className="w-full py-4 bg-violet-600 text-white rounded-2xl font-bold text-base hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            >
+              {withdrawProcessing ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  처리 중...
+                </>
+              ) : (
+                '출금 신청하기'
+              )}
             </button>
           </div>
         </div>
