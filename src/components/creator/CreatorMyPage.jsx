@@ -77,7 +77,17 @@ const CreatorMyPage = () => {
         .eq('id', user.id)
         .single()
 
-      setProfile(profileData)
+      // localStorage에서 계좌 정보 로드
+      const bankStorageKey = `cnec_bank_info_${user.id}`
+      const savedBankInfo = localStorage.getItem(bankStorageKey)
+      const bankInfo = savedBankInfo ? JSON.parse(savedBankInfo) : {}
+
+      setProfile({
+        ...profileData,
+        bank_name: bankInfo.bank_name || '',
+        account_number: bankInfo.account_number || '',
+        account_holder: bankInfo.account_holder || ''
+      })
       setEditForm({
         name: profileData?.name || '',
         phone: profileData?.phone || '',
@@ -90,9 +100,9 @@ const CreatorMyPage = () => {
         instagram_url: profileData?.instagram_url || '',
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
-        bank_name: profileData?.bank_name || '',
-        account_number: profileData?.account_number || '',
-        account_holder: profileData?.account_holder || ''
+        bank_name: bankInfo.bank_name || '',
+        account_number: bankInfo.account_number || '',
+        account_holder: bankInfo.account_holder || ''
       })
 
       // 지원 내역 가져오기 (조인 대신 별도 쿼리)
@@ -149,9 +159,6 @@ const CreatorMyPage = () => {
         instagram_url: editForm.instagram_url,
         tiktok_url: editForm.tiktok_url,
         youtube_url: editForm.youtube_url,
-        bank_name: editForm.bank_name,
-        account_number: editForm.account_number,
-        account_holder: editForm.account_holder,
         updated_at: new Date().toISOString()
       }
 
@@ -171,6 +178,36 @@ const CreatorMyPage = () => {
     } catch (error) {
       console.error('프로필 저장 오류:', error)
       setError('프로필 저장에 실패했습니다')
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  // 계좌 정보 저장 (localStorage)
+  const handleBankInfoSave = async () => {
+    try {
+      setProcessing(true)
+
+      const bankInfo = {
+        bank_name: editForm.bank_name,
+        account_number: editForm.account_number,
+        account_holder: editForm.account_holder,
+        updated_at: new Date().toISOString()
+      }
+
+      // localStorage에 저장
+      const bankStorageKey = `cnec_bank_info_${user.id}`
+      localStorage.setItem(bankStorageKey, JSON.stringify(bankInfo))
+
+      // profile 상태 업데이트
+      setProfile(prev => ({ ...prev, ...bankInfo }))
+      setActiveSection('dashboard')
+      setSuccess('계좌 정보가 저장되었습니다')
+      setTimeout(() => setSuccess(''), 3000)
+
+    } catch (error) {
+      console.error('계좌 정보 저장 오류:', error)
+      setError('계좌 정보 저장에 실패했습니다')
     } finally {
       setProcessing(false)
     }
@@ -750,7 +787,7 @@ const CreatorMyPage = () => {
               />
             </div>
             <button
-              onClick={handleProfileSave}
+              onClick={handleBankInfoSave}
               disabled={processing}
               className="w-full py-4 bg-violet-600 text-white rounded-2xl font-bold text-base hover:bg-violet-700 disabled:opacity-50 transition-colors"
             >
