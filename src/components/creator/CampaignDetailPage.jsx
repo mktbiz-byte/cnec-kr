@@ -22,7 +22,7 @@ const CampaignDetailPage = () => {
   const [existingApplication, setExistingApplication] = useState(null)
   const [userProfile, setUserProfile] = useState(null)
   const [liked, setLiked] = useState(false)
-  const [showGuide, setShowGuide] = useState(false)
+  const [showGuide, setShowGuide] = useState(true)
   const [showDetailImage, setShowDetailImage] = useState(false)
 
   useEffect(() => {
@@ -452,15 +452,25 @@ const CampaignDetailPage = () => {
           </h3>
 
           <div className="space-y-4">
-            {/* 상품 상세 이미지 - 클릭해서 보기 */}
+            {/* 상품 상세 이미지 - 미리보기 */}
             {campaign.product_detail_file_url && (
-              <button
-                onClick={() => setShowDetailImage(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-violet-50 border border-violet-200 rounded-xl text-sm font-medium text-violet-700 hover:bg-violet-100"
-              >
-                <FileText size={16} />
-                상품 상세 이미지 보기
-              </button>
+              <div className="relative">
+                <div className="overflow-hidden rounded-xl max-h-48">
+                  <img
+                    src={campaign.product_detail_file_url}
+                    alt="상품 상세"
+                    className="w-full object-cover object-top"
+                  />
+                  {/* 그라데이션 오버레이 */}
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
+                </div>
+                <button
+                  onClick={() => setShowDetailImage(true)}
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/90 backdrop-blur border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-white shadow-sm"
+                >
+                  상세 이미지 더보기
+                </button>
+              </div>
             )}
 
             {/* 상품 설명 */}
