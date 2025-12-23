@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { database, supabase } from '../../lib/supabase'
 import AdminNavigation from './AdminNavigation'
-import { 
-  Loader2, User, Mail, Phone, Calendar, Shield, 
-  CheckCircle, XCircle, Clock, AlertCircle, 
+import {
+  Loader2, User, Mail, Phone, Calendar, Shield,
+  CheckCircle, XCircle, Clock, AlertCircle,
   Search, Filter, RefreshCw, Eye, Edit, Crown,
   Users, UserCheck, UserX, Settings, Plus, Minus,
-  Star, Award, UserPlus, Trash2
+  Star, Award, UserPlus, Trash2, MailCheck
 } from 'lucide-react'
 
 const UserApprovalManagerEnhanced = () => {
@@ -358,13 +358,44 @@ const UserApprovalManagerEnhanced = () => {
     }
   }
 
+  // 이메일 인증 처리
+  const handleEmailVerification = async (userId, action = 'verify_email') => {
+    try {
+      setProcessing(true)
+
+      const response = await fetch('/.netlify/functions/verify-user-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setSuccess(action === 'verify_email'
+          ? '이메일이 인증 처리되었습니다.'
+          : '인증 메일이 재발송되었습니다.')
+        await loadUsers()
+      } else {
+        setError(result.error || '이메일 인증 처리 실패')
+      }
+      setTimeout(() => { setSuccess(''); setError(''); }, 3000)
+    } catch (error) {
+      console.error('이메일 인증 오류:', error)
+      setError('이메일 인증 처리 중 오류가 발생했습니다.')
+      setTimeout(() => setError(''), 3000)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
   const filteredUsers = users.filter(user => {
     const matchesStatus = !statusFilter || user.approval_status === statusFilter
     const matchesRole = !roleFilter || user.user_role === roleFilter
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     return matchesStatus && matchesRole && matchesSearch
   })
 
@@ -733,8 +764,19 @@ const UserApprovalManagerEnhanced = () => {
                             setPointModal(true)
                           }}
                           className="text-orange-600 hover:text-orange-900"
+                          title="포인트 관리"
                         >
                           <Plus className="w-4 h-4" />
+                        </button>
+
+                        {/* 이메일 인증 버튼 */}
+                        <button
+                          onClick={() => handleEmailVerification(user.user_id, 'verify_email')}
+                          disabled={processing}
+                          className="text-cyan-600 hover:text-cyan-900"
+                          title="이메일 인증 처리"
+                        >
+                          <MailCheck className="w-4 h-4" />
                         </button>
                       </td>
                     </tr>
@@ -789,6 +831,29 @@ const UserApprovalManagerEnhanced = () => {
                   </div>
                 </div>
                 
+                {/* 이메일 인증 버튼들 */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-sm font-medium text-gray-500 mb-2">이메일 인증</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEmailVerification(selectedUser.user_id, 'verify_email')}
+                      disabled={processing}
+                      className="flex-1 px-3 py-2 text-sm bg-cyan-600 text-white rounded-md hover:bg-cyan-700 disabled:opacity-50 flex items-center justify-center gap-1"
+                    >
+                      <MailCheck className="w-4 h-4" />
+                      이메일 인증 처리
+                    </button>
+                    <button
+                      onClick={() => handleEmailVerification(selectedUser.user_id, 'resend_verification')}
+                      disabled={processing}
+                      className="flex-1 px-3 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 flex items-center justify-center gap-1"
+                    >
+                      <Mail className="w-4 h-4" />
+                      인증메일 재발송
+                    </button>
+                  </div>
+                </div>
+
                 <div className="mt-6 flex justify-end">
                   <button
                     onClick={() => setDetailModal(false)}
