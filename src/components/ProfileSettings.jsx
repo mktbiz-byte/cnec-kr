@@ -346,10 +346,7 @@ const ProfileSettings = () => {
   const handleAddressSearch = () => {
     if (typeof window === 'undefined') return
 
-    // 다음 우편번호 스크립트 로드
-    const script = document.createElement('script')
-    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
-    script.onload = () => {
+    const executePostcode = () => {
       new window.daum.Postcode({
         oncomplete: function(data) {
           // 우편번호와 주소 정보 설정
@@ -371,10 +368,27 @@ const ProfileSettings = () => {
             postcode: data.zonecode,
             address: fullAddress
           }))
-        }
-      }).open()
+        },
+        // 모바일 최적화 옵션
+        width: '100%',
+        height: '100%'
+      }).open({
+        // 모바일에서 팝업 대신 현재 창에서 열기
+        popupKey: 'postcodePopup',
+        autoClose: true
+      })
     }
-    document.head.appendChild(script)
+
+    // 스크립트가 이미 로드되어 있는지 확인
+    if (window.daum && window.daum.Postcode) {
+      executePostcode()
+    } else {
+      // 다음 우편번호 스크립트 로드
+      const script = document.createElement('script')
+      script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+      script.onload = executePostcode
+      document.head.appendChild(script)
+    }
   }
 
   // 프로필 사진 업로드
