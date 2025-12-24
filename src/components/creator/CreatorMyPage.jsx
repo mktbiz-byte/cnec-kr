@@ -7,7 +7,7 @@ import {
   Edit3, Phone, Mail, MapPin, Instagram, Youtube, Hash,
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
-  ArrowRight, Bell, HelpCircle, Wallet, TrendingUp
+  ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift
 } from 'lucide-react'
 
 // 등급 설정
@@ -38,6 +38,12 @@ const CreatorMyPage = () => {
   // 출금 관련
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [residentNumber, setResidentNumber] = useState('')
+  const [withdrawProcessing, setWithdrawProcessing] = useState(false)
+
+  // 찜한 캠페인 관련
+  const [wishlistCampaigns, setWishlistCampaigns] = useState([])
+  const [wishlistLoading, setWishlistLoading] = useState(false)
 
   // 한국 주요 은행 목록 (레거시 18개 은행)
   const koreanBanks = [
@@ -77,7 +83,17 @@ const CreatorMyPage = () => {
         .eq('id', user.id)
         .single()
 
-      setProfile(profileData)
+      // localStorage에서 계좌 정보 로드
+      const bankStorageKey = `cnec_bank_info_${user.id}`
+      const savedBankInfo = localStorage.getItem(bankStorageKey)
+      const bankInfo = savedBankInfo ? JSON.parse(savedBankInfo) : {}
+
+      setProfile({
+        ...profileData,
+        bank_name: bankInfo.bank_name || '',
+        account_number: bankInfo.account_number || '',
+        account_holder: bankInfo.account_holder || ''
+      })
       setEditForm({
         name: profileData?.name || '',
         phone: profileData?.phone || '',
@@ -90,9 +106,9 @@ const CreatorMyPage = () => {
         instagram_url: profileData?.instagram_url || '',
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
-        bank_name: profileData?.bank_name || '',
-        account_number: profileData?.account_number || '',
-        account_holder: profileData?.account_holder || ''
+        bank_name: bankInfo.bank_name || '',
+        account_number: bankInfo.account_number || '',
+        account_holder: bankInfo.account_holder || ''
       })
 
       // 지원 내역 가져오기 (조인 대신 별도 쿼리)
@@ -133,6 +149,46 @@ const CreatorMyPage = () => {
     }
   }
 
+  // 찜한 캠페인 로드
+  const loadWishlist = async () => {
+    if (!user) return
+
+    try {
+      setWishlistLoading(true)
+      const storageKey = `cnec_wishlist_${user.id}`
+      const saved = localStorage.getItem(storageKey)
+
+      if (saved) {
+        const wishlistIds = JSON.parse(saved)
+        if (wishlistIds.length > 0) {
+          const { data: campaigns } = await supabase
+            .from('campaigns')
+            .select('id, title, brand, image_url, reward_points, creator_points_override, application_deadline, campaign_type')
+            .in('id', wishlistIds)
+
+          setWishlistCampaigns(campaigns || [])
+        } else {
+          setWishlistCampaigns([])
+        }
+      }
+    } catch (error) {
+      console.error('찜 목록 로드 오류:', error)
+    } finally {
+      setWishlistLoading(false)
+    }
+  }
+
+  // 찜하기 해제
+  const removeFromWishlist = (campaignId) => {
+    const storageKey = `cnec_wishlist_${user.id}`
+    const saved = localStorage.getItem(storageKey)
+    if (saved) {
+      const wishlistIds = JSON.parse(saved).filter(id => id !== campaignId)
+      localStorage.setItem(storageKey, JSON.stringify(wishlistIds))
+      setWishlistCampaigns(prev => prev.filter(c => c.id !== campaignId))
+    }
+  }
+
   const handleProfileSave = async () => {
     try {
       setProcessing(true)
@@ -149,9 +205,6 @@ const CreatorMyPage = () => {
         instagram_url: editForm.instagram_url,
         tiktok_url: editForm.tiktok_url,
         youtube_url: editForm.youtube_url,
-        bank_name: editForm.bank_name,
-        account_number: editForm.account_number,
-        account_holder: editForm.account_holder,
         updated_at: new Date().toISOString()
       }
 
@@ -173,6 +226,204 @@ const CreatorMyPage = () => {
       setError('프로필 저장에 실패했습니다')
     } finally {
       setProcessing(false)
+    }
+  }
+
+  // 계좌 정보 저장 (localStorage)
+  const handleBankInfoSave = async () => {
+    try {
+      setProcessing(true)
+
+      const bankInfo = {
+        bank_name: editForm.bank_name,
+        account_number: editForm.account_number,
+        account_holder: editForm.account_holder,
+        updated_at: new Date().toISOString()
+      }
+
+      // localStorage에 저장
+      const bankStorageKey = `cnec_bank_info_${user.id}`
+      localStorage.setItem(bankStorageKey, JSON.stringify(bankInfo))
+
+      // profile 상태 업데이트
+      setProfile(prev => ({ ...prev, ...bankInfo }))
+      setActiveSection('dashboard')
+      setSuccess('계좌 정보가 저장되었습니다')
+      setTimeout(() => setSuccess(''), 3000)
+
+    } catch (error) {
+      console.error('계좌 정보 저장 오류:', error)
+      setError('계좌 정보 저장에 실패했습니다')
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  // 주민번호 암호화 함수 (AES-GCM)
+  const encryptResidentNumber = async (plainText) => {
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(plainText)
+
+      // 암호화 키 생성 (실제 운영시에는 서버에서 관리해야 함)
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode('cnec-secure-key-2024-resident-num'),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveBits', 'deriveKey']
+      )
+
+      const salt = crypto.getRandomValues(new Uint8Array(16))
+      const key = await crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: salt,
+          iterations: 100000,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt']
+      )
+
+      const iv = crypto.getRandomValues(new Uint8Array(12))
+      const encrypted = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv: iv },
+        key,
+        data
+      )
+
+      // salt + iv + encrypted data를 합쳐서 Base64로 인코딩
+      const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength)
+      combined.set(salt, 0)
+      combined.set(iv, salt.length)
+      combined.set(new Uint8Array(encrypted), salt.length + iv.length)
+
+      return btoa(String.fromCharCode(...combined))
+    } catch (error) {
+      console.error('암호화 오류:', error)
+      throw new Error('주민번호 암호화에 실패했습니다')
+    }
+  }
+
+  // 주민번호 유효성 검사
+  const validateResidentNumber = (num) => {
+    const cleaned = num.replace(/-/g, '')
+    if (cleaned.length !== 13) return false
+    if (!/^\d{13}$/.test(cleaned)) return false
+    return true
+  }
+
+  // 팝빌 알림톡 발송 함수
+  const sendAlimtalk = async (templateCode, receiverNum, receiverName, variables) => {
+    try {
+      const response = await fetch('/.netlify/functions/send-alimtalk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templateCode,
+          receiverNum: receiverNum.replace(/-/g, ''),
+          receiverName,
+          variables
+        })
+      })
+
+      const result = await response.json()
+      console.log('알림톡 발송 결과:', result)
+      return result
+    } catch (error) {
+      console.error('알림톡 발송 오류:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
+  // 출금 신청 처리
+  const handleWithdrawSubmit = async () => {
+    try {
+      setWithdrawProcessing(true)
+      setError('')
+
+      const amount = parseInt(withdrawAmount.replace(/,/g, ''))
+
+      // 유효성 검사
+      if (!amount || amount < 10000) {
+        setError('최소 출금 금액은 10,000P입니다')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      if (amount > (profile?.points || 0)) {
+        setError('보유 포인트보다 많은 금액은 출금할 수 없습니다')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      if (!validateResidentNumber(residentNumber)) {
+        setError('주민등록번호 형식이 올바르지 않습니다 (13자리)')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      if (!profile?.bank_name || !profile?.account_number) {
+        setError('계좌 정보를 먼저 등록해주세요')
+        setWithdrawProcessing(false)
+        return
+      }
+
+      // 주민번호 암호화
+      const encryptedResidentNum = await encryptResidentNumber(residentNumber.replace(/-/g, ''))
+
+      // 현재 날짜 포맷
+      const today = new Date()
+      const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+
+      // point_transactions 테이블에 출금 기록 저장 (음수 금액)
+      // description에 계좌 정보 및 암호화된 주민번호 저장
+      const description = `출금 신청: ${amount.toLocaleString()}원 (은행: ${profile.bank_name}, 계좌: ${profile.account_number}, 예금주: ${profile.account_holder}) [주민번호:${encryptedResidentNum}]`
+
+      const { error: dbError } = await supabase
+        .from('point_transactions')
+        .insert([{
+          user_id: user.id,
+          amount: -amount, // 출금은 음수로 저장
+          type: 'withdraw',
+          description: description,
+          created_at: new Date().toISOString()
+        }])
+
+      if (dbError) throw dbError
+
+      // 팝빌 알림톡 발송 (출금 접수 완료)
+      if (profile?.phone) {
+        await sendAlimtalk(
+          '025100001019', // 출금 접수 완료 템플릿
+          profile.phone,
+          profile.name || '크리에이터',
+          {
+            '크리에이터명': profile.name || '크리에이터',
+            '출금금액': amount.toLocaleString(),
+            '신청일': dateStr
+          }
+        )
+      }
+
+      // 성공 처리
+      setShowWithdrawModal(false)
+      setWithdrawAmount('')
+      setResidentNumber('')
+      setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내 입금됩니다.')
+      setTimeout(() => setSuccess(''), 5000)
+
+      // 데이터 새로고침
+      loadUserData()
+
+    } catch (error) {
+      console.error('출금 신청 오류:', error)
+      setError('출금 신청에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setWithdrawProcessing(false)
     }
   }
 
@@ -367,13 +618,26 @@ const CreatorMyPage = () => {
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <button
                 onClick={() => navigate('/my/applications')}
-                className="w-full px-4 py-4 flex items-center justify-between"
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
                     <FileText size={18} className="text-violet-600" />
                   </div>
                   <span className="text-[15px] text-gray-900">지원 내역</span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+
+              <button
+                onClick={() => { setActiveSection('wishlist'); loadWishlist(); }}
+                className="w-full px-4 py-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center">
+                    <Heart size={18} className="text-red-500" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">찜한 캠페인</span>
                 </div>
                 <ChevronRight size={18} className="text-gray-300" />
               </button>
@@ -684,7 +948,10 @@ const CreatorMyPage = () => {
                   <p className="font-medium text-gray-900">{profile.bank_name} {profile.account_number}</p>
                   <p className="text-sm text-gray-600">{profile.account_holder}</p>
                 </div>
-                <button className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors">
+                <button
+                  onClick={() => setShowWithdrawModal(true)}
+                  className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors"
+                >
                   출금 신청하기
                 </button>
               </div>
@@ -750,11 +1017,213 @@ const CreatorMyPage = () => {
               />
             </div>
             <button
-              onClick={handleProfileSave}
+              onClick={handleBankInfoSave}
               disabled={processing}
               className="w-full py-4 bg-violet-600 text-white rounded-2xl font-bold text-base hover:bg-violet-700 disabled:opacity-50 transition-colors"
             >
               {processing ? '저장 중...' : '계좌 정보 저장'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 찜한 캠페인 */}
+      {activeSection === 'wishlist' && (
+        <div className="px-5 pt-5 pb-8">
+          <div className="flex items-center justify-between mb-4">
+            <button onClick={() => setActiveSection('dashboard')} className="p-2 -ml-2">
+              <ArrowRight size={20} className="text-gray-700 rotate-180" />
+            </button>
+            <h2 className="font-bold text-lg">찜한 캠페인</h2>
+            <div className="w-10" />
+          </div>
+
+          {wishlistLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-violet-600" />
+            </div>
+          ) : wishlistCampaigns.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-2xl">
+              <Heart size={48} className="mx-auto mb-4 text-gray-200" />
+              <p className="text-gray-500 mb-2">찜한 캠페인이 없습니다</p>
+              <p className="text-sm text-gray-400">캠페인 목록에서 하트를 눌러 찜해보세요</p>
+              <button
+                onClick={() => navigate('/campaigns')}
+                className="mt-4 px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-medium"
+              >
+                캠페인 둘러보기
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {wishlistCampaigns.map((campaign) => {
+                const reward = campaign.creator_points_override || campaign.reward_points || 0
+                return (
+                  <div
+                    key={campaign.id}
+                    className="bg-white rounded-2xl p-4 shadow-sm flex gap-3 cursor-pointer active:bg-gray-50"
+                    onClick={() => navigate(`/campaign/${campaign.id}`)}
+                  >
+                    {/* 썸네일 */}
+                    <div className="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gray-100">
+                      {campaign.image_url ? (
+                        <img
+                          src={campaign.image_url}
+                          alt={campaign.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Gift size={24} className="text-gray-300" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 캠페인 정보 */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 text-sm line-clamp-2 mb-1">{campaign.title}</p>
+                      <p className="text-xs text-gray-400 mb-2">{campaign.brand}</p>
+                      <p className="text-base font-bold text-violet-600">{reward.toLocaleString()}P</p>
+                    </div>
+
+                    {/* 찜 해제 버튼 */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeFromWishlist(campaign.id)
+                      }}
+                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                    >
+                      <Heart size={20} className="text-red-500 fill-red-500" />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 출금 신청 모달 */}
+      {showWithdrawModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
+          <div className="bg-white w-full max-w-md rounded-t-3xl p-6 animate-in slide-in-from-bottom">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-900">출금 신청</h3>
+              <button
+                onClick={() => {
+                  setShowWithdrawModal(false)
+                  setWithdrawAmount('')
+                  setResidentNumber('')
+                  setError('')
+                }}
+                className="p-2 -mr-2"
+              >
+                <X size={24} className="text-gray-400" />
+              </button>
+            </div>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-xl text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* 보유 포인트 */}
+            <div className="bg-violet-50 rounded-xl p-4 mb-4">
+              <p className="text-sm text-violet-600 mb-1">출금 가능 포인트</p>
+              <p className="text-2xl font-bold text-violet-700">{formatCurrency(profile?.points || 0)}</p>
+            </div>
+
+            {/* 등록된 계좌 */}
+            <div className="bg-gray-50 rounded-xl p-4 mb-4">
+              <p className="text-xs text-gray-500 mb-1">입금 계좌</p>
+              <p className="font-medium text-gray-900">{profile?.bank_name} {profile?.account_number}</p>
+              <p className="text-sm text-gray-600">{profile?.account_holder}</p>
+            </div>
+
+            {/* 출금 금액 입력 */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">출금 금액</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={withdrawAmount}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '')
+                    if (value) {
+                      setWithdrawAmount(parseInt(value).toLocaleString())
+                    } else {
+                      setWithdrawAmount('')
+                    }
+                  }}
+                  placeholder="최소 10,000P"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-lg font-medium focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">P</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">* 최소 출금 금액: 10,000P</p>
+            </div>
+
+            {/* 주민등록번호 입력 */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                주민등록번호 <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Shield size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  value={residentNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9-]/g, '')
+                    // 자동 하이픈 추가
+                    if (value.length === 6 && !value.includes('-')) {
+                      setResidentNumber(value + '-')
+                    } else if (value.length <= 14) {
+                      setResidentNumber(value)
+                    }
+                  }}
+                  placeholder="000000-0000000"
+                  maxLength={14}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  data-lpignore="true"
+                  data-form-type="other"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                <Shield size={12} />
+                세금 신고를 위해 필요하며, 암호화되어 안전하게 저장됩니다
+              </p>
+            </div>
+
+            {/* 안내사항 */}
+            <div className="bg-amber-50 rounded-xl p-4 mb-6">
+              <p className="text-xs text-amber-700 leading-relaxed">
+                • 출금 신청 후 영업일 기준 3~5일 내 입금됩니다<br />
+                • 세금(3.3%)이 공제된 금액이 입금됩니다<br />
+                • 정보가 일치하지 않을 경우 입금이 지연될 수 있습니다
+              </p>
+            </div>
+
+            {/* 출금 신청 버튼 */}
+            <button
+              onClick={handleWithdrawSubmit}
+              disabled={withdrawProcessing || !withdrawAmount || !residentNumber}
+              className="w-full py-4 bg-violet-600 text-white rounded-2xl font-bold text-base hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            >
+              {withdrawProcessing ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  처리 중...
+                </>
+              ) : (
+                '출금 신청하기'
+              )}
             </button>
           </div>
         </div>

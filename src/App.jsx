@@ -32,6 +32,7 @@ import AuthCallbackSafe from './components/AuthCallbackSafe';
 import HomePageExactReplica from './components/HomePageExactReplica';
 import MyPageKoreaEnhanced from './components/MyPageKoreaEnhanced';
 import ProfileSettings from './components/ProfileSettings';
+import NotificationSettings from './components/NotificationSettings';
 import CampaignApplicationUpdated from './components/CampaignApplicationUpdated';
 import CompanyReportNew from './components/CompanyReportNew';
 import CNECPlusPageEnhanced from './components/CNECPlusPageEnhanced';
@@ -107,6 +108,7 @@ const AppContent = () => {
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
         <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/settings/notifications" element={<NotificationSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/submit-video/:campaignId" element={<VideoSubmissionPage />} />

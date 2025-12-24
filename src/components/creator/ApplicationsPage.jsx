@@ -27,6 +27,79 @@ const renderValue = (value) => {
   return String(value)
 }
 
+// 촬영 장면 구성 카드 렌더링 컴포넌트 (모바일 최적화)
+const ShootingScenesTable = ({ scenes }) => {
+  if (!scenes || !Array.isArray(scenes) || scenes.length === 0) return null
+
+  return (
+    <div className="rounded-2xl bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100 p-4">
+      {/* 헤더 */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="bg-purple-600 p-1.5 rounded-lg">
+          <Video size={14} className="text-white" />
+        </div>
+        <span className="font-bold text-purple-900 text-sm">촬영 장면 구성</span>
+        <span className="ml-auto text-xs text-purple-600 font-medium bg-purple-100 px-2 py-0.5 rounded-full">
+          {scenes.length}개
+        </span>
+      </div>
+
+      {/* 안내 문구 */}
+      <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-4">
+        <p className="text-xs text-red-600 font-medium leading-relaxed">
+          💡 본 대사와 촬영 장면은 크리에이터님의 스타일에 맞게 자유롭게 변경하여 촬영해 주세요!
+        </p>
+      </div>
+
+      {/* 장면 카드 리스트 */}
+      <div className="space-y-3">
+        {scenes.map((scene, idx) => (
+          <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-sm border border-purple-100">
+            {/* 장면 헤더 */}
+            <div className="bg-gradient-to-r from-purple-600 to-violet-600 px-3 py-2 flex items-center gap-2">
+              <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded">
+                {scene.order || idx + 1}
+              </span>
+              <span className="text-white font-medium text-sm">{scene.scene_type || '장면'}</span>
+            </div>
+
+            {/* 장면 내용 */}
+            <div className="p-3 space-y-2.5">
+              {/* 촬영 장면 설명 */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">촬영 장면</span>
+                </div>
+                <p className="text-sm text-gray-800 leading-relaxed">{scene.scene_description || '-'}</p>
+              </div>
+
+              {/* 대사 */}
+              {scene.dialogue && (
+                <div className="bg-amber-50 rounded-lg p-2.5 border-l-3 border-amber-400">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">💬 대사/자막</span>
+                  </div>
+                  <p className="text-sm text-amber-900 italic leading-relaxed">"{scene.dialogue}"</p>
+                </div>
+              )}
+
+              {/* 촬영 팁 */}
+              {scene.shooting_tip && (
+                <div className="bg-emerald-50 rounded-lg p-2.5 border-l-3 border-emerald-400">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">💡 촬영 팁</span>
+                  </div>
+                  <p className="text-sm text-emerald-800 leading-relaxed">{scene.shooting_tip}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const ApplicationsPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -871,9 +944,17 @@ const ApplicationsPage = () => {
                     if (isObject) {
                       const entries = Object.entries(guideData)
                       const colorOrder = ['blue', 'green', 'purple', 'orange']
-                      return entries.map(([key, value], idx) =>
-                        renderGuideSection(key, value, colorOrder[idx % colorOrder.length])
-                      )
+                      let colorIdx = 0
+                      return entries.map(([key, value], idx) => {
+                        // shooting_scenes는 특별한 테이블로 렌더링
+                        if (key === 'shooting_scenes' && Array.isArray(value)) {
+                          return <ShootingScenesTable key={key} scenes={value} />
+                        }
+                        // 다른 섹션은 기존 방식으로 렌더링
+                        const color = colorOrder[colorIdx % colorOrder.length]
+                        colorIdx++
+                        return renderGuideSection(key, value, color)
+                      })
                     }
 
                     return (
@@ -978,6 +1059,42 @@ const ApplicationsPage = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* 올리브영 가이드 내 shooting_scenes 테이블 */}
+                  {(() => {
+                    // 각 스텝 가이드에서 shooting_scenes 찾기
+                    const allScenes = []
+                    const guides = [
+                      selectedGuide.campaigns?.oliveyoung_step1_guide_ai,
+                      selectedGuide.campaigns?.oliveyoung_step2_guide_ai,
+                      selectedGuide.campaigns?.oliveyoung_step3_guide_ai
+                    ]
+                    guides.forEach((guideStr) => {
+                      if (guideStr) {
+                        try {
+                          const parsed = typeof guideStr === 'string' ? JSON.parse(guideStr) : guideStr
+                          if (parsed?.shooting_scenes && Array.isArray(parsed.shooting_scenes)) {
+                            allScenes.push(...parsed.shooting_scenes)
+                          }
+                        } catch (e) {}
+                      }
+                    })
+                    // ai_generated_guide에서도 확인
+                    if (selectedGuide.campaigns?.ai_generated_guide) {
+                      try {
+                        const aiGuide = typeof selectedGuide.campaigns.ai_generated_guide === 'string'
+                          ? JSON.parse(selectedGuide.campaigns.ai_generated_guide)
+                          : selectedGuide.campaigns.ai_generated_guide
+                        if (aiGuide?.shooting_scenes && Array.isArray(aiGuide.shooting_scenes)) {
+                          allScenes.push(...aiGuide.shooting_scenes)
+                        }
+                      } catch (e) {}
+                    }
+                    if (allScenes.length > 0) {
+                      return <ShootingScenesTable scenes={allScenes} />
+                    }
+                    return null
+                  })()}
                 </div>
               )}
 
@@ -1034,6 +1151,38 @@ const ApplicationsPage = () => {
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">{renderValue(guides)}</p>
                       </div>
                     )
+                  })()}
+
+                  {/* 4주 챌린지 가이드 내 shooting_scenes 테이블 */}
+                  {(() => {
+                    const allScenes = []
+                    // 주차별 가이드에서 shooting_scenes 찾기
+                    let weeklyGuides = selectedGuide.campaigns?.challenge_weekly_guides_ai
+                    if (typeof weeklyGuides === 'string') {
+                      try { weeklyGuides = JSON.parse(weeklyGuides) } catch (e) { weeklyGuides = null }
+                    }
+                    if (Array.isArray(weeklyGuides)) {
+                      weeklyGuides.forEach((g) => {
+                        if (typeof g === 'object' && g?.shooting_scenes && Array.isArray(g.shooting_scenes)) {
+                          allScenes.push(...g.shooting_scenes)
+                        }
+                      })
+                    }
+                    // ai_generated_guide에서도 확인
+                    if (selectedGuide.campaigns?.ai_generated_guide) {
+                      try {
+                        const aiGuide = typeof selectedGuide.campaigns.ai_generated_guide === 'string'
+                          ? JSON.parse(selectedGuide.campaigns.ai_generated_guide)
+                          : selectedGuide.campaigns.ai_generated_guide
+                        if (aiGuide?.shooting_scenes && Array.isArray(aiGuide.shooting_scenes)) {
+                          allScenes.push(...aiGuide.shooting_scenes)
+                        }
+                      } catch (e) {}
+                    }
+                    if (allScenes.length > 0) {
+                      return <ShootingScenesTable scenes={allScenes} />
+                    }
+                    return null
                   })()}
                 </div>
               )}
@@ -1268,6 +1417,11 @@ const ApplicationsPage = () => {
                               <AlertCircle size={18} className="flex-shrink-0" />
                               <span className="font-medium">유료광고 표시 필요</span>
                             </div>
+                          )}
+
+                          {/* 촬영 장면 구성 (ai_generated_guide에 포함된 경우) */}
+                          {guide.shooting_scenes && Array.isArray(guide.shooting_scenes) && guide.shooting_scenes.length > 0 && (
+                            <ShootingScenesTable scenes={guide.shooting_scenes} />
                           )}
                         </>
                       )

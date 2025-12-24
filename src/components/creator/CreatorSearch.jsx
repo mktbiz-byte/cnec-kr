@@ -21,6 +21,7 @@ const CreatorSearch = ({ onCampaignClick }) => {
   const [visibleCampaigns, setVisibleCampaigns] = useState([])
   const [appliedCampaignIds, setAppliedCampaignIds] = useState([])
   const [hasMore, setHasMore] = useState(true)
+  const [wishlist, setWishlist] = useState([])
 
   const observerRef = useRef(null)
   const loadMoreRef = useRef(null)
@@ -28,6 +29,7 @@ const CreatorSearch = ({ onCampaignClick }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [sortBy, setSortBy] = useState('latest')
+  const [excludeClosingSoon, setExcludeClosingSoon] = useState(false)
 
   // 카테고리 탭 (고정형, 스크롤 없음)
   const categories = [
@@ -37,13 +39,45 @@ const CreatorSearch = ({ onCampaignClick }) => {
     { id: '4week_challenge', label: '4주챌린지' }
   ]
 
+  // 찜목록 로드
+  useEffect(() => {
+    if (user) {
+      const storageKey = `cnec_wishlist_${user.id}`
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        setWishlist(JSON.parse(saved))
+      }
+    }
+  }, [user])
+
+  // 찜하기 토글
+  const toggleWishlist = (e, campaignId) => {
+    e.stopPropagation()
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    const storageKey = `cnec_wishlist_${user.id}`
+    let newWishlist
+
+    if (wishlist.includes(campaignId)) {
+      newWishlist = wishlist.filter(id => id !== campaignId)
+    } else {
+      newWishlist = [...wishlist, campaignId]
+    }
+
+    setWishlist(newWishlist)
+    localStorage.setItem(storageKey, JSON.stringify(newWishlist))
+  }
+
   useEffect(() => {
     loadCampaigns()
   }, [user])
 
   useEffect(() => {
     filterCampaigns()
-  }, [campaigns, searchQuery, selectedCategory, sortBy, appliedCampaignIds])
+  }, [campaigns, searchQuery, selectedCategory, sortBy, appliedCampaignIds, excludeClosingSoon])
 
   useEffect(() => {
     setVisibleCampaigns(filteredCampaigns.slice(0, ITEMS_PER_PAGE))
@@ -150,6 +184,14 @@ const CreatorSearch = ({ onCampaignClick }) => {
       result = result.filter(c => c.campaign_type === selectedCategory)
     }
 
+    // 선착순 마감 제외 필터
+    if (excludeClosingSoon) {
+      result = result.filter(c => {
+        const days = getDaysUntilDeadline(c.application_deadline)
+        return days === null || days > 3
+      })
+    }
+
     switch (sortBy) {
       case 'reward_high':
         result.sort((a, b) => {
@@ -172,6 +214,20 @@ const CreatorSearch = ({ onCampaignClick }) => {
     }
 
     setFilteredCampaigns(result)
+  }
+
+  // D-day 배지 텍스트 및 스타일
+  const getDdayBadge = (deadline) => {
+    const days = getDaysUntilDeadline(deadline)
+    if (days === null) return null
+
+    if (days < 0) return null
+    if (days === 0) return { text: 'D-DAY', style: 'bg-red-500 text-white' }
+    if (days === 1) return { text: 'D-1', style: 'bg-red-500 text-white' }
+    if (days === 2) return { text: 'D-2', style: 'bg-orange-500 text-white' }
+    if (days === 3) return { text: 'D-3', style: 'bg-orange-400 text-white' }
+    if (days <= 7) return { text: '마감임박', style: 'bg-amber-400 text-white' }
+    return null
   }
 
   const formatPrice = (amount) => {
@@ -241,8 +297,13 @@ const CreatorSearch = ({ onCampaignClick }) => {
 
       {/* 정렬 옵션 */}
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600" />
+        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={excludeClosingSoon}
+            onChange={(e) => setExcludeClosingSoon(e.target.checked)}
+            className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+          />
           선착순 마감 제외
         </label>
         <select
@@ -273,6 +334,8 @@ const CreatorSearch = ({ onCampaignClick }) => {
             const reward = campaign.creator_points_override || campaign.reward_points || 0
             const originalPrice = campaign.product_price || reward * 1.5
             const paybackPercent = originalPrice > 0 ? Math.round((reward / originalPrice) * 100) : 0
+            const ddayBadge = getDdayBadge(campaign.application_deadline)
+            const isWishlisted = wishlist.includes(campaign.id)
 
             return (
               <div
@@ -295,12 +358,23 @@ const CreatorSearch = ({ onCampaignClick }) => {
                       <Gift size={32} className="text-gray-300" />
                     </div>
                   )}
-                  {/* 하트 버튼 */}
+                  {/* D-day 배지 */}
+                  {ddayBadge && (
+                    <div className={`absolute top-2 left-2 px-2 py-1 rounded-md text-xs font-bold shadow-sm ${ddayBadge.style}`}>
+                      {ddayBadge.text}
+                    </div>
+                  )}
+                  {/* 하트 버튼 (찜하기) */}
                   <button
-                    className="absolute top-2 right-2 w-7 h-7 bg-white/80 rounded-full flex items-center justify-center"
-                    onClick={(e) => e.stopPropagation()}
+                    className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                      isWishlisted ? 'bg-red-500' : 'bg-white/80'
+                    }`}
+                    onClick={(e) => toggleWishlist(e, campaign.id)}
                   >
-                    <Heart size={16} className="text-gray-400" />
+                    <Heart
+                      size={16}
+                      className={isWishlisted ? 'text-white fill-white' : 'text-gray-400'}
+                    />
                   </button>
                 </div>
 
