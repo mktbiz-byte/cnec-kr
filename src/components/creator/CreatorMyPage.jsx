@@ -277,7 +277,7 @@ const CreatorMyPage = () => {
           setSuccess('계좌 인증이 완료되었습니다. 예금주가 일치합니다.')
           setTimeout(() => setSuccess(''), 3000)
         } else {
-          setError(`예금주가 일치하지 않습니다. 입력: "${editForm.account_holder}" / 실제: "${result.accountName}"`)
+          setError('예금주가 일치하지 않습니다. 입력하신 이름을 다시 확인해주세요.')
         }
       } else {
         setError(result.error || '계좌 인증에 실패했습니다')
