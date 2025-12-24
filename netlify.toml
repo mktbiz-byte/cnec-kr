@@ -64,5 +64,9 @@
 [functions]
   directory = "netlify/functions/"
   node_bundler = "esbuild"
-  external_node_modules = ["axios", "nodemailer", "@supabase/supabase-js"]
+  external_node_modules = ["axios", "nodemailer", "@supabase/supabase-js", "googleapis"]
+
+# 주간 출금 보고서 스케줄 함수 (매주 월요일 오전 10시 KST = 01:00 UTC)
+[functions."weekly-withdrawal-report"]
+  schedule = "0 1 * * 1"
 
