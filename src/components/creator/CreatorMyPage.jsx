@@ -234,7 +234,7 @@ const CreatorMyPage = () => {
     }
   }
 
-  // 팝빌 계좌 인증 함수
+  // 팝빌 계좌 인증 함수 (입력한 예금주와 실제 예금주 일치 여부 확인)
   const verifyBankAccount = async () => {
     try {
       setAccountVerifying(true)
@@ -244,6 +244,12 @@ const CreatorMyPage = () => {
 
       if (!editForm.bank_name || !editForm.account_number) {
         setError('은행과 계좌번호를 입력해주세요')
+        setAccountVerifying(false)
+        return
+      }
+
+      if (!editForm.account_holder || editForm.account_holder.trim() === '') {
+        setError('예금주명을 입력해주세요')
         setAccountVerifying(false)
         return
       }
@@ -261,11 +267,18 @@ const CreatorMyPage = () => {
       console.log('계좌 인증 결과:', result)
 
       if (result.success && result.accountName) {
-        setAccountVerified(true)
-        setVerifiedAccountHolder(result.accountName)
-        setEditForm(prev => ({ ...prev, account_holder: result.accountName }))
-        setSuccess('계좌 인증이 완료되었습니다')
-        setTimeout(() => setSuccess(''), 3000)
+        // 입력한 예금주와 실제 예금주 비교 (공백 제거 후 비교)
+        const inputHolder = editForm.account_holder.trim().replace(/\s/g, '')
+        const actualHolder = result.accountName.trim().replace(/\s/g, '')
+
+        if (inputHolder === actualHolder) {
+          setAccountVerified(true)
+          setVerifiedAccountHolder(result.accountName)
+          setSuccess('계좌 인증이 완료되었습니다. 예금주가 일치합니다.')
+          setTimeout(() => setSuccess(''), 3000)
+        } else {
+          setError(`예금주가 일치하지 않습니다. 입력: "${editForm.account_holder}" / 실제: "${result.accountName}"`)
+        }
       } else {
         setError(result.error || '계좌 인증에 실패했습니다')
       }
@@ -1046,7 +1059,7 @@ const CreatorMyPage = () => {
             <div className="flex items-start gap-2">
               <Shield size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-blue-700">
-                팝빌 계좌 인증을 통해 예금주를 확인합니다. 인증된 계좌만 등록할 수 있습니다.
+                계좌 정보와 예금주명을 입력 후 인증하기를 눌러주세요. 입력한 예금주와 실제 예금주가 일치해야 등록됩니다.
               </p>
             </div>
           </div>
@@ -1073,61 +1086,62 @@ const CreatorMyPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">계좌번호 *</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={editForm.account_number}
-                  onChange={(e) => {
-                    setEditForm({...editForm, account_number: e.target.value.replace(/[^0-9]/g, '')})
-                    setAccountVerified(false)
-                    setVerifiedAccountHolder('')
-                  }}
-                  disabled={accountVerifying}
-                  className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-50"
-                  placeholder="'-' 없이 숫자만 입력"
-                />
-                <button
-                  onClick={verifyBankAccount}
-                  disabled={accountVerifying || !editForm.bank_name || !editForm.account_number}
-                  className="px-4 py-3 bg-gray-900 text-white rounded-xl font-medium text-sm hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 whitespace-nowrap"
-                >
-                  {accountVerifying ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      인증중
-                    </>
-                  ) : (
-                    '인증하기'
-                  )}
-                </button>
-              </div>
+              <input
+                type="text"
+                value={editForm.account_number}
+                onChange={(e) => {
+                  setEditForm({...editForm, account_number: e.target.value.replace(/[^0-9]/g, '')})
+                  setAccountVerified(false)
+                  setVerifiedAccountHolder('')
+                }}
+                disabled={accountVerifying}
+                className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-50"
+                placeholder="'-' 없이 숫자만 입력"
+              />
             </div>
+
+            {/* 예금주 입력 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">예금주 *</label>
+              <input
+                type="text"
+                value={editForm.account_holder}
+                onChange={(e) => {
+                  setEditForm({...editForm, account_holder: e.target.value})
+                  setAccountVerified(false)
+                  setVerifiedAccountHolder('')
+                }}
+                disabled={accountVerifying}
+                className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-50"
+                placeholder="실명을 정확히 입력해주세요"
+              />
+            </div>
+
+            {/* 인증 버튼 */}
+            <button
+              onClick={verifyBankAccount}
+              disabled={accountVerifying || !editForm.bank_name || !editForm.account_number || !editForm.account_holder}
+              className="w-full py-3 bg-gray-900 text-white rounded-xl font-medium text-sm hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            >
+              {accountVerifying ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  예금주 확인 중...
+                </>
+              ) : (
+                '예금주 인증하기'
+              )}
+            </button>
 
             {/* 인증 결과 표시 */}
             {accountVerified && verifiedAccountHolder && (
               <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2">
                   <CheckCircle size={18} className="text-green-600" />
-                  <span className="font-medium text-green-700">계좌 인증 완료</span>
-                </div>
-                <div className="text-sm text-green-700">
-                  <p>예금주: <span className="font-bold">{verifiedAccountHolder}</span></p>
+                  <span className="font-medium text-green-700">예금주 인증 완료 - {verifiedAccountHolder}</span>
                 </div>
               </div>
             )}
-
-            {/* 예금주 (인증 후 자동 입력) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">예금주</label>
-              <input
-                type="text"
-                value={editForm.account_holder}
-                readOnly
-                className="w-full px-4 py-3 bg-gray-100 rounded-xl text-sm text-gray-600 cursor-not-allowed"
-                placeholder="계좌 인증 시 자동 입력됩니다"
-              />
-              <p className="text-xs text-gray-400 mt-1">* 예금주는 계좌 인증을 통해 자동으로 확인됩니다</p>
-            </div>
 
             <button
               onClick={handleBankInfoSave}
