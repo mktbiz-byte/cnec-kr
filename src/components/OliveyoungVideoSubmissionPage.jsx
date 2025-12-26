@@ -1,42 +1,62 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Button } from './ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { Input } from './ui/input'
-import { Textarea } from './ui/textarea'
-import { Label } from './ui/label'
-import { Alert, AlertDescription } from './ui/alert'
-import { Video, Upload, CheckCircle, AlertCircle, ArrowLeft, FileVideo } from 'lucide-react'
+import {
+  ArrowLeft, Upload, CheckCircle, AlertCircle, FileVideo,
+  Video, Scissors, Hash, FileText, Copy, ExternalLink, Loader2,
+  Check, ChevronDown, ChevronUp
+} from 'lucide-react'
 
 export default function OliveyoungVideoSubmissionPage() {
   const { campaignId } = useParams()
   const navigate = useNavigate()
-  
+
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
-  
+  const [uploadingInfo, setUploadingInfo] = useState(null) // { videoNum: 1|2, type: 'clean'|'edited' }
+
   const [campaign, setCampaign] = useState(null)
   const [application, setApplication] = useState(null)
-  
-  // 영상 1
-  const [video1File, setVideo1File] = useState(null)
-  const [video1Url, setVideo1Url] = useState('')
-  const [video1Title, setVideo1Title] = useState('')
-  const [video1Caption, setVideo1Caption] = useState('')
-  const [video1Submission, setVideo1Submission] = useState(null)
-  
-  // 영상 2
-  const [video2File, setVideo2File] = useState(null)
-  const [video2Url, setVideo2Url] = useState('')
-  const [video2Title, setVideo2Title] = useState('')
-  const [video2Caption, setVideo2Caption] = useState('')
-  const [video2Submission, setVideo2Submission] = useState(null)
-  
+
+  // 영상 1 데이터
+  const [video1, setVideo1] = useState({
+    cleanFile: null,
+    cleanUrl: '',
+    editedFile: null,
+    editedUrl: '',
+    title: '',
+    content: '',
+    hashtags: '',
+    submission: null,
+    expanded: true
+  })
+
+  // 영상 2 데이터
+  const [video2, setVideo2] = useState({
+    cleanFile: null,
+    cleanUrl: '',
+    editedFile: null,
+    editedUrl: '',
+    title: '',
+    content: '',
+    hashtags: '',
+    submission: null,
+    expanded: true
+  })
+
+  // SNS 업로드 정보
+  const [snsForm, setSnsForm] = useState({
+    video1_url: '',
+    video2_url: '',
+    partnershipCode: ''
+  })
+  const [showSnsSection, setShowSnsSection] = useState(false)
+
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [copiedCode, setCopiedCode] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -45,14 +65,13 @@ export default function OliveyoungVideoSubmissionPage() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      
+
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         navigate('/login')
         return
       }
 
-      // 캠페인 정보
       const { data: campaignData, error: campaignError } = await supabase
         .from('campaigns')
         .select('*')
@@ -62,7 +81,6 @@ export default function OliveyoungVideoSubmissionPage() {
       if (campaignError) throw campaignError
       setCampaign(campaignData)
 
-      // 지원 정보
       const { data: appData, error: appError } = await supabase
         .from('applications')
         .select('*')
@@ -73,7 +91,7 @@ export default function OliveyoungVideoSubmissionPage() {
       if (appError) throw appError
       setApplication(appData)
 
-      // 기존 영상 제출 정보 (영상 1)
+      // 영상 1 데이터
       const { data: video1Data } = await supabase
         .from('video_submissions')
         .select('*')
@@ -84,13 +102,20 @@ export default function OliveyoungVideoSubmissionPage() {
         .maybeSingle()
 
       if (video1Data) {
-        setVideo1Submission(video1Data)
-        setVideo1Url(video1Data.video_file_url || '')
-        setVideo1Title(video1Data.sns_title || '')
-        setVideo1Caption(video1Data.sns_content || '')
+        setVideo1(prev => ({
+          ...prev,
+          cleanUrl: video1Data.clean_video_url || '',
+          editedUrl: video1Data.video_file_url || '',
+          title: video1Data.sns_title || '',
+          content: video1Data.sns_content || '',
+          hashtags: video1Data.hashtags || '',
+          submission: video1Data,
+          expanded: !video1Data.video_file_url
+        }))
+        setSnsForm(prev => ({ ...prev, video1_url: video1Data.sns_upload_url || '' }))
       }
 
-      // 기존 영상 제출 정보 (영상 2)
+      // 영상 2 데이터
       const { data: video2Data } = await supabase
         .from('video_submissions')
         .select('*')
@@ -101,10 +126,22 @@ export default function OliveyoungVideoSubmissionPage() {
         .maybeSingle()
 
       if (video2Data) {
-        setVideo2Submission(video2Data)
-        setVideo2Url(video2Data.video_file_url || '')
-        setVideo2Title(video2Data.sns_title || '')
-        setVideo2Caption(video2Data.sns_content || '')
+        setVideo2(prev => ({
+          ...prev,
+          cleanUrl: video2Data.clean_video_url || '',
+          editedUrl: video2Data.video_file_url || '',
+          title: video2Data.sns_title || '',
+          content: video2Data.sns_content || '',
+          hashtags: video2Data.hashtags || '',
+          submission: video2Data,
+          expanded: !video2Data.video_file_url
+        }))
+        setSnsForm(prev => ({ ...prev, video2_url: video2Data.sns_upload_url || '' }))
+      }
+
+      // SNS 섹션 표시 여부
+      if ((video1Data?.video_file_url || video2Data?.video_file_url)) {
+        setShowSnsSection(true)
       }
 
     } catch (err) {
@@ -115,7 +152,7 @@ export default function OliveyoungVideoSubmissionPage() {
     }
   }
 
-  const handleFileChange = (videoNumber, e) => {
+  const handleFileChange = (videoNum, type, e) => {
     const file = e.target.files[0]
     if (!file) return
 
@@ -129,52 +166,38 @@ export default function OliveyoungVideoSubmissionPage() {
       return
     }
 
-    if (videoNumber === 1) {
-      setVideo1File(file)
-    } else {
-      setVideo2File(file)
-    }
+    const setter = videoNum === 1 ? setVideo1 : setVideo2
+    const key = type === 'clean' ? 'cleanFile' : 'editedFile'
+    setter(prev => ({ ...prev, [key]: file }))
     setError('')
   }
 
-  const uploadVideoFile = async (file) => {
+  const uploadVideoFile = async (file, videoNum, type) => {
     try {
       setUploading(true)
+      setUploadingInfo({ videoNum, type })
       setUploadProgress(0)
 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('로그인이 필요합니다.')
 
       const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}_${campaignId}_${Date.now()}.${fileExt}`
+      const fileName = `${user.id}_${campaignId}_v${videoNum}_${type}_${Date.now()}.${fileExt}`
       const filePath = `videos/${fileName}`
 
-      const CHUNK_SIZE = 50 * 1024 * 1024
-      
-      if (file.size > CHUNK_SIZE) {
-        const { data, error } = await supabase.storage
-          .from('campaign-videos')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false,
-            onUploadProgress: (progress) => {
-              const percent = (progress.loaded / progress.total) * 100
-              setUploadProgress(Math.round(percent))
-            }
-          })
+      const { error } = await supabase.storage
+        .from('campaign-videos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          onUploadProgress: (progress) => {
+            const percent = (progress.loaded / progress.total) * 100
+            setUploadProgress(Math.round(percent))
+          }
+        })
 
-        if (error) throw error
-      } else {
-        const { data, error } = await supabase.storage
-          .from('campaign-videos')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          })
-
-        if (error) throw error
-        setUploadProgress(100)
-      }
+      if (error) throw error
+      setUploadProgress(100)
 
       const { data: urlData } = supabase.storage
         .from('campaign-videos')
@@ -187,24 +210,21 @@ export default function OliveyoungVideoSubmissionPage() {
       throw err
     } finally {
       setUploading(false)
+      setUploadingInfo(null)
     }
   }
 
-  const handleSubmit = async (videoNumber) => {
-    const isVideo1 = videoNumber === 1
-    const file = isVideo1 ? video1File : video2File
-    const url = isVideo1 ? video1Url : video2Url
-    const title = isVideo1 ? video1Title : video2Title
-    const caption = isVideo1 ? video1Caption : video2Caption
-    const existingSubmission = isVideo1 ? video1Submission : video2Submission
+  const handleVideoSubmit = async (videoNum) => {
+    const videoData = videoNum === 1 ? video1 : video2
+    const setVideoData = videoNum === 1 ? setVideo1 : setVideo2
 
-    if (!file && !url) {
-      setError(`영상 ${videoNumber} 파일을 선택해주세요.`)
+    if (!videoData.editedFile && !videoData.editedUrl) {
+      setError(`영상 ${videoNum} 편집본을 선택해주세요.`)
       return
     }
 
-    if (!title.trim()) {
-      setError(`영상 ${videoNumber} 제목을 입력해주세요.`)
+    if (!videoData.title.trim()) {
+      setError(`영상 ${videoNum} 제목을 입력해주세요.`)
       return
     }
 
@@ -213,20 +233,25 @@ export default function OliveyoungVideoSubmissionPage() {
       setError('')
       setSuccess('')
 
-      let uploadedUrl = url
+      let uploadedCleanUrl = videoData.cleanUrl
+      let uploadedEditedUrl = videoData.editedUrl
 
-      if (file) {
-        uploadedUrl = await uploadVideoFile(file)
+      if (videoData.cleanFile) {
+        uploadedCleanUrl = await uploadVideoFile(videoData.cleanFile, videoNum, 'clean')
+      }
+
+      if (videoData.editedFile) {
+        uploadedEditedUrl = await uploadVideoFile(videoData.editedFile, videoNum, 'edited')
       }
 
       const { data: { user } } = await supabase.auth.getUser()
 
-      // 다음 버전 번호 계산
       let nextVersion = 1
-      if (existingSubmission) {
-        nextVersion = existingSubmission.version + 1
+      if (videoData.submission) {
+        nextVersion = (videoData.submission.version || 0) + 1
         if (nextVersion > 3) {
-          setError(`영상 ${videoNumber}은 최대 V3까지만 제출 가능합니다.`)
+          setError(`영상 ${videoNum}은 최대 V3까지만 제출 가능합니다.`)
+          setSubmitting(false)
           return
         }
       }
@@ -235,10 +260,12 @@ export default function OliveyoungVideoSubmissionPage() {
         application_id: application.id,
         campaign_id: campaignId,
         user_id: user.id,
-        video_file_url: uploadedUrl,
-        sns_title: title,
-        sns_content: caption,
-        video_number: videoNumber,
+        clean_video_url: uploadedCleanUrl || null,
+        video_file_url: uploadedEditedUrl,
+        sns_title: videoData.title,
+        sns_content: videoData.content,
+        hashtags: videoData.hashtags,
+        video_number: videoNum,
         version: nextVersion,
         status: 'submitted',
         submitted_at: new Date().toISOString()
@@ -250,274 +277,541 @@ export default function OliveyoungVideoSubmissionPage() {
 
       if (insertError) throw insertError
 
-      // 기업에게 알림톡 및 이메일 발송
+      // 알림 발송
       try {
-        // 기업 정보 가져오기
         const { data: companyProfile } = await supabase
           .from('user_profiles')
           .select('company_name, email, phone')
           .eq('id', campaign.company_id)
           .single()
 
-        if (companyProfile) {
-          // 크리에이터 정보
+        if (companyProfile?.phone) {
           const { data: creatorProfile } = await supabase
             .from('user_profiles')
             .select('name')
             .eq('id', user.id)
             .single()
 
-          const creatorName = creatorProfile?.name || application.creator_name || application.applicant_name || '크리에이터'
-          const videoLabel = `${videoNumber}차 영상`
+          const creatorName = creatorProfile?.name || '크리에이터'
 
-          // 알림톡 발송
-          if (companyProfile.phone) {
-            await fetch('/.netlify/functions/send-alimtalk', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                receiver: companyProfile.phone,
-                template_code: '025100001008',
-                variables: {
-                  '회사명': companyProfile.company_name || '기업',
-                  '캐페인명': `${campaign.title} - ${videoLabel}`,
-                  '크리에이터명': creatorName
-                }
-              })
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiver: companyProfile.phone,
+              template_code: '025100001008',
+              variables: {
+                '회사명': companyProfile.company_name || '기업',
+                '캠페인명': `${campaign.title} - 영상${videoNum}`,
+                '크리에이터명': creatorName
+              }
             })
-          }
-
-          // 이메일 발송
-          if (companyProfile.email) {
-            await fetch('https://cnectotal.netlify.app/.netlify/functions/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: companyProfile.email,
-                subject: '[CNEC] 신청하신 캐페인 영상 제출',
-                html: `
-                  <h2>영상 제출 알림</h2>
-                  <p>${companyProfile.company_name || '기업'}님, 신청하신 캐페인의 크리에이터가 촬영 영상을 제출했습니다.</p>
-                  <ul>
-                    <li><strong>캐페인:</strong> ${campaign.title}</li>
-                    <li><strong>영상:</strong> ${videoLabel}</li>
-                    <li><strong>크리에이터:</strong> ${creatorName}</li>
-                    <li><strong>버전:</strong> V${nextVersion}</li>
-                  </ul>
-                  <p>관리자 페이지에서 영상을 검토하시고, 수정 사항이 있으면 피드백을 남겨주세요.</p>
-                  <p>검수 완료 후 SNS 업로드 될 예정입니다.</p>
-                  <p>문의: 1833-6025</p>
-                `
-              })
-            })
-          }
+          })
         }
       } catch (notificationError) {
         console.error('Notification error:', notificationError)
-        // 알림 실패해도 영상 제출은 성공으로 처리
       }
 
-      setSuccess(`영상 ${videoNumber} V${nextVersion}이 제출되었습니다!`)
+      setSuccess(`영상 ${videoNum} V${nextVersion}이 제출되었습니다!`)
+      setShowSnsSection(true)
+      setVideoData(prev => ({ ...prev, expanded: false }))
       await fetchData()
 
     } catch (err) {
       console.error('Error submitting video:', err)
-      setError(`영상 ${videoNumber} 제출 실패: ` + err.message)
+      setError(`영상 ${videoNum} 제출 실패: ` + err.message)
     } finally {
       setSubmitting(false)
     }
   }
 
+  const handleSnsSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!snsForm.video1_url && !snsForm.video2_url) {
+      setError('최소 1개의 SNS URL을 입력해주세요.')
+      return
+    }
+
+    try {
+      setSubmitting(true)
+      setError('')
+
+      if (video1.submission && snsForm.video1_url) {
+        await supabase
+          .from('video_submissions')
+          .update({
+            sns_upload_url: snsForm.video1_url,
+            partnership_code: snsForm.partnershipCode,
+            sns_uploaded_at: new Date().toISOString()
+          })
+          .eq('id', video1.submission.id)
+      }
+
+      if (video2.submission && snsForm.video2_url) {
+        await supabase
+          .from('video_submissions')
+          .update({
+            sns_upload_url: snsForm.video2_url,
+            partnership_code: snsForm.partnershipCode,
+            sns_uploaded_at: new Date().toISOString()
+          })
+          .eq('id', video2.submission.id)
+      }
+
+      setSuccess('SNS 업로드 정보가 저장되었습니다!')
+      setTimeout(() => navigate('/my/applications'), 2000)
+
+    } catch (err) {
+      console.error('Error updating SNS info:', err)
+      setError('SNS 정보 저장에 실패했습니다.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+    setCopiedCode(true)
+    setTimeout(() => setCopiedCode(false), 2000)
+  }
+
+  const getStatusBadge = (submission) => {
+    if (!submission) return null
+
+    const statusConfig = {
+      submitted: { label: '검토 중', color: 'bg-blue-500' },
+      revision_requested: { label: '수정 요청', color: 'bg-yellow-500' },
+      approved: { label: '승인됨', color: 'bg-green-500' }
+    }
+
+    const config = statusConfig[submission.status] || statusConfig.submitted
+
+    return (
+      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${config.color}`}>
+        {config.label} V{submission.version || 1}
+      </span>
+    )
+  }
+
+  const renderVideoSection = (videoNum) => {
+    const videoData = videoNum === 1 ? video1 : video2
+    const setVideoData = videoNum === 1 ? setVideo1 : setVideo2
+    const isUploading = uploadingInfo?.videoNum === videoNum
+
+    return (
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        {/* 헤더 */}
+        <button
+          onClick={() => setVideoData(prev => ({ ...prev, expanded: !prev.expanded }))}
+          className="w-full p-4 flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">{videoNum}</span>
+            </div>
+            <div className="text-left">
+              <p className="font-bold text-gray-900 text-sm">영상 {videoNum}</p>
+              {videoData.submission && (
+                <p className="text-xs text-gray-500">
+                  {new Date(videoData.submission.submitted_at).toLocaleDateString('ko-KR')} 제출
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {getStatusBadge(videoData.submission)}
+            {videoData.expanded ? (
+              <ChevronUp size={20} className="text-gray-400" />
+            ) : (
+              <ChevronDown size={20} className="text-gray-400" />
+            )}
+          </div>
+        </button>
+
+        {/* 콘텐츠 */}
+        {videoData.expanded && (
+          <div className="p-4 space-y-4">
+            {/* 피드백 */}
+            {videoData.submission?.status === 'revision_requested' && videoData.submission?.feedback && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-yellow-800 mb-1">기업 피드백</p>
+                    <p className="text-sm text-yellow-700">{videoData.submission.feedback}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 제출 완료 후 파일 다운로드 */}
+            {videoData.submission?.video_file_url && videoData.submission?.status !== 'revision_requested' && (
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href={videoData.submission.clean_video_url || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-dashed ${
+                    videoData.submission.clean_video_url
+                      ? 'border-green-200 bg-green-50 hover:bg-green-100'
+                      : 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
+                  }`}
+                  onClick={(e) => !videoData.submission.clean_video_url && e.preventDefault()}
+                >
+                  <Video size={20} className={videoData.submission.clean_video_url ? 'text-green-600' : 'text-gray-400'} />
+                  <span className={`text-xs font-bold mt-1 ${videoData.submission.clean_video_url ? 'text-gray-900' : 'text-gray-400'}`}>
+                    클린본
+                  </span>
+                </a>
+                <a
+                  href={videoData.submission.video_file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-dashed border-green-200 bg-green-50 hover:bg-green-100"
+                >
+                  <Scissors size={20} className="text-green-600" />
+                  <span className="text-xs font-bold mt-1 text-gray-900">편집본</span>
+                </a>
+              </div>
+            )}
+
+            {/* 업로드 폼 */}
+            {(!videoData.submission || videoData.submission.status === 'revision_requested') && (
+              <>
+                {/* 클린본 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    클린본 <span className="text-xs text-gray-400">(선택)</span>
+                  </label>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => handleFileChange(videoNum, 'clean', e)}
+                    disabled={uploading}
+                    className="hidden"
+                    id={`clean-video-${videoNum}`}
+                  />
+                  <label
+                    htmlFor={`clean-video-${videoNum}`}
+                    className={`flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed rounded-xl cursor-pointer transition-colors text-sm ${
+                      videoData.cleanFile || videoData.cleanUrl
+                        ? 'border-green-300 bg-green-50'
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}
+                  >
+                    {videoData.cleanFile ? (
+                      <>
+                        <FileVideo size={16} className="text-green-600" />
+                        <span className="text-green-700 font-medium truncate max-w-[150px]">{videoData.cleanFile.name}</span>
+                      </>
+                    ) : videoData.cleanUrl ? (
+                      <>
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-green-700 font-medium">기존 파일</span>
+                      </>
+                    ) : (
+                      <>
+                        <Video size={16} className="text-gray-400" />
+                        <span className="text-gray-500">클린본 선택</span>
+                      </>
+                    )}
+                  </label>
+                  {isUploading && uploadingInfo?.type === 'clean' && (
+                    <div className="mt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div className="bg-green-600 h-1 rounded-full" style={{ width: `${uploadProgress}%` }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 편집본 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    편집본 *
+                  </label>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => handleFileChange(videoNum, 'edited', e)}
+                    disabled={uploading}
+                    className="hidden"
+                    id={`edited-video-${videoNum}`}
+                  />
+                  <label
+                    htmlFor={`edited-video-${videoNum}`}
+                    className={`flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed rounded-xl cursor-pointer transition-colors text-sm ${
+                      videoData.editedFile || videoData.editedUrl
+                        ? 'border-green-300 bg-green-50'
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}
+                  >
+                    {videoData.editedFile ? (
+                      <>
+                        <FileVideo size={16} className="text-green-600" />
+                        <span className="text-green-700 font-medium truncate max-w-[150px]">{videoData.editedFile.name}</span>
+                      </>
+                    ) : videoData.editedUrl ? (
+                      <>
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-green-700 font-medium">기존 파일</span>
+                      </>
+                    ) : (
+                      <>
+                        <Scissors size={16} className="text-gray-400" />
+                        <span className="text-gray-500">편집본 선택</span>
+                      </>
+                    )}
+                  </label>
+                  {isUploading && uploadingInfo?.type === 'edited' && (
+                    <div className="mt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div className="bg-green-600 h-1 rounded-full" style={{ width: `${uploadProgress}%` }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 제목 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">영상 제목 *</label>
+                  <input
+                    type="text"
+                    value={videoData.title}
+                    onChange={(e) => setVideoData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="SNS 영상 제목"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* 피드글 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">영상 피드글</label>
+                  <textarea
+                    value={videoData.content}
+                    onChange={(e) => setVideoData(prev => ({ ...prev, content: e.target.value }))}
+                    placeholder="SNS 피드 내용"
+                    rows={3}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  />
+                </div>
+
+                {/* 해시태그 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <Hash size={14} />
+                    해시태그
+                  </label>
+                  <input
+                    type="text"
+                    value={videoData.hashtags}
+                    onChange={(e) => setVideoData(prev => ({ ...prev, hashtags: e.target.value }))}
+                    placeholder="#해시태그 #올리브영"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* 제출 버튼 */}
+                <button
+                  onClick={() => handleVideoSubmit(videoNum)}
+                  disabled={submitting || uploading}
+                  className="w-full py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {submitting || isUploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {isUploading ? '업로드 중...' : '제출 중...'}
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={16} />
+                      영상 {videoNum} 제출
+                    </>
+                  )}
+                </button>
+              </>
+            )}
+
+            {/* 제출 완료 상태 */}
+            {videoData.submission?.video_file_url && videoData.submission?.status !== 'revision_requested' && (
+              <div className="bg-green-50 rounded-xl p-3 text-center">
+                <p className="text-sm text-green-800 font-medium">
+                  {videoData.submission.status === 'approved' ? '🎉 승인 완료!' : '✅ 검수 중입니다'}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">로딩 중...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-green-600 mx-auto" />
+          <p className="mt-4 text-gray-600 text-sm">로딩 중...</p>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Button
-        variant="ghost"
-        onClick={() => navigate('/profile')}
-        className="mb-6"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        마이페이지로 돌아가기
-      </Button>
+  const creatorCode = application?.partnership_code || campaign?.partnership_code ||
+    `OLIVEYOUNG_${application?.id?.slice(0, 6)?.toUpperCase() || 'CODE'}`
 
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">🌸 올리브영 영상 제출</h1>
-        <p className="text-gray-600">{campaign?.title}</p>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 헤더 */}
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center">
+          <button
+            onClick={() => navigate('/my/applications')}
+            className="p-2 -ml-2 hover:bg-gray-100 rounded-full"
+          >
+            <ArrowLeft size={20} className="text-gray-700" />
+          </button>
+          <h1 className="flex-1 text-center font-bold text-gray-900">🌸 올리브영 영상 업로드</h1>
+          <div className="w-10" />
+        </div>
       </div>
 
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      <div className="max-w-md mx-auto px-4 py-6 space-y-4">
+        {/* 캠페인 정보 */}
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-4 text-white">
+          <p className="text-xs opacity-80">{campaign?.brand}</p>
+          <p className="font-bold">{campaign?.title}</p>
+        </div>
 
-      {success && (
-        <Alert className="mb-6 bg-green-50 text-green-800 border-green-200">
-          <CheckCircle className="h-4 w-4" />
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* 영상 1 */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Video className="w-5 h-5" />
-            영상 1 제출
-          </CardTitle>
-          <CardDescription>
-            첫 번째 영상을 업로드해주세요. {video1Submission && `(현재 버전: V${video1Submission.version})`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="video1-file">영상 파일 *</Label>
-            <Input
-              id="video1-file"
-              type="file"
-              accept="video/*"
-              onChange={(e) => handleFileChange(1, e)}
-              disabled={submitting || uploading}
-              className="mt-2"
-            />
-            {video1Url && (
-              <p className="text-sm text-green-600 mt-2">
-                ✓ 기존 영상이 있습니다. 새 파일을 선택하면 덮어씁니다.
-              </p>
-            )}
+        {/* 알림 */}
+        {success && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <p className="text-sm text-green-800 font-medium">{success}</p>
           </div>
+        )}
 
-          <div>
-            <Label htmlFor="video1-title">영상 제목 *</Label>
-            <Input
-              id="video1-title"
-              value={video1Title}
-              onChange={(e) => setVideo1Title(e.target.value)}
-              placeholder="영상 제목을 입력하세요"
-              disabled={submitting}
-              className="mt-2"
-            />
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-800 font-medium">{error}</p>
           </div>
+        )}
 
-          <div>
-            <Label htmlFor="video1-caption">영상 캡션</Label>
-            <Textarea
-              id="video1-caption"
-              value={video1Caption}
-              onChange={(e) => setVideo1Caption(e.target.value)}
-              placeholder="영상 캡션을 입력하세요"
-              disabled={submitting}
-              rows={4}
-              className="mt-2"
-            />
-          </div>
-
-          <Button
-            onClick={() => handleSubmit(1)}
-            disabled={submitting || uploading || (!video1File && !video1Url)}
-            className="w-full"
-          >
-            {submitting ? '제출 중...' : uploading ? `업로드 중... ${uploadProgress}%` : '영상 1 제출'}
-          </Button>
-
-          {video1Submission && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm font-semibold mb-2">제출 상태</p>
-              <p className="text-sm">버전: V{video1Submission.version}</p>
-              <p className="text-sm">상태: {video1Submission.status === 'submitted' ? '검토 중' : video1Submission.status === 'approved' ? '승인됨' : '수정 요청'}</p>
-              {video1Submission.feedback && (
-                <p className="text-sm mt-2 text-orange-600">피드백: {video1Submission.feedback}</p>
-              )}
+        {/* 파트너 코드 */}
+        {campaign?.ad_code_required && (
+          <div className="bg-gray-900 rounded-2xl p-4">
+            <p className="text-xs text-gray-400 mb-2">{application?.creator_name || '크리에이터'}님의 파트너 코드</p>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 bg-gray-800 rounded-xl px-4 py-2">
+                <p className="text-white font-mono font-bold">{creatorCode}</p>
+              </div>
+              <button
+                onClick={() => copyToClipboard(creatorCode)}
+                className="flex items-center gap-1 px-3 py-2 bg-white rounded-xl text-sm font-bold"
+              >
+                {copiedCode ? <Check size={14} /> : <Copy size={14} />}
+                {copiedCode ? '복사됨' : '복사'}
+              </button>
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* 영상 2 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Video className="w-5 h-5" />
-            영상 2 제출
-          </CardTitle>
-          <CardDescription>
-            두 번째 영상을 업로드해주세요. {video2Submission && `(현재 버전: V${video2Submission.version})`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="video2-file">영상 파일 *</Label>
-            <Input
-              id="video2-file"
-              type="file"
-              accept="video/*"
-              onChange={(e) => handleFileChange(2, e)}
-              disabled={submitting || uploading}
-              className="mt-2"
-            />
-            {video2Url && (
-              <p className="text-sm text-green-600 mt-2">
-                ✓ 기존 영상이 있습니다. 새 파일을 선택하면 덮어씁니다.
-              </p>
-            )}
           </div>
+        )}
 
-          <div>
-            <Label htmlFor="video2-title">영상 제목 *</Label>
-            <Input
-              id="video2-title"
-              value={video2Title}
-              onChange={(e) => setVideo2Title(e.target.value)}
-              placeholder="영상 제목을 입력하세요"
-              disabled={submitting}
-              className="mt-2"
-            />
-          </div>
+        {/* 영상 1, 2 */}
+        {renderVideoSection(1)}
+        {renderVideoSection(2)}
 
-          <div>
-            <Label htmlFor="video2-caption">영상 캡션</Label>
-            <Textarea
-              id="video2-caption"
-              value={video2Caption}
-              onChange={(e) => setVideo2Caption(e.target.value)}
-              placeholder="영상 캡션을 입력하세요"
-              disabled={submitting}
-              rows={4}
-              className="mt-2"
-            />
-          </div>
+        {/* SNS 업로드 섹션 */}
+        {showSnsSection && (video1.submission || video2.submission) && (
+          <form onSubmit={handleSnsSubmit} className="space-y-4">
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-900 flex items-center gap-2">
+                  <ExternalLink size={18} className="text-green-600" />
+                  SNS 업로드 정보
+                </h2>
+              </div>
 
-          <Button
-            onClick={() => handleSubmit(2)}
-            disabled={submitting || uploading || (!video2File && !video2Url)}
-            className="w-full"
-          >
-            {submitting ? '제출 중...' : uploading ? `업로드 중... ${uploadProgress}%` : '영상 2 제출'}
-          </Button>
+              <div className="p-4 bg-red-50 border-b border-red-100">
+                <p className="text-xs text-red-700 font-medium flex items-center gap-1">
+                  <AlertCircle size={12} />
+                  검수 완료 후 SNS에 업로드해주세요!
+                </p>
+              </div>
 
-          {video2Submission && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm font-semibold mb-2">제출 상태</p>
-              <p className="text-sm">버전: V{video2Submission.version}</p>
-              <p className="text-sm">상태: {video2Submission.status === 'submitted' ? '검토 중' : video2Submission.status === 'approved' ? '승인됨' : '수정 요청'}</p>
-              {video2Submission.feedback && (
-                <p className="text-sm mt-2 text-orange-600">피드백: {video2Submission.feedback}</p>
-              )}
+              <div className="p-4 space-y-4">
+                {video1.submission && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">영상 1 SNS URL</label>
+                    <input
+                      type="url"
+                      value={snsForm.video1_url}
+                      onChange={(e) => setSnsForm(prev => ({ ...prev, video1_url: e.target.value }))}
+                      placeholder="https://instagram.com/reel/..."
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                )}
+
+                {video2.submission && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">영상 2 SNS URL</label>
+                    <input
+                      type="url"
+                      value={snsForm.video2_url}
+                      onChange={(e) => setSnsForm(prev => ({ ...prev, video2_url: e.target.value }))}
+                      placeholder="https://instagram.com/reel/..."
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                )}
+
+                {campaign?.ad_code_required && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">광고코드 (파트너십)</label>
+                    <input
+                      type="text"
+                      value={snsForm.partnershipCode}
+                      onChange={(e) => setSnsForm(prev => ({ ...prev, partnershipCode: e.target.value }))}
+                      placeholder="광고 코드 입력"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex-1 py-4 bg-green-600 text-white rounded-2xl font-bold hover:bg-green-700 disabled:opacity-50"
+              >
+                {submitting ? '저장 중...' : '저장하기'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/my/applications')}
+                className="px-6 py-4 border border-gray-200 rounded-2xl font-bold text-gray-700"
+              >
+                나중에
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* 안내 */}
+        <div className="bg-green-50 rounded-2xl p-4">
+          <h3 className="text-sm font-bold text-green-900 mb-2">📌 안내 사항</h3>
+          <ul className="text-xs text-green-800 space-y-1">
+            <li>• 총 2개의 영상을 제출해주세요.</li>
+            <li>• 클린본은 자막/효과 없는 원본입니다.</li>
+            <li>• 각 영상별로 개별 제출 가능합니다.</li>
+            <li>• 검수 완료 후 SNS에 업로드해주세요.</li>
+          </ul>
+        </div>
+      </div>
     </div>
   )
 }
