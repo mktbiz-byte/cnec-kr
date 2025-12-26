@@ -523,17 +523,19 @@ export default function VideoSubmissionPage() {
           </div>
         )}
 
-        {/* 영상 제출 폼 */}
-        {(!videoSubmission || videoSubmission.status === 'revision_requested') && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+        {/* 영상 제출 폼 - 언제든 재제출 가능 */}
+        <form onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="p-4 border-b border-gray-100">
                 <h2 className="font-bold text-gray-900 flex items-center gap-2">
                   <Upload size={18} className="text-purple-600" />
-                  영상 파일 업로드
+                  {videoSubmission?.video_file_url ? '영상 수정본 재제출' : '영상 파일 업로드'}
                 </h2>
                 {videoSubmission?.status === 'revision_requested' && (
                   <p className="text-xs text-orange-600 mt-1">피드백을 반영하여 수정한 영상을 다시 업로드해주세요.</p>
+                )}
+                {videoSubmission?.video_file_url && videoSubmission?.status !== 'revision_requested' && (
+                  <p className="text-xs text-violet-600 mt-1">수정된 영상이 있다면 다시 업로드해주세요. 기존 영상을 덮어씁니다.</p>
                 )}
               </div>
 
@@ -732,8 +734,7 @@ export default function VideoSubmissionPage() {
                 </>
               )}
             </button>
-          </form>
-        )}
+        </form>
 
         {/* SNS 업로드 정보 섹션 */}
         {showSnsSection && videoSubmission && videoSubmission.status !== 'approved' && !videoSubmission.sns_upload_url && (

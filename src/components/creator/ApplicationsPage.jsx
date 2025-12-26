@@ -838,14 +838,53 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* video_submitted 상태일 때 SNS 업로드 버튼 */}
+                      {/* video_submitted 상태일 때 영상 재제출 + SNS 업로드 버튼 */}
                       {app.status === 'video_submitted' && (
-                        <button
-                          onClick={() => openSnsUploadModal(app)}
-                          className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
-                        >
-                          <Upload size={14} /> SNS 업로드하기
-                        </button>
+                        <div className="space-y-2">
+                          {/* 기획형 캠페인 영상 재제출 */}
+                          {app.campaigns?.campaign_type === 'planned' && (
+                            <button
+                              onClick={() => handleVideoUpload(app)}
+                              className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* 올리브영 캠페인 영상 재제출 */}
+                          {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && (
+                            <button
+                              onClick={() => handleVideoUpload(app, 'oliveyoung')}
+                              className="w-full py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* 4주 챌린지 캠페인 영상 재제출 */}
+                          {app.campaigns?.campaign_type === '4week_challenge' && (
+                            <button
+                              onClick={() => handleVideoUpload(app, '4week')}
+                              className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* 일반 캠페인 영상 재제출 */}
+                          {!app.campaigns?.campaign_type && !app.campaigns?.is_oliveyoung_sale && (
+                            <button
+                              onClick={() => handleVideoUpload(app)}
+                              className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* SNS 업로드 버튼 */}
+                          <button
+                            onClick={() => openSnsUploadModal(app)}
+                            className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
+                          >
+                            <Upload size={14} /> SNS 업로드하기
+                          </button>
+                        </div>
                       )}
                     </div>
                   )}

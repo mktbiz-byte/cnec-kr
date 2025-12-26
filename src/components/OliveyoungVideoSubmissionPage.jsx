@@ -476,10 +476,16 @@ export default function OliveyoungVideoSubmissionPage() {
               </div>
             )}
 
-            {/* 업로드 폼 */}
-            {(!videoData.submission || videoData.submission.status === 'revision_requested') && (
-              <>
-                {/* 클린본 */}
+            {/* 업로드 폼 - 언제든 재제출 가능 */}
+            <>
+              {videoData.submission?.video_file_url && videoData.submission?.status !== 'revision_requested' && (
+                <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 mb-3">
+                  <p className="text-xs text-violet-700 font-medium">
+                    수정된 영상이 있다면 다시 업로드해주세요. 새 버전으로 제출됩니다.
+                  </p>
+                </div>
+              )}
+              {/* 클린본 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     클린본 <span className="text-xs text-gray-400">(선택)</span>
@@ -626,17 +632,16 @@ export default function OliveyoungVideoSubmissionPage() {
                   ) : (
                     <>
                       <Upload size={16} />
-                      영상 {videoNum} 제출
+                      {videoData.submission?.video_file_url ? `영상 ${videoNum} 재제출` : `영상 ${videoNum} 제출`}
                     </>
                   )}
                 </button>
-              </>
-            )}
+            </>
 
-            {/* 제출 완료 상태 */}
-            {videoData.submission?.video_file_url && videoData.submission?.status !== 'revision_requested' && (
-              <div className="bg-green-50 rounded-xl p-3 text-center">
-                <p className="text-sm text-green-800 font-medium">
+            {/* 현재 상태 */}
+            {videoData.submission?.video_file_url && (
+              <div className={`rounded-xl p-3 text-center ${videoData.submission.status === 'approved' ? 'bg-green-50' : 'bg-blue-50'}`}>
+                <p className={`text-sm font-medium ${videoData.submission.status === 'approved' ? 'text-green-800' : 'text-blue-800'}`}>
                   {videoData.submission.status === 'approved' ? '🎉 승인 완료!' : '✅ 검수 중입니다'}
                 </p>
               </div>

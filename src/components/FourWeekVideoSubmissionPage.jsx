@@ -451,10 +451,16 @@ export default function FourWeekVideoSubmissionPage() {
               </div>
             )}
 
-            {/* 업로드 폼 */}
-            {(!weekData.submission || weekData.submission.status === 'revision_requested') && (
-              <>
-                {/* 클린본 */}
+            {/* 업로드 폼 - 언제든 재제출 가능 */}
+            <>
+              {weekData.submission?.video_file_url && weekData.submission?.status !== 'revision_requested' && (
+                <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 mb-3">
+                  <p className="text-xs text-violet-700 font-medium">
+                    수정된 영상이 있다면 다시 업로드해주세요. 새 버전으로 제출됩니다.
+                  </p>
+                </div>
+              )}
+              {/* 클린본 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     클린본 <span className="text-xs text-gray-400">(선택)</span>
@@ -599,17 +605,16 @@ export default function FourWeekVideoSubmissionPage() {
                   ) : (
                     <>
                       <Upload size={16} />
-                      {week}주차 제출
+                      {weekData.submission?.video_file_url ? `${week}주차 재제출` : `${week}주차 제출`}
                     </>
                   )}
                 </button>
-              </>
-            )}
+            </>
 
-            {/* 제출 완료 상태 */}
-            {weekData.submission?.video_file_url && weekData.submission?.status !== 'revision_requested' && (
+            {/* 현재 상태 */}
+            {weekData.submission?.video_file_url && (
               <div className={`${colors.light} rounded-xl p-3 text-center border`}>
-                <p className={`text-sm font-medium ${colors.text}`}>
+                <p className={`text-sm font-medium ${weekData.submission.status === 'approved' ? 'text-green-600' : colors.text}`}>
                   {weekData.submission.status === 'approved' ? '🎉 승인 완료!' : '✅ 검수 중입니다'}
                 </p>
               </div>
