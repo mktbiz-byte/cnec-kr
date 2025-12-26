@@ -135,7 +135,8 @@ const ApplicationsPage = () => {
     week1_video: '',
     week2_video: '',
     week3_video: '',
-    week4_video: ''
+    week4_video: '',
+    partnership_code: ''
   })
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
@@ -344,7 +345,8 @@ const ApplicationsPage = () => {
       week1_video: '',
       week2_video: '',
       week3_video: '',
-      week4_video: ''
+      week4_video: '',
+      partnership_code: ''
     })
     setError('')
     setShowSnsUploadModal(true)
@@ -442,6 +444,7 @@ const ApplicationsPage = () => {
           step3_url: snsUploadForm.step3_url,
           step1_2_video_folder: snsUploadForm.step1_2_video_folder || null,
           step3_video_folder: snsUploadForm.step3_video_folder || null,
+          partnership_code: snsUploadForm.partnership_code || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -456,6 +459,7 @@ const ApplicationsPage = () => {
           week2_video: snsUploadForm.week2_video || null,
           week3_video: snsUploadForm.week3_video || null,
           week4_video: snsUploadForm.week4_video || null,
+          partnership_code: snsUploadForm.partnership_code || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -463,6 +467,7 @@ const ApplicationsPage = () => {
       } else {
         updateData = {
           sns_upload_url: snsUploadForm.sns_upload_url,
+          partnership_code: snsUploadForm.partnership_code || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -506,7 +511,7 @@ const ApplicationsPage = () => {
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center">
           <button
-            onClick={() => navigate('/mypage')}
+            onClick={() => navigate('/')}
             className="p-2 -ml-2 hover:bg-gray-100 rounded-full"
           >
             <ArrowLeft size={20} className="text-gray-700" />
@@ -833,14 +838,53 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* video_submitted 상태일 때 SNS 업로드 버튼 */}
+                      {/* video_submitted 상태일 때 영상 재제출 + SNS 업로드 버튼 */}
                       {app.status === 'video_submitted' && (
-                        <button
-                          onClick={() => openSnsUploadModal(app)}
-                          className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
-                        >
-                          <Upload size={14} /> SNS 업로드하기
-                        </button>
+                        <div className="space-y-2">
+                          {/* 기획형 캠페인 영상 재제출 */}
+                          {app.campaigns?.campaign_type === 'planned' && (
+                            <button
+                              onClick={() => handleVideoUpload(app)}
+                              className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* 올리브영 캠페인 영상 재제출 */}
+                          {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && (
+                            <button
+                              onClick={() => handleVideoUpload(app, 'oliveyoung')}
+                              className="w-full py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* 4주 챌린지 캠페인 영상 재제출 */}
+                          {app.campaigns?.campaign_type === '4week_challenge' && (
+                            <button
+                              onClick={() => handleVideoUpload(app, '4week')}
+                              className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* 일반 캠페인 영상 재제출 */}
+                          {!app.campaigns?.campaign_type && !app.campaigns?.is_oliveyoung_sale && (
+                            <button
+                              onClick={() => handleVideoUpload(app)}
+                              className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Video size={14} /> 영상 수정본 재제출
+                            </button>
+                          )}
+                          {/* SNS 업로드 버튼 */}
+                          <button
+                            onClick={() => openSnsUploadModal(app)}
+                            className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
+                          >
+                            <Upload size={14} /> SNS 업로드하기
+                          </button>
+                        </div>
                       )}
                     </div>
                   )}
@@ -1646,6 +1690,25 @@ const ApplicationsPage = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                     placeholder="https://instagram.com/p/..."
                   />
+                </div>
+              )}
+
+              {/* 광고코드 (파트너십 코드) */}
+              {selectedApplication.campaigns?.ad_code_required && (
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                  <label className="block text-sm font-medium text-orange-800 mb-2">
+                    광고코드 (파트너십 코드)
+                  </label>
+                  <input
+                    type="text"
+                    value={snsUploadForm.partnership_code}
+                    onChange={(e) => setSnsUploadForm({...snsUploadForm, partnership_code: e.target.value})}
+                    className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                    placeholder="인스타그램 파트너십 광고 코드"
+                  />
+                  <p className="text-xs text-orange-600 mt-2">
+                    인스타그램 업로드 시 파트너십 광고 표시에 사용한 코드를 입력해주세요.
+                  </p>
                 </div>
               )}
 
