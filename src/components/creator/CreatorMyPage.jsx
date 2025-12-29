@@ -451,31 +451,18 @@ const CreatorMyPage = () => {
       const today = new Date()
       const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-      // 1. 포인트 차감
-      const newPoints = (profile?.points || 0) - amount
-      const { error: pointsError } = await supabase
-        .from('user_profiles')
-        .update({ points: newPoints })
-        .eq('id', user.id)
+      // 출금 신청 (포인트 차감 + 거래 내역 생성)
+      const result = await database.userPoints.requestWithdrawal({
+        user_id: user.id,
+        amount: amount,
+        bank_name: profile.bank_name,
+        bank_account_number: profile.account_number,
+        bank_account_holder: profile.account_holder
+      })
 
-      if (pointsError) throw pointsError
+      if (!result.success) throw new Error('출금 신청 처리 실패')
 
-      // 2. point_transactions 테이블에 출금 신청 저장
-      // description에 계좌 정보 포함 (관리자가 조회 가능)
-      const description = `[출금신청] ${amount.toLocaleString()}원 | ${profile.bank_name} ${profile.account_number} (${profile.account_holder})`
-
-      const { error: dbError } = await supabase
-        .from('point_transactions')
-        .insert([{
-          user_id: user.id,
-          amount: -amount,
-          transaction_type: 'withdraw',
-          description: description
-        }])
-
-      if (dbError) throw dbError
-
-      // 3. 알림 발송 (실패해도 출금 신청은 성공으로 처리)
+      // 알림 발송 (실패해도 출금 신청은 성공으로 처리)
       try {
         // 카카오 알림톡 발송
         if (profile?.phone) {
