@@ -624,9 +624,16 @@ const ApplicationsPage = () => {
                       </div>
 
                       <p className="text-xs text-gray-400 mb-0.5">{app.campaigns?.brand}</p>
-                      <p className="font-bold text-gray-900 text-sm line-clamp-2 mb-2">
+                      <p className="font-bold text-gray-900 text-sm line-clamp-2 mb-1">
                         {app.campaigns?.title}
                       </p>
+
+                      {/* 지급 예정 포인트 */}
+                      {reward > 0 && !['completed', 'paid'].includes(app.status) && (
+                        <p className="text-xs text-purple-600 font-semibold mb-2">
+                          💰 지급 예정: {formatCurrency(reward)}P
+                        </p>
+                      )}
 
                       {/* 상태별 추가 정보 */}
                       {app.status === 'pending' && (
