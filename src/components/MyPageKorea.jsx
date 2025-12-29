@@ -183,12 +183,12 @@ const MyPageKorea = () => {
       }
       setApplications(applicationsData || [])
 
-      // 출금 내역 (description이 '[출금신청]'으로 시작하는 것만 조회)
+      // 출금 내역 (transaction_type='withdraw')
       const { data: withdrawalsData, error: withdrawalsError } = await supabase
         .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
-        .like('description', '[출금신청]%')
+        .eq('transaction_type', 'withdraw')
         .order('created_at', { ascending: false })
 
       if (withdrawalsError) {
@@ -356,10 +356,10 @@ const MyPageKorea = () => {
       if (pointsError) throw pointsError
 
       // 2. point_transactions에 출금 신청 저장
-      // description에 계좌 정보 포함 (관리자가 조회 가능)
       const { error: txError } = await supabase.from('point_transactions').insert({
         user_id: user.id,
         amount: -amount,
+        transaction_type: 'withdraw',
         description: `[출금신청] ${amount.toLocaleString()}원 | ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber} (${withdrawForm.bankAccountHolder})`
       })
 

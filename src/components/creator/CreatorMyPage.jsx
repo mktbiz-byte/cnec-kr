@@ -469,6 +469,7 @@ const CreatorMyPage = () => {
         .insert([{
           user_id: user.id,
           amount: -amount,
+          transaction_type: 'withdraw',
           description: description
         }])
 
