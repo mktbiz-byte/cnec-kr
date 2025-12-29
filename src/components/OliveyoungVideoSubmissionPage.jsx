@@ -298,8 +298,9 @@ export default function OliveyoungVideoSubmissionPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              receiver: companyProfile.phone,
-              template_code: '025100001008',
+              receiverNum: companyProfile.phone.replace(/-/g, ''),
+              receiverName: companyProfile.company_name || '기업',
+              templateCode: '025100001008',
               variables: {
                 '회사명': companyProfile.company_name || '기업',
                 '캠페인명': `${campaign.title} - 영상${videoNum}`,
