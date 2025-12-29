@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import VideoReferencesSection from './VideoReferencesSection'
 import { useAuth } from '../contexts/AuthContext'
-import { database, supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { 
   User, Mail, Phone, MapPin, Calendar, Award, 
   CreditCard, Download, Settings, LogOut, 
@@ -127,7 +127,7 @@ const MyPageKorea = () => {
       setLoading(true)
       
       // 프로필 정보 가져오기
-      const { data: profileData, error: profileError } = await database
+      const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
@@ -184,7 +184,7 @@ const MyPageKorea = () => {
       setApplications(applicationsData || [])
 
       // 출금 내역 (Master DB 표준: withdrawal_requests)
-      const { data: withdrawalsData, error: withdrawalsError } = await database
+      const { data: withdrawalsData, error: withdrawalsError } = await supabase
         .from('withdrawal_requests')
         .select('*')
         .eq('user_id', user.id)
@@ -194,7 +194,7 @@ const MyPageKorea = () => {
       setWithdrawals(withdrawalsData || [])
 
       // 포인트 거래 내역
-      const { data: transactionsData, error: transactionsError } = await database
+      const { data: transactionsData, error: transactionsError } = await supabase
         .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
@@ -251,7 +251,7 @@ const MyPageKorea = () => {
         }
 
         // 암호화 함수 호출
-        const { data: encryptedData, error: encryptError } = await database.rpc(
+        const { data: encryptedData, error: encryptError } = await supabase.rpc(
           'encrypt_resident_number',
           {
             resident_number: editForm.resident_number.replace('-', ''),
@@ -269,7 +269,7 @@ const MyPageKorea = () => {
         updateData.resident_number_encrypted = encryptedData
       }
 
-      const { error: updateError } = await database
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update(updateData)
         .eq('id', user.id)
@@ -326,7 +326,7 @@ const MyPageKorea = () => {
 
       // 주민번호 암호화
       const encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || 'default-key-change-this'
-      const { data: encryptedResident, error: encryptError } = await database.rpc(
+      const { data: encryptedResident, error: encryptError } = await supabase.rpc(
         'encrypt_resident_number',
         {
           resident_number: withdrawForm.residentNumber.replace('-', ''),
@@ -342,7 +342,7 @@ const MyPageKorea = () => {
       }
 
       // 출금 신청 생성 (Master DB 표준: withdrawal_requests)
-      const { error: withdrawalError } = await database
+      const { error: withdrawalError } = await supabase
         .from('withdrawal_requests')
         .insert({
           user_id: user.id,
@@ -357,7 +357,7 @@ const MyPageKorea = () => {
 
       // 포인트 차감
       const newPoints = profile.points - amount
-      const { error: pointsError } = await database
+      const { error: pointsError } = await supabase
         .from('user_profiles')
         .update({ points: newPoints })
         .eq('id', user.id)
@@ -365,7 +365,7 @@ const MyPageKorea = () => {
       if (pointsError) throw pointsError
 
       // 포인트 거래 내역 추가
-      await database.from('point_transactions').insert({
+      await supabase.from('point_transactions').insert({
         user_id: user.id,
         amount: -amount,
         type: 'withdraw',
@@ -524,7 +524,7 @@ const MyPageKorea = () => {
         }
       }
 
-      const { error: updateError } = await database
+      const { error: updateError } = await supabase
         .from('applications')
         .update(updateData)
         .eq('id', selectedApplication.id)
