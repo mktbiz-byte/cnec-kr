@@ -690,8 +690,8 @@ const ApplicationsPage = () => {
                     </div>
                   </div>
 
-                  {/* 선정됨/진행중 상태일 때 가이드 및 액션 버튼 */}
-                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
+                  {/* 선정됨/진행중/완료 상태일 때 가이드 및 액션 버튼 */}
+                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'completed', 'paid'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
                       {/* 기획형 캠페인 가이드 */}
                       {app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (
