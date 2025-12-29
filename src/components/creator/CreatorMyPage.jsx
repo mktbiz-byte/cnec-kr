@@ -1318,6 +1318,8 @@ const CreatorMyPage = () => {
                 <Shield size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="password"
+                  name="resident-number-field"
+                  id="resident-number-field"
                   value={residentNumber}
                   onChange={(e) => {
                     const value = e.target.value.replace(/[^0-9-]/g, '')
@@ -1330,12 +1332,13 @@ const CreatorMyPage = () => {
                   }}
                   placeholder="000000-0000000"
                   maxLength={14}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck="false"
                   data-lpignore="true"
                   data-form-type="other"
+                  data-1p-ignore="true"
                   className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl text-lg tracking-wider focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
               </div>
