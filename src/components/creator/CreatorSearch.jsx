@@ -145,18 +145,49 @@ const CreatorSearch = ({ onCampaignClick }) => {
       const campaignsData = await database.campaigns.getAll()
       const now = new Date()
 
+      // 디버깅: 모든 캠페인 데이터 확인
+      console.log('=== 캠페인 필터링 디버그 ===')
+      console.log('전체 캠페인 수:', campaignsData?.length)
+
       const activeCampaigns = campaignsData?.filter(campaign => {
-        if (campaign.status !== 'active') return false
-        if (campaign.approval_status === 'pending_approval') return false
+        const isFiltered = {
+          title: campaign.title,
+          status: campaign.status,
+          approval_status: campaign.approval_status,
+          remaining_slots: campaign.remaining_slots,
+          application_deadline: campaign.application_deadline,
+          reason: null
+        }
+
+        if (campaign.status !== 'active') {
+          isFiltered.reason = 'status가 active가 아님'
+          console.log('필터링됨:', isFiltered)
+          return false
+        }
+        if (campaign.approval_status === 'pending_approval') {
+          isFiltered.reason = 'approval_status가 pending_approval'
+          console.log('필터링됨:', isFiltered)
+          return false
+        }
 
         if (campaign.application_deadline) {
           const deadline = new Date(campaign.application_deadline)
           deadline.setHours(23, 59, 59, 999)
-          if (now > deadline) return false
+          if (now > deadline) {
+            isFiltered.reason = '마감일 지남'
+            console.log('필터링됨:', isFiltered)
+            return false
+          }
         }
 
-        if (campaign.remaining_slots !== undefined && campaign.remaining_slots <= 0) return false
+        // remaining_slots이 숫자이고 0 이하인 경우에만 필터링 (null/undefined는 무제한으로 처리)
+        if (typeof campaign.remaining_slots === 'number' && campaign.remaining_slots <= 0) {
+          isFiltered.reason = 'remaining_slots이 0 이하'
+          console.log('필터링됨:', isFiltered)
+          return false
+        }
 
+        console.log('통과:', campaign.title)
         return true
       }) || []
 

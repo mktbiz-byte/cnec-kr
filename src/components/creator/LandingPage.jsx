@@ -36,6 +36,7 @@ const LandingPage = () => {
         if (c.approval_status === 'pending_approval') return false
         if (c.application_deadline) {
           const deadline = new Date(c.application_deadline)
+          deadline.setHours(23, 59, 59, 999)
           if (now > deadline) return false
         }
         return true
