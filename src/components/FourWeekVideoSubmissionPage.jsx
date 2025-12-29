@@ -263,22 +263,11 @@ export default function FourWeekVideoSubmissionPage() {
         const companyName = campaign.company_name || campaign.brand || '기업'
         const campaignTitle = `${campaign.title} - ${week}주차`
 
-        // 기업 연락처 가져오기 (companies 테이블에서)
-        let companyPhone = null
-        let companyEmail = null
+        // 기업 연락처: campaigns 테이블에서 직접 가져옴
+        const companyPhone = campaign.company_phone
+        const companyEmail = campaign.company_email
 
-        if (campaign.company_id) {
-          const { data: companyData } = await supabase
-            .from('companies')
-            .select('contact_phone, contact_email')
-            .eq('id', campaign.company_id)
-            .single()
-
-          if (companyData) {
-            companyPhone = companyData.contact_phone
-            companyEmail = companyData.contact_email
-          }
-        }
+        console.log('[알림 발송] 기업 정보:', { companyName, companyPhone, companyEmail })
 
         // 카카오톡 알림 발송
         if (companyPhone) {

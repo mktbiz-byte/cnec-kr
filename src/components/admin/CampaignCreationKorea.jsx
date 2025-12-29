@@ -17,6 +17,9 @@ const CampaignCreationKorea = () => {
   const [campaignForm, setCampaignForm] = useState({
     title: '',
     brand: '',
+    company_name: '',
+    company_phone: '',
+    company_email: '',
     description: '',
     requirements: '',
     category: 'youtube',  // youtube, instagram, 4week_challenge
@@ -284,6 +287,38 @@ const CampaignCreationKorea = () => {
                   placeholder="예: 에이블씨엔씨"
                   required
                 />
+              </div>
+
+              {/* 기업 정보 (알림용) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-blue-50 rounded-lg">
+                <div>
+                  <Label htmlFor="company_name">기업명 (알림용)</Label>
+                  <Input
+                    id="company_name"
+                    value={campaignForm.company_name}
+                    onChange={(e) => setCampaignForm(prev => ({ ...prev, company_name: e.target.value }))}
+                    placeholder="예: 주식회사 OOO"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="company_phone">기업 전화번호 (카카오톡 알림)</Label>
+                  <Input
+                    id="company_phone"
+                    value={campaignForm.company_phone}
+                    onChange={(e) => setCampaignForm(prev => ({ ...prev, company_phone: e.target.value }))}
+                    placeholder="예: 01012345678"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="company_email">기업 이메일 (이메일 알림)</Label>
+                  <Input
+                    id="company_email"
+                    type="email"
+                    value={campaignForm.company_email}
+                    onChange={(e) => setCampaignForm(prev => ({ ...prev, company_email: e.target.value }))}
+                    placeholder="예: company@example.com"
+                  />
+                </div>
               </div>
 
               {/* 캠페인 설명 */}
