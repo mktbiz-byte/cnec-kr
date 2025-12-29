@@ -183,9 +183,9 @@ const MyPageKorea = () => {
       }
       setApplications(applicationsData || [])
 
-      // 출금 내역 (Master DB 표준: withdrawal_requests)
+      // 출금 내역
       const { data: withdrawalsData, error: withdrawalsError } = await supabase
-        .from('withdrawal_requests')
+        .from('withdrawals')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -341,9 +341,9 @@ const MyPageKorea = () => {
         return
       }
 
-      // 출금 신청 생성 (Master DB 표준: withdrawal_requests)
+      // 출금 신청 생성
       const { error: withdrawalError } = await supabase
-        .from('withdrawal_requests')
+        .from('withdrawals')
         .insert({
           user_id: user.id,
           amount: amount,

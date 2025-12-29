@@ -451,9 +451,9 @@ const CreatorMyPage = () => {
       const today = new Date()
       const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-      // 1. withdrawal_requests 테이블에 출금 신청 저장
+      // 1. withdrawals 테이블에 출금 신청 저장
       const { error: withdrawalError } = await supabase
-        .from('withdrawal_requests')
+        .from('withdrawals')
         .insert({
           user_id: user.id,
           amount: amount,
