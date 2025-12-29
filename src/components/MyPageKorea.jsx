@@ -374,6 +374,63 @@ const MyPageKorea = () => {
         country_code: 'KR'
       })
 
+      // 카카오 알림톡 + 이메일 발송 (실패해도 출금 신청은 성공으로 처리)
+      try {
+        const today = new Date().toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+
+        // 1. 카카오 알림톡 발송 (팝빌 템플릿: 025100001019 - 출금 접수 완료)
+        if (profile?.phone) {
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiverNum: profile.phone.replace(/-/g, ''),
+              receiverName: profile.name || '',
+              templateCode: '025100001019',
+              variables: {
+                '크리에이터명': profile.name || '크리에이터',
+                '출금금액': amount.toLocaleString(),
+                '신청일': today
+              }
+            })
+          })
+          console.log('출금 알림톡 발송 완료')
+        }
+
+        // 2. 이메일 발송
+        if (profile?.email) {
+          await fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: profile.email,
+              subject: '[CNEC] 출금 신청 접수 완료',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <h2 style="color: #1f2937;">출금 신청 접수</h2>
+                  <p>${profile.name || '크리에이터'}님, 출금 신청이 접수되었습니다.</p>
+                  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>출금 금액:</strong> ${amount.toLocaleString()}원</p>
+                    <p><strong>신청일:</strong> ${today}</p>
+                    <p><strong>입금 계좌:</strong> ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber}</p>
+                  </div>
+                  <p>관리자 승인 후 입금 처리됩니다.</p>
+                  <p style="color: #6b7280;">처리 기간: 매주 월요일</p>
+                  <p style="color: #6b7280;">문의: 1833-6025</p>
+                </div>
+              `
+            })
+          })
+          console.log('출금 안내 이메일 발송 완료')
+        }
+      } catch (notificationError) {
+        console.error('알림 발송 실패 (출금 신청은 정상 처리됨):', notificationError)
+      }
+
       setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내에 처리됩니다.')
       setShowWithdrawModal(false)
       setWithdrawForm({
