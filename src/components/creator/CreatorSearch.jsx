@@ -155,7 +155,8 @@ const CreatorSearch = ({ onCampaignClick }) => {
           if (now > deadline) return false
         }
 
-        if (campaign.remaining_slots !== undefined && campaign.remaining_slots <= 0) return false
+        // remaining_slots이 숫자이고 0 이하인 경우에만 필터링 (null/undefined는 무제한으로 처리)
+        if (typeof campaign.remaining_slots === 'number' && campaign.remaining_slots <= 0) return false
 
         return true
       }) || []
