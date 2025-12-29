@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { supabase } from '../../lib/supabase'
+import { supabase, database } from '../../lib/supabase'
 import {
   ArrowLeft, Wallet, DollarSign, CreditCard, Clock,
   CheckCircle, AlertCircle, Loader2, ChevronRight,
@@ -79,18 +79,16 @@ const PointsPage = () => {
         return sum + (a.campaigns?.creator_points_override || a.campaigns?.reward_points || 0)
       }, 0)
 
-      // 출금 내역 가져오기 (withdrawal_requests 테이블 - Master DB 표준)
+      // 출금 내역 가져오기 (point_transactions 테이블 사용)
       const { data: withdrawalsData } = await supabase
-        .from('withdrawal_requests')
+        .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
+        .eq('transaction_type', 'withdraw')
         .order('created_at', { ascending: false })
 
-      const pendingWithdrawals = withdrawalsData?.filter(w =>
-        w.status === 'pending' || w.status === 'processing'
-      ) || []
-
-      const pendingWithdrawalAmount = pendingWithdrawals.reduce((sum, w) => sum + (w.amount || 0), 0)
+      // 출금은 이미 포인트가 차감된 상태이므로 pending 계산 불필요
+      const pendingWithdrawalAmount = 0
 
       const totalPoints = profileData?.points || 0
       const withdrawablePoints = Math.max(0, totalPoints - pendingWithdrawalAmount)
@@ -127,7 +125,7 @@ const PointsPage = () => {
     }
   }
 
-  // 출금 신청 - 레거시 MyPageKorea.jsx 로직 적용
+  // 출금 신청 - database.userPoints.requestWithdrawal() 헬퍼 사용
   const handleWithdrawRequest = async () => {
     const amount = parseInt(withdrawAmount)
 
@@ -156,38 +154,18 @@ const PointsPage = () => {
       setProcessing(true)
       setError('')
 
-      // 1. 출금 신청 생성 (withdrawal_requests 테이블 - Master DB 표준)
-      const { error: withdrawalError } = await supabase
-        .from('withdrawal_requests')
-        .insert({
-          user_id: user.id,
-          amount: amount,
-          bank_name: profile.bank_name,
-          account_number: profile.account_number,
-          account_holder: profile.account_holder,
-          status: 'pending'
-        })
-
-      if (withdrawalError) throw withdrawalError
-
-      // 2. 포인트 차감 (레거시 로직)
-      const newPoints = (profile.points || 0) - amount
-      const { error: pointsError } = await supabase
-        .from('user_profiles')
-        .update({ points: newPoints })
-        .eq('id', user.id)
-
-      if (pointsError) throw pointsError
-
-      // 3. 포인트 거래 내역 추가 (레거시 로직)
-      await supabase.from('point_transactions').insert({
+      // 출금 신청 (포인트 차감 + 거래 내역 생성)
+      const result = await database.userPoints.requestWithdrawal({
         user_id: user.id,
-        amount: -amount,
-        type: 'withdraw',
-        description: `출금 신청: ${amount.toLocaleString()}원 (${profile.bank_name} ${profile.account_number})`,
-        platform_region: 'kr',
-        country_code: 'KR'
+        amount: amount,
+        bank_name: profile.bank_name,
+        bank_account_number: profile.account_number,
+        bank_account_holder: profile.account_holder
       })
+
+      if (!result.success) {
+        throw new Error(result.error?.message || '출금 신청 처리 실패')
+      }
 
       setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내에 처리됩니다.')
       setShowWithdrawModal(false)
@@ -198,7 +176,7 @@ const PointsPage = () => {
 
     } catch (error) {
       console.error('출금 신청 오류:', error)
-      setError('출금 신청 중 오류가 발생했습니다')
+      setError(error.message || '출금 신청 중 오류가 발생했습니다')
     } finally {
       setProcessing(false)
     }
@@ -405,31 +383,27 @@ const PointsPage = () => {
               </div>
             ) : (
               withdrawalHistory.map((item, idx) => {
-                const status = getWithdrawalStatusBadge(item.status)
+                // point_transactions 데이터에서 출금 금액과 설명 추출
+                const withdrawAmount = Math.abs(item.amount || 0)
                 return (
                   <div
                     key={idx}
                     className="bg-white rounded-2xl p-4 shadow-sm"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${status.color}`}>
-                        {status.label}
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-100 text-green-700">
+                        완료
                       </span>
                       <span className="text-xs text-gray-400">{formatDate(item.created_at)}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600">
-                          {item.bank_name} {item.account_number?.slice(-4)}
+                        <p className="text-sm text-gray-600 truncate max-w-[180px]">
+                          {item.description || '출금'}
                         </p>
                       </div>
-                      <p className="font-bold text-gray-900">{formatCurrency(item.amount)}</p>
+                      <p className="font-bold text-gray-900">{formatCurrency(withdrawAmount)}</p>
                     </div>
-                    {item.processed_at && (
-                      <p className="text-xs text-gray-400 mt-2">
-                        처리일: {formatDate(item.processed_at)}
-                      </p>
-                    )}
                   </div>
                 )
               })
