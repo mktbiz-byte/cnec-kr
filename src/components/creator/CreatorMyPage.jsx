@@ -451,34 +451,93 @@ const CreatorMyPage = () => {
       const today = new Date()
       const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-      // point_transactions 테이블에 출금 기록 저장 (음수 금액)
-      // description에 계좌 정보 및 암호화된 주민번호 저장
-      const description = `출금 신청: ${amount.toLocaleString()}원 (은행: ${profile.bank_name}, 계좌: ${profile.account_number}, 예금주: ${profile.account_holder}) [주민번호:${encryptedResidentNum}]`
+      // 1. withdrawal_requests 테이블에 출금 신청 저장
+      const { error: withdrawalError } = await supabase
+        .from('withdrawal_requests')
+        .insert({
+          user_id: user.id,
+          amount: amount,
+          bank_name: profile.bank_name,
+          account_number: profile.account_number,
+          account_holder: profile.account_holder,
+          status: 'pending'
+        })
+
+      if (withdrawalError) throw withdrawalError
+
+      // 2. 포인트 차감
+      const newPoints = (profile?.points || 0) - amount
+      const { error: pointsError } = await supabase
+        .from('user_profiles')
+        .update({ points: newPoints })
+        .eq('id', user.id)
+
+      if (pointsError) throw pointsError
+
+      // 3. point_transactions 테이블에 거래 내역 저장
+      const description = `출금 신청: ${amount.toLocaleString()}원 (${profile.bank_name} ${profile.account_number})`
 
       const { error: dbError } = await supabase
         .from('point_transactions')
         .insert([{
           user_id: user.id,
-          amount: -amount, // 출금은 음수로 저장
+          amount: -amount,
           type: 'withdraw',
           description: description,
-          created_at: new Date().toISOString()
+          platform_region: 'kr',
+          country_code: 'KR'
         }])
 
       if (dbError) throw dbError
 
-      // 팝빌 알림톡 발송 (출금 접수 완료)
-      if (profile?.phone) {
-        await sendAlimtalk(
-          '025100001019', // 출금 접수 완료 템플릿
-          profile.phone,
-          profile.name || '크리에이터',
-          {
-            '크리에이터명': profile.name || '크리에이터',
-            '출금금액': amount.toLocaleString(),
-            '신청일': dateStr
-          }
-        )
+      // 4. 알림 발송 (실패해도 출금 신청은 성공으로 처리)
+      try {
+        // 카카오 알림톡 발송
+        if (profile?.phone) {
+          await sendAlimtalk(
+            '025100001019',
+            profile.phone,
+            profile.name || '크리에이터',
+            {
+              '크리에이터명': profile.name || '크리에이터',
+              '출금금액': amount.toLocaleString(),
+              '신청일': dateStr
+            }
+          )
+        }
+
+        // 이메일 발송
+        if (profile?.email) {
+          const todayKorean = today.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+          await fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: profile.email,
+              subject: '[CNEC] 출금 신청 접수 완료',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <h2 style="color: #1f2937;">출금 신청 접수</h2>
+                  <p>${profile.name || '크리에이터'}님, 출금 신청이 접수되었습니다.</p>
+                  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>출금 금액:</strong> ${amount.toLocaleString()}원</p>
+                    <p><strong>신청일:</strong> ${todayKorean}</p>
+                    <p><strong>입금 계좌:</strong> ${profile.bank_name} ${profile.account_number}</p>
+                  </div>
+                  <p>관리자 승인 후 입금 처리됩니다.</p>
+                  <p style="color: #6b7280;">처리 기간: 매주 월요일</p>
+                  <p style="color: #6b7280;">문의: 1833-6025</p>
+                </div>
+              `
+            })
+          })
+        }
+      } catch (notificationError) {
+        console.error('알림 발송 실패 (출금 신청은 정상 처리됨):', notificationError)
       }
 
       // 성공 처리
