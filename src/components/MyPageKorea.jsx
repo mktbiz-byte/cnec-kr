@@ -183,11 +183,12 @@ const MyPageKorea = () => {
       }
       setApplications(applicationsData || [])
 
-      // 출금 내역
+      // 출금 내역 (point_transactions에서 type='withdraw'인 것만 조회)
       const { data: withdrawalsData, error: withdrawalsError } = await supabase
-        .from('withdrawals')
+        .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
+        .eq('type', 'withdraw')
         .order('created_at', { ascending: false })
 
       if (withdrawalsError) throw withdrawalsError
@@ -341,21 +342,7 @@ const MyPageKorea = () => {
         return
       }
 
-      // 출금 신청 생성
-      const { error: withdrawalError } = await supabase
-        .from('withdrawals')
-        .insert({
-          user_id: user.id,
-          amount: amount,
-          bank_name: withdrawForm.bankName,
-          account_number: withdrawForm.bankAccountNumber,
-          account_holder: withdrawForm.bankAccountHolder,
-          status: 'pending'
-        })
-
-      if (withdrawalError) throw withdrawalError
-
-      // 포인트 차감
+      // 1. 포인트 차감
       const newPoints = profile.points - amount
       const { error: pointsError } = await supabase
         .from('user_profiles')
@@ -364,15 +351,18 @@ const MyPageKorea = () => {
 
       if (pointsError) throw pointsError
 
-      // 포인트 거래 내역 추가
-      await supabase.from('point_transactions').insert({
+      // 2. point_transactions에 출금 신청 저장
+      // description에 계좌 정보 포함 (관리자가 조회 가능)
+      const { error: txError } = await supabase.from('point_transactions').insert({
         user_id: user.id,
         amount: -amount,
         type: 'withdraw',
-        description: `출금 신청: ${amount.toLocaleString()}포인트 (${withdrawForm.bankName} ${withdrawForm.bankAccountNumber})`,
+        description: `[출금신청] ${amount.toLocaleString()}원 | ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber} (${withdrawForm.bankAccountHolder})`,
         platform_region: 'kr',
         country_code: 'KR'
       })
+
+      if (txError) throw txError
 
       // 카카오 알림톡 + 이메일 발송 (실패해도 출금 신청은 성공으로 처리)
       try {
