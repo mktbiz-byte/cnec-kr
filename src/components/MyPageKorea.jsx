@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import VideoReferencesSection from './VideoReferencesSection'
 import { useAuth } from '../contexts/AuthContext'
-import { database, supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { 
   User, Mail, Phone, MapPin, Calendar, Award, 
   CreditCard, Download, Settings, LogOut, 
@@ -127,7 +127,7 @@ const MyPageKorea = () => {
       setLoading(true)
       
       // 프로필 정보 가져오기
-      const { data: profileData, error: profileError } = await database
+      const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
@@ -183,18 +183,23 @@ const MyPageKorea = () => {
       }
       setApplications(applicationsData || [])
 
-      // 출금 내역 (Master DB 표준: withdrawal_requests)
-      const { data: withdrawalsData, error: withdrawalsError } = await database
-        .from('withdrawal_requests')
+      // 출금 내역 (transaction_type='withdraw')
+      const { data: withdrawalsData, error: withdrawalsError } = await supabase
+        .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
+        .eq('transaction_type', 'withdraw')
         .order('created_at', { ascending: false })
 
-      if (withdrawalsError) throw withdrawalsError
-      setWithdrawals(withdrawalsData || [])
+      if (withdrawalsError) {
+        console.error('출금 내역 조회 오류:', withdrawalsError)
+        setWithdrawals([])
+      } else {
+        setWithdrawals(withdrawalsData || [])
+      }
 
       // 포인트 거래 내역
-      const { data: transactionsData, error: transactionsError } = await database
+      const { data: transactionsData, error: transactionsError } = await supabase
         .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
@@ -251,7 +256,7 @@ const MyPageKorea = () => {
         }
 
         // 암호화 함수 호출
-        const { data: encryptedData, error: encryptError } = await database.rpc(
+        const { data: encryptedData, error: encryptError } = await supabase.rpc(
           'encrypt_resident_number',
           {
             resident_number: editForm.resident_number.replace('-', ''),
@@ -269,7 +274,7 @@ const MyPageKorea = () => {
         updateData.resident_number_encrypted = encryptedData
       }
 
-      const { error: updateError } = await database
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update(updateData)
         .eq('id', user.id)
@@ -326,7 +331,7 @@ const MyPageKorea = () => {
 
       // 주민번호 암호화
       const encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || 'default-key-change-this'
-      const { data: encryptedResident, error: encryptError } = await database.rpc(
+      const { data: encryptedResident, error: encryptError } = await supabase.rpc(
         'encrypt_resident_number',
         {
           resident_number: withdrawForm.residentNumber.replace('-', ''),
@@ -341,38 +346,81 @@ const MyPageKorea = () => {
         return
       }
 
-      // 출금 신청 생성 (Master DB 표준: withdrawal_requests)
-      const { error: withdrawalError } = await database
-        .from('withdrawal_requests')
-        .insert({
-          user_id: user.id,
-          amount: amount,
-          bank_name: withdrawForm.bankName,
-          account_number: withdrawForm.bankAccountNumber,
-          account_holder: withdrawForm.bankAccountHolder,
-          status: 'pending'
-        })
-
-      if (withdrawalError) throw withdrawalError
-
-      // 포인트 차감
+      // 1. 포인트 차감
       const newPoints = profile.points - amount
-      const { error: pointsError } = await database
+      const { error: pointsError } = await supabase
         .from('user_profiles')
         .update({ points: newPoints })
         .eq('id', user.id)
 
       if (pointsError) throw pointsError
 
-      // 포인트 거래 내역 추가
-      await database.from('point_transactions').insert({
+      // 2. point_transactions에 출금 신청 저장
+      const { error: txError } = await supabase.from('point_transactions').insert({
         user_id: user.id,
         amount: -amount,
-        type: 'withdraw',
-        description: `출금 신청: ${amount.toLocaleString()}포인트 (${withdrawForm.bankName} ${withdrawForm.bankAccountNumber})`,
-        platform_region: 'kr',
-        country_code: 'KR'
+        transaction_type: 'withdraw',
+        description: `[출금신청] ${amount.toLocaleString()}원 | ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber} (${withdrawForm.bankAccountHolder})`
       })
+
+      if (txError) throw txError
+
+      // 카카오 알림톡 + 이메일 발송 (실패해도 출금 신청은 성공으로 처리)
+      try {
+        const today = new Date().toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+
+        // 1. 카카오 알림톡 발송 (팝빌 템플릿: 025100001019 - 출금 접수 완료)
+        if (profile?.phone) {
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiverNum: profile.phone.replace(/-/g, ''),
+              receiverName: profile.name || '',
+              templateCode: '025100001019',
+              variables: {
+                '크리에이터명': profile.name || '크리에이터',
+                '출금금액': amount.toLocaleString(),
+                '신청일': today
+              }
+            })
+          })
+          console.log('출금 알림톡 발송 완료')
+        }
+
+        // 2. 이메일 발송
+        if (profile?.email) {
+          await fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: profile.email,
+              subject: '[CNEC] 출금 신청 접수 완료',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <h2 style="color: #1f2937;">출금 신청 접수</h2>
+                  <p>${profile.name || '크리에이터'}님, 출금 신청이 접수되었습니다.</p>
+                  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>출금 금액:</strong> ${amount.toLocaleString()}원</p>
+                    <p><strong>신청일:</strong> ${today}</p>
+                    <p><strong>입금 계좌:</strong> ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber}</p>
+                  </div>
+                  <p>관리자 승인 후 입금 처리됩니다.</p>
+                  <p style="color: #6b7280;">처리 기간: 매주 월요일</p>
+                  <p style="color: #6b7280;">문의: 1833-6025</p>
+                </div>
+              `
+            })
+          })
+          console.log('출금 안내 이메일 발송 완료')
+        }
+      } catch (notificationError) {
+        console.error('알림 발송 실패 (출금 신청은 정상 처리됨):', notificationError)
+      }
 
       setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내에 처리됩니다.')
       setShowWithdrawModal(false)
@@ -524,7 +572,7 @@ const MyPageKorea = () => {
         }
       }
 
-      const { error: updateError } = await database
+      const { error: updateError } = await supabase
         .from('applications')
         .update(updateData)
         .eq('id', selectedApplication.id)

@@ -1077,6 +1077,58 @@ export const database = {
         console.log('포인트 차감 완료:', data)
         return data && data.length > 0 ? data[0] : null
       })
+    },
+
+    // 한국 출금 신청 (포인트 차감 + 거래 내역 생성)
+    async requestWithdrawal({ user_id, amount, bank_name, bank_account_number, bank_account_holder, resident_number_encrypted }) {
+      return safeQuery(async () => {
+        console.log('출금 신청:', { user_id, amount, bank_name })
+
+        // 1. 현재 포인트 조회
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('points')
+          .eq('id', user_id)
+          .single()
+
+        if (profileError) throw profileError
+
+        const currentPoints = profileData?.points || 0
+        if (currentPoints < amount) {
+          throw new Error('보유 포인트가 부족합니다')
+        }
+
+        // 2. 포인트 차감
+        const newPoints = currentPoints - amount
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ points: newPoints })
+          .eq('id', user_id)
+
+        if (updateError) throw updateError
+
+        // 3. point_transactions에 출금 신청 기록
+        const description = `[출금신청] ${amount.toLocaleString()}원 | ${bank_name} ${bank_account_number} (${bank_account_holder})`
+
+        const { data: txData, error: txError } = await supabase
+          .from('point_transactions')
+          .insert([{
+            user_id: user_id,
+            amount: -amount,
+            transaction_type: 'withdraw',
+            description: description
+          }])
+          .select()
+
+        if (txError) throw txError
+
+        console.log('출금 신청 완료:', txData)
+        return {
+          success: true,
+          transaction: txData && txData.length > 0 ? txData[0] : null,
+          newPoints: newPoints
+        }
+      })
     }
   }
 }
