@@ -183,16 +183,20 @@ const MyPageKorea = () => {
       }
       setApplications(applicationsData || [])
 
-      // 출금 내역 (point_transactions에서 type='withdraw'인 것만 조회)
+      // 출금 내역 (description이 '[출금신청]'으로 시작하는 것만 조회)
       const { data: withdrawalsData, error: withdrawalsError } = await supabase
         .from('point_transactions')
         .select('*')
         .eq('user_id', user.id)
-        .eq('type', 'withdraw')
+        .like('description', '[출금신청]%')
         .order('created_at', { ascending: false })
 
-      if (withdrawalsError) throw withdrawalsError
-      setWithdrawals(withdrawalsData || [])
+      if (withdrawalsError) {
+        console.error('출금 내역 조회 오류:', withdrawalsError)
+        setWithdrawals([])
+      } else {
+        setWithdrawals(withdrawalsData || [])
+      }
 
       // 포인트 거래 내역
       const { data: transactionsData, error: transactionsError } = await supabase
@@ -356,10 +360,7 @@ const MyPageKorea = () => {
       const { error: txError } = await supabase.from('point_transactions').insert({
         user_id: user.id,
         amount: -amount,
-        type: 'withdraw',
-        description: `[출금신청] ${amount.toLocaleString()}원 | ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber} (${withdrawForm.bankAccountHolder})`,
-        platform_region: 'kr',
-        country_code: 'KR'
+        description: `[출금신청] ${amount.toLocaleString()}원 | ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber} (${withdrawForm.bankAccountHolder})`
       })
 
       if (txError) throw txError

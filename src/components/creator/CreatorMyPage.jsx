@@ -469,10 +469,7 @@ const CreatorMyPage = () => {
         .insert([{
           user_id: user.id,
           amount: -amount,
-          type: 'withdraw',
-          description: description,
-          platform_region: 'kr',
-          country_code: 'KR'
+          description: description
         }])
 
       if (dbError) throw dbError
