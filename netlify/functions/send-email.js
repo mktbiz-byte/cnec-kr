@@ -45,22 +45,29 @@ exports.handler = async (event, context) => {
     const { to, subject, html, text, settings } = JSON.parse(event.body)
 
     // 필수 파라미터 검증
-    if (!to || !subject || !html || !settings) {
+    if (!to || !subject || !html) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: '필수 파라미터가 누락되었습니다.' })
+        body: JSON.stringify({ error: '필수 파라미터가 누락되었습니다. (to, subject, html)' })
       }
     }
 
-    // SMTP 설정 검증
-    const { smtpHost, smtpPort, smtpUser, smtpPass, smtpSecure, fromEmail, fromName, replyToEmail } = settings
-    
-    if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !fromEmail) {
+    // SMTP 설정: settings가 있으면 사용, 없으면 환경변수에서 읽음
+    const smtpHost = settings?.smtpHost || process.env.SMTP_HOST || 'smtp.gmail.com'
+    const smtpPort = settings?.smtpPort || process.env.SMTP_PORT || '587'
+    const smtpUser = settings?.smtpUser || process.env.SMTP_USER
+    const smtpPass = settings?.smtpPass || process.env.SMTP_PASS
+    const smtpSecure = settings?.smtpSecure || process.env.SMTP_SECURE === 'true'
+    const fromEmail = settings?.fromEmail || process.env.SMTP_FROM_EMAIL || smtpUser
+    const fromName = settings?.fromName || process.env.SMTP_FROM_NAME || 'CNEC Korea'
+    const replyToEmail = settings?.replyToEmail || process.env.SMTP_REPLY_TO || fromEmail
+
+    if (!smtpUser || !smtpPass) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'SMTP 설정이 불완전합니다.' })
+        body: JSON.stringify({ error: 'SMTP 설정이 불완전합니다. settings를 전달하거나 환경변수를 설정해주세요.' })
       }
     }
 
