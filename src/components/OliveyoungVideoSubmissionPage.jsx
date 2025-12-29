@@ -279,79 +279,90 @@ export default function OliveyoungVideoSubmissionPage() {
 
       // 알림 발송
       try {
-        const { data: companyProfile } = await supabase
+        // 크리에이터 이름 가져오기
+        const { data: creatorProfile } = await supabase
           .from('user_profiles')
-          .select('company_name, email, phone')
-          .eq('id', campaign.company_id)
+          .select('name')
+          .eq('id', user.id)
           .single()
 
-        if (companyProfile?.phone) {
-          const { data: creatorProfile } = await supabase
-            .from('user_profiles')
-            .select('name')
-            .eq('id', user.id)
+        const creatorName = creatorProfile?.name || '크리에이터'
+        const companyName = campaign.company_name || campaign.brand || '기업'
+        const campaignTitle = `${campaign.title} - 영상${videoNum}`
+
+        // 기업 연락처 가져오기 (companies 테이블에서)
+        let companyPhone = null
+        let companyEmail = null
+
+        if (campaign.company_id) {
+          const { data: companyData } = await supabase
+            .from('companies')
+            .select('contact_phone, contact_email')
+            .eq('id', campaign.company_id)
             .single()
 
-          const creatorName = creatorProfile?.name || '크리에이터'
-          const campaignTitle = `${campaign.title} - 영상${videoNum}`
-
-          // 카카오톡 알림 발송
-          if (companyProfile.phone) {
-            await fetch('/.netlify/functions/send-alimtalk', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                receiverNum: companyProfile.phone.replace(/-/g, ''),
-                receiverName: companyProfile.company_name || '기업',
-                templateCode: '025100001008',
-                variables: {
-                  '회사명': companyProfile.company_name || '기업',
-                  '캠페인명': campaignTitle,
-                  '크리에이터명': creatorName
-                }
-              })
-            })
+          if (companyData) {
+            companyPhone = companyData.contact_phone
+            companyEmail = companyData.contact_email
           }
+        }
 
-          // 이메일 알림 발송
-          if (companyProfile.email) {
-            await fetch('/.netlify/functions/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: companyProfile.email,
-                subject: `[CNEC] ${campaignTitle} - 크리에이터 영상 제출 알림`,
-                html: `
-                  <div style="font-family: 'Noto Sans KR', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-                      <h1 style="color: white; margin: 0; font-size: 24px;">CNEC</h1>
-                      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">크리에이터 영상 제출 알림</p>
-                    </div>
-                    <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
-                      <h2 style="color: #1f2937; margin-top: 0;">📹 영상이 제출되었습니다!</h2>
-                      <p style="color: #4b5563; line-height: 1.6;">
-                        안녕하세요, <strong>${companyProfile.company_name || '기업'}</strong>님!<br><br>
-                        신청하신 캠페인의 크리에이터가 촬영 영상을 제출했습니다.
-                      </p>
-                      <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        <p style="margin: 0; color: #374151;"><strong>캠페인:</strong> ${campaignTitle}</p>
-                        <p style="margin: 10px 0 0 0; color: #374151;"><strong>크리에이터:</strong> ${creatorName}</p>
-                      </div>
-                      <p style="color: #4b5563; line-height: 1.6;">
-                        관리자 페이지에서 영상을 검토하시고, 수정 사항이 있으면 피드백을 남겨주세요.
-                      </p>
-                      <div style="text-align: center; margin: 30px 0;">
-                        <a href="https://cnec.co.kr/company/applications" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">영상 검토하기</a>
-                      </div>
-                      <p style="color: #6b7280; font-size: 14px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                        문의사항이 있으시면 1833-6025로 연락주세요.
-                      </p>
-                    </div>
+        // 카카오톡 알림 발송
+        if (companyPhone) {
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiverNum: companyPhone.replace(/-/g, ''),
+              receiverName: companyName,
+              templateCode: '025100001008',
+              variables: {
+                '회사명': companyName,
+                '캠페인명': campaignTitle,
+                '크리에이터명': creatorName
+              }
+            })
+          })
+        }
+
+        // 이메일 알림 발송
+        if (companyEmail) {
+          await fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: companyEmail,
+              subject: `[CNEC] ${campaignTitle} - 크리에이터 영상 제출 알림`,
+              html: `
+                <div style="font-family: 'Noto Sans KR', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 24px;">CNEC</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">크리에이터 영상 제출 알림</p>
                   </div>
-                `
-              })
+                  <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                    <h2 style="color: #1f2937; margin-top: 0;">📹 영상이 제출되었습니다!</h2>
+                    <p style="color: #4b5563; line-height: 1.6;">
+                      안녕하세요, <strong>${companyName}</strong>님!<br><br>
+                      신청하신 캠페인의 크리에이터가 촬영 영상을 제출했습니다.
+                    </p>
+                    <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                      <p style="margin: 0; color: #374151;"><strong>캠페인:</strong> ${campaignTitle}</p>
+                      <p style="margin: 10px 0 0 0; color: #374151;"><strong>크리에이터:</strong> ${creatorName}</p>
+                    </div>
+                    <p style="color: #4b5563; line-height: 1.6;">
+                      관리자 페이지에서 영상을 검토하시고, 수정 사항이 있으면 피드백을 남겨주세요.
+                    </p>
+                    <div style="text-align: center; margin: 30px 0;">
+                      <a href="https://cnec.co.kr/company/applications" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">영상 검토하기</a>
+                    </div>
+                    <p style="color: #6b7280; font-size: 14px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                      문의사항이 있으시면 1833-6025로 연락주세요.
+                    </p>
+                  </div>
+                </div>
+              `
             })
-          }
+          })
         }
       } catch (notificationError) {
         console.error('Notification error:', notificationError)
