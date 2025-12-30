@@ -123,68 +123,69 @@ exports.handler = async (event) => {
       );
     });
 
-    // 팝빌 result 코드 확인 (1: 성공, 그 외: 실패)
-    if (result.result !== 1) {
-      // result 코드별 에러 메시지
-      let errorMessage = '계좌 조회에 실패했습니다.';
-
-      switch (result.result) {
-        case 2:
-          errorMessage = '예금주 정보를 확인할 수 없습니다.';
-          break;
-        case 3:
-          errorMessage = '계좌번호 오류입니다. 계좌번호를 확인해주세요.';
-          break;
-        case 4:
-          errorMessage = '해당 은행에서 거래가 정지된 계좌입니다.';
-          break;
-        case 5:
-          errorMessage = '해당 계좌는 해지된 계좌입니다.';
-          break;
-        case 6:
-          errorMessage = '은행 시스템 점검 중입니다. 잠시 후 다시 시도해주세요.';
-          break;
-        case 899:
-          errorMessage = '예금주 조회 서비스 오류입니다. 잠시 후 다시 시도해주세요.';
-          break;
-        default:
-          errorMessage = result.resultMessage || '계좌 조회 중 오류가 발생했습니다.';
-      }
-
-      console.log('[WARN] Account check failed:', {
-        resultCode: result.result,
-        resultMessage: result.resultMessage
+    // 팝빌 result 코드 확인 (1 또는 100: 성공, accountName이 있으면 성공)
+    // accountName이 있으면 성공으로 처리
+    if (result.accountName) {
+      console.log('[SUCCESS] Account verified:', {
+        accountName: result.accountName,
+        bankCode: result.bankCode,
+        resultCode: result.result
       });
 
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          success: false,
-          error: errorMessage,
-          resultCode: result.result,
-          resultMessage: result.resultMessage
+          success: true,
+          accountName: result.accountName,        // 예금주명
+          bankCode: result.bankCode,              // 은행코드
+          accountNumber: result.accountNumber,    // 계좌번호
+          checkDate: result.checkDate,            // 조회일시
+          result: result.result,                  // 조회결과 코드
+          resultMessage: result.resultMessage     // 조회결과 메시지
         })
       };
     }
 
-    // 성공 응답 (result === 1)
-    console.log('[SUCCESS] Account verified:', {
-      accountName: result.accountName,
-      bankCode: result.bankCode
+    // accountName이 없으면 실패로 처리
+    let errorMessage = '계좌 조회에 실패했습니다.';
+
+    switch (result.result) {
+      case 2:
+        errorMessage = '예금주 정보를 확인할 수 없습니다.';
+        break;
+      case 3:
+        errorMessage = '계좌번호 오류입니다. 계좌번호를 확인해주세요.';
+        break;
+      case 4:
+        errorMessage = '해당 은행에서 거래가 정지된 계좌입니다.';
+        break;
+      case 5:
+        errorMessage = '해당 계좌는 해지된 계좌입니다.';
+        break;
+      case 6:
+        errorMessage = '은행 시스템 점검 중입니다. 잠시 후 다시 시도해주세요.';
+        break;
+      case 899:
+        errorMessage = '예금주 조회 서비스 오류입니다. 잠시 후 다시 시도해주세요.';
+        break;
+      default:
+        errorMessage = result.resultMessage || '계좌 조회 중 오류가 발생했습니다.';
+    }
+
+    console.log('[WARN] Account check failed:', {
+      resultCode: result.result,
+      resultMessage: result.resultMessage
     });
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        success: true,
-        accountName: result.accountName,        // 예금주명
-        bankCode: result.bankCode,              // 은행코드
-        accountNumber: result.accountNumber,    // 계좌번호
-        checkDate: result.checkDate,            // 조회일시
-        result: result.result,                  // 조회결과 코드
-        resultMessage: result.resultMessage     // 조회결과 메시지
+        success: false,
+        error: errorMessage,
+        resultCode: result.result,
+        resultMessage: result.resultMessage
       })
     };
 

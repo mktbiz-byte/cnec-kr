@@ -88,16 +88,11 @@ const CreatorMyPage = () => {
         .eq('id', user.id)
         .single()
 
-      // localStorage에서 계좌 정보 로드
-      const bankStorageKey = `cnec_bank_info_${user.id}`
-      const savedBankInfo = localStorage.getItem(bankStorageKey)
-      const bankInfo = savedBankInfo ? JSON.parse(savedBankInfo) : {}
-
       setProfile({
         ...profileData,
-        bank_name: bankInfo.bank_name || '',
-        account_number: bankInfo.account_number || '',
-        account_holder: bankInfo.account_holder || ''
+        bank_name: profileData?.bank_name || '',
+        account_number: profileData?.bank_account_number || '',
+        account_holder: profileData?.bank_account_holder || ''
       })
       setEditForm({
         name: profileData?.name || '',
@@ -111,9 +106,9 @@ const CreatorMyPage = () => {
         instagram_url: profileData?.instagram_url || '',
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
-        bank_name: bankInfo.bank_name || '',
-        account_number: bankInfo.account_number || '',
-        account_holder: bankInfo.account_holder || ''
+        bank_name: profileData?.bank_name || '',
+        account_number: profileData?.bank_account_number || '',
+        account_holder: profileData?.bank_account_holder || ''
       })
 
       // 지원 내역 가져오기 (조인 대신 별도 쿼리)
@@ -267,18 +262,14 @@ const CreatorMyPage = () => {
       console.log('계좌 인증 결과:', result)
 
       if (result.success && result.accountName) {
-        // 입력한 예금주와 실제 예금주 비교 (공백 제거 후 비교)
-        const inputHolder = editForm.account_holder.trim().replace(/\s/g, '')
-        const actualHolder = result.accountName.trim().replace(/\s/g, '')
+        // 은행 API에서 반환한 예금주명으로 인증 완료
+        const bankAccountName = result.accountName.trim()
 
-        if (inputHolder === actualHolder) {
-          setAccountVerified(true)
-          setVerifiedAccountHolder(result.accountName)
-          setSuccess('계좌 인증이 완료되었습니다. 예금주가 일치합니다.')
-          setTimeout(() => setSuccess(''), 3000)
-        } else {
-          setError('예금주가 일치하지 않습니다. 입력하신 이름을 다시 확인해주세요.')
-        }
+        // 인증 완료 상태 설정 (editForm은 건드리지 않음)
+        setVerifiedAccountHolder(bankAccountName)
+        setAccountVerified(true)
+        setSuccess(`계좌 인증 완료! 예금주: ${bankAccountName}`)
+        setTimeout(() => setSuccess(''), 3000)
       } else {
         setError(result.error || '계좌 인증에 실패했습니다')
       }
@@ -290,7 +281,7 @@ const CreatorMyPage = () => {
     }
   }
 
-  // 계좌 정보 저장 (localStorage)
+  // 계좌 정보 저장 (Supabase)
   const handleBankInfoSave = async () => {
     try {
       setProcessing(true)
@@ -304,19 +295,30 @@ const CreatorMyPage = () => {
 
       const bankInfo = {
         bank_name: editForm.bank_name,
-        account_number: editForm.account_number,
-        account_holder: editForm.account_holder,
-        verified: true,
-        verified_at: new Date().toISOString(),
+        bank_account_number: editForm.account_number,
+        bank_account_holder: verifiedAccountHolder || editForm.account_holder,
         updated_at: new Date().toISOString()
       }
 
-      // localStorage에 저장
-      const bankStorageKey = `cnec_bank_info_${user.id}`
-      localStorage.setItem(bankStorageKey, JSON.stringify(bankInfo))
+      // Supabase에 저장
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update(bankInfo)
+        .eq('id', user.id)
 
-      // profile 상태 업데이트
-      setProfile(prev => ({ ...prev, ...bankInfo }))
+      if (updateError) {
+        console.error('계좌 정보 저장 오류:', updateError)
+        setError('계좌 정보 저장에 실패했습니다')
+        return
+      }
+
+      // profile 상태 업데이트 (internal state uses short names)
+      setProfile(prev => ({
+        ...prev,
+        bank_name: editForm.bank_name,
+        account_number: editForm.account_number,
+        account_holder: verifiedAccountHolder || editForm.account_holder
+      }))
       setActiveSection('dashboard')
       setAccountVerified(false)
       setVerifiedAccountHolder('')

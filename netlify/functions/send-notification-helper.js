@@ -36,7 +36,7 @@ async function sendNotification({
       const baseUrl = process.env.URL || 'https://cnectotal.netlify.app'
       console.log('[INFO] Sending Kakao notification to:', receiverNum)
       const kakaoResponse = await axios.post(
-        `${baseUrl}/.netlify/functions/send-kakao-notification`,
+        `${baseUrl}/.netlify/functions/send-alimtalk`,
         {
           receiverNum,
           receiverName,

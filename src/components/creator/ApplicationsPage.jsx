@@ -175,6 +175,8 @@ const ApplicationsPage = () => {
       let applicationsData = appsData || []
       if (applicationsData.length > 0) {
         const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
+        const applicationIds = applicationsData.map(a => a.id).filter(Boolean)
+
         if (campaignIds.length > 0) {
           // 기본 필드만 먼저 조회 (안전한 쿼리)
           const { data: campaignsData, error: campaignsError } = await supabase
@@ -186,10 +188,69 @@ const ApplicationsPage = () => {
             console.error('캠페인 데이터 로드 오류:', campaignsError)
           }
 
-          // 캠페인 데이터 병합
+          // video_submissions 데이터 조회
+          const { data: videoSubmissionsData, error: videoError } = await supabase
+            .from('video_submissions')
+            .select('*')
+            .in('application_id', applicationIds)
+            .order('created_at', { ascending: false })
+
+          if (videoError) {
+            console.error('Video submissions 로드 오류:', videoError)
+          }
+
+          // video_review_comments 조회 - submission_id와 application_id 모두로 조회
+          let videoReviewComments = []
+          const submissionIds = (videoSubmissionsData || []).map(vs => vs.id).filter(Boolean)
+
+          // 1. submission_id로 조회
+          if (submissionIds.length > 0) {
+            const { data: commentsBySubmission, error: err1 } = await supabase
+              .from('video_review_comments')
+              .select('*')
+              .in('submission_id', submissionIds)
+
+            if (!err1 && commentsBySubmission) {
+              videoReviewComments = [...commentsBySubmission]
+            }
+          }
+
+          // 2. application_id로도 조회 (4주/올영 등 week_number, video_number로 매칭 필요)
+          const { data: commentsByApplication, error: err2 } = await supabase
+            .from('video_review_comments')
+            .select('*')
+            .in('application_id', applicationIds)
+
+          if (!err2 && commentsByApplication) {
+            // 중복 제거하면서 추가
+            const existingIds = new Set(videoReviewComments.map(c => c.id))
+            commentsByApplication.forEach(c => {
+              if (!existingIds.has(c.id)) {
+                videoReviewComments.push(c)
+              }
+            })
+          }
+
+          // video_submissions에 video_review_comments 병합
+          // submission_id 또는 (application_id + week_number/video_number) 매칭
+          const videoSubmissionsWithComments = (videoSubmissionsData || []).map(vs => ({
+            ...vs,
+            video_review_comments: videoReviewComments.filter(c => {
+              // submission_id로 매칭
+              if (c.submission_id === vs.id) return true
+              // application_id + week_number 매칭 (4주 챌린지)
+              if (c.application_id === vs.application_id && c.week_number && c.week_number === vs.week_number) return true
+              // application_id + video_number 매칭 (올리브영)
+              if (c.application_id === vs.application_id && c.video_number && c.video_number === vs.video_number) return true
+              return false
+            })
+          }))
+
+          // 캠페인 및 비디오 데이터 병합
           applicationsData = applicationsData.map(app => ({
             ...app,
-            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null,
+            video_submissions: videoSubmissionsWithComments.filter(v => v.application_id === app.id)
           }))
         }
       }
@@ -628,6 +689,32 @@ const ApplicationsPage = () => {
                         {app.campaigns?.title}
                       </p>
 
+                      {/* 기본 정보 (포인트, 마감일) */}
+                      {!['pending', 'rejected', 'cancelled'].includes(app.status) && (
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          {reward > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-bold">
+                              <Gift size={10} />
+                              {formatCurrency(reward)}P
+                            </span>
+                          )}
+                          {deadline && (
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              dDay?.urgent ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              <Calendar size={10} />
+                              마감 {formatDate(deadline)}
+                            </span>
+                          )}
+                          {app.campaigns?.product_shipping_date && ['approved', 'selected', 'virtual_selected'].includes(app.status) && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold">
+                              <Truck size={10} />
+                              발송 {formatDate(app.campaigns.product_shipping_date)}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
                       {/* 상태별 추가 정보 */}
                       {app.status === 'pending' && (
                         <div className="flex items-center justify-between">
@@ -647,38 +734,21 @@ const ApplicationsPage = () => {
                       )}
 
                       {['approved', 'selected', 'virtual_selected'].includes(app.status) && (
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          {app.campaigns?.product_shipping_date && (
-                            <span className="flex items-center gap-1">
-                              <Truck size={12} />
-                              발송: {formatDate(app.campaigns.product_shipping_date)}
-                            </span>
-                          )}
-                          {deadline && (
-                            <span className="flex items-center gap-1">
-                              <Calendar size={12} />
-                              마감: {formatDate(deadline)}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {['filming', 'video_submitted'].includes(app.status) && deadline && (
-                        <div className="flex items-center gap-1 text-xs text-orange-600">
-                          <Clock size={12} />
-                          촬영 마감: {formatDate(deadline)}
-                        </div>
+                        <p className="text-xs text-gray-400">
+                          선정일: {formatDate(app.updated_at)}
+                        </p>
                       )}
 
                       {['completed', 'paid'].includes(app.status) && (
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs text-gray-400">
-                            완료일: {formatDate(app.updated_at)}
-                          </span>
-                          <span className="text-sm font-bold text-emerald-600">
-                            +{formatCurrency(reward)}
-                          </span>
-                        </div>
+                        <p className="text-xs text-gray-400">
+                          완료일: {formatDate(app.updated_at)}
+                        </p>
+                      )}
+
+                      {['filming', 'video_submitted'].includes(app.status) && (
+                        <p className="text-xs text-gray-400">
+                          시작일: {formatDate(app.campaigns?.start_date || app.updated_at)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -784,6 +854,58 @@ const ApplicationsPage = () => {
                                 <Video size={12} /> 영상 업로드
                               </button>
                             )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 수정 요청 알림 배너 - filming 상태에서도 표시 */}
+                      {['filming', 'video_submitted'].includes(app.status) &&
+                       app.video_submissions?.filter(vs => vs.video_review_comments?.length > 0).length > 0 && (
+                        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                            <h4 className="font-semibold text-red-900 text-sm">🎬 영상 수정 요청이 있습니다!</h4>
+                          </div>
+                          <p className="text-xs text-red-700 mb-3">
+                            기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.
+                          </p>
+                          <div className="space-y-2">
+                            {(() => {
+                              // week_number 또는 video_number로 그룹화하여 최신 버전만 표시
+                              const submissionsWithComments = app.video_submissions.filter(vs => vs.video_review_comments?.length > 0)
+                              const groupedByKey = {}
+
+                              submissionsWithComments.forEach(vs => {
+                                const key = vs.week_number ? `week_${vs.week_number}` :
+                                            vs.video_number ? `video_${vs.video_number}` : 'default'
+                                if (!groupedByKey[key] || (vs.version || 1) > (groupedByKey[key].version || 1)) {
+                                  groupedByKey[key] = vs
+                                }
+                              })
+
+                              return Object.values(groupedByKey).map((vs, idx) => {
+                                let label = '영상'
+                                if (app.campaigns?.campaign_type === '4week_challenge' && vs.week_number) {
+                                  label = `Week ${vs.week_number}`
+                                } else if ((app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && vs.video_number) {
+                                  label = `Video ${vs.video_number}`
+                                } else if (Object.keys(groupedByKey).length > 1) {
+                                  label = `영상 ${idx + 1}`
+                                }
+                                const versionLabel = vs.version ? ` V${vs.version}` : ''
+                                return (
+                                  <button
+                                    key={vs.id}
+                                    onClick={() => {
+                                      window.location.href = `/video-review/${vs.id}`
+                                    }}
+                                    className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                                  >
+                                    {label}{versionLabel} 수정 요청 확인하기 ({vs.video_review_comments.length}개)
+                                  </button>
+                                )
+                              })
+                            })()}
                           </div>
                         </div>
                       )}
