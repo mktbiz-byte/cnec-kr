@@ -189,11 +189,9 @@ const ApplicationsPage = () => {
           }
 
           // video_submissions 데이터 조회
-          // user_id와 application_id 모두 필터링하여 정확한 데이터만 가져옴
           const { data: videoSubmissionsData, error: videoError } = await supabase
             .from('video_submissions')
             .select('*')
-            .eq('user_id', user.id)
             .in('application_id', applicationIds)
             .order('created_at', { ascending: false })
 
@@ -201,26 +199,51 @@ const ApplicationsPage = () => {
             console.error('Video submissions 로드 오류:', videoError)
           }
 
-          // video_review_comments 별도 조회 (nested select가 foreign key 설정 없이 작동 안 할 수 있음)
+          // video_review_comments 조회 - submission_id와 application_id 모두로 조회
           let videoReviewComments = []
-          if (videoSubmissionsData && videoSubmissionsData.length > 0) {
-            const submissionIds = videoSubmissionsData.map(vs => vs.id)
-            const { data: commentsData, error: commentsError } = await supabase
+          const submissionIds = (videoSubmissionsData || []).map(vs => vs.id).filter(Boolean)
+
+          // 1. submission_id로 조회
+          if (submissionIds.length > 0) {
+            const { data: commentsBySubmission, error: err1 } = await supabase
               .from('video_review_comments')
               .select('*')
               .in('submission_id', submissionIds)
 
-            if (commentsError) {
-              console.error('Video review comments 로드 오류:', commentsError)
-            } else {
-              videoReviewComments = commentsData || []
+            if (!err1 && commentsBySubmission) {
+              videoReviewComments = [...commentsBySubmission]
             }
           }
 
+          // 2. application_id로도 조회 (4주/올영 등 week_number, video_number로 매칭 필요)
+          const { data: commentsByApplication, error: err2 } = await supabase
+            .from('video_review_comments')
+            .select('*')
+            .in('application_id', applicationIds)
+
+          if (!err2 && commentsByApplication) {
+            // 중복 제거하면서 추가
+            const existingIds = new Set(videoReviewComments.map(c => c.id))
+            commentsByApplication.forEach(c => {
+              if (!existingIds.has(c.id)) {
+                videoReviewComments.push(c)
+              }
+            })
+          }
+
           // video_submissions에 video_review_comments 병합
+          // submission_id 또는 (application_id + week_number/video_number) 매칭
           const videoSubmissionsWithComments = (videoSubmissionsData || []).map(vs => ({
             ...vs,
-            video_review_comments: videoReviewComments.filter(c => c.submission_id === vs.id)
+            video_review_comments: videoReviewComments.filter(c => {
+              // submission_id로 매칭
+              if (c.submission_id === vs.id) return true
+              // application_id + week_number 매칭 (4주 챌린지)
+              if (c.application_id === vs.application_id && c.week_number && c.week_number === vs.week_number) return true
+              // application_id + video_number 매칭 (올리브영)
+              if (c.application_id === vs.application_id && c.video_number && c.video_number === vs.video_number) return true
+              return false
+            })
           }))
 
           // 캠페인 및 비디오 데이터 병합
