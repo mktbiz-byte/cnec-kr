@@ -80,10 +80,31 @@ exports.handler = async (event) => {
     const creatorName = submission.applications?.applicant_name || '크리에이터'
     const campaignTitle = submission.applications?.campaigns?.title || '캠페인'
     const companyName = submission.applications?.campaigns?.company_name || '기업'
-    const companyPhone = submission.applications?.campaigns?.companies?.contact_phone
-    const companyEmail = submission.applications?.campaigns?.companies?.contact_email
+    const companyId = submission.applications?.campaigns?.company_id
 
-    console.log('[INFO] Company info:', { companyName, companyPhone, companyEmail })
+    // nested select로 가져온 회사 정보 (foreign key가 설정된 경우)
+    let companyPhone = submission.applications?.campaigns?.companies?.contact_phone
+    let companyEmail = submission.applications?.campaigns?.companies?.contact_email
+
+    // nested select가 실패한 경우, 별도 쿼리로 회사 정보 조회
+    if ((!companyPhone && !companyEmail) && companyId) {
+      console.log('[INFO] Company info not found in nested select, fetching separately for company_id:', companyId)
+      const { data: companyData, error: companyError } = await supabaseAdmin
+        .from('companies')
+        .select('contact_phone, contact_email')
+        .eq('id', companyId)
+        .single()
+
+      if (!companyError && companyData) {
+        companyPhone = companyData.contact_phone
+        companyEmail = companyData.contact_email
+        console.log('[INFO] Company info fetched successfully:', { companyPhone, companyEmail })
+      } else {
+        console.error('[ERROR] Failed to fetch company info:', companyError)
+      }
+    }
+
+    console.log('[INFO] Company info:', { companyName, companyPhone, companyEmail, companyId })
 
     // 2. 알림톡 + 이메일 발송
     const templateCode = '025100001008' // 영상 제출 템플릿
