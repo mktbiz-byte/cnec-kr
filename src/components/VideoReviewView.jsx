@@ -290,10 +290,10 @@ export default function VideoReviewView() {
         <div className="text-center">
           <p className="text-gray-600">영상을 찾을 수 없습니다.</p>
           <button 
-            onClick={() => navigate('/profile')} 
+            onClick={() => navigate('/my/applications')}
             className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
           >
-            마이페이지로 돌아가기
+            지원 내역으로 돌아가기
           </button>
         </div>
       </div>
@@ -309,11 +309,11 @@ export default function VideoReviewView() {
         {/* Header */}
         <div className="mb-4 md:mb-6">
           <button
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/my/applications')}
             className="mb-3 md:mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="w-4 h-4" />
-            마이페이지로 돌아가기
+            지원 내역으로 돌아가기
           </button>
           <h1 className="text-2xl md:text-3xl font-bold">영상 수정 요청 사항</h1>
           <p className="text-gray-600 mt-2 text-sm md:text-base">

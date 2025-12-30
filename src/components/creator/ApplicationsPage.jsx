@@ -189,12 +189,14 @@ const ApplicationsPage = () => {
           }
 
           // video_submissions 데이터 조회 (video_review_comments 포함)
+          // user_id와 application_id 모두 필터링하여 정확한 데이터만 가져옴
           const { data: videoSubmissionsData, error: videoError } = await supabase
             .from('video_submissions')
             .select(`
               *,
               video_review_comments (*)
             `)
+            .eq('user_id', user.id)
             .in('application_id', applicationIds)
             .order('created_at', { ascending: false })
 
