@@ -175,6 +175,8 @@ const ApplicationsPage = () => {
       let applicationsData = appsData || []
       if (applicationsData.length > 0) {
         const campaignIds = [...new Set(applicationsData.map(a => a.campaign_id).filter(Boolean))]
+        const applicationIds = applicationsData.map(a => a.id).filter(Boolean)
+
         if (campaignIds.length > 0) {
           // 기본 필드만 먼저 조회 (안전한 쿼리)
           const { data: campaignsData, error: campaignsError } = await supabase
@@ -186,10 +188,25 @@ const ApplicationsPage = () => {
             console.error('캠페인 데이터 로드 오류:', campaignsError)
           }
 
-          // 캠페인 데이터 병합
+          // video_submissions 데이터 조회 (video_review_comments 포함)
+          const { data: videoSubmissionsData, error: videoError } = await supabase
+            .from('video_submissions')
+            .select(`
+              *,
+              video_review_comments (*)
+            `)
+            .in('application_id', applicationIds)
+            .order('created_at', { ascending: false })
+
+          if (videoError) {
+            console.error('Video submissions 로드 오류:', videoError)
+          }
+
+          // 캠페인 및 비디오 데이터 병합
           applicationsData = applicationsData.map(app => ({
             ...app,
-            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null,
+            video_submissions: videoSubmissionsData?.filter(v => v.application_id === app.id) || []
           }))
         }
       }
@@ -841,6 +858,26 @@ const ApplicationsPage = () => {
                       {/* video_submitted 상태일 때 영상 재제출 + SNS 업로드 버튼 */}
                       {app.status === 'video_submitted' && (
                         <div className="space-y-2">
+                          {/* 수정 요청 알림 배너 */}
+                          {app.video_submissions?.[0]?.video_review_comments?.length > 0 && (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                                <h4 className="font-semibold text-red-900 text-sm">🎬 영상 수정 요청이 있습니다!</h4>
+                              </div>
+                              <p className="text-xs text-red-700 mb-3">
+                                기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.
+                              </p>
+                              <button
+                                onClick={() => {
+                                  window.location.href = `/video-review/${app.video_submissions[0].id}`
+                                }}
+                                className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                              >
+                                수정 요청 확인하기 ({app.video_submissions[0].video_review_comments.length}개)
+                              </button>
+                            </div>
+                          )}
                           {/* 기획형 캠페인 영상 재제출 */}
                           {app.campaigns?.campaign_type === 'planned' && (
                             <button
