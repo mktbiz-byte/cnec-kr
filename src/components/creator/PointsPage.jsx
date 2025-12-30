@@ -45,7 +45,12 @@ const PointsPage = () => {
         .eq('id', user.id)
         .single()
 
-      setProfile(profileData)
+      // Map database column names to internal state names
+      setProfile({
+        ...profileData,
+        account_number: profileData?.bank_account_number || '',
+        account_holder: profileData?.bank_account_holder || ''
+      })
 
       // 지원 내역에서 정산 예정금 계산 (조인 대신 별도 쿼리)
       const { data: appsData } = await supabase

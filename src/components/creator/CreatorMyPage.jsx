@@ -91,8 +91,8 @@ const CreatorMyPage = () => {
       setProfile({
         ...profileData,
         bank_name: profileData?.bank_name || '',
-        account_number: profileData?.account_number || '',
-        account_holder: profileData?.account_holder || ''
+        account_number: profileData?.bank_account_number || '',
+        account_holder: profileData?.bank_account_holder || ''
       })
       setEditForm({
         name: profileData?.name || '',
@@ -107,8 +107,8 @@ const CreatorMyPage = () => {
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
         bank_name: profileData?.bank_name || '',
-        account_number: profileData?.account_number || '',
-        account_holder: profileData?.account_holder || ''
+        account_number: profileData?.bank_account_number || '',
+        account_holder: profileData?.bank_account_holder || ''
       })
 
       // 지원 내역 가져오기 (조인 대신 별도 쿼리)
@@ -295,8 +295,8 @@ const CreatorMyPage = () => {
 
       const bankInfo = {
         bank_name: editForm.bank_name,
-        account_number: editForm.account_number,
-        account_holder: verifiedAccountHolder || editForm.account_holder,
+        bank_account_number: editForm.account_number,
+        bank_account_holder: verifiedAccountHolder || editForm.account_holder,
         updated_at: new Date().toISOString()
       }
 
@@ -312,8 +312,13 @@ const CreatorMyPage = () => {
         return
       }
 
-      // profile 상태 업데이트
-      setProfile(prev => ({ ...prev, ...bankInfo }))
+      // profile 상태 업데이트 (internal state uses short names)
+      setProfile(prev => ({
+        ...prev,
+        bank_name: editForm.bank_name,
+        account_number: editForm.account_number,
+        account_holder: verifiedAccountHolder || editForm.account_holder
+      }))
       setActiveSection('dashboard')
       setAccountVerified(false)
       setVerifiedAccountHolder('')
