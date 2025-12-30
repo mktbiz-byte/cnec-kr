@@ -188,14 +188,11 @@ const ApplicationsPage = () => {
             console.error('캠페인 데이터 로드 오류:', campaignsError)
           }
 
-          // video_submissions 데이터 조회 (video_review_comments 포함)
+          // video_submissions 데이터 조회
           // user_id와 application_id 모두 필터링하여 정확한 데이터만 가져옴
           const { data: videoSubmissionsData, error: videoError } = await supabase
             .from('video_submissions')
-            .select(`
-              *,
-              video_review_comments (*)
-            `)
+            .select('*')
             .eq('user_id', user.id)
             .in('application_id', applicationIds)
             .order('created_at', { ascending: false })
@@ -204,11 +201,33 @@ const ApplicationsPage = () => {
             console.error('Video submissions 로드 오류:', videoError)
           }
 
+          // video_review_comments 별도 조회 (nested select가 foreign key 설정 없이 작동 안 할 수 있음)
+          let videoReviewComments = []
+          if (videoSubmissionsData && videoSubmissionsData.length > 0) {
+            const submissionIds = videoSubmissionsData.map(vs => vs.id)
+            const { data: commentsData, error: commentsError } = await supabase
+              .from('video_review_comments')
+              .select('*')
+              .in('submission_id', submissionIds)
+
+            if (commentsError) {
+              console.error('Video review comments 로드 오류:', commentsError)
+            } else {
+              videoReviewComments = commentsData || []
+            }
+          }
+
+          // video_submissions에 video_review_comments 병합
+          const videoSubmissionsWithComments = (videoSubmissionsData || []).map(vs => ({
+            ...vs,
+            video_review_comments: videoReviewComments.filter(c => c.submission_id === vs.id)
+          }))
+
           // 캠페인 및 비디오 데이터 병합
           applicationsData = applicationsData.map(app => ({
             ...app,
             campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null,
-            video_submissions: videoSubmissionsData?.filter(v => v.application_id === app.id) || []
+            video_submissions: videoSubmissionsWithComments.filter(v => v.application_id === app.id)
           }))
         }
       }
