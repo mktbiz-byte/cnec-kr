@@ -210,11 +210,22 @@ export default function VideoReviewView() {
       return
     }
 
+    // 현재 버전 확인 (최대 V3까지)
+    const currentVersion = submission?.version || 1
+    const nextVersion = currentVersion + 1
+    if (nextVersion > 3) {
+      alert('영상은 최대 V3까지만 제출 가능합니다.')
+      return
+    }
+
     setUploading(true)
 
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('로그인이 필요합니다.')
+
       const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}.${fileExt}`
+      const fileName = `${user.id}_${submission.campaign_id}_v${nextVersion}_${Date.now()}.${fileExt}`
       const filePath = `video-submissions/${fileName}`
 
       const { error: uploadError } = await supabase.storage
@@ -227,22 +238,55 @@ export default function VideoReviewView() {
         .from('videos')
         .getPublicUrl(filePath)
 
-      const { error: updateError } = await supabase
+      // 새 버전으로 INSERT (기존 레코드 덮어쓰기 대신)
+      const newSubmissionData = {
+        application_id: submission.application_id,
+        campaign_id: submission.campaign_id,
+        user_id: user.id,
+        video_file_url: publicUrl,
+        clean_video_url: submission.clean_video_url,
+        sns_title: submission.sns_title,
+        sns_content: submission.sns_content,
+        hashtags: submission.hashtags,
+        week_number: submission.week_number || null,
+        video_number: submission.video_number || null,
+        version: nextVersion,
+        status: 'submitted',
+        submitted_at: new Date().toISOString()
+      }
+
+      const { data: newSubmission, error: insertError } = await supabase
         .from('video_submissions')
-        .update({
-          video_file_url: publicUrl,
-          status: 'resubmitted',
-          resubmitted_at: new Date().toISOString()
-        })
+        .insert([newSubmissionData])
+        .select()
+        .single()
+
+      if (insertError) throw insertError
+
+      // 기존 submission 상태 업데이트
+      await supabase
+        .from('video_submissions')
+        .update({ status: 'superseded' })
         .eq('id', submissionId)
 
-      if (updateError) throw updateError
+      // 자동으로 알림톡 발송
+      try {
+        await fetch('/.netlify/functions/send-resubmit-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submissionId: newSubmission.id })
+        })
+      } catch (notificationError) {
+        console.error('Notification error:', notificationError)
+      }
 
-      alert('영상이 성공적으로 업로드되었습니다!')
-      loadSubmission()
+      alert(`영상 V${nextVersion}이 제출되었습니다! 기업에게 알림이 전송되었습니다.`)
+
+      // 새 submission 페이지로 이동
+      navigate(`/video-review/${newSubmission.id}`)
     } catch (error) {
       console.error('Error uploading video:', error)
-      alert('영상 업로드에 실패했습니다.')
+      alert('영상 업로드에 실패했습니다: ' + error.message)
     } finally {
       setUploading(false)
     }
@@ -284,12 +328,19 @@ export default function VideoReviewView() {
   const getVideoLabel = () => {
     if (!submission) return ''
     const campaignType = submission.applications?.campaigns?.campaign_type
+    const version = submission.version ? `V${submission.version}` : ''
+
     if (campaignType === '4week_challenge' && submission.week_number) {
-      return `Week ${submission.week_number}`
+      return `Week ${submission.week_number} ${version}`.trim()
     } else if (campaignType === 'oliveyoung' && submission.video_number) {
-      return `Video ${submission.video_number}`
+      return `Video ${submission.video_number} ${version}`.trim()
     }
-    return ''
+    return version
+  }
+
+  // 다음 버전 번호
+  const getNextVersion = () => {
+    return (submission?.version || 1) + 1
   }
 
   if (loading) {
@@ -631,9 +682,16 @@ export default function VideoReviewView() {
         {/* 하단 액션 버튼 */}
         <div className="px-4 pb-8">
           <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 space-y-3">
-            <h3 className="font-bold text-gray-900">수정 완료 후</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900">수정 완료 후</h3>
+              {submission?.version && (
+                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
+                  현재 V{submission.version}
+                </span>
+              )}
+            </div>
             <p className="text-xs text-gray-600">
-              수정 사항을 반영한 영상을 다시 업로드하고 기업에게 알림을 보내주세요.
+              수정 사항을 반영한 영상을 업로드하면 자동으로 기업에게 알림이 전송됩니다.
             </p>
 
             <input
@@ -644,23 +702,24 @@ export default function VideoReviewView() {
               className="hidden"
             />
 
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <Upload className="w-5 h-5" />
-              {uploading ? '업로드 중...' : '영상 재업로드'}
-            </button>
+            {getNextVersion() <= 3 ? (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <Upload className="w-5 h-5" />
+                {uploading ? '업로드 중...' : `영상 V${getNextVersion()} 업로드`}
+              </button>
+            ) : (
+              <div className="w-full py-3.5 bg-gray-200 text-gray-500 rounded-xl font-bold text-center">
+                최대 버전(V3)에 도달했습니다
+              </div>
+            )}
 
-            <button
-              onClick={sendReviewCompleteNotification}
-              disabled={sending}
-              className="w-full py-3.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <CheckCircle className="w-5 h-5" />
-              {sending ? '전송 중...' : '수정 완료 알림 보내기'}
-            </button>
+            <p className="text-xs text-gray-400 text-center">
+              * 영상 업로드 시 자동으로 알림톡이 전송됩니다
+            </p>
           </div>
         </div>
       </div>
