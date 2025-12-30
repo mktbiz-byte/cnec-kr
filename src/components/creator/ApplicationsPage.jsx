@@ -689,6 +689,32 @@ const ApplicationsPage = () => {
                         {app.campaigns?.title}
                       </p>
 
+                      {/* 기본 정보 (포인트, 마감일) */}
+                      {!['pending', 'rejected', 'cancelled'].includes(app.status) && (
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          {reward > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-bold">
+                              <Gift size={10} />
+                              {formatCurrency(reward)}P
+                            </span>
+                          )}
+                          {deadline && (
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              dDay?.urgent ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              <Calendar size={10} />
+                              마감 {formatDate(deadline)}
+                            </span>
+                          )}
+                          {app.campaigns?.product_shipping_date && ['approved', 'selected', 'virtual_selected'].includes(app.status) && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold">
+                              <Truck size={10} />
+                              발송 {formatDate(app.campaigns.product_shipping_date)}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
                       {/* 상태별 추가 정보 */}
                       {app.status === 'pending' && (
                         <div className="flex items-center justify-between">
@@ -708,38 +734,21 @@ const ApplicationsPage = () => {
                       )}
 
                       {['approved', 'selected', 'virtual_selected'].includes(app.status) && (
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          {app.campaigns?.product_shipping_date && (
-                            <span className="flex items-center gap-1">
-                              <Truck size={12} />
-                              발송: {formatDate(app.campaigns.product_shipping_date)}
-                            </span>
-                          )}
-                          {deadline && (
-                            <span className="flex items-center gap-1">
-                              <Calendar size={12} />
-                              마감: {formatDate(deadline)}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {['filming', 'video_submitted'].includes(app.status) && deadline && (
-                        <div className="flex items-center gap-1 text-xs text-orange-600">
-                          <Clock size={12} />
-                          촬영 마감: {formatDate(deadline)}
-                        </div>
+                        <p className="text-xs text-gray-400">
+                          선정일: {formatDate(app.updated_at)}
+                        </p>
                       )}
 
                       {['completed', 'paid'].includes(app.status) && (
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs text-gray-400">
-                            완료일: {formatDate(app.updated_at)}
-                          </span>
-                          <span className="text-sm font-bold text-emerald-600">
-                            +{formatCurrency(reward)}
-                          </span>
-                        </div>
+                        <p className="text-xs text-gray-400">
+                          완료일: {formatDate(app.updated_at)}
+                        </p>
+                      )}
+
+                      {['filming', 'video_submitted'].includes(app.status) && (
+                        <p className="text-xs text-gray-400">
+                          시작일: {formatDate(app.campaigns?.start_date || app.updated_at)}
+                        </p>
                       )}
                     </div>
                   </div>
