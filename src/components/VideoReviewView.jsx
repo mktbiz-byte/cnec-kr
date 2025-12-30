@@ -378,6 +378,46 @@ export default function VideoReviewView() {
               >
                 브라우저가 비디오를 지원하지 않습니다.
               </video>
+
+              {/* 피드백 위치 마커 (네모 박스) */}
+              {comments.map((comment, index) => {
+                const x = comment.box_x || (20 + (comment.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 60))
+                const y = comment.box_y || (20 + ((comment.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) * 7) % 60))
+                const width = comment.box_width || 120
+                const height = comment.box_height || 120
+                const isSelected = selectedComment === comment.id
+
+                const timeDiff = Math.abs(currentTime - comment.timestamp)
+                const isVisible = isPaused && timeDiff <= 2
+
+                if (!isVisible) return null
+
+                return (
+                  <div
+                    key={comment.id}
+                    className={`absolute cursor-pointer transition-all ${
+                      isSelected ? 'border-4 border-yellow-500 z-20' : 'border-4 border-red-500 z-10'
+                    }`}
+                    style={{
+                      left: `${x}%`,
+                      top: `${y}%`,
+                      width: `${Math.min(width, 100)}px`,
+                      height: `${Math.min(height, 100)}px`,
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      seekToTimestamp(comment.timestamp, comment.id)
+                    }}
+                  >
+                    <div className={`absolute -top-7 left-1/2 transform -translate-x-1/2 px-2 py-0.5 rounded text-xs font-bold whitespace-nowrap ${
+                      isSelected ? 'bg-yellow-500 text-black' : 'bg-red-600 text-white'
+                    }`}>
+                      #{index + 1} {formatTime(comment.timestamp)}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
             {/* 타임라인 마커 */}
