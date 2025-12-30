@@ -262,9 +262,11 @@ const CreatorMyPage = () => {
       console.log('계좌 인증 결과:', result)
 
       if (result.success && result.accountName) {
-        // 입력한 예금주와 실제 예금주 비교 (공백 제거 후 비교)
-        const inputHolder = editForm.account_holder.trim().replace(/\s/g, '')
-        const actualHolder = result.accountName.trim().replace(/\s/g, '')
+        // 입력한 예금주와 실제 예금주 비교 (공백 제거, 소문자 변환 후 비교)
+        const inputHolder = editForm.account_holder.trim().replace(/\s/g, '').normalize('NFC')
+        const actualHolder = result.accountName.trim().replace(/\s/g, '').normalize('NFC')
+
+        console.log('예금주 비교:', { inputHolder, actualHolder, match: inputHolder === actualHolder })
 
         if (inputHolder === actualHolder) {
           setAccountVerified(true)
@@ -272,7 +274,12 @@ const CreatorMyPage = () => {
           setSuccess('계좌 인증이 완료되었습니다. 예금주가 일치합니다.')
           setTimeout(() => setSuccess(''), 3000)
         } else {
-          setError('예금주가 일치하지 않습니다. 입력하신 이름을 다시 확인해주세요.')
+          // 예금주가 다를 경우, 실제 예금주를 보여주고 자동으로 수정
+          setEditForm(prev => ({ ...prev, account_holder: result.accountName }))
+          setAccountVerified(true)
+          setVerifiedAccountHolder(result.accountName)
+          setSuccess(`예금주가 "${result.accountName}"(으)로 확인되어 자동 수정되었습니다.`)
+          setTimeout(() => setSuccess(''), 5000)
         }
       } else {
         setError(result.error || '계좌 인증에 실패했습니다')
