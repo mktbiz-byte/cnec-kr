@@ -88,16 +88,11 @@ const CreatorMyPage = () => {
         .eq('id', user.id)
         .single()
 
-      // localStorage에서 계좌 정보 로드
-      const bankStorageKey = `cnec_bank_info_${user.id}`
-      const savedBankInfo = localStorage.getItem(bankStorageKey)
-      const bankInfo = savedBankInfo ? JSON.parse(savedBankInfo) : {}
-
       setProfile({
         ...profileData,
-        bank_name: bankInfo.bank_name || '',
-        account_number: bankInfo.account_number || '',
-        account_holder: bankInfo.account_holder || ''
+        bank_name: profileData?.bank_name || '',
+        account_number: profileData?.account_number || '',
+        account_holder: profileData?.account_holder || ''
       })
       setEditForm({
         name: profileData?.name || '',
@@ -111,9 +106,9 @@ const CreatorMyPage = () => {
         instagram_url: profileData?.instagram_url || '',
         tiktok_url: profileData?.tiktok_url || '',
         youtube_url: profileData?.youtube_url || '',
-        bank_name: bankInfo.bank_name || '',
-        account_number: bankInfo.account_number || '',
-        account_holder: bankInfo.account_holder || ''
+        bank_name: profileData?.bank_name || '',
+        account_number: profileData?.account_number || '',
+        account_holder: profileData?.account_holder || ''
       })
 
       // 지원 내역 가져오기 (조인 대신 별도 쿼리)
@@ -290,7 +285,7 @@ const CreatorMyPage = () => {
     }
   }
 
-  // 계좌 정보 저장 (localStorage)
+  // 계좌 정보 저장 (Supabase)
   const handleBankInfoSave = async () => {
     try {
       setProcessing(true)
@@ -306,14 +301,20 @@ const CreatorMyPage = () => {
         bank_name: editForm.bank_name,
         account_number: editForm.account_number,
         account_holder: editForm.account_holder,
-        verified: true,
-        verified_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
 
-      // localStorage에 저장
-      const bankStorageKey = `cnec_bank_info_${user.id}`
-      localStorage.setItem(bankStorageKey, JSON.stringify(bankInfo))
+      // Supabase에 저장
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update(bankInfo)
+        .eq('id', user.id)
+
+      if (updateError) {
+        console.error('계좌 정보 저장 오류:', updateError)
+        setError('계좌 정보 저장에 실패했습니다')
+        return
+      }
 
       // profile 상태 업데이트
       setProfile(prev => ({ ...prev, ...bankInfo }))
