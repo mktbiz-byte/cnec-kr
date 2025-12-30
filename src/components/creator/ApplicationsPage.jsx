@@ -858,8 +858,8 @@ const ApplicationsPage = () => {
                       {/* video_submitted 상태일 때 영상 재제출 + SNS 업로드 버튼 */}
                       {app.status === 'video_submitted' && (
                         <div className="space-y-2">
-                          {/* 수정 요청 알림 배너 */}
-                          {app.video_submissions?.[0]?.video_review_comments?.length > 0 && (
+                          {/* 수정 요청 알림 배너 - 모든 영상의 수정요청 표시 */}
+                          {app.video_submissions?.filter(vs => vs.video_review_comments?.length > 0).length > 0 && (
                             <div className="bg-red-50 border border-red-200 rounded-xl p-3">
                               <div className="flex items-center gap-2 mb-2">
                                 <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
@@ -868,14 +868,32 @@ const ApplicationsPage = () => {
                               <p className="text-xs text-red-700 mb-3">
                                 기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.
                               </p>
-                              <button
-                                onClick={() => {
-                                  window.location.href = `/video-review/${app.video_submissions[0].id}`
-                                }}
-                                className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
-                              >
-                                수정 요청 확인하기 ({app.video_submissions[0].video_review_comments.length}개)
-                              </button>
+                              <div className="space-y-2">
+                                {app.video_submissions
+                                  .filter(vs => vs.video_review_comments?.length > 0)
+                                  .map((vs, idx) => {
+                                    // 영상 라벨 결정 (4주챌린지: Week N, 올리브영: Video N, 일반: 영상)
+                                    let label = '영상'
+                                    if (app.campaigns?.campaign_type === '4week_challenge' && vs.week_number) {
+                                      label = `Week ${vs.week_number}`
+                                    } else if ((app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && vs.video_number) {
+                                      label = `Video ${vs.video_number}`
+                                    } else if (app.video_submissions.filter(v => v.video_review_comments?.length > 0).length > 1) {
+                                      label = `영상 ${idx + 1}`
+                                    }
+                                    return (
+                                      <button
+                                        key={vs.id}
+                                        onClick={() => {
+                                          window.location.href = `/video-review/${vs.id}`
+                                        }}
+                                        className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                                      >
+                                        {label} 수정 요청 확인하기 ({vs.video_review_comments.length}개)
+                                      </button>
+                                    )
+                                  })}
+                              </div>
                             </div>
                           )}
                           {/* 기획형 캠페인 영상 재제출 */}
