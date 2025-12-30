@@ -11,6 +11,7 @@ export default function VideoReviewView() {
   const fileInputRef = useRef(null)
 
   const [submission, setSubmission] = useState(null)
+  const [allVersions, setAllVersions] = useState([]) // 모든 버전 목록
   const [comments, setComments] = useState([])
   const [replies, setReplies] = useState({})
   const [loading, setLoading] = useState(true)
@@ -83,6 +84,25 @@ export default function VideoReviewView() {
               submissionData.applications.campaigns = campaignData
             }
           }
+        }
+
+        // 동일 application의 모든 버전 조회
+        let versionsQuery = supabase
+          .from('video_submissions')
+          .select('id, version, status, created_at')
+          .eq('application_id', submissionData.application_id)
+
+        // week_number 또는 video_number가 있으면 해당 조건 추가
+        if (submissionData.week_number) {
+          versionsQuery = versionsQuery.eq('week_number', submissionData.week_number)
+        } else if (submissionData.video_number) {
+          versionsQuery = versionsQuery.eq('video_number', submissionData.video_number)
+        }
+
+        const { data: versions } = await versionsQuery.order('version', { ascending: true })
+
+        if (versions && versions.length > 0) {
+          setAllVersions(versions)
         }
       }
 
@@ -403,6 +423,34 @@ export default function VideoReviewView() {
       </div>
 
       <div className="max-w-lg mx-auto">
+        {/* 버전 탭 네비게이션 */}
+        {allVersions.length > 1 && (
+          <div className="px-4 pt-4">
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {allVersions.map((v) => (
+                <button
+                  key={v.id}
+                  onClick={() => {
+                    if (v.id !== submissionId) {
+                      navigate(`/video-review/${v.id}`)
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                    v.id === submissionId
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  V{v.version || 1}
+                  {v.status === 'revision_requested' && (
+                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* 안내 배너 */}
         <div className="px-4 pt-4">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-2xl p-4">

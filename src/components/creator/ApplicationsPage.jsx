@@ -861,17 +861,29 @@ const ApplicationsPage = () => {
                             기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.
                           </p>
                           <div className="space-y-2">
-                            {app.video_submissions
-                              .filter(vs => vs.video_review_comments?.length > 0)
-                              .map((vs, idx) => {
+                            {(() => {
+                              // week_number 또는 video_number로 그룹화하여 최신 버전만 표시
+                              const submissionsWithComments = app.video_submissions.filter(vs => vs.video_review_comments?.length > 0)
+                              const groupedByKey = {}
+
+                              submissionsWithComments.forEach(vs => {
+                                const key = vs.week_number ? `week_${vs.week_number}` :
+                                            vs.video_number ? `video_${vs.video_number}` : 'default'
+                                if (!groupedByKey[key] || (vs.version || 1) > (groupedByKey[key].version || 1)) {
+                                  groupedByKey[key] = vs
+                                }
+                              })
+
+                              return Object.values(groupedByKey).map((vs, idx) => {
                                 let label = '영상'
                                 if (app.campaigns?.campaign_type === '4week_challenge' && vs.week_number) {
                                   label = `Week ${vs.week_number}`
                                 } else if ((app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && vs.video_number) {
                                   label = `Video ${vs.video_number}`
-                                } else if (app.video_submissions.filter(v => v.video_review_comments?.length > 0).length > 1) {
+                                } else if (Object.keys(groupedByKey).length > 1) {
                                   label = `영상 ${idx + 1}`
                                 }
+                                const versionLabel = vs.version ? ` V${vs.version}` : ''
                                 return (
                                   <button
                                     key={vs.id}
@@ -880,10 +892,11 @@ const ApplicationsPage = () => {
                                     }}
                                     className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
                                   >
-                                    {label} 수정 요청 확인하기 ({vs.video_review_comments.length}개)
+                                    {label}{versionLabel} 수정 요청 확인하기 ({vs.video_review_comments.length}개)
                                   </button>
                                 )
-                              })}
+                              })
+                            })()}
                           </div>
                         </div>
                       )}
