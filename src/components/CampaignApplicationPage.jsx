@@ -215,11 +215,9 @@ const CampaignApplicationPage = () => {
     }
   }
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ko-KR', {
-      style: 'currency',
-      currency: 'KRW'
-    }).format(amount || 0)
+  const formatPoints = (amount) => {
+    if (!amount) return '0P'
+    return `${amount.toLocaleString()}P`
   }
 
   const getPlatformBadge = (platform) => {
@@ -326,10 +324,10 @@ const CampaignApplicationPage = () => {
               
               <div className="text-right ml-6">
                 <div className="text-3xl font-bold text-purple-600 mb-1">
-                  {formatCurrency(campaign.reward_amount)}
+                  {formatPoints(campaign.reward_points || campaign.reward_amount)}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {language === 'ko' ? '보상' : '報酬'}
+                  {language === 'ko' ? '포인트' : 'ポイント'}
                 </div>
                 <Badge className="bg-green-100 text-green-800 mt-2">
                   {language === 'ko' ? '모집중' : '募集中'}

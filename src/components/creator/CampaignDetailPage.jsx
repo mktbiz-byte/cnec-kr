@@ -63,9 +63,9 @@ const CampaignDetailPage = () => {
     }
   }
 
-  const formatPrice = (amount) => {
+  const formatPoints = (amount) => {
     if (!amount) return '-'
-    return `${Number(amount).toLocaleString()}원`
+    return `${Number(amount).toLocaleString()}P`
   }
 
   const formatDate = (dateStr) => {
@@ -264,11 +264,11 @@ const CampaignDetailPage = () => {
             <p className="text-sm text-gray-600 mb-3">{campaign.product_name}</p>
           )}
 
-          {/* 원고료 & 모집인원 */}
+          {/* 포인트 & 모집인원 */}
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <DollarSign size={18} className="text-violet-500" />
-              <span className="text-2xl font-bold text-violet-600">{formatPrice(reward)}</span>
+              <Gift size={18} className="text-violet-500" />
+              <span className="text-2xl font-bold text-violet-600">{formatPoints(reward)}</span>
             </div>
             {campaign.total_slots && (
               <div className="flex items-center gap-1 text-gray-500 text-sm">

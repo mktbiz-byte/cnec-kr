@@ -40,11 +40,9 @@ const HomePage = () => {
     }
   }
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('ko-KR', {
-      style: 'currency',
-      currency: 'KRW'
-    }).format(amount || 0)
+  const formatPoints = (amount) => {
+    if (!amount) return '0P'
+    return `${amount.toLocaleString()}P`
   }
 
   const getCampaignTypeBadge = (campaignType) => {
@@ -199,7 +197,7 @@ const HomePage = () => {
               <CardContent className="pt-6">
                 <Award className="h-8 w-8 text-orange-600 mx-auto mb-2" />
                 <div className="text-3xl font-bold text-orange-600 mb-1">
-                  {formatCurrency(stats.totalRewards)}
+                  {formatPoints(stats.totalRewards)}
                 </div>
                 <div className="text-gray-600">{t('totalRewards')}</div>
               </CardContent>
@@ -264,10 +262,10 @@ const HomePage = () => {
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-purple-600">
-                          {formatCurrency(campaign.reward_points * 0.6)}
+                          {formatPoints(campaign.reward_points * 0.6)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {language === 'ko' ? '보상' : '報酬'}
+                          {language === 'ko' ? '포인트' : 'ポイント'}
                         </div>
                       </div>
                     </div>
