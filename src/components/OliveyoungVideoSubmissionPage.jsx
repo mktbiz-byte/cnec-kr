@@ -356,6 +356,36 @@ export default function OliveyoungVideoSubmissionPage() {
           .eq('id', video2.submission.id)
       }
 
+      // 기업에게 SNS 업로드 완료 알림톡 발송
+      try {
+        const companyId = campaign?.company_id
+        if (companyId) {
+          const { data: companyData } = await supabase
+            .from('companies')
+            .select('company_name, phone')
+            .eq('id', companyId)
+            .single()
+
+          if (companyData?.phone) {
+            await fetch('/.netlify/functions/send-alimtalk', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                receiverNum: companyData.phone.replace(/-/g, ''),
+                receiverName: companyData.company_name,
+                templateCode: '025100001009',
+                variables: {
+                  '회사명': companyData.company_name,
+                  '캠페인명': campaign?.title || '캠페인'
+                }
+              })
+            })
+          }
+        }
+      } catch (notificationError) {
+        console.error('알림톡 발송 오류:', notificationError)
+      }
+
       setSuccess('SNS 업로드 정보가 저장되었습니다!')
       setTimeout(() => navigate('/my/applications'), 2000)
 

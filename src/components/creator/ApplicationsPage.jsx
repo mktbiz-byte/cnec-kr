@@ -542,6 +542,37 @@ const ApplicationsPage = () => {
 
       if (updateError) throw updateError
 
+      // 기업에게 SNS 업로드 완료 알림톡 발송
+      try {
+        // 기업 정보 조회
+        const companyId = selectedApplication.campaigns?.company_id
+        if (companyId) {
+          const { data: companyData } = await supabase
+            .from('companies')
+            .select('company_name, phone')
+            .eq('id', companyId)
+            .single()
+
+          if (companyData?.phone) {
+            await fetch('/.netlify/functions/send-alimtalk', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                receiverNum: companyData.phone.replace(/-/g, ''),
+                receiverName: companyData.company_name,
+                templateCode: '025100001009',
+                variables: {
+                  '회사명': companyData.company_name,
+                  '캠페인명': selectedApplication.campaigns?.title || '캠페인'
+                }
+              })
+            })
+          }
+        }
+      } catch (notificationError) {
+        console.error('알림톡 발송 오류:', notificationError)
+      }
+
       setSuccess('SNS 업로드가 완료되었습니다. 관리자 승인 후 포인트가 지급됩니다.')
       setShowSnsUploadModal(false)
       setSelectedApplication(null)
