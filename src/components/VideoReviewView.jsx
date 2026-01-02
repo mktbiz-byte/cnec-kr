@@ -76,7 +76,7 @@ export default function VideoReviewView() {
           if (applicationData.campaign_id) {
             const { data: campaignData, error: campaignError } = await supabase
               .from('campaigns')
-              .select('title, company_name, company_id, campaign_type')
+              .select('title, company_name, company_id, company_phone, campaign_type')
               .eq('id', applicationData.campaign_id)
               .single()
 
