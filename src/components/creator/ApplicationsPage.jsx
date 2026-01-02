@@ -544,25 +544,27 @@ const ApplicationsPage = () => {
 
       // 기업에게 SNS 업로드 완료 알림톡 발송
       try {
-        // 기업 정보 조회
         const companyId = selectedApplication.campaigns?.company_id
+        const companyName = selectedApplication.campaigns?.company_name || '기업'
+
         if (companyId) {
-          const { data: companyData } = await supabase
-            .from('companies')
-            .select('company_name, phone')
+          // user_profiles에서 기업 전화번호 조회
+          const { data: companyProfile } = await supabase
+            .from('user_profiles')
+            .select('phone')
             .eq('id', companyId)
             .single()
 
-          if (companyData?.phone) {
+          if (companyProfile?.phone) {
             await fetch('/.netlify/functions/send-alimtalk', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                receiverNum: companyData.phone.replace(/-/g, ''),
-                receiverName: companyData.company_name,
+                receiverNum: companyProfile.phone.replace(/-/g, ''),
+                receiverName: companyName,
                 templateCode: '025100001009',
                 variables: {
-                  '회사명': companyData.company_name,
+                  '회사명': companyName,
                   '캠페인명': selectedApplication.campaigns?.title || '캠페인'
                 }
               })
