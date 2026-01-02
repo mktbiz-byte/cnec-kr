@@ -1815,24 +1815,22 @@ const ApplicationsPage = () => {
                 </div>
               )}
 
-              {/* 광고코드 (파트너십 코드) */}
-              {selectedApplication.campaigns?.ad_code_required && (
-                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-orange-800 mb-2">
-                    광고코드 (파트너십 코드)
-                  </label>
-                  <input
-                    type="text"
-                    value={snsUploadForm.partnership_code}
-                    onChange={(e) => setSnsUploadForm({...snsUploadForm, partnership_code: e.target.value})}
-                    className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
-                    placeholder="인스타그램 파트너십 광고 코드"
-                  />
-                  <p className="text-xs text-orange-600 mt-2">
-                    인스타그램 업로드 시 파트너십 광고 표시에 사용한 코드를 입력해주세요.
-                  </p>
-                </div>
-              )}
+              {/* 광고코드 (파트너십 코드) - 모든 캠페인에서 표시 */}
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <label className="block text-sm font-medium text-orange-800 mb-2">
+                  광고코드 (파트너십 코드)
+                </label>
+                <input
+                  type="text"
+                  value={snsUploadForm.partnership_code}
+                  onChange={(e) => setSnsUploadForm({...snsUploadForm, partnership_code: e.target.value})}
+                  className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                  placeholder="인스타그램 파트너십 광고 코드"
+                />
+                <p className="text-xs text-orange-600 mt-2">
+                  인스타그램 업로드 시 파트너십 광고 표시에 사용한 코드를 입력해주세요.
+                </p>
+              </div>
 
               {/* 메모 */}
               <div>
