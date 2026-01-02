@@ -250,13 +250,22 @@ export default function VideoSubmissionPage() {
 
       // 알림 발송
       try {
-        const { data: companyProfile } = await supabase
-          .from('user_profiles')
-          .select('company_name, email, phone')
-          .eq('id', campaign.company_id)
-          .single()
+        const companyName = campaign?.company_name || '기업'
 
-        if (companyProfile) {
+        // 1. 캠페인에 저장된 company_phone 먼저 확인
+        let companyPhone = campaign?.company_phone
+
+        // 2. 없으면 user_profiles에서 조회
+        if (!companyPhone && campaign?.company_id) {
+          const { data: companyProfile } = await supabase
+            .from('user_profiles')
+            .select('phone')
+            .eq('id', campaign.company_id)
+            .single()
+          companyPhone = companyProfile?.phone
+        }
+
+        if (companyPhone) {
           const { data: creatorProfile } = await supabase
             .from('user_profiles')
             .select('name')
@@ -265,22 +274,22 @@ export default function VideoSubmissionPage() {
 
           const creatorName = creatorProfile?.name || '크리에이터'
 
-          if (companyProfile.phone) {
-            await fetch('/.netlify/functions/send-alimtalk', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                receiverNum: companyProfile.phone.replace(/-/g, ''),
-                receiverName: companyProfile.company_name || '기업',
-                templateCode: '025100001008',
-                variables: {
-                  '회사명': companyProfile.company_name || '기업',
-                  '캠페인명': campaign.title,
-                  '크리에이터명': creatorName
-                }
-              })
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiverNum: companyPhone.replace(/-/g, ''),
+              receiverName: companyName,
+              templateCode: '025100001008',
+              variables: {
+                '회사명': companyName,
+                '캠페인명': campaign.title,
+                '크리에이터명': creatorName
+              }
             })
-          }
+          })
+        } else {
+          console.log('기업 전화번호가 없어 알림톡을 발송하지 않습니다.')
         }
       } catch (notificationError) {
         console.error('Notification error:', notificationError)
