@@ -189,9 +189,9 @@ const CampaignApplyPage = () => {
     }
   }
 
-  const formatPrice = (amount) => {
+  const formatPoints = (amount) => {
     if (!amount) return '-'
-    return `${Number(amount).toLocaleString()}원`
+    return `${Number(amount).toLocaleString()}P`
   }
 
   const formatDate = (dateStr) => {
@@ -354,8 +354,8 @@ const CampaignApplyPage = () => {
               <h2 className="text-sm font-bold text-gray-900 line-clamp-2">{campaign.title}</h2>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-sm font-bold text-violet-600 flex items-center gap-1">
-                  <DollarSign size={14} />
-                  {formatPrice(reward)}
+                  <Gift size={14} />
+                  {formatPoints(reward)}
                 </span>
                 {campaign.application_deadline && (
                   <span className="text-xs text-gray-500 flex items-center gap-1">

@@ -470,9 +470,9 @@ const CampaignApplicationUpdated = () => {
     }
   }
 
-  const formatCurrency = (amount) => {
-    if (!amount) return '₩0'
-    return `₩${amount.toLocaleString()}`
+  const formatPoints = (amount) => {
+    if (!amount) return '0P'
+    return `${amount.toLocaleString()}P`
   }
 
   const getCampaignTypeBadge = (campaignType) => {
@@ -745,7 +745,7 @@ const CampaignApplicationUpdated = () => {
                     </svg>
                     <div>
                       <p className="text-xs text-gray-500">{t.reward}</p>
-                      <p className="text-sm font-medium text-gray-900">{formatCurrency(campaign.reward_points || campaign.reward_amount || 0)}</p>
+                      <p className="text-sm font-medium text-gray-900">{formatPoints(campaign.reward_points || campaign.reward_amount || 0)}</p>
                     </div>
                   </div>
 
