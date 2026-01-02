@@ -146,7 +146,7 @@ export default function FourWeekVideoSubmissionPage() {
     setError('')
   }
 
-  const uploadVideoFile = async (file, week, type) => {
+  const uploadVideoFile = async (file, week, type, version = 1) => {
     try {
       setUploading(true)
       setUploadingInfo({ week, type })
@@ -156,7 +156,7 @@ export default function FourWeekVideoSubmissionPage() {
       if (!user) throw new Error('로그인이 필요합니다.')
 
       const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}_${campaignId}_week${week}_${type}_${Date.now()}.${fileExt}`
+      const fileName = `${user.id}_${campaignId}_week${week}_v${version}_${type}_${Date.now()}.${fileExt}`
       const filePath = `videos/${fileName}`
 
       const { error } = await supabase.storage
@@ -206,27 +206,23 @@ export default function FourWeekVideoSubmissionPage() {
       setError('')
       setSuccess('')
 
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // 버전 계산 (제한 없음)
+      let nextVersion = 1
+      if (weekData.submission) {
+        nextVersion = (weekData.submission.version || 0) + 1
+      }
+
       let uploadedCleanUrl = weekData.cleanUrl
       let uploadedEditedUrl = weekData.editedUrl
 
       if (weekData.cleanFile) {
-        uploadedCleanUrl = await uploadVideoFile(weekData.cleanFile, week, 'clean')
+        uploadedCleanUrl = await uploadVideoFile(weekData.cleanFile, week, 'clean', nextVersion)
       }
 
       if (weekData.editedFile) {
-        uploadedEditedUrl = await uploadVideoFile(weekData.editedFile, week, 'edited')
-      }
-
-      const { data: { user } } = await supabase.auth.getUser()
-
-      let nextVersion = 1
-      if (weekData.submission) {
-        nextVersion = (weekData.submission.version || 0) + 1
-        if (nextVersion > 3) {
-          setError(`${week}주차 영상은 최대 V3까지만 제출 가능합니다.`)
-          setSubmitting(false)
-          return
-        }
+        uploadedEditedUrl = await uploadVideoFile(weekData.editedFile, week, 'edited', nextVersion)
       }
 
       const submissionData = {

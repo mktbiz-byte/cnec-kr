@@ -172,7 +172,7 @@ export default function OliveyoungVideoSubmissionPage() {
     setError('')
   }
 
-  const uploadVideoFile = async (file, videoNum, type) => {
+  const uploadVideoFile = async (file, videoNum, type, version = 1) => {
     try {
       setUploading(true)
       setUploadingInfo({ videoNum, type })
@@ -182,7 +182,7 @@ export default function OliveyoungVideoSubmissionPage() {
       if (!user) throw new Error('로그인이 필요합니다.')
 
       const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}_${campaignId}_v${videoNum}_${type}_${Date.now()}.${fileExt}`
+      const fileName = `${user.id}_${campaignId}_video${videoNum}_v${version}_${type}_${Date.now()}.${fileExt}`
       const filePath = `videos/${fileName}`
 
       const { error } = await supabase.storage
@@ -233,27 +233,23 @@ export default function OliveyoungVideoSubmissionPage() {
       setError('')
       setSuccess('')
 
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // 버전 계산 (제한 없음)
+      let nextVersion = 1
+      if (videoData.submission) {
+        nextVersion = (videoData.submission.version || 0) + 1
+      }
+
       let uploadedCleanUrl = videoData.cleanUrl
       let uploadedEditedUrl = videoData.editedUrl
 
       if (videoData.cleanFile) {
-        uploadedCleanUrl = await uploadVideoFile(videoData.cleanFile, videoNum, 'clean')
+        uploadedCleanUrl = await uploadVideoFile(videoData.cleanFile, videoNum, 'clean', nextVersion)
       }
 
       if (videoData.editedFile) {
-        uploadedEditedUrl = await uploadVideoFile(videoData.editedFile, videoNum, 'edited')
-      }
-
-      const { data: { user } } = await supabase.auth.getUser()
-
-      let nextVersion = 1
-      if (videoData.submission) {
-        nextVersion = (videoData.submission.version || 0) + 1
-        if (nextVersion > 3) {
-          setError(`영상 ${videoNum}은 최대 V3까지만 제출 가능합니다.`)
-          setSubmitting(false)
-          return
-        }
+        uploadedEditedUrl = await uploadVideoFile(videoData.editedFile, videoNum, 'edited', nextVersion)
       }
 
       const submissionData = {

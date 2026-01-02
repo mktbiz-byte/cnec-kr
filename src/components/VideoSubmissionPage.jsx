@@ -139,7 +139,7 @@ export default function VideoSubmissionPage() {
     setError('')
   }
 
-  const uploadVideoFile = async (file, type) => {
+  const uploadVideoFile = async (file, type, version = 1) => {
     try {
       setUploading(true)
       setUploadingType(type)
@@ -150,7 +150,7 @@ export default function VideoSubmissionPage() {
 
       const fileExt = file.name.split('.').pop()
       const typePrefix = type === 'clean' ? 'clean' : 'edited'
-      const fileName = `${user.id}_${campaignId}_${typePrefix}_${Date.now()}.${fileExt}`
+      const fileName = `${user.id}_${campaignId}_v${version}_${typePrefix}_${Date.now()}.${fileExt}`
       const filePath = `videos/${fileName}`
 
       const { data, error } = await supabase.storage
@@ -200,20 +200,26 @@ export default function VideoSubmissionPage() {
       setError('')
       setSuccess('')
 
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // 버전 계산
+      let nextVersion = 1
+      if (videoSubmission) {
+        nextVersion = (videoSubmission.version || 0) + 1
+      }
+
       let uploadedCleanUrl = cleanVideoUrl
       let uploadedEditedUrl = editedVideoUrl
 
       // 클린본 업로드
       if (cleanVideoFile) {
-        uploadedCleanUrl = await uploadVideoFile(cleanVideoFile, 'clean')
+        uploadedCleanUrl = await uploadVideoFile(cleanVideoFile, 'clean', nextVersion)
       }
 
       // 편집본 업로드
       if (editedVideoFile) {
-        uploadedEditedUrl = await uploadVideoFile(editedVideoFile, 'edited')
+        uploadedEditedUrl = await uploadVideoFile(editedVideoFile, 'edited', nextVersion)
       }
-
-      const { data: { user } } = await supabase.auth.getUser()
 
       const submissionData = {
         application_id: application.id,
@@ -224,27 +230,17 @@ export default function VideoSubmissionPage() {
         sns_title: snsTitle,
         sns_content: snsContent,
         hashtags: hashtags,
+        version: nextVersion,
         status: 'submitted',
         submitted_at: new Date().toISOString()
       }
 
-      if (videoSubmission) {
-        const { error: updateError } = await supabase
-          .from('video_submissions')
-          .update({
-            ...submissionData,
-            resubmitted_at: new Date().toISOString()
-          })
-          .eq('id', videoSubmission.id)
+      // 항상 새 레코드로 INSERT (버전별 개별 저장)
+      const { error: insertError } = await supabase
+        .from('video_submissions')
+        .insert([submissionData])
 
-        if (updateError) throw updateError
-      } else {
-        const { error: insertError } = await supabase
-          .from('video_submissions')
-          .insert([submissionData])
-
-        if (insertError) throw insertError
-      }
+      if (insertError) throw insertError
 
       // applications 상태 업데이트
       await supabase
@@ -290,7 +286,7 @@ export default function VideoSubmissionPage() {
         console.error('Notification error:', notificationError)
       }
 
-      setSuccess('영상이 성공적으로 제출되었습니다!')
+      setSuccess(`영상 V${nextVersion}이 성공적으로 제출되었습니다!`)
       setShowSnsSection(true)
       await fetchData()
 
@@ -358,7 +354,7 @@ export default function VideoSubmissionPage() {
 
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${config.color}`}>
-        {config.label}
+        {config.label} V{videoSubmission.version || 1}
       </span>
     )
   }
