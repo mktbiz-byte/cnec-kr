@@ -769,18 +769,17 @@ export default function OliveyoungVideoSubmissionPage() {
                   </div>
                 )}
 
-                {campaign?.ad_code_required && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">광고코드 (파트너십)</label>
-                    <input
-                      type="text"
-                      value={snsForm.partnershipCode}
-                      onChange={(e) => setSnsForm(prev => ({ ...prev, partnershipCode: e.target.value }))}
-                      placeholder="광고 코드 입력"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                )}
+                {/* 광고코드 (파트너십) - 모든 캠페인에서 표시 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">광고코드 (파트너십)</label>
+                  <input
+                    type="text"
+                    value={snsForm.partnershipCode}
+                    onChange={(e) => setSnsForm(prev => ({ ...prev, partnershipCode: e.target.value }))}
+                    placeholder="광고 코드 입력"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
               </div>
             </div>
 
