@@ -34,7 +34,10 @@ export default function FourWeekVideoSubmissionPage() {
     week2_url: '',
     week3_url: '',
     week4_url: '',
-    partnershipCode: ''
+    week1_code: '',
+    week2_code: '',
+    week3_code: '',
+    week4_code: ''
   })
   const [showSnsSection, setShowSnsSection] = useState(false)
 
@@ -311,13 +314,14 @@ export default function FourWeekVideoSubmissionPage() {
       for (let week = 1; week <= 4; week++) {
         const weekData = weekVideos[week]
         const snsUrl = snsForm[`week${week}_url`]
+        const partnershipCode = snsForm[`week${week}_code`]
 
         if (weekData.submission && snsUrl) {
           await supabase
             .from('video_submissions')
             .update({
               sns_upload_url: snsUrl,
-              partnership_code: snsForm.partnershipCode,
+              partnership_code: partnershipCode || null,
               sns_uploaded_at: new Date().toISOString()
             })
             .eq('id', weekData.submission.id)
@@ -732,30 +736,31 @@ export default function FourWeekVideoSubmissionPage() {
               <div className="p-4 space-y-4">
                 {[1, 2, 3, 4].map(week => (
                   weekVideos[week].submission && (
-                    <div key={week}>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{week}주차 SNS URL</label>
-                      <input
-                        type="url"
-                        value={snsForm[`week${week}_url`]}
-                        onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_url`]: e.target.value }))}
-                        placeholder="https://instagram.com/reel/..."
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
+                    <div key={week} className="p-3 bg-gray-50 rounded-xl space-y-3">
+                      <p className="text-sm font-bold text-gray-800">{week}주차</p>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">SNS URL</label>
+                        <input
+                          type="url"
+                          value={snsForm[`week${week}_url`]}
+                          onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_url`]: e.target.value }))}
+                          placeholder="https://instagram.com/reel/..."
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">광고코드 (파트너십)</label>
+                        <input
+                          type="text"
+                          value={snsForm[`week${week}_code`]}
+                          onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_code`]: e.target.value }))}
+                          placeholder="광고 코드 입력"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
                     </div>
                   )
                 ))}
-
-                {/* 광고코드 (파트너십) - 모든 캠페인에서 표시 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">광고코드 (파트너십)</label>
-                  <input
-                    type="text"
-                    value={snsForm.partnershipCode}
-                    onChange={(e) => setSnsForm(prev => ({ ...prev, partnershipCode: e.target.value }))}
-                    placeholder="광고 코드 입력"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
               </div>
             </div>
 
