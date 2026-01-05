@@ -110,6 +110,7 @@
  * @property {string} [description]
  * @property {string} [brand]
  * @property {string} [company_email]
+ * @property {string} [company_phone]
  * @property {UUID} [company_id]
  * @property {number} [budget]
  * @property {number} [total_amount]

@@ -172,7 +172,7 @@ export default function OliveyoungVideoSubmissionPage() {
     setError('')
   }
 
-  const uploadVideoFile = async (file, videoNum, type) => {
+  const uploadVideoFile = async (file, videoNum, type, version = 1) => {
     try {
       setUploading(true)
       setUploadingInfo({ videoNum, type })
@@ -182,7 +182,7 @@ export default function OliveyoungVideoSubmissionPage() {
       if (!user) throw new Error('로그인이 필요합니다.')
 
       const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}_${campaignId}_v${videoNum}_${type}_${Date.now()}.${fileExt}`
+      const fileName = `${user.id}_${campaignId}_video${videoNum}_v${version}_${type}_${Date.now()}.${fileExt}`
       const filePath = `videos/${fileName}`
 
       const { error } = await supabase.storage
@@ -233,27 +233,23 @@ export default function OliveyoungVideoSubmissionPage() {
       setError('')
       setSuccess('')
 
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // 버전 계산 (제한 없음)
+      let nextVersion = 1
+      if (videoData.submission) {
+        nextVersion = (videoData.submission.version || 0) + 1
+      }
+
       let uploadedCleanUrl = videoData.cleanUrl
       let uploadedEditedUrl = videoData.editedUrl
 
       if (videoData.cleanFile) {
-        uploadedCleanUrl = await uploadVideoFile(videoData.cleanFile, videoNum, 'clean')
+        uploadedCleanUrl = await uploadVideoFile(videoData.cleanFile, videoNum, 'clean', nextVersion)
       }
 
       if (videoData.editedFile) {
-        uploadedEditedUrl = await uploadVideoFile(videoData.editedFile, videoNum, 'edited')
-      }
-
-      const { data: { user } } = await supabase.auth.getUser()
-
-      let nextVersion = 1
-      if (videoData.submission) {
-        nextVersion = (videoData.submission.version || 0) + 1
-        if (nextVersion > 3) {
-          setError(`영상 ${videoNum}은 최대 V3까지만 제출 가능합니다.`)
-          setSubmitting(false)
-          return
-        }
+        uploadedEditedUrl = await uploadVideoFile(videoData.editedFile, videoNum, 'edited', nextVersion)
       }
 
       const submissionData = {
@@ -279,13 +275,22 @@ export default function OliveyoungVideoSubmissionPage() {
 
       // 알림 발송
       try {
-        const { data: companyProfile } = await supabase
-          .from('user_profiles')
-          .select('company_name, email, phone')
-          .eq('id', campaign.company_id)
-          .single()
+        const companyName = campaign?.company_name || '기업'
 
-        if (companyProfile?.phone) {
+        // 1. 캠페인에 저장된 company_phone 먼저 확인
+        let companyPhone = campaign?.company_phone
+
+        // 2. 없으면 user_profiles에서 조회
+        if (!companyPhone && campaign?.company_id) {
+          const { data: companyProfile } = await supabase
+            .from('user_profiles')
+            .select('phone')
+            .eq('id', campaign.company_id)
+            .single()
+          companyPhone = companyProfile?.phone
+        }
+
+        if (companyPhone) {
           const { data: creatorProfile } = await supabase
             .from('user_profiles')
             .select('name')
@@ -298,11 +303,11 @@ export default function OliveyoungVideoSubmissionPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              receiverNum: companyProfile.phone.replace(/-/g, ''),
-              receiverName: companyProfile.company_name || '기업',
+              receiverNum: companyPhone.replace(/-/g, ''),
+              receiverName: companyName,
               templateCode: '025100001008',
               variables: {
-                '회사명': companyProfile.company_name || '기업',
+                '회사명': companyName,
                 '캠페인명': `${campaign.title} - 영상${videoNum}`,
                 '크리에이터명': creatorName
               }
@@ -358,6 +363,44 @@ export default function OliveyoungVideoSubmissionPage() {
             sns_uploaded_at: new Date().toISOString()
           })
           .eq('id', video2.submission.id)
+      }
+
+      // 기업에게 SNS 업로드 완료 알림톡 발송
+      try {
+        const companyName = campaign?.company_name || '기업'
+
+        // 1. 캠페인에 저장된 company_phone 먼저 확인
+        let companyPhone = campaign?.company_phone
+
+        // 2. 없으면 user_profiles에서 조회
+        if (!companyPhone && campaign?.company_id) {
+          const { data: companyProfile } = await supabase
+            .from('user_profiles')
+            .select('phone')
+            .eq('id', campaign.company_id)
+            .single()
+          companyPhone = companyProfile?.phone
+        }
+
+        if (companyPhone) {
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiverNum: companyPhone.replace(/-/g, ''),
+              receiverName: companyName,
+              templateCode: '025100001009',
+              variables: {
+                '회사명': companyName,
+                '캠페인명': campaign?.title || '캠페인'
+              }
+            })
+          })
+        } else {
+          console.log('기업 전화번호가 없어 알림톡을 발송하지 않습니다.')
+        }
+      } catch (notificationError) {
+        console.error('알림톡 발송 오류:', notificationError)
       }
 
       setSuccess('SNS 업로드 정보가 저장되었습니다!')
@@ -773,18 +816,17 @@ export default function OliveyoungVideoSubmissionPage() {
                   </div>
                 )}
 
-                {campaign?.ad_code_required && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">광고코드 (파트너십)</label>
-                    <input
-                      type="text"
-                      value={snsForm.partnershipCode}
-                      onChange={(e) => setSnsForm(prev => ({ ...prev, partnershipCode: e.target.value }))}
-                      placeholder="광고 코드 입력"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                )}
+                {/* 광고코드 (파트너십) - 모든 캠페인에서 표시 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">광고코드 (파트너십)</label>
+                  <input
+                    type="text"
+                    value={snsForm.partnershipCode}
+                    onChange={(e) => setSnsForm(prev => ({ ...prev, partnershipCode: e.target.value }))}
+                    placeholder="광고 코드 입력"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
               </div>
             </div>
 

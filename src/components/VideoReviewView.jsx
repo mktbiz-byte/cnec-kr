@@ -76,7 +76,7 @@ export default function VideoReviewView() {
           if (applicationData.campaign_id) {
             const { data: campaignData, error: campaignError } = await supabase
               .from('campaigns')
-              .select('title, company_name, company_id, campaign_type')
+              .select('title, company_name, company_id, company_phone, campaign_type')
               .eq('id', applicationData.campaign_id)
               .single()
 
@@ -230,13 +230,9 @@ export default function VideoReviewView() {
       return
     }
 
-    // 현재 버전 확인 (최대 V3까지)
+    // 다음 버전 계산 (제한 없음)
     const currentVersion = submission?.version || 1
     const nextVersion = currentVersion + 1
-    if (nextVersion > 3) {
-      alert('영상은 최대 V3까지만 제출 가능합니다.')
-      return
-    }
 
     setUploading(true)
 
@@ -750,20 +746,14 @@ export default function VideoReviewView() {
               className="hidden"
             />
 
-            {getNextVersion() <= 3 ? (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Upload className="w-5 h-5" />
-                {uploading ? '업로드 중...' : `영상 V${getNextVersion()} 업로드`}
-              </button>
-            ) : (
-              <div className="w-full py-3.5 bg-gray-200 text-gray-500 rounded-xl font-bold text-center">
-                최대 버전(V3)에 도달했습니다
-              </div>
-            )}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Upload className="w-5 h-5" />
+              {uploading ? '업로드 중...' : `영상 V${getNextVersion()} 업로드`}
+            </button>
 
             <p className="text-xs text-gray-400 text-center">
               * 영상 업로드 시 자동으로 알림톡이 전송됩니다

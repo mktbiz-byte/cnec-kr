@@ -542,6 +542,44 @@ const ApplicationsPage = () => {
 
       if (updateError) throw updateError
 
+      // 기업에게 SNS 업로드 완료 알림톡 발송
+      try {
+        const companyName = selectedApplication.campaigns?.company_name || '기업'
+
+        // 1. 캠페인에 저장된 company_phone 먼저 확인
+        let companyPhone = selectedApplication.campaigns?.company_phone
+
+        // 2. 없으면 user_profiles에서 조회
+        if (!companyPhone && selectedApplication.campaigns?.company_id) {
+          const { data: companyProfile } = await supabase
+            .from('user_profiles')
+            .select('phone')
+            .eq('id', selectedApplication.campaigns.company_id)
+            .single()
+          companyPhone = companyProfile?.phone
+        }
+
+        if (companyPhone) {
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiverNum: companyPhone.replace(/-/g, ''),
+              receiverName: companyName,
+              templateCode: '025100001009',
+              variables: {
+                '회사명': companyName,
+                '캠페인명': selectedApplication.campaigns?.title || '캠페인'
+              }
+            })
+          })
+        } else {
+          console.log('기업 전화번호가 없어 알림톡을 발송하지 않습니다.')
+        }
+      } catch (notificationError) {
+        console.error('알림톡 발송 오류:', notificationError)
+      }
+
       setSuccess('SNS 업로드가 완료되었습니다. 관리자 승인 후 포인트가 지급됩니다.')
       setShowSnsUploadModal(false)
       setSelectedApplication(null)
@@ -1815,24 +1853,22 @@ const ApplicationsPage = () => {
                 </div>
               )}
 
-              {/* 광고코드 (파트너십 코드) */}
-              {selectedApplication.campaigns?.ad_code_required && (
-                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-orange-800 mb-2">
-                    광고코드 (파트너십 코드)
-                  </label>
-                  <input
-                    type="text"
-                    value={snsUploadForm.partnership_code}
-                    onChange={(e) => setSnsUploadForm({...snsUploadForm, partnership_code: e.target.value})}
-                    className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
-                    placeholder="인스타그램 파트너십 광고 코드"
-                  />
-                  <p className="text-xs text-orange-600 mt-2">
-                    인스타그램 업로드 시 파트너십 광고 표시에 사용한 코드를 입력해주세요.
-                  </p>
-                </div>
-              )}
+              {/* 광고코드 (파트너십 코드) - 모든 캠페인에서 표시 */}
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <label className="block text-sm font-medium text-orange-800 mb-2">
+                  광고코드 (파트너십 코드)
+                </label>
+                <input
+                  type="text"
+                  value={snsUploadForm.partnership_code}
+                  onChange={(e) => setSnsUploadForm({...snsUploadForm, partnership_code: e.target.value})}
+                  className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                  placeholder="인스타그램 파트너십 광고 코드"
+                />
+                <p className="text-xs text-orange-600 mt-2">
+                  인스타그램 업로드 시 파트너십 광고 표시에 사용한 코드를 입력해주세요.
+                </p>
+              </div>
 
               {/* 메모 */}
               <div>

@@ -34,7 +34,10 @@ export default function FourWeekVideoSubmissionPage() {
     week2_url: '',
     week3_url: '',
     week4_url: '',
-    partnershipCode: ''
+    week1_code: '',
+    week2_code: '',
+    week3_code: '',
+    week4_code: ''
   })
   const [showSnsSection, setShowSnsSection] = useState(false)
 
@@ -146,7 +149,7 @@ export default function FourWeekVideoSubmissionPage() {
     setError('')
   }
 
-  const uploadVideoFile = async (file, week, type) => {
+  const uploadVideoFile = async (file, week, type, version = 1) => {
     try {
       setUploading(true)
       setUploadingInfo({ week, type })
@@ -156,7 +159,7 @@ export default function FourWeekVideoSubmissionPage() {
       if (!user) throw new Error('로그인이 필요합니다.')
 
       const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}_${campaignId}_week${week}_${type}_${Date.now()}.${fileExt}`
+      const fileName = `${user.id}_${campaignId}_week${week}_v${version}_${type}_${Date.now()}.${fileExt}`
       const filePath = `videos/${fileName}`
 
       const { error } = await supabase.storage
@@ -206,27 +209,23 @@ export default function FourWeekVideoSubmissionPage() {
       setError('')
       setSuccess('')
 
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // 버전 계산 (제한 없음)
+      let nextVersion = 1
+      if (weekData.submission) {
+        nextVersion = (weekData.submission.version || 0) + 1
+      }
+
       let uploadedCleanUrl = weekData.cleanUrl
       let uploadedEditedUrl = weekData.editedUrl
 
       if (weekData.cleanFile) {
-        uploadedCleanUrl = await uploadVideoFile(weekData.cleanFile, week, 'clean')
+        uploadedCleanUrl = await uploadVideoFile(weekData.cleanFile, week, 'clean', nextVersion)
       }
 
       if (weekData.editedFile) {
-        uploadedEditedUrl = await uploadVideoFile(weekData.editedFile, week, 'edited')
-      }
-
-      const { data: { user } } = await supabase.auth.getUser()
-
-      let nextVersion = 1
-      if (weekData.submission) {
-        nextVersion = (weekData.submission.version || 0) + 1
-        if (nextVersion > 3) {
-          setError(`${week}주차 영상은 최대 V3까지만 제출 가능합니다.`)
-          setSubmitting(false)
-          return
-        }
+        uploadedEditedUrl = await uploadVideoFile(weekData.editedFile, week, 'edited', nextVersion)
       }
 
       const submissionData = {
@@ -252,13 +251,22 @@ export default function FourWeekVideoSubmissionPage() {
 
       // 알림 발송
       try {
-        const { data: companyProfile } = await supabase
-          .from('user_profiles')
-          .select('company_name, email, phone')
-          .eq('id', campaign.company_id)
-          .single()
+        const companyName = campaign?.company_name || '기업'
 
-        if (companyProfile?.phone) {
+        // 1. 캠페인에 저장된 company_phone 먼저 확인
+        let companyPhone = campaign?.company_phone
+
+        // 2. 없으면 user_profiles에서 조회
+        if (!companyPhone && campaign?.company_id) {
+          const { data: companyProfile } = await supabase
+            .from('user_profiles')
+            .select('phone')
+            .eq('id', campaign.company_id)
+            .single()
+          companyPhone = companyProfile?.phone
+        }
+
+        if (companyPhone) {
           const { data: creatorProfile } = await supabase
             .from('user_profiles')
             .select('name')
@@ -271,11 +279,11 @@ export default function FourWeekVideoSubmissionPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              receiverNum: companyProfile.phone.replace(/-/g, ''),
-              receiverName: companyProfile.company_name || '기업',
+              receiverNum: companyPhone.replace(/-/g, ''),
+              receiverName: companyName,
               templateCode: '025100001008',
               variables: {
-                '회사명': companyProfile.company_name || '기업',
+                '회사명': companyName,
                 '캠페인명': `${campaign.title} - ${week}주차`,
                 '크리에이터명': creatorName
               }
@@ -315,17 +323,56 @@ export default function FourWeekVideoSubmissionPage() {
       for (let week = 1; week <= 4; week++) {
         const weekData = weekVideos[week]
         const snsUrl = snsForm[`week${week}_url`]
+        const partnershipCode = snsForm[`week${week}_code`]
 
         if (weekData.submission && snsUrl) {
           await supabase
             .from('video_submissions')
             .update({
               sns_upload_url: snsUrl,
-              partnership_code: snsForm.partnershipCode,
+              partnership_code: partnershipCode || null,
               sns_uploaded_at: new Date().toISOString()
             })
             .eq('id', weekData.submission.id)
         }
+      }
+
+      // 기업에게 SNS 업로드 완료 알림톡 발송
+      try {
+        const companyName = campaign?.company_name || '기업'
+
+        // 1. 캠페인에 저장된 company_phone 먼저 확인
+        let companyPhone = campaign?.company_phone
+
+        // 2. 없으면 user_profiles에서 조회
+        if (!companyPhone && campaign?.company_id) {
+          const { data: companyProfile } = await supabase
+            .from('user_profiles')
+            .select('phone')
+            .eq('id', campaign.company_id)
+            .single()
+          companyPhone = companyProfile?.phone
+        }
+
+        if (companyPhone) {
+          await fetch('/.netlify/functions/send-alimtalk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiverNum: companyPhone.replace(/-/g, ''),
+              receiverName: companyName,
+              templateCode: '025100001009',
+              variables: {
+                '회사명': companyName,
+                '캠페인명': campaign?.title || '캠페인'
+              }
+            })
+          })
+        } else {
+          console.log('기업 전화번호가 없어 알림톡을 발송하지 않습니다.')
+        }
+      } catch (notificationError) {
+        console.error('알림톡 발송 오류:', notificationError)
       }
 
       setSuccess('SNS 업로드 정보가 저장되었습니다!')
@@ -736,31 +783,31 @@ export default function FourWeekVideoSubmissionPage() {
               <div className="p-4 space-y-4">
                 {[1, 2, 3, 4].map(week => (
                   weekVideos[week].submission && (
-                    <div key={week}>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{week}주차 SNS URL</label>
-                      <input
-                        type="url"
-                        value={snsForm[`week${week}_url`]}
-                        onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_url`]: e.target.value }))}
-                        placeholder="https://instagram.com/reel/..."
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
+                    <div key={week} className="p-3 bg-gray-50 rounded-xl space-y-3">
+                      <p className="text-sm font-bold text-gray-800">{week}주차</p>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">SNS URL</label>
+                        <input
+                          type="url"
+                          value={snsForm[`week${week}_url`]}
+                          onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_url`]: e.target.value }))}
+                          placeholder="https://instagram.com/reel/..."
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">광고코드 (파트너십)</label>
+                        <input
+                          type="text"
+                          value={snsForm[`week${week}_code`]}
+                          onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_code`]: e.target.value }))}
+                          placeholder="광고 코드 입력"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
                     </div>
                   )
                 ))}
-
-                {campaign?.ad_code_required && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">광고코드 (파트너십)</label>
-                    <input
-                      type="text"
-                      value={snsForm.partnershipCode}
-                      onChange={(e) => setSnsForm(prev => ({ ...prev, partnershipCode: e.target.value }))}
-                      placeholder="광고 코드 입력"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                )}
               </div>
             </div>
 
