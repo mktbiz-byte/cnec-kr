@@ -453,13 +453,14 @@ const CreatorMyPage = () => {
       const today = new Date()
       const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-      // 출금 신청 (포인트 차감 + 거래 내역 생성)
+      // 출금 신청 (포인트 차감 + withdrawals 테이블 저장 + 거래 내역 생성)
       const result = await database.userPoints.requestWithdrawal({
         user_id: user.id,
         amount: amount,
         bank_name: profile.bank_name,
         bank_account_number: profile.account_number,
-        bank_account_holder: profile.account_holder
+        bank_account_holder: profile.account_holder,
+        resident_number_encrypted: encryptedResidentNum
       })
 
       if (!result.success) throw new Error('출금 신청 처리 실패')

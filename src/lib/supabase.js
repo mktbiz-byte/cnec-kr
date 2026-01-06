@@ -1079,10 +1079,15 @@ export const database = {
       })
     },
 
-    // 한국 출금 신청 (포인트 차감 + 거래 내역 생성)
+    // 한국 출금 신청 (포인트 차감 + withdrawals 테이블 저장 + 거래 내역 생성)
     async requestWithdrawal({ user_id, amount, bank_name, bank_account_number, bank_account_holder, resident_number_encrypted }) {
       return safeQuery(async () => {
         console.log('출금 신청:', { user_id, amount, bank_name })
+
+        // 주민번호 필수 체크
+        if (!resident_number_encrypted) {
+          throw new Error('주민등록번호가 필요합니다')
+        }
 
         // 1. 현재 포인트 조회
         const { data: profileData, error: profileError } = await supabase
@@ -1107,7 +1112,32 @@ export const database = {
 
         if (updateError) throw updateError
 
-        // 3. point_transactions에 출금 신청 기록
+        // 3. withdrawals 테이블에 출금 신청 저장
+        const { data: withdrawalData, error: withdrawalError } = await supabase
+          .from('withdrawals')
+          .insert([{
+            user_id: user_id,
+            amount: amount,
+            bank_name: bank_name,
+            bank_account_number: bank_account_number,
+            bank_account_holder: bank_account_holder,
+            resident_number_encrypted: resident_number_encrypted,
+            status: 'pending',
+            platform_region: 'KR',
+            country_code: 'KR'
+          }])
+          .select()
+
+        if (withdrawalError) {
+          // 출금 저장 실패 시 포인트 복구
+          await supabase
+            .from('user_profiles')
+            .update({ points: currentPoints })
+            .eq('id', user_id)
+          throw withdrawalError
+        }
+
+        // 4. point_transactions에 출금 신청 기록
         const description = `[출금신청] ${amount.toLocaleString()}원 | ${bank_name} ${bank_account_number} (${bank_account_holder})`
 
         const { data: txData, error: txError } = await supabase
@@ -1116,15 +1146,20 @@ export const database = {
             user_id: user_id,
             amount: -amount,
             transaction_type: 'withdraw',
-            description: description
+            description: description,
+            related_withdrawal_id: withdrawalData?.[0]?.id || null
           }])
           .select()
 
-        if (txError) throw txError
+        if (txError) {
+          console.error('point_transactions 저장 실패:', txError)
+          // 트랜잭션 기록 실패해도 출금 신청은 유지
+        }
 
-        console.log('출금 신청 완료:', txData)
+        console.log('출금 신청 완료:', { withdrawal: withdrawalData, transaction: txData })
         return {
           success: true,
+          withdrawal: withdrawalData && withdrawalData.length > 0 ? withdrawalData[0] : null,
           transaction: txData && txData.length > 0 ? txData[0] : null,
           newPoints: newPoints
         }
