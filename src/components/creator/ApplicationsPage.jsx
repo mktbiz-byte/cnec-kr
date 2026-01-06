@@ -1199,9 +1199,9 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* 기획형/일반 캠페인 - video_submitted 상태일 때 영상 재제출 버튼 */}
+                      {/* 기획형/일반 캠페인 - video_submitted, sns_uploaded 상태일 때 영상 재제출 버튼 */}
                       {/* 올리브영, 4주 챌린지는 위에서 별도 처리 */}
-                      {app.status === 'video_submitted' &&
+                      {['video_submitted', 'sns_uploaded'].includes(app.status) &&
                        app.campaigns?.campaign_type !== 'oliveyoung' &&
                        app.campaigns?.campaign_type !== '4week_challenge' &&
                        !app.campaigns?.is_oliveyoung_sale && (
