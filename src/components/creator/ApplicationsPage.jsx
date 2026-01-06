@@ -791,6 +791,126 @@ const ApplicationsPage = () => {
                     </div>
                   </div>
 
+                  {/* 완료 상태일 때 제출 정보 확인 (수정 불가) */}
+                  {['completed', 'paid', 'sns_uploaded'].includes(app.status) && (
+                    <div className="mt-3 space-y-2">
+                      {/* 영상 제출 정보 */}
+                      {app.video_submissions && app.video_submissions.length > 0 && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Video size={14} className="text-gray-600" />
+                            <span className="text-xs font-semibold text-gray-700">제출한 영상</span>
+                            <span className="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">완료됨</span>
+                          </div>
+                          <div className="space-y-1">
+                            {app.video_submissions.slice(0, 1).map((vs, idx) => (
+                              <a
+                                key={idx}
+                                href={vs.video_file_url || vs.clean_video_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800"
+                              >
+                                <ExternalLink size={12} />
+                                <span>V{vs.version || 1} 영상 보기</span>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SNS 업로드 정보 */}
+                      {(app.sns_upload_url || app.step1_url || app.week1_url) && (
+                        <div className="bg-pink-50 border border-pink-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Upload size={14} className="text-pink-600" />
+                            <span className="text-xs font-semibold text-pink-700">업로드한 SNS</span>
+                            <span className="text-[10px] bg-pink-200 text-pink-600 px-1.5 py-0.5 rounded">완료됨</span>
+                          </div>
+                          <div className="space-y-1">
+                            {/* 일반 캠페인 SNS URL */}
+                            {app.sns_upload_url && (
+                              <a
+                                href={app.sns_upload_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800"
+                              >
+                                <ExternalLink size={12} />
+                                <span className="truncate max-w-[200px]">{app.sns_upload_url}</span>
+                              </a>
+                            )}
+                            {/* 올리브영 캠페인 SNS URL */}
+                            {app.step1_url && (
+                              <a href={app.step1_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800">
+                                <ExternalLink size={12} />
+                                <span>STEP 1 URL 보기</span>
+                              </a>
+                            )}
+                            {app.step2_url && (
+                              <a href={app.step2_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800">
+                                <ExternalLink size={12} />
+                                <span>STEP 2 URL 보기</span>
+                              </a>
+                            )}
+                            {app.step3_url && (
+                              <a href={app.step3_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800">
+                                <ExternalLink size={12} />
+                                <span>STEP 3 URL 보기</span>
+                              </a>
+                            )}
+                            {/* 4주 챌린지 SNS URL */}
+                            {app.week1_url && (
+                              <a href={app.week1_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800">
+                                <ExternalLink size={12} />
+                                <span>Week 1 URL 보기</span>
+                              </a>
+                            )}
+                            {app.week2_url && (
+                              <a href={app.week2_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800">
+                                <ExternalLink size={12} />
+                                <span>Week 2 URL 보기</span>
+                              </a>
+                            )}
+                            {app.week3_url && (
+                              <a href={app.week3_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800">
+                                <ExternalLink size={12} />
+                                <span>Week 3 URL 보기</span>
+                              </a>
+                            )}
+                            {app.week4_url && (
+                              <a href={app.week4_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-pink-600 hover:text-pink-800">
+                                <ExternalLink size={12} />
+                                <span>Week 4 URL 보기</span>
+                              </a>
+                            )}
+                          </div>
+                          {app.partnership_code && (
+                            <div className="mt-2 pt-2 border-t border-pink-200">
+                              <span className="text-[10px] text-pink-500">광고코드: {app.partnership_code}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* SNS URL 미입력 안내 및 입력 버튼 */}
+                      {!app.sns_upload_url && !app.step1_url && !app.week1_url && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <AlertCircle size={14} className="text-yellow-600" />
+                            <span className="text-xs font-semibold text-yellow-700">SNS 업로드가 필요합니다</span>
+                          </div>
+                          <button
+                            onClick={() => openSnsUploadModal(app)}
+                            className="w-full py-2 bg-pink-600 text-white rounded-lg text-xs font-bold hover:bg-pink-700 flex items-center justify-center gap-1"
+                          >
+                            <Upload size={12} /> SNS 업로드하기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* 선정됨/진행중 상태일 때 가이드 및 액션 버튼 */}
                   {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
@@ -998,11 +1118,8 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* video_submitted 상태이거나, 완료/검수완료 상태이지만 SNS URL이 입력되지 않은 경우 영상 재제출 + SNS 업로드 버튼 */}
-                      {/* SNS URL 입력 여부 확인: 캠페인 타입에 따라 다른 필드 체크 */}
-                      {(app.status === 'video_submitted' ||
-                        (['completed', 'paid', 'sns_uploaded'].includes(app.status) &&
-                         !app.sns_upload_url && !app.step1_url && !app.week1_url)) && (
+                      {/* video_submitted 상태일 때 영상 재제출 버튼 (완료 전까지만 수정 가능) */}
+                      {app.status === 'video_submitted' && (
                         <div className="space-y-2">
                           {/* 기획형 캠페인 영상 재제출 */}
                           {app.campaigns?.campaign_type === 'planned' && (
@@ -1040,14 +1157,19 @@ const ApplicationsPage = () => {
                               <Video size={14} /> 영상 수정본 재제출
                             </button>
                           )}
-                          {/* SNS 업로드 버튼 */}
-                          <button
-                            onClick={() => openSnsUploadModal(app)}
-                            className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
-                          >
-                            <Upload size={14} /> SNS 업로드하기
-                          </button>
                         </div>
+                      )}
+
+                      {/* SNS 업로드 버튼: video_submitted 상태이거나, 완료 상태이지만 SNS URL 미입력 시 표시 */}
+                      {(app.status === 'video_submitted' ||
+                        (['completed', 'paid', 'sns_uploaded'].includes(app.status) &&
+                         !app.sns_upload_url && !app.step1_url && !app.week1_url)) && (
+                        <button
+                          onClick={() => openSnsUploadModal(app)}
+                          className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
+                        >
+                          <Upload size={14} /> SNS 업로드하기
+                        </button>
                       )}
                     </div>
                   )}
