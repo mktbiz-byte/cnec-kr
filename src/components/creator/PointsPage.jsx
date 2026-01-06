@@ -5,7 +5,7 @@ import { supabase, database } from '../../lib/supabase'
 import {
   ArrowLeft, Wallet, DollarSign, CreditCard, Clock,
   CheckCircle, AlertCircle, Loader2, ChevronRight,
-  ArrowUpRight, ArrowDownLeft, Minus
+  ArrowUpRight, ArrowDownLeft, Minus, Eye, EyeOff
 } from 'lucide-react'
 
 const PointsPage = () => {
@@ -24,6 +24,8 @@ const PointsPage = () => {
   const [withdrawalHistory, setWithdrawalHistory] = useState([])
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [residentNumber, setResidentNumber] = useState('')
+  const [showResidentNumber, setShowResidentNumber] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -155,17 +157,42 @@ const PointsPage = () => {
       return
     }
 
+    // 주민번호 검증
+    const residentNumberPattern = /^\d{6}-?\d{7}$/
+    if (!residentNumber || !residentNumberPattern.test(residentNumber)) {
+      setError('주민등록번호를 올바르게 입력해주세요 (예: 123456-1234567)')
+      return
+    }
+
     try {
       setProcessing(true)
       setError('')
 
-      // 출금 신청 (포인트 차감 + 거래 내역 생성)
+      // 주민번호 암호화
+      const encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || 'default-key-change-this'
+      const { data: encryptedResident, error: encryptError } = await supabase.rpc(
+        'encrypt_resident_number',
+        {
+          resident_number: residentNumber.replace(/-/g, ''),
+          encryption_key: encryptionKey
+        }
+      )
+
+      if (encryptError) {
+        console.error('암호화 오류:', encryptError)
+        setError('주민번호 암호화 중 오류가 발생했습니다')
+        setProcessing(false)
+        return
+      }
+
+      // 출금 신청 (포인트 차감 + withdrawals 테이블 저장 + 거래 내역 생성)
       const result = await database.userPoints.requestWithdrawal({
         user_id: user.id,
         amount: amount,
         bank_name: profile.bank_name,
         bank_account_number: profile.account_number,
-        bank_account_holder: profile.account_holder
+        bank_account_holder: profile.account_holder,
+        resident_number_encrypted: encryptedResident
       })
 
       if (!result.success) {
@@ -175,6 +202,7 @@ const PointsPage = () => {
       setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내에 처리됩니다.')
       setShowWithdrawModal(false)
       setWithdrawAmount('')
+      setResidentNumber('')
       loadPointsData()
 
       setTimeout(() => setSuccess(''), 5000)
@@ -440,7 +468,7 @@ const PointsPage = () => {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-4 mb-6">
+            <div className="bg-gray-50 rounded-xl p-4 mb-4">
               <p className="text-xs text-gray-500 mb-1">입금 계좌</p>
               <p className="font-medium text-gray-900">
                 {profile?.bank_name} {profile?.account_number}
@@ -448,11 +476,51 @@ const PointsPage = () => {
               <p className="text-sm text-gray-600">{profile?.account_holder}</p>
             </div>
 
+            {/* 주민등록번호 입력 */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                주민등록번호 <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showResidentNumber ? "text" : "password"}
+                  value={residentNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9-]/g, '')
+                    if (value.length === 6 && !value.includes('-')) {
+                      setResidentNumber(value + '-')
+                    } else if (value.length <= 14) {
+                      setResidentNumber(value)
+                    }
+                  }}
+                  placeholder="123456-1234567"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowResidentNumber(!showResidentNumber)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showResidentNumber ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                세금 신고를 위해 필요하며, 암호화되어 안전하게 보관됩니다.
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl">
+                {error}
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button
                 onClick={() => {
                   setShowWithdrawModal(false)
                   setWithdrawAmount('')
+                  setResidentNumber('')
                   setError('')
                 }}
                 className="flex-1 py-3.5 border border-gray-200 text-gray-700 rounded-xl font-bold"
