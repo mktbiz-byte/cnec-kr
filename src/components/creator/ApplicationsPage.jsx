@@ -388,26 +388,47 @@ const ApplicationsPage = () => {
     }
   }
 
-  // SNS 업로드 모달 열기
+  // SNS 업로드 모달 열기 (기존 값 불러오기)
   const openSnsUploadModal = (app) => {
     setSelectedApplication(app)
+
+    // 기존 광고코드 파싱 (JSON인 경우)
+    let partnershipCodes = {}
+    if (app.partnership_code) {
+      try {
+        partnershipCodes = JSON.parse(app.partnership_code)
+      } catch (e) {
+        // JSON이 아니면 일반 캠페인용 단일 코드
+        partnershipCodes = { single: app.partnership_code }
+      }
+    }
+
     setSnsUploadForm({
-      sns_upload_url: '',
-      notes: '',
-      step1_url: '',
-      step2_url: '',
-      step3_url: '',
-      step1_2_video_folder: '',
-      step3_video_folder: '',
-      week1_url: '',
-      week2_url: '',
-      week3_url: '',
-      week4_url: '',
-      week1_video: '',
-      week2_video: '',
-      week3_video: '',
-      week4_video: '',
-      partnership_code: ''
+      // 일반 캠페인
+      sns_upload_url: app.sns_upload_url || '',
+      partnership_code: partnershipCodes.single || app.partnership_code || '',
+      notes: app.notes || '',
+      // 올리브영 캠페인
+      step1_url: app.step1_url || '',
+      step2_url: app.step2_url || '',
+      step3_url: app.step3_url || '',
+      step1_2_video_folder: app.step1_2_video_folder || '',
+      step3_video_folder: app.step3_video_folder || '',
+      step1_2_partnership_code: partnershipCodes.step1_2 || '',
+      step3_partnership_code: partnershipCodes.step3 || '',
+      // 4주 챌린지
+      week1_url: app.week1_url || '',
+      week2_url: app.week2_url || '',
+      week3_url: app.week3_url || '',
+      week4_url: app.week4_url || '',
+      week1_video: app.week1_video || '',
+      week2_video: app.week2_video || '',
+      week3_video: app.week3_video || '',
+      week4_video: app.week4_video || '',
+      week1_partnership_code: partnershipCodes.week1 || '',
+      week2_partnership_code: partnershipCodes.week2 || '',
+      week3_partnership_code: partnershipCodes.week3 || '',
+      week4_partnership_code: partnershipCodes.week4 || ''
     })
     setError('')
     setShowSnsUploadModal(true)
@@ -1027,15 +1048,15 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 올리브영 캠페인 SNS 업로드 버튼 (별도 표시) */}
-                      {/* filming 상태부터 SNS 업로드 가능 (영상과 별개로 입력) */}
+                      {/* sns_uploaded에서도 수정 가능 (기업 확정 전까지) */}
                       {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) &&
-                       (['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) ||
-                        (['completed', 'paid', 'sns_uploaded'].includes(app.status) && !app.step1_url)) && (
+                       (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
+                        (['completed', 'paid'].includes(app.status) && !app.step1_url)) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Upload size={14} /> SNS 업로드 정보 입력 (3개 URL + 광고코드 2개)
+                          <Upload size={14} /> {app.step1_url ? 'SNS 정보 수정' : 'SNS 업로드 정보 입력'} (3개 URL + 광고코드 2개)
                         </button>
                       )}
 
@@ -1073,15 +1094,15 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 4주 챌린지 캠페인 SNS 업로드 버튼 (별도 표시) */}
-                      {/* filming 상태부터 SNS 업로드 가능 (영상과 별개로 입력) */}
+                      {/* sns_uploaded에서도 수정 가능 (기업 확정 전까지) */}
                       {app.campaigns?.campaign_type === '4week_challenge' &&
-                       (['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) ||
-                        (['completed', 'paid', 'sns_uploaded'].includes(app.status) && !app.week1_url)) && (
+                       (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
+                        (['completed', 'paid'].includes(app.status) && !app.week1_url)) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Upload size={14} /> SNS 업로드 정보 입력 (4개 URL + 광고코드 4개)
+                          <Upload size={14} /> {app.week1_url ? 'SNS 정보 수정' : 'SNS 업로드 정보 입력'} (4개 URL + 광고코드 4개)
                         </button>
                       )}
 
@@ -1202,18 +1223,18 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 기획형/일반 캠페인 - SNS 업로드 버튼 */}
-                      {/* filming 상태부터 SNS 업로드 가능 (영상과 별개로 입력) */}
+                      {/* sns_uploaded에서도 수정 가능 (기업 확정 전까지) */}
                       {/* 올리브영, 4주 챌린지는 위에서 별도 처리 */}
                       {app.campaigns?.campaign_type !== 'oliveyoung' &&
                        app.campaigns?.campaign_type !== '4week_challenge' &&
                        !app.campaigns?.is_oliveyoung_sale &&
-                       (['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) ||
-                        (['completed', 'paid', 'sns_uploaded'].includes(app.status) && !app.sns_upload_url)) && (
+                       (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
+                        (['completed', 'paid'].includes(app.status) && !app.sns_upload_url)) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Upload size={14} /> SNS 업로드 정보 입력 (1개 URL + 광고코드 1개)
+                          <Upload size={14} /> {app.sns_upload_url ? 'SNS 정보 수정' : 'SNS 업로드 정보 입력'} (1개 URL + 광고코드 1개)
                         </button>
                       )}
                     </div>
