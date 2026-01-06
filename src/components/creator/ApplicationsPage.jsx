@@ -1027,13 +1027,14 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 올리브영 캠페인 영상 업로드 버튼 (별도 표시) */}
+                      {/* 올리브영: sns_uploaded에서도 영상 추가 가능 (영상 2개 모두 제출해야 함) */}
                       {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) &&
-                       ['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) && (
+                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) && (
                         <button
                           onClick={() => handleVideoUpload(app, 'oliveyoung')}
                           className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Video size={14} /> {app.status === 'video_submitted' ? '영상 수정본 재제출' : '영상 업로드하기'}
+                          <Video size={14} /> {['video_submitted', 'sns_uploaded'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
                         </button>
                       )}
 
@@ -1072,14 +1073,14 @@ const ApplicationsPage = () => {
                         </div>
                       )}
 
-                      {/* 4주 챌린지 캠페인 영상 업로드 버튼 (별도 표시) */}
+                      {/* 4주 챌린지: sns_uploaded에서도 영상 추가 가능 (4주차 영상 모두 제출해야 함) */}
                       {app.campaigns?.campaign_type === '4week_challenge' &&
-                       ['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) && (
+                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) && (
                         <button
                           onClick={() => handleVideoUpload(app, '4week')}
                           className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Video size={14} /> {app.status === 'video_submitted' ? '영상 수정본 재제출' : '영상 업로드하기'}
+                          <Video size={14} /> {['video_submitted', 'sns_uploaded'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
                         </button>
                       )}
 
