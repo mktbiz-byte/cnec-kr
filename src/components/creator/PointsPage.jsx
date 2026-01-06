@@ -494,6 +494,16 @@ const PointsPage = () => {
                     }
                   }}
                   placeholder="123456-1234567"
+                  maxLength={14}
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  name="resident-number-field"
+                  id="resident-number-points"
+                  data-lpignore="true"
+                  data-form-type="other"
+                  data-1p-ignore="true"
                   className="w-full px-4 py-3 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 pr-12"
                 />
                 <button
