@@ -123,19 +123,22 @@ const ApplicationsPage = () => {
   const [snsUploadForm, setSnsUploadForm] = useState({
     sns_upload_url: '',
     notes: '',
+    // 올리브영: step1 URL + 코드, step2 URL + 코드, step3 URL만
     step1_url: '',
     step2_url: '',
     step3_url: '',
-    step1_2_video_folder: '',
-    step3_video_folder: '',
+    step1_partnership_code: '',
+    step2_partnership_code: '',
+    // 4주 챌린지
     week1_url: '',
     week2_url: '',
     week3_url: '',
     week4_url: '',
-    week1_video: '',
-    week2_video: '',
-    week3_video: '',
-    week4_video: '',
+    week1_partnership_code: '',
+    week2_partnership_code: '',
+    week3_partnership_code: '',
+    week4_partnership_code: '',
+    // 일반/기획형
     partnership_code: ''
   })
   const [processing, setProcessing] = useState(false)
@@ -397,23 +400,17 @@ const ApplicationsPage = () => {
       sns_upload_url: app.sns_upload_url || '',
       partnership_code: app.partnership_code || '',
       notes: app.notes || '',
-      // 올리브영 캠페인
+      // 올리브영 캠페인: step1 URL+코드, step2 URL+코드, step3 URL만
       step1_url: app.step1_url || '',
       step2_url: app.step2_url || '',
       step3_url: app.step3_url || '',
-      step1_2_video_folder: app.step1_2_video_folder || '',
-      step3_video_folder: app.step3_video_folder || '',
-      step1_2_partnership_code: app.step1_2_partnership_code || '',
-      step3_partnership_code: app.step3_partnership_code || '',
+      step1_partnership_code: app.step1_partnership_code || '',
+      step2_partnership_code: app.step2_partnership_code || '',
       // 4주 챌린지
       week1_url: app.week1_url || '',
       week2_url: app.week2_url || '',
       week3_url: app.week3_url || '',
       week4_url: app.week4_url || '',
-      week1_video: app.week1_video || '',
-      week2_video: app.week2_video || '',
-      week3_video: app.week3_video || '',
-      week4_video: app.week4_video || '',
       week1_partnership_code: app.week1_partnership_code || '',
       week2_partnership_code: app.week2_partnership_code || '',
       week3_partnership_code: app.week3_partnership_code || '',
@@ -484,14 +481,14 @@ const ApplicationsPage = () => {
       const isOliveYoungSale = selectedApplication?.campaigns?.is_oliveyoung_sale
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올영세일: 3개 URL + 2개 광고코드 필수
+        // 올영세일: 3개 URL + 2개 광고코드 필수 (step1, step2만 광고코드)
         if (!snsUploadForm.step1_url || !snsUploadForm.step2_url || !snsUploadForm.step3_url) {
           setError('STEP 1, 2, 3 URL을 모두 입력해주세요.')
           setProcessing(false)
           return
         }
-        if (!snsUploadForm.step1_2_partnership_code || !snsUploadForm.step3_partnership_code) {
-          setError('광고코드를 모두 입력해주세요. (STEP 1&2용, STEP 3용)')
+        if (!snsUploadForm.step1_partnership_code || !snsUploadForm.step2_partnership_code) {
+          setError('광고코드를 모두 입력해주세요. (STEP 1용, STEP 2용)')
           setProcessing(false)
           return
         }
@@ -525,15 +522,13 @@ const ApplicationsPage = () => {
       let updateData
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올리브영: 각 컬럼에 개별 저장
+        // 올리브영: step1 URL+코드, step2 URL+코드, step3 URL만
         updateData = {
           step1_url: snsUploadForm.step1_url,
           step2_url: snsUploadForm.step2_url,
           step3_url: snsUploadForm.step3_url,
-          step1_2_video_folder: snsUploadForm.step1_2_video_folder || null,
-          step3_video_folder: snsUploadForm.step3_video_folder || null,
-          step1_2_partnership_code: snsUploadForm.step1_2_partnership_code || null,
-          step3_partnership_code: snsUploadForm.step3_partnership_code || null,
+          step1_partnership_code: snsUploadForm.step1_partnership_code || null,
+          step2_partnership_code: snsUploadForm.step2_partnership_code || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -918,18 +913,18 @@ const ApplicationsPage = () => {
                             )}
                           </div>
                           {/* 광고코드 표시 - 개별 컬럼에서 읽기 */}
-                          {(app.partnership_code || app.step1_2_partnership_code || app.week1_partnership_code) && (
+                          {(app.partnership_code || app.step1_partnership_code || app.week1_partnership_code) && (
                             <div className="mt-2 pt-2 border-t border-pink-200 space-y-1">
                               {/* 일반 캠페인 광고코드 */}
                               {app.partnership_code && typeof app.partnership_code === 'string' && (
                                 <span className="text-[10px] text-pink-500">광고코드: {app.partnership_code}</span>
                               )}
-                              {/* 올리브영 캠페인 광고코드 */}
-                              {app.step1_2_partnership_code && (
-                                <div className="text-[10px] text-pink-500">STEP 1&2 광고코드: {app.step1_2_partnership_code}</div>
+                              {/* 올리브영 캠페인 광고코드 (step1, step2만) */}
+                              {app.step1_partnership_code && (
+                                <div className="text-[10px] text-pink-500">STEP 1 광고코드: {app.step1_partnership_code}</div>
                               )}
-                              {app.step3_partnership_code && (
-                                <div className="text-[10px] text-pink-500">STEP 3 광고코드: {app.step3_partnership_code}</div>
+                              {app.step2_partnership_code && (
+                                <div className="text-[10px] text-pink-500">STEP 2 광고코드: {app.step2_partnership_code}</div>
                               )}
                               {/* 4주 챌린지 광고코드 */}
                               {app.week1_partnership_code && (
@@ -1947,15 +1942,15 @@ const ApplicationsPage = () => {
               {/* 올리브영 캠페인: 3개 URL + 2개 광고코드 입력 */}
               {(selectedApplication.campaigns?.campaign_type === 'oliveyoung' || selectedApplication.campaigns?.is_oliveyoung_sale) && (
                 <>
-                  {/* STEP 1 & 2 릴스 섹션 */}
+                  {/* STEP 1 릴스 섹션 */}
                   <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-3">
                     <div className="flex items-center gap-2">
-                      <span className="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded">STEP 1 & 2</span>
-                      <span className="text-xs text-green-700">릴스 영상 2개</span>
+                      <span className="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded">STEP 1</span>
+                      <span className="text-xs text-green-700">릴스 (세일 7일 전)</span>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 1 릴스 URL (세일 7일 전) *
+                        STEP 1 릴스 URL *
                       </label>
                       <input
                         type="url"
@@ -1967,25 +1962,45 @@ const ApplicationsPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 2 릴스 URL (세일 1일 전) *
+                        STEP 1 광고코드 (파트너십 코드) *
+                      </label>
+                      <input
+                        type="text"
+                        value={snsUploadForm.step1_partnership_code || ''}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, step1_partnership_code: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                        placeholder="파트너십 광고 코드"
+                      />
+                    </div>
+                  </div>
+
+                  {/* STEP 2 릴스 섹션 */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded">STEP 2</span>
+                      <span className="text-xs text-blue-700">릴스 (세일 1일 전)</span>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        STEP 2 릴스 URL *
                       </label>
                       <input
                         type="url"
                         value={snsUploadForm.step2_url}
                         onChange={(e) => setSnsUploadForm({...snsUploadForm, step2_url: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         placeholder="https://instagram.com/reel/..."
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 1&2 광고코드 (파트너십 코드) *
+                        STEP 2 광고코드 (파트너십 코드) *
                       </label>
                       <input
                         type="text"
-                        value={snsUploadForm.step1_2_partnership_code || ''}
-                        onChange={(e) => setSnsUploadForm({...snsUploadForm, step1_2_partnership_code: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                        value={snsUploadForm.step2_partnership_code || ''}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, step2_partnership_code: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         placeholder="파트너십 광고 코드"
                       />
                     </div>
@@ -1995,11 +2010,11 @@ const ApplicationsPage = () => {
                   <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 space-y-3">
                     <div className="flex items-center gap-2">
                       <span className="bg-orange-600 text-white text-xs font-bold px-2 py-0.5 rounded">STEP 3</span>
-                      <span className="text-xs text-orange-700">스토리 1개</span>
+                      <span className="text-xs text-orange-700">스토리 (세일 당일)</span>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 3 스토리 URL (세일 당일) *
+                        STEP 3 스토리 URL *
                       </label>
                       <input
                         type="url"
@@ -2007,18 +2022,6 @@ const ApplicationsPage = () => {
                         onChange={(e) => setSnsUploadForm({...snsUploadForm, step3_url: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
                         placeholder="https://instagram.com/stories/..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 3 광고코드 (파트너십 코드) *
-                      </label>
-                      <input
-                        type="text"
-                        value={snsUploadForm.step3_partnership_code || ''}
-                        onChange={(e) => setSnsUploadForm({...snsUploadForm, step3_partnership_code: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
-                        placeholder="파트너십 광고 코드"
                       />
                     </div>
                   </div>
