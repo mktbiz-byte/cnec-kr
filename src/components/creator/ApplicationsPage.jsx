@@ -388,18 +388,14 @@ const ApplicationsPage = () => {
     }
   }
 
-  // SNS 업로드 모달 열기 (기존 값 불러오기)
+  // SNS 업로드 모달 열기 (기존 값 불러오기 - 개별 컬럼에서 직접 읽기)
   const openSnsUploadModal = (app) => {
     setSelectedApplication(app)
-
-    // 기존 광고코드 (jsonb 객체 또는 문자열)
-    const codes = app.partnership_code || {}
-    const isObject = typeof codes === 'object' && codes !== null
 
     setSnsUploadForm({
       // 일반 캠페인
       sns_upload_url: app.sns_upload_url || '',
-      partnership_code: isObject ? '' : (codes || ''),
+      partnership_code: app.partnership_code || '',
       notes: app.notes || '',
       // 올리브영 캠페인
       step1_url: app.step1_url || '',
@@ -407,8 +403,8 @@ const ApplicationsPage = () => {
       step3_url: app.step3_url || '',
       step1_2_video_folder: app.step1_2_video_folder || '',
       step3_video_folder: app.step3_video_folder || '',
-      step1_2_partnership_code: isObject ? (codes.step1_2 || '') : '',
-      step3_partnership_code: isObject ? (codes.step3 || '') : '',
+      step1_2_partnership_code: app.step1_2_partnership_code || '',
+      step3_partnership_code: app.step3_partnership_code || '',
       // 4주 챌린지
       week1_url: app.week1_url || '',
       week2_url: app.week2_url || '',
@@ -418,10 +414,10 @@ const ApplicationsPage = () => {
       week2_video: app.week2_video || '',
       week3_video: app.week3_video || '',
       week4_video: app.week4_video || '',
-      week1_partnership_code: isObject ? (codes.week1 || '') : '',
-      week2_partnership_code: isObject ? (codes.week2 || '') : '',
-      week3_partnership_code: isObject ? (codes.week3 || '') : '',
-      week4_partnership_code: isObject ? (codes.week4 || '') : ''
+      week1_partnership_code: app.week1_partnership_code || '',
+      week2_partnership_code: app.week2_partnership_code || '',
+      week3_partnership_code: app.week3_partnership_code || '',
+      week4_partnership_code: app.week4_partnership_code || ''
     })
     setError('')
     setShowSnsUploadModal(true)
@@ -529,23 +525,21 @@ const ApplicationsPage = () => {
       let updateData
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올리브영: 광고코드 2개를 jsonb로 저장
+        // 올리브영: 각 컬럼에 개별 저장
         updateData = {
           step1_url: snsUploadForm.step1_url,
           step2_url: snsUploadForm.step2_url,
           step3_url: snsUploadForm.step3_url,
           step1_2_video_folder: snsUploadForm.step1_2_video_folder || null,
           step3_video_folder: snsUploadForm.step3_video_folder || null,
-          partnership_code: {
-            step1_2: snsUploadForm.step1_2_partnership_code || '',
-            step3: snsUploadForm.step3_partnership_code || ''
-          },
+          step1_2_partnership_code: snsUploadForm.step1_2_partnership_code || null,
+          step3_partnership_code: snsUploadForm.step3_partnership_code || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
         }
       } else if (campaignType === '4week_challenge') {
-        // 4주 챌린지: 광고코드 4개를 jsonb로 저장
+        // 4주 챌린지: 각 컬럼에 개별 저장
         updateData = {
           week1_url: snsUploadForm.week1_url,
           week2_url: snsUploadForm.week2_url,
@@ -555,12 +549,10 @@ const ApplicationsPage = () => {
           week2_video: snsUploadForm.week2_video || null,
           week3_video: snsUploadForm.week3_video || null,
           week4_video: snsUploadForm.week4_video || null,
-          partnership_code: {
-            week1: snsUploadForm.week1_partnership_code || '',
-            week2: snsUploadForm.week2_partnership_code || '',
-            week3: snsUploadForm.week3_partnership_code || '',
-            week4: snsUploadForm.week4_partnership_code || ''
-          },
+          week1_partnership_code: snsUploadForm.week1_partnership_code || null,
+          week2_partnership_code: snsUploadForm.week2_partnership_code || null,
+          week3_partnership_code: snsUploadForm.week3_partnership_code || null,
+          week4_partnership_code: snsUploadForm.week4_partnership_code || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -925,16 +917,32 @@ const ApplicationsPage = () => {
                               </a>
                             )}
                           </div>
-                          {app.partnership_code && (
+                          {/* 광고코드 표시 - 개별 컬럼에서 읽기 */}
+                          {(app.partnership_code || app.step1_2_partnership_code || app.week1_partnership_code) && (
                             <div className="mt-2 pt-2 border-t border-pink-200 space-y-1">
-                              {typeof app.partnership_code === 'object' ? (
-                                // jsonb 객체인 경우
-                                Object.entries(app.partnership_code).map(([key, value]) => (
-                                  value && <div key={key} className="text-[10px] text-pink-500">{key} 광고코드: {value}</div>
-                                ))
-                              ) : (
-                                // 문자열인 경우 (일반 캠페인)
+                              {/* 일반 캠페인 광고코드 */}
+                              {app.partnership_code && typeof app.partnership_code === 'string' && (
                                 <span className="text-[10px] text-pink-500">광고코드: {app.partnership_code}</span>
+                              )}
+                              {/* 올리브영 캠페인 광고코드 */}
+                              {app.step1_2_partnership_code && (
+                                <div className="text-[10px] text-pink-500">STEP 1&2 광고코드: {app.step1_2_partnership_code}</div>
+                              )}
+                              {app.step3_partnership_code && (
+                                <div className="text-[10px] text-pink-500">STEP 3 광고코드: {app.step3_partnership_code}</div>
+                              )}
+                              {/* 4주 챌린지 광고코드 */}
+                              {app.week1_partnership_code && (
+                                <div className="text-[10px] text-pink-500">Week 1 광고코드: {app.week1_partnership_code}</div>
+                              )}
+                              {app.week2_partnership_code && (
+                                <div className="text-[10px] text-pink-500">Week 2 광고코드: {app.week2_partnership_code}</div>
+                              )}
+                              {app.week3_partnership_code && (
+                                <div className="text-[10px] text-pink-500">Week 3 광고코드: {app.week3_partnership_code}</div>
+                              )}
+                              {app.week4_partnership_code && (
+                                <div className="text-[10px] text-pink-500">Week 4 광고코드: {app.week4_partnership_code}</div>
                               )}
                             </div>
                           )}
