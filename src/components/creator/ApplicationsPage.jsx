@@ -515,19 +515,30 @@ const ApplicationsPage = () => {
       let updateData
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
+        // 올리브영: 광고코드 2개를 JSON으로 저장
+        const partnershipCodes = JSON.stringify({
+          step1_2: snsUploadForm.step1_2_partnership_code || '',
+          step3: snsUploadForm.step3_partnership_code || ''
+        })
         updateData = {
           step1_url: snsUploadForm.step1_url,
           step2_url: snsUploadForm.step2_url,
           step3_url: snsUploadForm.step3_url,
           step1_2_video_folder: snsUploadForm.step1_2_video_folder || null,
           step3_video_folder: snsUploadForm.step3_video_folder || null,
-          step1_2_partnership_code: snsUploadForm.step1_2_partnership_code || null,
-          step3_partnership_code: snsUploadForm.step3_partnership_code || null,
+          partnership_code: partnershipCodes,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
         }
       } else if (campaignType === '4week_challenge') {
+        // 4주 챌린지: 광고코드 4개를 JSON으로 저장
+        const partnershipCodes = JSON.stringify({
+          week1: snsUploadForm.week1_partnership_code || '',
+          week2: snsUploadForm.week2_partnership_code || '',
+          week3: snsUploadForm.week3_partnership_code || '',
+          week4: snsUploadForm.week4_partnership_code || ''
+        })
         updateData = {
           week1_url: snsUploadForm.week1_url,
           week2_url: snsUploadForm.week2_url,
@@ -537,10 +548,7 @@ const ApplicationsPage = () => {
           week2_video: snsUploadForm.week2_video || null,
           week3_video: snsUploadForm.week3_video || null,
           week4_video: snsUploadForm.week4_video || null,
-          week1_partnership_code: snsUploadForm.week1_partnership_code || null,
-          week2_partnership_code: snsUploadForm.week2_partnership_code || null,
-          week3_partnership_code: snsUploadForm.week3_partnership_code || null,
-          week4_partnership_code: snsUploadForm.week4_partnership_code || null,
+          partnership_code: partnershipCodes,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -906,8 +914,21 @@ const ApplicationsPage = () => {
                             )}
                           </div>
                           {app.partnership_code && (
-                            <div className="mt-2 pt-2 border-t border-pink-200">
-                              <span className="text-[10px] text-pink-500">광고코드: {app.partnership_code}</span>
+                            <div className="mt-2 pt-2 border-t border-pink-200 space-y-1">
+                              {(() => {
+                                // JSON 형태인지 확인하여 파싱
+                                try {
+                                  const codes = JSON.parse(app.partnership_code)
+                                  if (typeof codes === 'object') {
+                                    return Object.entries(codes).map(([key, value]) => (
+                                      value && <div key={key} className="text-[10px] text-pink-500">{key} 광고코드: {value}</div>
+                                    ))
+                                  }
+                                } catch (e) {
+                                  // JSON이 아니면 그대로 표시
+                                  return <span className="text-[10px] text-pink-500">광고코드: {app.partnership_code}</span>
+                                }
+                              })()}
                             </div>
                           )}
                         </div>
@@ -1006,14 +1027,15 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 올리브영 캠페인 SNS 업로드 버튼 (별도 표시) */}
+                      {/* filming 상태부터 SNS 업로드 가능 (영상과 별개로 입력) */}
                       {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) &&
-                       (app.status === 'video_submitted' ||
+                       (['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) ||
                         (['completed', 'paid', 'sns_uploaded'].includes(app.status) && !app.step1_url)) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Upload size={14} /> SNS 업로드하기 (3개 URL + 광고코드 2개)
+                          <Upload size={14} /> SNS 업로드 정보 입력 (3개 URL + 광고코드 2개)
                         </button>
                       )}
 
@@ -1051,14 +1073,15 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 4주 챌린지 캠페인 SNS 업로드 버튼 (별도 표시) */}
+                      {/* filming 상태부터 SNS 업로드 가능 (영상과 별개로 입력) */}
                       {app.campaigns?.campaign_type === '4week_challenge' &&
-                       (app.status === 'video_submitted' ||
+                       (['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) ||
                         (['completed', 'paid', 'sns_uploaded'].includes(app.status) && !app.week1_url)) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Upload size={14} /> SNS 업로드하기 (4개 URL + 광고코드 4개)
+                          <Upload size={14} /> SNS 업로드 정보 입력 (4개 URL + 광고코드 4개)
                         </button>
                       )}
 
@@ -1179,17 +1202,18 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 기획형/일반 캠페인 - SNS 업로드 버튼 */}
+                      {/* filming 상태부터 SNS 업로드 가능 (영상과 별개로 입력) */}
                       {/* 올리브영, 4주 챌린지는 위에서 별도 처리 */}
                       {app.campaigns?.campaign_type !== 'oliveyoung' &&
                        app.campaigns?.campaign_type !== '4week_challenge' &&
                        !app.campaigns?.is_oliveyoung_sale &&
-                       (app.status === 'video_submitted' ||
+                       (['filming', 'approved', 'selected', 'video_submitted'].includes(app.status) ||
                         (['completed', 'paid', 'sns_uploaded'].includes(app.status) && !app.sns_upload_url)) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Upload size={14} /> SNS 업로드하기 (1개 URL + 광고코드 1개)
+                          <Upload size={14} /> SNS 업로드 정보 입력 (1개 URL + 광고코드 1개)
                         </button>
                       )}
                     </div>
