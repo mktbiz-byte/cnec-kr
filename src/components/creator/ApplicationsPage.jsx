@@ -1939,20 +1939,6 @@ const ApplicationsPage = () => {
                           placeholder="파트너십 광고 코드"
                         />
                       </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">
-                          영상 파일 (선택)
-                        </label>
-                        <input
-                          type="file"
-                          accept="video/*"
-                          onChange={(e) => handleSnsVideoUpload(e, `week${week}`)}
-                          className="w-full text-xs"
-                        />
-                        {snsUploadForm[`week${week}_video`] && (
-                          <p className="text-xs text-green-600 mt-1">✓ 업로드 완료</p>
-                        )}
-                      </div>
                     </div>
                   ))}
                 </>
@@ -2003,21 +1989,6 @@ const ApplicationsPage = () => {
                         placeholder="파트너십 광고 코드"
                       />
                     </div>
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">
-                        영상 파일 (선택)
-                      </label>
-                      <input
-                        type="file"
-                        multiple
-                        accept="video/*"
-                        onChange={(e) => handleSnsVideoUpload(e, 'step1_2')}
-                        className="w-full text-xs"
-                      />
-                      {snsUploadForm.step1_2_video_folder && (
-                        <p className="text-xs text-green-600 mt-1">✓ 업로드 완료</p>
-                      )}
-                    </div>
                   </div>
 
                   {/* STEP 3 스토리 섹션 */}
@@ -2049,21 +2020,6 @@ const ApplicationsPage = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
                         placeholder="파트너십 광고 코드"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">
-                        영상 파일 (선택)
-                      </label>
-                      <input
-                        type="file"
-                        multiple
-                        accept="video/*"
-                        onChange={(e) => handleSnsVideoUpload(e, 'step3')}
-                        className="w-full text-xs"
-                      />
-                      {snsUploadForm.step3_video_folder && (
-                        <p className="text-xs text-green-600 mt-1">✓ 업로드 완료</p>
-                      )}
                     </div>
                   </div>
                 </>
