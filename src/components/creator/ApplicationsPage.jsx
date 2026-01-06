@@ -998,8 +998,11 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* video_submitted 상태일 때 영상 재제출 + SNS 업로드 버튼 */}
-                      {app.status === 'video_submitted' && (
+                      {/* video_submitted 상태이거나, 완료/검수완료 상태이지만 SNS URL이 입력되지 않은 경우 영상 재제출 + SNS 업로드 버튼 */}
+                      {/* SNS URL 입력 여부 확인: 캠페인 타입에 따라 다른 필드 체크 */}
+                      {(app.status === 'video_submitted' ||
+                        (['completed', 'paid', 'sns_uploaded'].includes(app.status) &&
+                         !app.sns_upload_url && !app.step1_url && !app.week1_url)) && (
                         <div className="space-y-2">
                           {/* 기획형 캠페인 영상 재제출 */}
                           {app.campaigns?.campaign_type === 'planned' && (
