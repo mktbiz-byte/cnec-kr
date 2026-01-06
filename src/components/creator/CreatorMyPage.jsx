@@ -333,52 +333,27 @@ const CreatorMyPage = () => {
     }
   }
 
-  // 주민번호 암호화 함수 (AES-GCM)
+  // 주민번호 암호화 함수 (Supabase RPC - pgcrypto)
   const encryptResidentNumber = async (plainText) => {
     try {
-      const encoder = new TextEncoder()
-      const data = encoder.encode(plainText)
-
-      // 암호화 키 생성 (실제 운영시에는 서버에서 관리해야 함)
-      const keyMaterial = await crypto.subtle.importKey(
-        'raw',
-        encoder.encode('cnec-secure-key-2024-resident-num'),
-        { name: 'PBKDF2' },
-        false,
-        ['deriveBits', 'deriveKey']
-      )
-
-      const salt = crypto.getRandomValues(new Uint8Array(16))
-      const key = await crypto.subtle.deriveKey(
+      const encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || 'default-key-change-this'
+      const { data: encryptedData, error } = await supabase.rpc(
+        'encrypt_resident_number',
         {
-          name: 'PBKDF2',
-          salt: salt,
-          iterations: 100000,
-          hash: 'SHA-256'
-        },
-        keyMaterial,
-        { name: 'AES-GCM', length: 256 },
-        false,
-        ['encrypt']
+          resident_number: plainText,
+          encryption_key: encryptionKey
+        }
       )
 
-      const iv = crypto.getRandomValues(new Uint8Array(12))
-      const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv: iv },
-        key,
-        data
-      )
+      if (error) {
+        console.error('암호화 오류:', error)
+        return null
+      }
 
-      // salt + iv + encrypted data를 합쳐서 Base64로 인코딩
-      const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength)
-      combined.set(salt, 0)
-      combined.set(iv, salt.length)
-      combined.set(new Uint8Array(encrypted), salt.length + iv.length)
-
-      return btoa(String.fromCharCode(...combined))
+      return encryptedData
     } catch (error) {
-      console.error('암호화 오류:', error)
-      throw new Error('주민번호 암호화에 실패했습니다')
+      console.error('암호화 실패:', error)
+      return null
     }
   }
 
@@ -453,13 +428,14 @@ const CreatorMyPage = () => {
       const today = new Date()
       const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-      // 출금 신청 (포인트 차감 + 거래 내역 생성)
+      // 출금 신청 (포인트 차감 + withdrawals 테이블 저장 + 거래 내역 생성)
       const result = await database.userPoints.requestWithdrawal({
         user_id: user.id,
         amount: amount,
         bank_name: profile.bank_name,
         bank_account_number: profile.account_number,
-        bank_account_holder: profile.account_holder
+        bank_account_holder: profile.account_holder,
+        resident_number_encrypted: encryptedResidentNum
       })
 
       if (!result.success) throw new Error('출금 신청 처리 실패')

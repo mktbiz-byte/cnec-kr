@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import VideoReferencesSection from './VideoReferencesSection'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
+import { supabase, database } from '../lib/supabase'
 import { 
   User, Mail, Phone, MapPin, Calendar, Award, 
   CreditCard, Download, Settings, LogOut, 
@@ -346,24 +346,17 @@ const MyPageKorea = () => {
         return
       }
 
-      // 1. 포인트 차감
-      const newPoints = profile.points - amount
-      const { error: pointsError } = await supabase
-        .from('user_profiles')
-        .update({ points: newPoints })
-        .eq('id', user.id)
-
-      if (pointsError) throw pointsError
-
-      // 2. point_transactions에 출금 신청 저장
-      const { error: txError } = await supabase.from('point_transactions').insert({
+      // 출금 신청 (포인트 차감 + withdrawals 테이블 저장 + 거래 내역 생성)
+      const result = await database.userPoints.requestWithdrawal({
         user_id: user.id,
-        amount: -amount,
-        transaction_type: 'withdraw',
-        description: `[출금신청] ${amount.toLocaleString()}원 | ${withdrawForm.bankName} ${withdrawForm.bankAccountNumber} (${withdrawForm.bankAccountHolder})`
+        amount: amount,
+        bank_name: withdrawForm.bankName,
+        bank_account_number: withdrawForm.bankAccountNumber,
+        bank_account_holder: withdrawForm.bankAccountHolder,
+        resident_number_encrypted: encryptedResident
       })
 
-      if (txError) throw txError
+      if (!result.success) throw new Error('출금 신청 처리 실패')
 
       // 카카오 알림톡 + 이메일 발송 (실패해도 출금 신청은 성공으로 처리)
       try {

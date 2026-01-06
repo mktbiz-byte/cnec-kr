@@ -260,30 +260,91 @@ const AdminWithdrawals = () => {
         .select('*')
         .eq('id', withdrawalId)
         .single()
-      
+
       if (selectError) {
         console.error('레코드 조회 오류:', selectError)
         throw new Error(`레코드를 찾을 수 없습니다: ${selectError.message}`)
       }
-      
+
       console.log('기존 레코드:', existingRecord)
-      
+
       // description 필드를 사용해서 상태 정보를 저장
       let newDescription = existingRecord.description || ''
-      
+
       if (newStatus === 'approved') {
         newDescription = newDescription.replace(/\[상태:.*?\]/g, '') + ' [상태:승인됨]'
         console.log('승인 처리 중...')
-        
+
       } else if (newStatus === 'rejected') {
         newDescription = newDescription.replace(/\[상태:.*?\]/g, '') + ` [상태:거부됨] [사유:${adminNotes}]`
         console.log('거부 처리 중...')
-        
+
+        // 포인트 환불 처리 (Netlify 함수 사용 - RLS 우회)
+        const refundAmount = Math.abs(existingRecord.amount)
+        const userId = existingRecord.user_id
+
+        if (userId && refundAmount > 0) {
+          try {
+            const refundResponse = await fetch('/.netlify/functions/admin-refund-points', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: userId,
+                amount: refundAmount,
+                reason: adminNotes || '관리자 거절'
+              })
+            })
+
+            const refundResult = await refundResponse.json()
+
+            if (!refundResult.success) {
+              console.error('포인트 환불 오류:', refundResult.error)
+              throw new Error('포인트 환불에 실패했습니다: ' + refundResult.error)
+            }
+
+            console.log('포인트 환불 완료:', refundResult.data)
+          } catch (refundError) {
+            console.error('포인트 환불 처리 실패:', refundError)
+            throw new Error('포인트 환불에 실패했습니다')
+          }
+        }
+
+        // withdrawals 테이블도 업데이트 (있는 경우)
+        try {
+          await supabase
+            .from('withdrawals')
+            .update({
+              status: 'rejected',
+              admin_notes: adminNotes,
+              processed_at: new Date().toISOString()
+            })
+            .eq('user_id', existingRecord.user_id)
+            .eq('amount', Math.abs(existingRecord.amount))
+            .eq('status', 'pending')
+        } catch (withdrawalUpdateError) {
+          console.log('withdrawals 테이블 업데이트 스킵 (테이블 없거나 매칭 레코드 없음)')
+        }
+
       } else if (newStatus === 'completed') {
         newDescription = newDescription.replace(/\[상태:.*?\]/g, '') + ' [상태:완료됨]'
         console.log('완료 처리 중...')
+
+        // withdrawals 테이블도 업데이트 (있는 경우)
+        try {
+          await supabase
+            .from('withdrawals')
+            .update({
+              status: 'completed',
+              processed_at: new Date().toISOString()
+            })
+            .eq('user_id', existingRecord.user_id)
+            .eq('amount', Math.abs(existingRecord.amount))
+            .eq('status', 'approved')
+        } catch (withdrawalUpdateError) {
+          console.log('withdrawals 테이블 업데이트 스킵')
+        }
       }
-      
+
       // description 필드 업데이트
       const { data: updateResult, error: updateError } = await supabase
         .from('point_transactions')
