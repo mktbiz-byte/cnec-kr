@@ -279,50 +279,33 @@ const AdminWithdrawals = () => {
         newDescription = newDescription.replace(/\[상태:.*?\]/g, '') + ` [상태:거부됨] [사유:${adminNotes}]`
         console.log('거부 처리 중...')
 
-        // 포인트 환불 처리
+        // 포인트 환불 처리 (Netlify 함수 사용 - RLS 우회)
         const refundAmount = Math.abs(existingRecord.amount)
         const userId = existingRecord.user_id
 
         if (userId && refundAmount > 0) {
-          // 1. 현재 포인트 조회
-          const { data: profileData, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('points')
-            .eq('id', userId)
-            .single()
-
-          if (profileError) {
-            console.error('프로필 조회 오류:', profileError)
-          } else {
-            const currentPoints = profileData?.points || 0
-            const newPoints = currentPoints + refundAmount
-
-            // 2. 포인트 환불
-            const { error: updatePointsError } = await supabase
-              .from('user_profiles')
-              .update({ points: newPoints })
-              .eq('id', userId)
-
-            if (updatePointsError) {
-              console.error('포인트 환불 오류:', updatePointsError)
-              throw new Error('포인트 환불에 실패했습니다')
-            }
-
-            // 3. 환불 기록 추가
-            const { error: refundTxError } = await supabase
-              .from('point_transactions')
-              .insert({
+          try {
+            const refundResponse = await fetch('/.netlify/functions/admin-refund-points', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
                 user_id: userId,
                 amount: refundAmount,
-                transaction_type: 'refund',
-                description: `[출금거절] ${refundAmount.toLocaleString()}원 환불 - ${adminNotes || '관리자 거절'}`
+                reason: adminNotes || '관리자 거절'
               })
+            })
 
-            if (refundTxError) {
-              console.error('환불 기록 오류:', refundTxError)
+            const refundResult = await refundResponse.json()
+
+            if (!refundResult.success) {
+              console.error('포인트 환불 오류:', refundResult.error)
+              throw new Error('포인트 환불에 실패했습니다: ' + refundResult.error)
             }
 
-            console.log('포인트 환불 완료:', { userId, refundAmount, newPoints })
+            console.log('포인트 환불 완료:', refundResult.data)
+          } catch (refundError) {
+            console.error('포인트 환불 처리 실패:', refundError)
+            throw new Error('포인트 환불에 실패했습니다')
           }
         }
 
