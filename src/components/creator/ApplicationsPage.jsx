@@ -392,21 +392,14 @@ const ApplicationsPage = () => {
   const openSnsUploadModal = (app) => {
     setSelectedApplication(app)
 
-    // 기존 광고코드 파싱 (JSON인 경우)
-    let partnershipCodes = {}
-    if (app.partnership_code) {
-      try {
-        partnershipCodes = JSON.parse(app.partnership_code)
-      } catch (e) {
-        // JSON이 아니면 일반 캠페인용 단일 코드
-        partnershipCodes = { single: app.partnership_code }
-      }
-    }
+    // 기존 광고코드 (jsonb 객체 또는 문자열)
+    const codes = app.partnership_code || {}
+    const isObject = typeof codes === 'object' && codes !== null
 
     setSnsUploadForm({
       // 일반 캠페인
       sns_upload_url: app.sns_upload_url || '',
-      partnership_code: partnershipCodes.single || app.partnership_code || '',
+      partnership_code: isObject ? '' : (codes || ''),
       notes: app.notes || '',
       // 올리브영 캠페인
       step1_url: app.step1_url || '',
@@ -414,8 +407,8 @@ const ApplicationsPage = () => {
       step3_url: app.step3_url || '',
       step1_2_video_folder: app.step1_2_video_folder || '',
       step3_video_folder: app.step3_video_folder || '',
-      step1_2_partnership_code: partnershipCodes.step1_2 || '',
-      step3_partnership_code: partnershipCodes.step3 || '',
+      step1_2_partnership_code: isObject ? (codes.step1_2 || '') : '',
+      step3_partnership_code: isObject ? (codes.step3 || '') : '',
       // 4주 챌린지
       week1_url: app.week1_url || '',
       week2_url: app.week2_url || '',
@@ -425,10 +418,10 @@ const ApplicationsPage = () => {
       week2_video: app.week2_video || '',
       week3_video: app.week3_video || '',
       week4_video: app.week4_video || '',
-      week1_partnership_code: partnershipCodes.week1 || '',
-      week2_partnership_code: partnershipCodes.week2 || '',
-      week3_partnership_code: partnershipCodes.week3 || '',
-      week4_partnership_code: partnershipCodes.week4 || ''
+      week1_partnership_code: isObject ? (codes.week1 || '') : '',
+      week2_partnership_code: isObject ? (codes.week2 || '') : '',
+      week3_partnership_code: isObject ? (codes.week3 || '') : '',
+      week4_partnership_code: isObject ? (codes.week4 || '') : ''
     })
     setError('')
     setShowSnsUploadModal(true)
@@ -536,30 +529,23 @@ const ApplicationsPage = () => {
       let updateData
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올리브영: 광고코드 2개를 JSON으로 저장
-        const partnershipCodes = JSON.stringify({
-          step1_2: snsUploadForm.step1_2_partnership_code || '',
-          step3: snsUploadForm.step3_partnership_code || ''
-        })
+        // 올리브영: 광고코드 2개를 jsonb로 저장
         updateData = {
           step1_url: snsUploadForm.step1_url,
           step2_url: snsUploadForm.step2_url,
           step3_url: snsUploadForm.step3_url,
           step1_2_video_folder: snsUploadForm.step1_2_video_folder || null,
           step3_video_folder: snsUploadForm.step3_video_folder || null,
-          partnership_code: partnershipCodes,
+          partnership_code: {
+            step1_2: snsUploadForm.step1_2_partnership_code || '',
+            step3: snsUploadForm.step3_partnership_code || ''
+          },
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
         }
       } else if (campaignType === '4week_challenge') {
-        // 4주 챌린지: 광고코드 4개를 JSON으로 저장
-        const partnershipCodes = JSON.stringify({
-          week1: snsUploadForm.week1_partnership_code || '',
-          week2: snsUploadForm.week2_partnership_code || '',
-          week3: snsUploadForm.week3_partnership_code || '',
-          week4: snsUploadForm.week4_partnership_code || ''
-        })
+        // 4주 챌린지: 광고코드 4개를 jsonb로 저장
         updateData = {
           week1_url: snsUploadForm.week1_url,
           week2_url: snsUploadForm.week2_url,
@@ -569,7 +555,12 @@ const ApplicationsPage = () => {
           week2_video: snsUploadForm.week2_video || null,
           week3_video: snsUploadForm.week3_video || null,
           week4_video: snsUploadForm.week4_video || null,
-          partnership_code: partnershipCodes,
+          partnership_code: {
+            week1: snsUploadForm.week1_partnership_code || '',
+            week2: snsUploadForm.week2_partnership_code || '',
+            week3: snsUploadForm.week3_partnership_code || '',
+            week4: snsUploadForm.week4_partnership_code || ''
+          },
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -936,20 +927,15 @@ const ApplicationsPage = () => {
                           </div>
                           {app.partnership_code && (
                             <div className="mt-2 pt-2 border-t border-pink-200 space-y-1">
-                              {(() => {
-                                // JSON 형태인지 확인하여 파싱
-                                try {
-                                  const codes = JSON.parse(app.partnership_code)
-                                  if (typeof codes === 'object') {
-                                    return Object.entries(codes).map(([key, value]) => (
-                                      value && <div key={key} className="text-[10px] text-pink-500">{key} 광고코드: {value}</div>
-                                    ))
-                                  }
-                                } catch (e) {
-                                  // JSON이 아니면 그대로 표시
-                                  return <span className="text-[10px] text-pink-500">광고코드: {app.partnership_code}</span>
-                                }
-                              })()}
+                              {typeof app.partnership_code === 'object' ? (
+                                // jsonb 객체인 경우
+                                Object.entries(app.partnership_code).map(([key, value]) => (
+                                  value && <div key={key} className="text-[10px] text-pink-500">{key} 광고코드: {value}</div>
+                                ))
+                              ) : (
+                                // 문자열인 경우 (일반 캠페인)
+                                <span className="text-[10px] text-pink-500">광고코드: {app.partnership_code}</span>
+                              )}
                             </div>
                           )}
                         </div>
