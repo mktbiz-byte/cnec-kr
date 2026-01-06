@@ -521,8 +521,49 @@ const CampaignApplyPage = () => {
           />
         </div>
 
-        {/* 초상권 동의 */}
-        <div className="bg-white rounded-xl p-4">
+        {/* 필수 제출 사항 안내 */}
+        <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+          <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <AlertCircle size={18} className="text-blue-600" />
+            필수 제출 사항 안내
+          </h3>
+          <p className="text-sm text-gray-600 mb-3">
+            선정 시 다음 항목을 필수로 제출해야 합니다:
+          </p>
+          <ul className="space-y-2 text-sm text-gray-700">
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold">•</span>
+              <span><strong>영상 편집본</strong> - 자막, 효과 등이 포함된 완성된 콘텐츠</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold">•</span>
+              <span><strong>클린본</strong> - 자막/텍스트가 없는 원본 영상</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold">•</span>
+              <span><strong>광고코드</strong> - 브랜드에서 제공하는 파트너십 코드</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* 초상권 및 콘텐츠 사용 동의 */}
+        <div className="bg-white rounded-xl p-4 border border-gray-200">
+          <h3 className="font-bold text-gray-900 mb-3">초상권 및 콘텐츠 사용 동의 *</h3>
+          <div className="bg-gray-50 rounded-lg p-3 mb-4 text-xs text-gray-600 leading-relaxed space-y-2">
+            <p>
+              본인은 본 캠페인을 통해 제작되는 모든 콘텐츠(영상, 이미지, 음성 등)에 포함된
+              본인의 초상, 성명, 음성에 대하여 아래와 같이 사용권을 부여합니다.
+            </p>
+            <ul className="space-y-1 pl-2">
+              <li>• <strong>사용권자:</strong> 해당 브랜드사 및 CNEC 플랫폼</li>
+              <li>• <strong>사용 목적:</strong> 광고, 마케팅, 홍보 등 상업적 목적</li>
+              <li>• <strong>사용 기간:</strong> 콘텐츠 최초 게시일로부터 1년간</li>
+              <li>• <strong>사용 범위:</strong> 온·오프라인 매체, SNS, 홈페이지, 광고물 등</li>
+            </ul>
+            <p className="text-gray-500">
+              ※ 사용 기간 종료 후 콘텐츠 사용 연장 시 별도 협의가 진행됩니다.
+            </p>
+          </div>
           <label className="flex items-start gap-3 cursor-pointer">
             <input
               type="checkbox"
@@ -533,8 +574,8 @@ const CampaignApplyPage = () => {
               })}
               className="mt-0.5 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="text-sm text-gray-600 leading-relaxed">
-              본 캠페인에서 제작하는 콘텐츠에 포함된 초상에 대해 브랜드 및 CNEC 플랫폼이 마케팅 목적으로 1년간 사용하는 것에 동의합니다. *
+            <span className="text-sm text-gray-700 leading-relaxed">
+              위 내용을 충분히 이해하였으며, 초상권 및 콘텐츠 사용에 동의합니다.
             </span>
           </label>
         </div>
