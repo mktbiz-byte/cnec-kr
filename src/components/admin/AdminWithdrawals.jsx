@@ -260,30 +260,108 @@ const AdminWithdrawals = () => {
         .select('*')
         .eq('id', withdrawalId)
         .single()
-      
+
       if (selectError) {
         console.error('레코드 조회 오류:', selectError)
         throw new Error(`레코드를 찾을 수 없습니다: ${selectError.message}`)
       }
-      
+
       console.log('기존 레코드:', existingRecord)
-      
+
       // description 필드를 사용해서 상태 정보를 저장
       let newDescription = existingRecord.description || ''
-      
+
       if (newStatus === 'approved') {
         newDescription = newDescription.replace(/\[상태:.*?\]/g, '') + ' [상태:승인됨]'
         console.log('승인 처리 중...')
-        
+
       } else if (newStatus === 'rejected') {
         newDescription = newDescription.replace(/\[상태:.*?\]/g, '') + ` [상태:거부됨] [사유:${adminNotes}]`
         console.log('거부 처리 중...')
-        
+
+        // 포인트 환불 처리
+        const refundAmount = Math.abs(existingRecord.amount)
+        const userId = existingRecord.user_id
+
+        if (userId && refundAmount > 0) {
+          // 1. 현재 포인트 조회
+          const { data: profileData, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('points')
+            .eq('id', userId)
+            .single()
+
+          if (profileError) {
+            console.error('프로필 조회 오류:', profileError)
+          } else {
+            const currentPoints = profileData?.points || 0
+            const newPoints = currentPoints + refundAmount
+
+            // 2. 포인트 환불
+            const { error: updatePointsError } = await supabase
+              .from('user_profiles')
+              .update({ points: newPoints })
+              .eq('id', userId)
+
+            if (updatePointsError) {
+              console.error('포인트 환불 오류:', updatePointsError)
+              throw new Error('포인트 환불에 실패했습니다')
+            }
+
+            // 3. 환불 기록 추가
+            const { error: refundTxError } = await supabase
+              .from('point_transactions')
+              .insert({
+                user_id: userId,
+                amount: refundAmount,
+                transaction_type: 'refund',
+                description: `[출금거절] ${refundAmount.toLocaleString()}원 환불 - ${adminNotes || '관리자 거절'}`
+              })
+
+            if (refundTxError) {
+              console.error('환불 기록 오류:', refundTxError)
+            }
+
+            console.log('포인트 환불 완료:', { userId, refundAmount, newPoints })
+          }
+        }
+
+        // withdrawals 테이블도 업데이트 (있는 경우)
+        try {
+          await supabase
+            .from('withdrawals')
+            .update({
+              status: 'rejected',
+              admin_notes: adminNotes,
+              processed_at: new Date().toISOString()
+            })
+            .eq('user_id', existingRecord.user_id)
+            .eq('amount', Math.abs(existingRecord.amount))
+            .eq('status', 'pending')
+        } catch (withdrawalUpdateError) {
+          console.log('withdrawals 테이블 업데이트 스킵 (테이블 없거나 매칭 레코드 없음)')
+        }
+
       } else if (newStatus === 'completed') {
         newDescription = newDescription.replace(/\[상태:.*?\]/g, '') + ' [상태:완료됨]'
         console.log('완료 처리 중...')
+
+        // withdrawals 테이블도 업데이트 (있는 경우)
+        try {
+          await supabase
+            .from('withdrawals')
+            .update({
+              status: 'completed',
+              processed_at: new Date().toISOString()
+            })
+            .eq('user_id', existingRecord.user_id)
+            .eq('amount', Math.abs(existingRecord.amount))
+            .eq('status', 'approved')
+        } catch (withdrawalUpdateError) {
+          console.log('withdrawals 테이블 업데이트 스킵')
+        }
       }
-      
+
       // description 필드 업데이트
       const { data: updateResult, error: updateError } = await supabase
         .from('point_transactions')
