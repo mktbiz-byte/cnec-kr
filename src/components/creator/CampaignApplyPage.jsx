@@ -557,7 +557,7 @@ const CampaignApplyPage = () => {
             <ul className="space-y-1 pl-2">
               <li>• <strong>사용권자:</strong> 해당 브랜드사 및 CNEC 플랫폼</li>
               <li>• <strong>사용 목적:</strong> 광고, 마케팅, 홍보 등 상업적 목적</li>
-              <li>• <strong>사용 기간:</strong> 콘텐츠 최초 게시일로부터 1년간</li>
+              <li>• <strong>사용 기간:</strong> SNS 업로드일로부터 1년간</li>
               <li>• <strong>사용 범위:</strong> 온·오프라인 매체, SNS, 홈페이지, 광고물 등</li>
             </ul>
             <p className="text-gray-500">
