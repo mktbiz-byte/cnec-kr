@@ -132,6 +132,29 @@ const PointsPage = () => {
     }
   }
 
+  // 팝빌 알림톡 발송 함수
+  const sendAlimtalk = async (templateCode, receiverNum, receiverName, variables) => {
+    try {
+      const response = await fetch('/.netlify/functions/send-alimtalk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templateCode,
+          receiverNum: receiverNum.replace(/-/g, ''),
+          receiverName,
+          variables
+        })
+      })
+
+      const result = await response.json()
+      console.log('알림톡 발송 결과:', result)
+      return result
+    } catch (error) {
+      console.error('알림톡 발송 오류:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
   // 출금 신청 - database.userPoints.requestWithdrawal() 헬퍼 사용
   const handleWithdrawRequest = async () => {
     const amount = parseInt(withdrawAmount)
@@ -197,6 +220,59 @@ const PointsPage = () => {
 
       if (!result.success) {
         throw new Error(result.error?.message || '출금 신청 처리 실패')
+      }
+
+      // 알림 발송 (실패해도 출금 신청은 성공으로 처리)
+      try {
+        const today = new Date()
+        const dateStr = today.toISOString().split('T')[0]
+
+        // 카카오 알림톡 발송
+        if (profile?.phone) {
+          await sendAlimtalk(
+            '025100001019',
+            profile.phone,
+            profile.name || '크리에이터',
+            {
+              '크리에이터명': profile.name || '크리에이터',
+              '출금금액': amount.toLocaleString(),
+              '신청일': dateStr
+            }
+          )
+        }
+
+        // 이메일 발송
+        if (profile?.email) {
+          const todayKorean = today.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+          await fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: profile.email,
+              subject: '[CNEC] 출금 신청 접수 완료',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <h2 style="color: #1f2937;">출금 신청 접수</h2>
+                  <p>${profile.name || '크리에이터'}님, 출금 신청이 접수되었습니다.</p>
+                  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>출금 금액:</strong> ${amount.toLocaleString()}원</p>
+                    <p><strong>신청일:</strong> ${todayKorean}</p>
+                    <p><strong>입금 계좌:</strong> ${profile.bank_name} ${profile.account_number}</p>
+                  </div>
+                  <p>관리자 승인 후 입금 처리됩니다.</p>
+                  <p style="color: #6b7280;">처리 기간: 매주 월요일</p>
+                  <p style="color: #6b7280;">문의: 1833-6025</p>
+                </div>
+              `
+            })
+          })
+        }
+      } catch (notificationError) {
+        console.error('알림 발송 실패 (출금 신청은 정상 처리됨):', notificationError)
       }
 
       setSuccess('출금 신청이 완료되었습니다. 영업일 기준 3-5일 내에 처리됩니다.')
