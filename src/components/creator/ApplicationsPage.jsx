@@ -963,7 +963,8 @@ const ApplicationsPage = () => {
                   )}
 
                   {/* 선정됨/진행중 상태일 때 가이드 및 액션 버튼 */}
-                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
+                  {/* sns_uploaded도 포함 - 기업 확정 전까지 수정 가능 */}
+                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
                       {/* 기획형 캠페인 가이드 */}
                       {app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (
