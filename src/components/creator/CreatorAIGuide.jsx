@@ -5,7 +5,8 @@ import { supabase } from '../../lib/supabase'
 import {
   Sparkles, Youtube, FileText, CheckCircle, Copy, Check,
   Loader2, ArrowLeft, Video, Crown, Play,
-  ChevronRight, AlertCircle, Zap, Clock, Film, RefreshCw
+  ChevronRight, AlertCircle, Zap, Clock, Film, RefreshCw,
+  FolderOpen, Trash2, Eye
 } from 'lucide-react'
 
 // MUSE 등급 전용 AI 숏폼 가이드 플랫폼
@@ -16,7 +17,13 @@ const CreatorAIGuide = () => {
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
   const [isMuse, setIsMuse] = useState(false)
-  const [activeTab, setActiveTab] = useState('analyze') // analyze, script
+  const [activeTab, setActiveTab] = useState('analyze') // analyze, script, saved
+
+  // 저장된 대본 관련
+  const [savedScripts, setSavedScripts] = useState([])
+  const [loadingSaved, setLoadingSaved] = useState(false)
+  const [selectedSavedScript, setSelectedSavedScript] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   // 숏폼 분석 관련
   const [youtubeUrl, setYoutubeUrl] = useState('')
@@ -74,11 +81,84 @@ const CreatorAIGuide = () => {
       const isMuseGrade = profileData?.cnec_grade_level === 5
       setIsMuse(isMuseGrade)
 
+      // MUSE면 저장된 대본 로드
+      if (isMuseGrade) {
+        loadSavedScripts()
+      }
+
     } catch (error) {
       console.error('접근 권한 확인 오류:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  // 저장된 대본 로드
+  const loadSavedScripts = async () => {
+    try {
+      setLoadingSaved(true)
+      const { data, error } = await supabase
+        .from('ai_scripts')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      if (error) throw error
+      setSavedScripts(data || [])
+    } catch (error) {
+      console.error('저장된 대본 로드 오류:', error)
+    } finally {
+      setLoadingSaved(false)
+    }
+  }
+
+  // 대본 삭제
+  const handleDeleteScript = async (scriptId) => {
+    if (!confirm('이 대본을 삭제하시겠습니까?')) return
+
+    try {
+      setDeletingId(scriptId)
+      const { error } = await supabase
+        .from('ai_scripts')
+        .delete()
+        .eq('id', scriptId)
+        .eq('user_id', user.id)
+
+      if (error) throw error
+
+      setSavedScripts(prev => prev.filter(s => s.id !== scriptId))
+      setSuccess('대본이 삭제되었습니다.')
+      setTimeout(() => setSuccess(''), 3000)
+
+      // 선택된 대본이 삭제된 경우 초기화
+      if (selectedSavedScript?.id === scriptId) {
+        setSelectedSavedScript(null)
+      }
+    } catch (error) {
+      console.error('대본 삭제 오류:', error)
+      setError('대본 삭제에 실패했습니다.')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  // 저장된 대본 불러오기
+  const handleLoadScript = (script) => {
+    setSelectedSavedScript(script)
+    setScriptResult(script.generated_script)
+    setScriptForm({
+      brandName: script.brand_name || '',
+      brandInfo: script.brand_info || '',
+      storyConcept: script.story_concept || '',
+      targetAudience: script.target_audience || '',
+      duration: '30초',
+      additionalNotes: script.additional_notes || ''
+    })
+    setVerificationResult(null)
+    setActiveTab('script')
+    setSuccess('대본을 불러왔습니다.')
+    setTimeout(() => setSuccess(''), 3000)
   }
 
   // 숏폼 분석
@@ -429,35 +509,46 @@ const CreatorAIGuide = () => {
       )}
 
       {/* 탭 버튼 */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-3 gap-2 mb-6">
         <button
           onClick={() => setActiveTab('analyze')}
-          className={`p-4 rounded-2xl text-left transition-all ${
+          className={`p-3 rounded-2xl text-left transition-all ${
             activeTab === 'analyze'
               ? 'bg-red-500 text-white shadow-lg'
               : 'bg-white text-gray-700 border border-gray-100 shadow-sm'
           }`}
         >
-          <Youtube size={24} className={activeTab === 'analyze' ? 'text-white' : 'text-red-500'} />
-          <p className="font-bold mt-2">숏폼 분석</p>
-          <p className={`text-xs mt-0.5 ${activeTab === 'analyze' ? 'text-white/70' : 'text-gray-400'}`}>
-            Shorts URL 입력
-          </p>
+          <Youtube size={20} className={activeTab === 'analyze' ? 'text-white' : 'text-red-500'} />
+          <p className="font-bold mt-1.5 text-sm">분석</p>
         </button>
 
         <button
           onClick={() => setActiveTab('script')}
-          className={`p-4 rounded-2xl text-left transition-all ${
+          className={`p-3 rounded-2xl text-left transition-all ${
             activeTab === 'script'
               ? 'bg-amber-500 text-white shadow-lg'
               : 'bg-white text-gray-700 border border-gray-100 shadow-sm'
           }`}
         >
-          <FileText size={24} className={activeTab === 'script' ? 'text-white' : 'text-amber-500'} />
-          <p className="font-bold mt-2">대본 생성</p>
-          <p className={`text-xs mt-0.5 ${activeTab === 'script' ? 'text-white/70' : 'text-gray-400'}`}>
-            15~60초 숏폼
-          </p>
+          <FileText size={20} className={activeTab === 'script' ? 'text-white' : 'text-amber-500'} />
+          <p className="font-bold mt-1.5 text-sm">대본 생성</p>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('saved'); loadSavedScripts(); }}
+          className={`p-3 rounded-2xl text-left transition-all ${
+            activeTab === 'saved'
+              ? 'bg-violet-500 text-white shadow-lg'
+              : 'bg-white text-gray-700 border border-gray-100 shadow-sm'
+          }`}
+        >
+          <FolderOpen size={20} className={activeTab === 'saved' ? 'text-white' : 'text-violet-500'} />
+          <p className="font-bold mt-1.5 text-sm">저장됨</p>
+          {savedScripts.length > 0 && (
+            <span className={`text-xs ${activeTab === 'saved' ? 'text-white/70' : 'text-gray-400'}`}>
+              {savedScripts.length}개
+            </span>
+          )}
         </button>
       </div>
 
@@ -885,6 +976,106 @@ const CreatorAIGuide = () => {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* 저장된 대본 탭 */}
+      {activeTab === 'saved' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FolderOpen size={20} className="text-violet-500" />
+                <h2 className="font-bold text-gray-900">저장된 대본</h2>
+              </div>
+              <span className="text-sm text-gray-400">{savedScripts.length}개</span>
+            </div>
+
+            {loadingSaved ? (
+              <div className="text-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-violet-500 mx-auto" />
+                <p className="text-sm text-gray-400 mt-2">불러오는 중...</p>
+              </div>
+            ) : savedScripts.length === 0 ? (
+              <div className="text-center py-8">
+                <FolderOpen size={48} className="mx-auto text-gray-200 mb-3" />
+                <p className="text-gray-400 text-sm">저장된 대본이 없습니다</p>
+                <button
+                  onClick={() => setActiveTab('script')}
+                  className="mt-3 px-4 py-2 bg-violet-500 text-white rounded-xl text-sm font-medium"
+                >
+                  대본 만들기
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {savedScripts.map((script) => (
+                  <div
+                    key={script.id}
+                    className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-900 truncate">
+                          {script.generated_script?.title || script.brand_name || '제목 없음'}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full">
+                            {script.brand_name}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full">
+                            {script.story_concept}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2">
+                          {new Date(script.created_at).toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 ml-2">
+                        <button
+                          onClick={() => handleLoadScript(script)}
+                          className="p-2 text-violet-500 hover:bg-violet-100 rounded-lg transition-colors"
+                          title="불러오기"
+                        >
+                          <Eye size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteScript(script.id)}
+                          disabled={deletingId === script.id}
+                          className="p-2 text-red-400 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
+                          title="삭제"
+                        >
+                          {deletingId === script.id ? (
+                            <Loader2 size={18} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={18} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 대본 미리보기 */}
+                    {script.generated_script?.hook && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-500 mb-1">훅</p>
+                        <p className="text-sm text-gray-700 line-clamp-2">
+                          {typeof script.generated_script.hook === 'string'
+                            ? script.generated_script.hook
+                            : script.generated_script.hook?.text || ''}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
