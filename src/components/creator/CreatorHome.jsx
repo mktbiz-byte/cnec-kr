@@ -52,7 +52,7 @@ export const GRADE_CONFIG = {
     bgGradient: 'from-amber-400 to-orange-500',
     minScore: 95,
     minCampaigns: 50,
-    benefit: '소속크리에이터로 개별 프로필 및 맞춤형 캠페인 제안, 포인트 20% 상향'
+    benefit: '소속크리에이터로 개별 프로필 및 맞춤형 캠페인 제안, 포인트 상향'
   }
 }
 
