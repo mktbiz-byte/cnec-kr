@@ -16,7 +16,7 @@ export const GRADE_CONFIG = {
     bgGradient: 'from-emerald-500 to-teal-600',
     minScore: 0,
     minCampaigns: 0,
-    benefit: '첫 캠페인 가이드 제공'
+    benefit: '1회 이상 진행시 기업측에 프로필 제공'
   },
   2: {
     name: 'GLOW',
