@@ -7,7 +7,8 @@ import {
   Edit3, Phone, Mail, MapPin, Instagram, Youtube, Hash,
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
-  ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift
+  ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift,
+  Crown, Sparkles
 } from 'lucide-react'
 
 // 등급 설정
@@ -538,7 +539,7 @@ const CreatorMyPage = () => {
   }
 
   const counts = getCampaignCounts()
-  const currentGrade = profile?.grade || 1
+  const currentGrade = profile?.cnec_grade_level || 1
   const gradeInfo = GRADE_CONFIG[currentGrade]
   const totalScore = profile?.total_score || 0
 
@@ -724,6 +725,33 @@ const CreatorMyPage = () => {
               </button>
             </div>
           </div>
+
+          {/* MUSE 전용 혜택 섹션 - MUSE 등급(5)일 때만 표시 */}
+          {currentGrade === 5 && (
+            <div className="mx-5 mt-6">
+              <p className="text-xs text-amber-600 font-medium mb-2 px-1 flex items-center gap-1">
+                <Crown size={12} />
+                MUSE 전용 혜택
+              </p>
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-sm overflow-hidden border border-amber-200">
+                <button
+                  onClick={() => navigate('/my/ai-guide')}
+                  className="w-full px-4 py-4 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
+                      <Sparkles size={18} className="text-white" />
+                    </div>
+                    <div className="text-left">
+                      <span className="text-[15px] text-gray-900 font-medium block">AI 크리에이터 가이드</span>
+                      <span className="text-xs text-amber-600">유튜브 분석, 대본 생성, 콘텐츠 검증</span>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-amber-400" />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 계정 및 설정 섹션 */}
           <div className="mx-5 mt-6">

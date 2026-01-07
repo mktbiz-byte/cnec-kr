@@ -231,14 +231,37 @@ const ProfileSettings = () => {
       setDeleting(true)
       setError('')
 
-      const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
-      if (deleteError) throw deleteError
+      // 현재 세션 토큰 가져오기
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        throw new Error('인증 세션이 만료되었습니다. 다시 로그인해주세요.')
+      }
+
+      // Netlify Function으로 탈퇴 요청
+      const response = await fetch('/.netlify/functions/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          reason: deletionReason,
+          details: deletionDetails
+        })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || '회원 탈퇴 처리에 실패했습니다.')
+      }
 
       setSuccess('회원 탈퇴가 완료되었습니다.')
       setTimeout(() => signOut(), 2000)
     } catch (err) {
       console.error('회원 탈퇴 오류:', err)
-      setError('회원 탈퇴 처리 중 오류가 발생했습니다.')
+      setError(err.message || '회원 탈퇴 처리 중 오류가 발생했습니다.')
     } finally {
       setDeleting(false)
     }
