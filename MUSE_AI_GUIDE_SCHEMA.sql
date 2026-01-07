@@ -3,6 +3,15 @@
 -- Muse 등급 크리에이터 전용 AI 가이드 플랫폼
 -- ============================================
 
+-- 0. 필요한 함수 생성 (없을 경우)
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- 1. AI 가이드 분석 저장 테이블 (유튜브 분석, 아이디어 생성)
 CREATE TABLE IF NOT EXISTS public.ai_guides (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
