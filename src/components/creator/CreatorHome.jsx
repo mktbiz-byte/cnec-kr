@@ -25,7 +25,7 @@ export const GRADE_CONFIG = {
     bgGradient: 'from-blue-500 to-indigo-600',
     minScore: 40,
     minCampaigns: 3,
-    benefit: '캠페인 추천 알림'
+    benefit: '추천크리에이터 등록'
   },
   3: {
     name: 'BLOOM',
@@ -34,7 +34,7 @@ export const GRADE_CONFIG = {
     bgGradient: 'from-violet-500 to-purple-600',
     minScore: 60,
     minCampaigns: 10,
-    benefit: '원고비 +10% 프리미엄'
+    benefit: '개별 맞춤형 캠페인 및 비공개 캠페인 제안'
   },
   4: {
     name: 'ICONIC',
@@ -43,7 +43,7 @@ export const GRADE_CONFIG = {
     bgGradient: 'from-pink-500 to-rose-600',
     minScore: 80,
     minCampaigns: 30,
-    benefit: '원고비 +20% & 직접 제안'
+    benefit: '포인트 상향 조정 및 소속 크리에이터 제안'
   },
   5: {
     name: 'MUSE',
@@ -52,7 +52,7 @@ export const GRADE_CONFIG = {
     bgGradient: 'from-amber-400 to-orange-500',
     minScore: 95,
     minCampaigns: 50,
-    benefit: '전담 매니저 & +30%'
+    benefit: '소속크리에이터로 개별 프로필 및 맞춤형 캠페인 제안, 포인트 20% 상향'
   }
 }
 

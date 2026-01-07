@@ -4,8 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, Sparkles, Star, Clock, CheckCircle,
-  ChevronDown, ChevronUp, Award, TrendingUp, Users,
-  Target, Zap, Loader2, HelpCircle
+  ChevronDown, ChevronUp, Loader2, HelpCircle
 } from 'lucide-react'
 import {
   GRADE_CONFIG,
@@ -140,60 +139,6 @@ const GradeDetailPage = () => {
     }
   }
 
-  // 점수 카테고리 설명
-  const scoreCategories = [
-    {
-      id: 'brandTrust',
-      name: '브랜드 신뢰',
-      score: scores.brandTrustScore,
-      maxScore: 40,
-      icon: Star,
-      color: 'text-yellow-500',
-      bgColor: 'bg-yellow-100',
-      description: '광고주 평점, 재협업률, 가이드라인 준수율'
-    },
-    {
-      id: 'contentQuality',
-      name: '콘텐츠 퀄리티',
-      score: scores.contentQualityScore,
-      maxScore: 25,
-      icon: Award,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-100',
-      description: '업로드 퀄리티, 인게이지먼트, 브랜드 피드백'
-    },
-    {
-      id: 'professionalism',
-      name: '프로페셔널',
-      score: scores.professionalismScore,
-      maxScore: 20,
-      icon: CheckCircle,
-      color: 'text-green-500',
-      bgColor: 'bg-green-100',
-      description: '마감 준수율, 응답 속도, 수정 횟수'
-    },
-    {
-      id: 'growth',
-      name: '성장률',
-      score: scores.growthScore,
-      maxScore: 10,
-      icon: TrendingUp,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-100',
-      description: '팔로워 성장률, 인게이지먼트 변화'
-    },
-    {
-      id: 'contribution',
-      name: '기여도',
-      score: scores.contributionScore,
-      maxScore: 5,
-      icon: Users,
-      color: 'text-indigo-500',
-      bgColor: 'bg-indigo-100',
-      description: '활동 기간, 커뮤니티 활동'
-    }
-  ]
-
   // 승급 팁
   const upgradeTips = [
     { icon: '📸', tip: '고화질 영상으로 콘텐츠 퀄리티 점수 UP' },
@@ -285,44 +230,6 @@ const GradeDetailPage = () => {
           </div>
         </div>
 
-        {/* 세부 점수 */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 mb-4">세부 점수</h3>
-
-          <div className="space-y-4">
-            {scoreCategories.map((cat) => {
-              const Icon = cat.icon
-              const percent = (cat.score / cat.maxScore) * 100
-
-              return (
-                <div key={cat.id}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-8 h-8 ${cat.bgColor} rounded-lg flex items-center justify-center`}>
-                        <Icon size={16} className={cat.color} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{cat.name}</p>
-                        <p className="text-xs text-gray-400">{cat.description}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-bold text-gray-900">{cat.score}</span>
-                      <span className="text-gray-400 text-sm">/{cat.maxScore}</span>
-                    </div>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${cat.bgColor.replace('100', '500')}`}
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
         {/* 활동 지표 */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <h3 className="font-bold text-gray-900 mb-4">활동 지표</h3>
@@ -406,16 +313,10 @@ const GradeDetailPage = () => {
 
                   {isExpanded && (
                     <div className="px-4 pb-4 border-t border-gray-100 pt-3">
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">조건</span>
-                          <span className="text-gray-900">
-                            {grade.minScore}점 이상 + {grade.minCampaigns}건 완료
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">혜택</span>
-                          <span className="text-gray-900 font-medium">{grade.benefit}</span>
+                      <div className="text-sm">
+                        <div className="flex items-start gap-2">
+                          <Sparkles size={14} className="text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-900">{grade.benefit}</span>
                         </div>
                       </div>
                     </div>
