@@ -1,6 +1,6 @@
 /**
- * AI 콘텐츠 아이디어 생성 Netlify Function (Gemini API)
- * 키워드/주제를 입력받아 콘텐츠 아이디어 추천
+ * AI 숏폼 콘텐츠 아이디어 생성 Netlify Function (Gemini API)
+ * 키워드/주제를 입력받아 숏폼 콘텐츠 아이디어 추천
  * Muse 등급 크리에이터 전용
  */
 
@@ -51,20 +51,33 @@ exports.handler = async (event, context) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
 
     const ideaPrompt = `
-당신은 인플루언서 콘텐츠 기획 전문가입니다. 다음 정보를 바탕으로 독창적인 콘텐츠 아이디어를 제안해주세요.
+당신은 숏폼 콘텐츠(YouTube Shorts, Instagram Reels, TikTok) 기획 전문가입니다.
+다음 정보를 바탕으로 바이럴될 수 있는 숏폼 콘텐츠 아이디어를 제안해주세요.
 
 ## 입력 정보
 - **키워드/주제**: ${keyword}
 - **카테고리**: ${category || '뷰티/라이프스타일'}
-- **플랫폼**: ${platform || '유튜브, 인스타그램'}
+- **플랫폼**: ${platform || 'YouTube Shorts, Instagram Reels, TikTok'}
 - **크리에이터 스타일**: ${creatorStyle || '친근하고 자연스러운'}
 
-## 아이디어 생성 가이드라인
-1. 2024-2025 최신 트렌드 반영
-2. 바이럴 가능성 높은 아이디어
-3. 다양한 형식 제안 (롱폼, 숏폼, 챌린지 등)
-4. 실제 제작 가능한 현실적인 아이디어
-5. 브랜드 협업 연계 가능성
+## 숏폼 아이디어 생성 핵심 원칙
+1. **트렌드 반영**: 2024-2025 최신 숏폼 트렌드 반영
+2. **바이럴 요소**: 공유/저장되기 좋은 콘텐츠
+3. **첫 3초 훅**: 스크롤 멈추게 하는 강력한 오프닝
+4. **15-60초 최적화**: 짧은 시간 내 임팩트
+5. **참여 유도**: 댓글/좋아요/공유 유도 요소
+6. **브랜드 협업 연계**: 브랜드 마케팅 활용 가능성
+
+## 인기 숏폼 포맷
+- 비포&애프터 (Before/After)
+- GRWM (Get Ready With Me)
+- POV (Point of View)
+- 저장해두세요 시리즈
+- 꿀팁/라이프핵
+- 언박싱/첫인상
+- 밈/유머
+- 챌린지/트렌드
+- 스토리타임
 
 반드시 아래 JSON 형식으로만 응답해주세요 (다른 텍스트 없이):
 {
@@ -72,36 +85,30 @@ exports.handler = async (event, context) => {
   "trendingTopics": ["관련 트렌드1", "관련 트렌드2", "관련 트렌드3"],
   "ideas": [
     {
-      "title": "콘텐츠 제목",
-      "format": "영상 형식 (롱폼/숏폼/릴스 등)",
-      "platform": "추천 플랫폼",
+      "title": "숏폼 콘텐츠 제목",
+      "format": "포맷 (릴스/쇼츠/틱톡)",
+      "duration": "15초/30초/45초/60초",
+      "hook": "첫 3초 훅 아이디어",
       "description": "콘텐츠 상세 설명",
-      "hook": "시청자 주목 포인트",
-      "viralPotential": "상",
-      "difficulty": "보통",
-      "estimatedTime": "제작 예상 시간",
-      "brandCollabPotential": "브랜드 협업 연계 아이디어"
+      "viralPotential": "상/중/하",
+      "difficulty": "쉬움/보통/어려움",
+      "trendingElement": "활용할 트렌드 요소",
+      "brandCollabPotential": "브랜드 협업 연계 아이디어",
+      "hashtags": ["#추천해시태그1", "#추천해시태그2"]
     }
   ],
-  "challengeIdeas": [
+  "trendingSounds": [
     {
-      "name": "챌린지명",
-      "description": "챌린지 설명",
-      "hashtag": "#추천해시태그"
+      "name": "트렌딩 사운드/BGM",
+      "usage": "활용 방법"
     }
   ],
-  "seriesIdeas": [
-    {
-      "name": "시리즈명",
-      "episodeCount": "예상 에피소드 수",
-      "description": "시리즈 설명"
-    }
-  ],
-  "tips": ["성공 팁1", "성공 팁2", "성공 팁3"],
+  "tips": ["숏폼 성공 팁1", "성공 팁2", "성공 팁3"],
   "avoidThese": ["피해야 할 것1", "피해야 할 것2"]
 }
 
-최소 6개 이상의 다양한 아이디어를 제안해주세요. ideas 배열에 6개 이상 포함.
+최소 6개 이상의 다양한 숏폼 아이디어를 제안해주세요. ideas 배열에 6개 이상 포함.
+각 아이디어는 실제로 바로 촬영할 수 있을 정도로 구체적이어야 합니다.
 `
 
     const result = await model.generateContent(ideaPrompt)
