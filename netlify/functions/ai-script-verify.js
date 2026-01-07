@@ -1,8 +1,10 @@
 /**
- * AI 대본 검증 Netlify Function
+ * AI 대본 검증 Netlify Function (Gemini API)
  * 생성된 대본을 검증하고 개선점 제안
  * Muse 등급 크리에이터 전용
  */
+
+const { GoogleGenerativeAI } = require('@google/generative-ai')
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -34,15 +36,19 @@ exports.handler = async (event, context) => {
       }
     }
 
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
-    if (!OPENAI_API_KEY) {
+    if (!GEMINI_API_KEY) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'AI API 키가 설정되지 않았습니다.' })
+        body: JSON.stringify({ error: 'Gemini API 키가 설정되지 않았습니다.' })
       }
     }
+
+    // Gemini 클라이언트 초기화
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
 
     const verifyPrompt = `
 당신은 인플루언서 마케팅 콘텐츠 품질 관리 전문가입니다. 다음 대본을 검토하고 상세한 피드백을 제공해주세요.
@@ -62,7 +68,7 @@ ${JSON.stringify(script, null, 2)}
 4. **광고 효과 예측**: 예상되는 마케팅 효과
 5. **개선 제안**: 구체적인 수정 방향
 
-JSON 형식으로 응답해주세요:
+반드시 아래 JSON 형식으로만 응답해주세요 (다른 텍스트 없이):
 {
   "overallScore": 85,
   "scores": {
@@ -74,12 +80,13 @@ JSON 형식으로 응답해주세요:
   },
   "strengths": [
     "강점1",
-    "강점2"
+    "강점2",
+    "강점3"
   ],
   "riskAssessment": [
     {
       "type": "리스크 유형",
-      "severity": "low/medium/high",
+      "severity": "low",
       "description": "설명",
       "suggestion": "해결 방안"
     }
@@ -93,50 +100,20 @@ JSON 형식으로 응답해주세요:
     }
   ],
   "predictedPerformance": {
-    "viewPotential": "상/중/하",
-    "engagementPotential": "상/중/하",
-    "conversionPotential": "상/중/하"
+    "viewPotential": "상",
+    "engagementPotential": "중",
+    "conversionPotential": "상"
   },
-  "finalVerdict": "승인/조건부승인/수정필요",
+  "finalVerdict": "승인",
   "summary": "전체 검토 요약 (3-4문장)"
 }
+
+finalVerdict는 "승인", "조건부승인", "수정필요" 중 하나입니다.
 `
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: '당신은 광고 및 인플루언서 마케팅 전문 심사관입니다. 공정하고 건설적인 피드백을 한국어로 제공합니다.'
-          },
-          {
-            role: 'user',
-            content: verifyPrompt
-          }
-        ],
-        temperature: 0.5,
-        max_tokens: 2000
-      })
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('OpenAI API 오류:', errorData)
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'AI 검증 중 오류가 발생했습니다.' })
-      }
-    }
-
-    const data = await response.json()
-    const aiResponse = data.choices[0].message.content
+    const result = await model.generateContent(verifyPrompt)
+    const response = await result.response
+    const aiResponse = response.text()
 
     // JSON 파싱
     let verificationResult

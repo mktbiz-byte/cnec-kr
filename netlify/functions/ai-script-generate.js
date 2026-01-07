@@ -1,8 +1,10 @@
 /**
- * AI 대본 생성 Netlify Function
+ * AI 대본 생성 Netlify Function (Gemini API)
  * 브랜드와 스토리를 입력받아 촬영장면/대사 생성
  * Muse 등급 크리에이터 전용
  */
+
+const { GoogleGenerativeAI } = require('@google/generative-ai')
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -34,15 +36,19 @@ exports.handler = async (event, context) => {
       }
     }
 
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
-    if (!OPENAI_API_KEY) {
+    if (!GEMINI_API_KEY) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'AI API 키가 설정되지 않았습니다.' })
+        body: JSON.stringify({ error: 'Gemini API 키가 설정되지 않았습니다.' })
       }
     }
+
+    // Gemini 클라이언트 초기화
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
 
     const scriptPrompt = `
 당신은 인플루언서 마케팅 콘텐츠 전문 작가입니다. 다음 정보를 바탕으로 유튜브/인스타그램 영상 대본을 작성해주세요.
@@ -62,7 +68,7 @@ exports.handler = async (event, context) => {
 4. 실제 촬영 가능한 구체적인 장면 설명
 5. 자막 및 효과음 삽입 포인트 제안
 
-JSON 형식으로 응답해주세요:
+반드시 아래 JSON 형식으로만 응답해주세요 (다른 텍스트 없이):
 {
   "title": "대본 제목",
   "totalDuration": "예상 영상 길이",
@@ -80,47 +86,17 @@ JSON 형식으로 응답해주세요:
     }
   ],
   "callToAction": "마지막 행동 유도 멘트",
-  "hashtags": ["추천해시태그1", "추천해시태그2"],
+  "hashtags": ["추천해시태그1", "추천해시태그2", "추천해시태그3", "추천해시태그4", "추천해시태그5"],
   "productPlacement": "제품 노출 타이밍 및 방법",
-  "tips": ["촬영 팁1", "촬영 팁2"]
+  "tips": ["촬영 팁1", "촬영 팁2", "촬영 팁3"]
 }
+
+최소 4-6개의 장면을 포함해주세요.
 `
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: '당신은 인플루언서 마케팅과 브랜드 콘텐츠 제작 전문가입니다. 크리에이터가 바로 사용할 수 있는 실용적인 대본을 한국어로 작성합니다.'
-          },
-          {
-            role: 'user',
-            content: scriptPrompt
-          }
-        ],
-        temperature: 0.8,
-        max_tokens: 3000
-      })
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('OpenAI API 오류:', errorData)
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'AI 대본 생성 중 오류가 발생했습니다.' })
-      }
-    }
-
-    const data = await response.json()
-    const aiResponse = data.choices[0].message.content
+    const result = await model.generateContent(scriptPrompt)
+    const response = await result.response
+    const aiResponse = response.text()
 
     // JSON 파싱
     let scriptResult

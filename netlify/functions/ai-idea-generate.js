@@ -1,8 +1,10 @@
 /**
- * AI 콘텐츠 아이디어 생성 Netlify Function
+ * AI 콘텐츠 아이디어 생성 Netlify Function (Gemini API)
  * 키워드/주제를 입력받아 콘텐츠 아이디어 추천
  * Muse 등급 크리에이터 전용
  */
+
+const { GoogleGenerativeAI } = require('@google/generative-ai')
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -34,15 +36,19 @@ exports.handler = async (event, context) => {
       }
     }
 
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
-    if (!OPENAI_API_KEY) {
+    if (!GEMINI_API_KEY) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'AI API 키가 설정되지 않았습니다.' })
+        body: JSON.stringify({ error: 'Gemini API 키가 설정되지 않았습니다.' })
       }
     }
+
+    // Gemini 클라이언트 초기화
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
 
     const ideaPrompt = `
 당신은 인플루언서 콘텐츠 기획 전문가입니다. 다음 정보를 바탕으로 독창적인 콘텐츠 아이디어를 제안해주세요.
@@ -60,10 +66,10 @@ exports.handler = async (event, context) => {
 4. 실제 제작 가능한 현실적인 아이디어
 5. 브랜드 협업 연계 가능성
 
-JSON 형식으로 응답해주세요:
+반드시 아래 JSON 형식으로만 응답해주세요 (다른 텍스트 없이):
 {
-  "keyword": "입력된 키워드",
-  "trendingTopics": ["관련 트렌드1", "관련 트렌드2"],
+  "keyword": "${keyword}",
+  "trendingTopics": ["관련 트렌드1", "관련 트렌드2", "관련 트렌드3"],
   "ideas": [
     {
       "title": "콘텐츠 제목",
@@ -71,8 +77,8 @@ JSON 형식으로 응답해주세요:
       "platform": "추천 플랫폼",
       "description": "콘텐츠 상세 설명",
       "hook": "시청자 주목 포인트",
-      "viralPotential": "상/중/하",
-      "difficulty": "쉬움/보통/어려움",
+      "viralPotential": "상",
+      "difficulty": "보통",
       "estimatedTime": "제작 예상 시간",
       "brandCollabPotential": "브랜드 협업 연계 아이디어"
     }
@@ -81,7 +87,7 @@ JSON 형식으로 응답해주세요:
     {
       "name": "챌린지명",
       "description": "챌린지 설명",
-      "hashtag": "추천 해시태그"
+      "hashtag": "#추천해시태그"
     }
   ],
   "seriesIdeas": [
@@ -91,48 +97,16 @@ JSON 형식으로 응답해주세요:
       "description": "시리즈 설명"
     }
   ],
-  "tips": ["성공 팁1", "성공 팁2"],
+  "tips": ["성공 팁1", "성공 팁2", "성공 팁3"],
   "avoidThese": ["피해야 할 것1", "피해야 할 것2"]
 }
 
-최소 5개 이상의 다양한 아이디어를 제안해주세요.
+최소 6개 이상의 다양한 아이디어를 제안해주세요. ideas 배열에 6개 이상 포함.
 `
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: '당신은 SNS 트렌드와 인플루언서 마케팅에 정통한 콘텐츠 기획 전문가입니다. 창의적이고 실용적인 아이디어를 한국어로 제안합니다.'
-          },
-          {
-            role: 'user',
-            content: ideaPrompt
-          }
-        ],
-        temperature: 0.9,
-        max_tokens: 3000
-      })
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('OpenAI API 오류:', errorData)
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'AI 아이디어 생성 중 오류가 발생했습니다.' })
-      }
-    }
-
-    const data = await response.json()
-    const aiResponse = data.choices[0].message.content
+    const result = await model.generateContent(ideaPrompt)
+    const response = await result.response
+    const aiResponse = response.text()
 
     // JSON 파싱
     let ideasResult
