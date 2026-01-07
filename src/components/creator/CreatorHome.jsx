@@ -271,7 +271,14 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
       }
 
       const scores = calculateScores(scoreData)
-      const grade = determineGrade(scores.totalScore, completed.length, recollabRate)
+
+      // DB에 저장된 등급이 있으면 우선 사용, 없으면 계산된 등급 사용
+      let grade
+      if (profileData?.cnec_grade_level && GRADE_CONFIG[profileData.cnec_grade_level]) {
+        grade = GRADE_CONFIG[profileData.cnec_grade_level]
+      } else {
+        grade = determineGrade(scores.totalScore, completed.length, recollabRate)
+      }
       const nextGrade = getNextGradeInfo(grade, scores.totalScore, completed.length)
 
       setGradeInfo({ current: grade, next: nextGrade })
