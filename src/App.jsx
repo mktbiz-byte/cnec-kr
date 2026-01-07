@@ -15,7 +15,8 @@ import {
   WelcomeScreen,
   HomePage,
   CampaignsPage,
-  MyPageWrapper
+  MyPageWrapper,
+  CreatorAIGuide
 } from './components/creator';
 import LandingPage from './components/creator/LandingPage';
 import CampaignDetailPage from './components/creator/CampaignDetailPage';
@@ -88,6 +89,7 @@ const AppContent = () => {
         <Route path="/my/grade" element={<GradeDetailPage />} />
         <Route path="/my/points" element={<PointsPage />} />
         <Route path="/my/applications" element={<ApplicationsPage />} />
+        <Route path="/my/ai-guide" element={<CreatorAIGuide />} />
         <Route path="/welcome" element={<WelcomeScreen />} />
 
         {/* 레거시 - 호환성 */}
