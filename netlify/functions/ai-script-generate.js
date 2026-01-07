@@ -26,7 +26,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { brandName, brandInfo, storyConcept, targetAudience, additionalNotes, videoLength } = JSON.parse(event.body)
+    const { brandName, brandInfo, storyConcept, targetAudience, additionalNotes, videoLength, previousScript, improvementFeedback } = JSON.parse(event.body)
 
     if (!brandName || !storyConcept) {
       return {
@@ -57,6 +57,33 @@ exports.handler = async (event, context) => {
     else if (duration === '45초') sceneCount = 4
     else if (duration === '60초') sceneCount = 5
 
+    // 이전 대본과 피드백이 있는 경우 (재생성)
+    const isRegeneration = previousScript && improvementFeedback
+
+    // 피드백 정보 추출
+    let feedbackSection = ''
+    if (isRegeneration) {
+      const improvements = improvementFeedback.improvementSuggestions || []
+      const risks = improvementFeedback.riskAssessment || []
+      const previousScore = improvementFeedback.overallScore || 0
+
+      feedbackSection = `
+## ⚠️ 중요: 이전 대본 개선 요청
+이전 대본의 점수는 ${previousScore}점이었습니다. 85점 이상을 목표로 다음 피드백을 반드시 반영해주세요:
+
+### 개선해야 할 점:
+${improvements.map((item, i) => `${i + 1}. ${item.suggested || item.area || item}`).join('\n')}
+
+### 주의사항:
+${risks.map((risk, i) => `${i + 1}. ${risk.description || risk} → ${risk.suggestion || '개선 필요'}`).join('\n')}
+
+### 이전 대본의 강점 (유지할 것):
+${(improvementFeedback.strengths || []).slice(0, 2).join(', ')}
+
+이전 대본보다 확실히 개선된 버전을 작성해주세요!
+`
+    }
+
     const scriptPrompt = `
 당신은 숏폼 콘텐츠(YouTube Shorts, Instagram Reels, TikTok) 전문 대본 작가입니다.
 다음 정보를 바탕으로 ${duration} 길이의 숏폼 영상 대본을 작성해주세요.
@@ -68,7 +95,7 @@ exports.handler = async (event, context) => {
 - **타겟 시청자**: ${targetAudience || '일반 시청자'}
 - **영상 길이**: ${duration}
 - **추가 요청사항**: ${additionalNotes || '없음'}
-
+${feedbackSection}
 ## 숏폼 대본 작성 핵심 원칙
 1. **첫 3초 훅**: 스크롤 멈추게 하는 강력한 훅 필수! (질문, 충격, 호기심 유발)
 2. **빠른 전개**: 지루할 틈 없이 빠르게 진행

@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 import {
   Sparkles, Youtube, FileText, CheckCircle, Copy, Check,
   Loader2, ArrowLeft, Video, Crown, Play,
-  ChevronRight, AlertCircle, Zap, Clock, Film
+  ChevronRight, AlertCircle, Zap, Clock, Film, RefreshCw
 } from 'lucide-react'
 
 // MUSE 등급 전용 AI 숏폼 가이드 플랫폼
@@ -38,6 +38,10 @@ const CreatorAIGuide = () => {
   // 검증 관련
   const [verifying, setVerifying] = useState(false)
   const [verificationResult, setVerificationResult] = useState(null)
+
+  // 재생성 관련
+  const [regenerating, setRegenerating] = useState(false)
+  const [scriptVersion, setScriptVersion] = useState(1)
 
   // 복사 상태
   const [copiedId, setCopiedId] = useState(null)
@@ -211,6 +215,79 @@ const CreatorAIGuide = () => {
       setError(error.message || '검증 중 오류가 발생했습니다.')
     } finally {
       setVerifying(false)
+    }
+  }
+
+  // 피드백 반영하여 대본 재생성
+  const handleRegenerateWithFeedback = async () => {
+    if (!verificationResult) {
+      setError('검증 결과가 없습니다.')
+      return
+    }
+
+    try {
+      setRegenerating(true)
+      setError('')
+
+      // 검증 피드백을 추가 요청사항에 포함
+      const feedbackNotes = []
+
+      if (verificationResult.improvementSuggestions) {
+        verificationResult.improvementSuggestions.forEach(item => {
+          const suggestion = item.suggested || item.area || item
+          if (suggestion) feedbackNotes.push(suggestion)
+        })
+      }
+
+      if (verificationResult.riskAssessment) {
+        verificationResult.riskAssessment.forEach(risk => {
+          if (risk.suggestion) feedbackNotes.push(risk.suggestion)
+        })
+      }
+
+      const improvedNotes = `[이전 대본 개선사항 반영] ${feedbackNotes.join('. ')}. ${scriptForm.additionalNotes || ''}`
+
+      const response = await fetch('/.netlify/functions/ai-script-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...scriptForm,
+          videoLength: scriptForm.duration,
+          additionalNotes: improvedNotes,
+          previousScript: scriptResult,
+          improvementFeedback: verificationResult
+        })
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || '대본 재생성에 실패했습니다.')
+      }
+
+      setScriptResult(data.script)
+      setVerificationResult(null) // 검증 결과 초기화
+      setScriptVersion(prev => prev + 1)
+
+      // DB에 저장
+      await supabase.from('ai_scripts').insert({
+        user_id: user.id,
+        brand_name: scriptForm.brandName,
+        brand_info: scriptForm.brandInfo,
+        story_concept: scriptForm.storyConcept,
+        target_audience: scriptForm.targetAudience,
+        additional_notes: improvedNotes,
+        generated_script: data.script
+      })
+
+      setSuccess(`대본 v${scriptVersion + 1}이 생성되었습니다! 피드백이 반영되었습니다.`)
+      setTimeout(() => setSuccess(''), 3000)
+
+    } catch (error) {
+      console.error('대본 재생성 오류:', error)
+      setError(error.message || '대본 재생성 중 오류가 발생했습니다.')
+    } finally {
+      setRegenerating(false)
     }
   }
 
@@ -717,26 +794,42 @@ const CreatorAIGuide = () => {
           {verificationResult && (
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-gray-900">검증 결과</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-gray-900">검증 결과</h3>
+                  {scriptVersion > 1 && (
+                    <span className="text-xs text-gray-400">v{scriptVersion}</span>
+                  )}
+                </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                  verificationResult.finalVerdict === '승인'
+                  verificationResult.overallScore >= 85
                     ? 'bg-green-100 text-green-700'
-                    : verificationResult.finalVerdict === '수정필요'
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-amber-100 text-amber-700'
+                    : verificationResult.overallScore >= 70
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-red-100 text-red-700'
                 }`}>
-                  {verificationResult.finalVerdict || '검토완료'}
+                  {verificationResult.overallScore >= 85 ? '우수' : verificationResult.overallScore >= 70 ? '양호' : '개선필요'}
                 </span>
               </div>
 
               {verificationResult.overallScore && (
                 <div className="text-center py-3 mb-3">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500">
-                    <span className="text-xl font-bold text-white">
+                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br ${
+                    verificationResult.overallScore >= 85
+                      ? 'from-emerald-400 to-teal-500'
+                      : verificationResult.overallScore >= 70
+                      ? 'from-amber-400 to-orange-500'
+                      : 'from-red-400 to-rose-500'
+                  }`}>
+                    <span className="text-2xl font-bold text-white">
                       {verificationResult.overallScore}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">종합 점수</p>
+                  {verificationResult.overallScore < 85 && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      85점 이상이면 최적의 숏폼입니다!
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -752,13 +845,42 @@ const CreatorAIGuide = () => {
               )}
 
               {verificationResult.improvementSuggestions && verificationResult.improvementSuggestions.length > 0 && (
-                <div className="bg-blue-50 rounded-xl p-3">
+                <div className="bg-blue-50 rounded-xl p-3 mb-4">
                   <p className="text-xs text-blue-600 font-bold mb-1">💡 개선 제안</p>
                   <ul className="space-y-0.5">
                     {verificationResult.improvementSuggestions.slice(0, 3).map((item, idx) => (
-                      <li key={idx} className="text-sm text-gray-700">• {item.suggested || item}</li>
+                      <li key={idx} className="text-sm text-gray-700">• {item.suggested || item.area || item}</li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {/* 피드백 반영 재생성 버튼 - 점수가 85 미만일 때만 표시 */}
+              {verificationResult.overallScore < 85 && (
+                <button
+                  onClick={handleRegenerateWithFeedback}
+                  disabled={regenerating}
+                  className="w-full py-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-violet-600 hover:to-purple-700 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
+                >
+                  {regenerating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      피드백 반영 중...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={16} />
+                      피드백 반영하여 재생성
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* 점수가 85 이상이면 축하 메시지 */}
+              {verificationResult.overallScore >= 85 && (
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 text-center">
+                  <p className="text-emerald-700 font-bold text-sm">🎉 훌륭한 대본입니다!</p>
+                  <p className="text-emerald-600 text-xs mt-1">이대로 촬영하시면 됩니다</p>
                 </div>
               )}
             </div>
