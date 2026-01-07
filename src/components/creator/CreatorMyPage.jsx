@@ -539,7 +539,7 @@ const CreatorMyPage = () => {
   }
 
   const counts = getCampaignCounts()
-  const currentGrade = profile?.grade || 1
+  const currentGrade = profile?.cnec_grade_level || 1
   const gradeInfo = GRADE_CONFIG[currentGrade]
   const totalScore = profile?.total_score || 0
 

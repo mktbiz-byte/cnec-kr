@@ -81,7 +81,7 @@ const CreatorAIGuide = () => {
       // 개발/테스트 목적으로 일시적으로 모든 사용자 허용하려면 아래 주석 해제
       // setIsMuse(true)
 
-      const isMuseGrade = profileData?.grade === 5
+      const isMuseGrade = profileData?.cnec_grade_level === 5
       setIsMuse(isMuseGrade)
 
       if (isMuseGrade) {
