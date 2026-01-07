@@ -389,7 +389,14 @@ const CreatorAIGuide = () => {
     let fullText = `[${scriptResult.title || '숏폼 대본'}]\n\n`
 
     if (scriptResult.hook) {
-      fullText += `🎬 훅 (첫 3초):\n${scriptResult.hook}\n\n`
+      const hookText = typeof scriptResult.hook === 'string'
+        ? scriptResult.hook
+        : scriptResult.hook?.text || ''
+      fullText += `🎬 훅 (첫 3초):\n${hookText}\n`
+      if (typeof scriptResult.hook === 'object' && scriptResult.hook?.visualAction) {
+        fullText += `📍 ${scriptResult.hook.visualAction}\n`
+      }
+      fullText += `\n`
     }
 
     if (scriptResult.scenes) {
@@ -398,12 +405,17 @@ const CreatorAIGuide = () => {
         fullText += `--- ${scene.sceneTitle || `장면 ${idx + 1}`} (${scene.duration || ''}) ---\n`
         if (scene.dialogue) fullText += `🎤 ${scene.dialogue}\n`
         if (scene.action) fullText += `📍 ${scene.action}\n`
+        if (scene.tone) fullText += `🎭 톤: ${scene.tone}\n`
+        if (scene.cameraWork) fullText += `🎥 ${scene.cameraWork}\n`
         fullText += `\n`
       })
     }
 
     if (scriptResult.callToAction) {
-      fullText += `📢 CTA:\n${scriptResult.callToAction}\n\n`
+      const ctaText = typeof scriptResult.callToAction === 'string'
+        ? scriptResult.callToAction
+        : scriptResult.callToAction?.text || ''
+      fullText += `📢 CTA:\n${ctaText}\n\n`
     }
 
     if (scriptResult.hashtags) {
@@ -799,13 +811,26 @@ const CreatorAIGuide = () => {
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-xs text-red-600 font-bold">🎬 훅 (첫 3초)</p>
                     <button
-                      onClick={() => copyToClipboard(scriptResult.hook, 'hook')}
+                      onClick={() => copyToClipboard(
+                        typeof scriptResult.hook === 'string' ? scriptResult.hook : scriptResult.hook?.text || '',
+                        'hook'
+                      )}
                       className="text-red-400 hover:text-red-600"
                     >
                       {copiedId === 'hook' ? <Check size={14} /> : <Copy size={14} />}
                     </button>
                   </div>
-                  <p className="text-sm text-gray-800 font-medium">{scriptResult.hook}</p>
+                  <p className="text-sm text-gray-800 font-medium">
+                    {typeof scriptResult.hook === 'string' ? scriptResult.hook : scriptResult.hook?.text || ''}
+                  </p>
+                  {typeof scriptResult.hook === 'object' && scriptResult.hook?.visualAction && (
+                    <p className="text-xs text-gray-500 mt-1">📍 {scriptResult.hook.visualAction}</p>
+                  )}
+                  {typeof scriptResult.hook === 'object' && scriptResult.hook?.hookType && (
+                    <span className="inline-block text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full mt-1">
+                      {scriptResult.hook.hookType}
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -829,8 +854,19 @@ const CreatorAIGuide = () => {
                       {scene.dialogue && (
                         <p className="text-sm text-gray-800">🎤 {scene.dialogue}</p>
                       )}
+                      {scene.tone && (
+                        <span className="inline-block text-xs px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full mt-1 mr-1">
+                          {scene.tone}
+                        </span>
+                      )}
                       {scene.action && (
                         <p className="text-xs text-gray-500 mt-1">📍 {scene.action}</p>
+                      )}
+                      {scene.cameraWork && (
+                        <p className="text-xs text-blue-500 mt-0.5">🎥 {scene.cameraWork}</p>
+                      )}
+                      {scene.textOverlay && (
+                        <p className="text-xs text-purple-500 mt-0.5">💬 자막: {scene.textOverlay}</p>
                       )}
                     </div>
                   ))}
@@ -841,7 +877,14 @@ const CreatorAIGuide = () => {
               {scriptResult.callToAction && (
                 <div className="bg-green-50 rounded-xl p-3 mb-3">
                   <p className="text-xs text-green-600 font-bold mb-1">📢 CTA</p>
-                  <p className="text-sm text-gray-800">{scriptResult.callToAction}</p>
+                  <p className="text-sm text-gray-800">
+                    {typeof scriptResult.callToAction === 'string'
+                      ? scriptResult.callToAction
+                      : scriptResult.callToAction?.text || ''}
+                  </p>
+                  {typeof scriptResult.callToAction === 'object' && scriptResult.callToAction?.visualCue && (
+                    <p className="text-xs text-gray-500 mt-1">📍 {scriptResult.callToAction.visualCue}</p>
+                  )}
                 </div>
               )}
 
