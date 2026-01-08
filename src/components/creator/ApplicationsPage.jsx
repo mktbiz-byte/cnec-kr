@@ -755,6 +755,18 @@ const ApplicationsPage = () => {
                       </p>
 
                       {/* 기본 정보 (포인트, 마감일) */}
+                      {/* pending 상태: 모집 마감일만 표시 */}
+                      {app.status === 'pending' && app.campaigns?.application_deadline && (
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            getDDay(app.campaigns.application_deadline)?.urgent ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'
+                          }`}>
+                            <Calendar size={10} />
+                            모집 마감 {formatDate(app.campaigns.application_deadline)}
+                          </span>
+                        </div>
+                      )}
+                      {/* 선정됨/진행중/완료 상태: 포인트, 영상 제출 마감일 표시 */}
                       {!['pending', 'rejected', 'cancelled'].includes(app.status) && (
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           {reward > 0 && (
@@ -763,7 +775,69 @@ const ApplicationsPage = () => {
                               {formatCurrency(reward)}P
                             </span>
                           )}
-                          {deadline && (
+                          {/* 올리브영 캠페인: 2개 영상 제출 마감일 (step1, step2) */}
+                          {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && (
+                            <>
+                              {app.campaigns?.step1_deadline && (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  getDDay(app.campaigns.step1_deadline)?.urgent ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
+                                }`}>
+                                  <Video size={10} />
+                                  1차 {formatDate(app.campaigns.step1_deadline)}
+                                </span>
+                              )}
+                              {app.campaigns?.step2_deadline && (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  getDDay(app.campaigns.step2_deadline)?.urgent ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
+                                }`}>
+                                  <Video size={10} />
+                                  2차 {formatDate(app.campaigns.step2_deadline)}
+                                </span>
+                              )}
+                            </>
+                          )}
+                          {/* 4주 챌린지 캠페인: 4개 영상 제출 마감일 */}
+                          {app.campaigns?.campaign_type === '4week_challenge' && (
+                            <>
+                              {app.campaigns?.week1_deadline && (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  getDDay(app.campaigns.week1_deadline)?.urgent ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'
+                                }`}>
+                                  <Video size={10} />
+                                  1주 {formatDate(app.campaigns.week1_deadline)}
+                                </span>
+                              )}
+                              {app.campaigns?.week2_deadline && (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  getDDay(app.campaigns.week2_deadline)?.urgent ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'
+                                }`}>
+                                  <Video size={10} />
+                                  2주 {formatDate(app.campaigns.week2_deadline)}
+                                </span>
+                              )}
+                              {app.campaigns?.week3_deadline && (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  getDDay(app.campaigns.week3_deadline)?.urgent ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'
+                                }`}>
+                                  <Video size={10} />
+                                  3주 {formatDate(app.campaigns.week3_deadline)}
+                                </span>
+                              )}
+                              {app.campaigns?.week4_deadline && (
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  getDDay(app.campaigns.week4_deadline)?.urgent ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'
+                                }`}>
+                                  <Video size={10} />
+                                  4주 {formatDate(app.campaigns.week4_deadline)}
+                                </span>
+                              )}
+                            </>
+                          )}
+                          {/* 일반/기획형 캠페인: 기존 content_submission_deadline 표시 */}
+                          {app.campaigns?.campaign_type !== 'oliveyoung' &&
+                           app.campaigns?.campaign_type !== '4week_challenge' &&
+                           !app.campaigns?.is_oliveyoung_sale &&
+                           deadline && (
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               dDay?.urgent ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'
                             }`}>
