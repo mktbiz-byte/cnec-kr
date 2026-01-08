@@ -20,36 +20,25 @@ export default function OliveyoungVideoSubmissionPage() {
   const [campaign, setCampaign] = useState(null)
   const [application, setApplication] = useState(null)
 
-  // 영상 1 데이터
-  const [video1, setVideo1] = useState({
-    cleanFile: null,
-    cleanUrl: '',
-    editedFile: null,
-    editedUrl: '',
-    title: '',
-    content: '',
-    hashtags: '',
-    submission: null,
-    expanded: true
-  })
-
-  // 영상 2 데이터
-  const [video2, setVideo2] = useState({
-    cleanFile: null,
-    cleanUrl: '',
-    editedFile: null,
-    editedUrl: '',
-    title: '',
-    content: '',
-    hashtags: '',
-    submission: null,
-    expanded: true
-  })
+  // 영상 데이터 (최대 10개)
+  const [videos, setVideos] = useState(
+    Array.from({ length: 10 }, (_, i) => ({
+      number: i + 1,
+      cleanFile: null,
+      cleanUrl: '',
+      editedFile: null,
+      editedUrl: '',
+      title: '',
+      content: '',
+      hashtags: '',
+      submission: null,
+      expanded: i === 0 // 첫 번째만 기본 열림
+    }))
+  )
 
   // SNS 업로드 정보
   const [snsForm, setSnsForm] = useState({
-    video1_url: '',
-    video2_url: '',
+    videoUrls: {},
     partnershipCode: ''
   })
   const [showSnsSection, setShowSnsSection] = useState(false)
@@ -91,56 +80,42 @@ export default function OliveyoungVideoSubmissionPage() {
       if (appError) throw appError
       setApplication(appData)
 
-      // 영상 1 데이터
-      const { data: video1Data } = await supabase
-        .from('video_submissions')
-        .select('*')
-        .eq('application_id', appData.id)
-        .eq('video_number', 1)
-        .order('version', { ascending: false })
-        .limit(1)
-        .maybeSingle()
+      // 영상 데이터 (1-10) 조회
+      const updatedVideos = [...videos]
+      const updatedSnsUrls = {}
+      let hasSubmittedVideo = false
 
-      if (video1Data) {
-        setVideo1(prev => ({
-          ...prev,
-          cleanUrl: video1Data.clean_video_url || '',
-          editedUrl: video1Data.video_file_url || '',
-          title: video1Data.sns_title || '',
-          content: video1Data.sns_content || '',
-          hashtags: video1Data.hashtags || '',
-          submission: video1Data,
-          expanded: !video1Data.video_file_url
-        }))
-        setSnsForm(prev => ({ ...prev, video1_url: video1Data.sns_upload_url || '' }))
+      for (let i = 1; i <= 10; i++) {
+        const { data: videoData } = await supabase
+          .from('video_submissions')
+          .select('*')
+          .eq('application_id', appData.id)
+          .eq('video_number', i)
+          .order('version', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (videoData) {
+          updatedVideos[i - 1] = {
+            ...updatedVideos[i - 1],
+            cleanUrl: videoData.clean_video_url || '',
+            editedUrl: videoData.video_file_url || '',
+            title: videoData.sns_title || '',
+            content: videoData.sns_content || '',
+            hashtags: videoData.hashtags || '',
+            submission: videoData,
+            expanded: !videoData.video_file_url
+          }
+          updatedSnsUrls[i] = videoData.sns_upload_url || ''
+          if (videoData.video_file_url) hasSubmittedVideo = true
+        }
       }
 
-      // 영상 2 데이터
-      const { data: video2Data } = await supabase
-        .from('video_submissions')
-        .select('*')
-        .eq('application_id', appData.id)
-        .eq('video_number', 2)
-        .order('version', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (video2Data) {
-        setVideo2(prev => ({
-          ...prev,
-          cleanUrl: video2Data.clean_video_url || '',
-          editedUrl: video2Data.video_file_url || '',
-          title: video2Data.sns_title || '',
-          content: video2Data.sns_content || '',
-          hashtags: video2Data.hashtags || '',
-          submission: video2Data,
-          expanded: !video2Data.video_file_url
-        }))
-        setSnsForm(prev => ({ ...prev, video2_url: video2Data.sns_upload_url || '' }))
-      }
+      setVideos(updatedVideos)
+      setSnsForm(prev => ({ ...prev, videoUrls: updatedSnsUrls }))
 
       // SNS 섹션 표시 여부
-      if ((video1Data?.video_file_url || video2Data?.video_file_url)) {
+      if (hasSubmittedVideo) {
         setShowSnsSection(true)
       }
 
@@ -166,9 +141,12 @@ export default function OliveyoungVideoSubmissionPage() {
       return
     }
 
-    const setter = videoNum === 1 ? setVideo1 : setVideo2
     const key = type === 'clean' ? 'cleanFile' : 'editedFile'
-    setter(prev => ({ ...prev, [key]: file }))
+    setVideos(prev => {
+      const updated = [...prev]
+      updated[videoNum - 1] = { ...updated[videoNum - 1], [key]: file }
+      return updated
+    })
     setError('')
   }
 
@@ -215,8 +193,7 @@ export default function OliveyoungVideoSubmissionPage() {
   }
 
   const handleVideoSubmit = async (videoNum) => {
-    const videoData = videoNum === 1 ? video1 : video2
-    const setVideoData = videoNum === 1 ? setVideo1 : setVideo2
+    const videoData = videos[videoNum - 1]
 
     if (!videoData.editedFile && !videoData.editedUrl) {
       setError(`영상 ${videoNum} 편집본을 선택해주세요.`)
@@ -320,7 +297,11 @@ export default function OliveyoungVideoSubmissionPage() {
 
       setSuccess(`영상 ${videoNum} V${nextVersion}이 제출되었습니다!`)
       setShowSnsSection(true)
-      setVideoData(prev => ({ ...prev, expanded: false }))
+      setVideos(prev => {
+        const updated = [...prev]
+        updated[videoNum - 1] = { ...updated[videoNum - 1], expanded: false }
+        return updated
+      })
       await fetchData()
 
     } catch (err) {
@@ -334,7 +315,8 @@ export default function OliveyoungVideoSubmissionPage() {
   const handleSnsSubmit = async (e) => {
     e.preventDefault()
 
-    if (!snsForm.video1_url && !snsForm.video2_url) {
+    const hasAnyUrl = Object.values(snsForm.videoUrls).some(url => url && url.trim())
+    if (!hasAnyUrl) {
       setError('최소 1개의 SNS URL을 입력해주세요.')
       return
     }
@@ -343,26 +325,20 @@ export default function OliveyoungVideoSubmissionPage() {
       setSubmitting(true)
       setError('')
 
-      if (video1.submission && snsForm.video1_url) {
-        await supabase
-          .from('video_submissions')
-          .update({
-            sns_upload_url: snsForm.video1_url,
-            partnership_code: snsForm.partnershipCode,
-            sns_uploaded_at: new Date().toISOString()
-          })
-          .eq('id', video1.submission.id)
-      }
+      for (let i = 1; i <= 10; i++) {
+        const video = videos[i - 1]
+        const url = snsForm.videoUrls[i]
 
-      if (video2.submission && snsForm.video2_url) {
-        await supabase
-          .from('video_submissions')
-          .update({
-            sns_upload_url: snsForm.video2_url,
-            partnership_code: snsForm.partnershipCode,
-            sns_uploaded_at: new Date().toISOString()
-          })
-          .eq('id', video2.submission.id)
+        if (video.submission && url && url.trim()) {
+          await supabase
+            .from('video_submissions')
+            .update({
+              sns_upload_url: url,
+              partnership_code: snsForm.partnershipCode,
+              sns_uploaded_at: new Date().toISOString()
+            })
+            .eq('id', video.submission.id)
+        }
       }
 
       // 기업에게 SNS 업로드 완료 알림톡 발송
@@ -439,15 +415,22 @@ export default function OliveyoungVideoSubmissionPage() {
   }
 
   const renderVideoSection = (videoNum) => {
-    const videoData = videoNum === 1 ? video1 : video2
-    const setVideoData = videoNum === 1 ? setVideo1 : setVideo2
+    const videoData = videos[videoNum - 1]
     const isUploading = uploadingInfo?.videoNum === videoNum
+
+    const updateVideoData = (updates) => {
+      setVideos(prev => {
+        const updated = [...prev]
+        updated[videoNum - 1] = { ...updated[videoNum - 1], ...updates }
+        return updated
+      })
+    }
 
     return (
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         {/* 헤더 */}
         <button
-          onClick={() => setVideoData(prev => ({ ...prev, expanded: !prev.expanded }))}
+          onClick={() => updateVideoData({ expanded: !videoData.expanded })}
           className="w-full p-4 flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100"
         >
           <div className="flex items-center gap-3">
@@ -629,7 +612,7 @@ export default function OliveyoungVideoSubmissionPage() {
                   <input
                     type="text"
                     value={videoData.title}
-                    onChange={(e) => setVideoData(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) => updateVideoData({ title: e.target.value })}
                     placeholder="SNS 영상 제목"
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
@@ -640,7 +623,7 @@ export default function OliveyoungVideoSubmissionPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">영상 피드글</label>
                   <textarea
                     value={videoData.content}
-                    onChange={(e) => setVideoData(prev => ({ ...prev, content: e.target.value }))}
+                    onChange={(e) => updateVideoData({ content: e.target.value })}
                     placeholder="SNS 피드 내용"
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
@@ -656,7 +639,7 @@ export default function OliveyoungVideoSubmissionPage() {
                   <input
                     type="text"
                     value={videoData.hashtags}
-                    onChange={(e) => setVideoData(prev => ({ ...prev, hashtags: e.target.value }))}
+                    onChange={(e) => updateVideoData({ hashtags: e.target.value })}
                     placeholder="#해시태그 #올리브영"
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
@@ -767,15 +750,16 @@ export default function OliveyoungVideoSubmissionPage() {
           </div>
         )}
 
-        {/* 영상 1, 2 */}
-        {renderVideoSection(1)}
-        {renderVideoSection(2)}
+        {/* 영상 1-10 */}
+        {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
+          <div key={num}>{renderVideoSection(num)}</div>
+        ))}
 
         {/* 안내 */}
         <div className="bg-green-50 rounded-2xl p-4">
           <h3 className="text-sm font-bold text-green-900 mb-2">📌 안내 사항</h3>
           <ul className="text-xs text-green-800 space-y-1">
-            <li>• 총 2개의 영상을 제출해주세요.</li>
+            <li>• 최대 10개의 영상을 제출할 수 있습니다.</li>
             <li>• 클린본은 자막/효과 없는 원본입니다.</li>
             <li>• 각 영상별로 개별 제출 가능합니다.</li>
             <li>• 검수 완료 후 SNS에 업로드해주세요.</li>
