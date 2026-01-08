@@ -390,7 +390,7 @@ const PointsPage = () => {
                     <p className="text-sm text-gray-600">{profile.account_holder}</p>
                   </div>
                   <button
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/mypage', { state: { section: 'account' } })}
                     className="text-sm text-violet-600 font-medium"
                   >
                     변경
@@ -411,7 +411,7 @@ const PointsPage = () => {
               <CreditCard size={36} className="mx-auto mb-3 text-gray-300" />
               <p className="text-gray-500 text-sm mb-4">정산받을 계좌를 먼저 등록해주세요</p>
               <button
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate('/mypage', { state: { section: 'account' } })}
                 className="px-6 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700"
               >
                 계좌 등록하기
