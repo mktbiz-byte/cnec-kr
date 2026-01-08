@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { database, supabase } from '../../lib/supabase'
 import {
@@ -23,6 +23,7 @@ const GRADE_CONFIG = {
 const CreatorMyPage = () => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
@@ -78,6 +79,13 @@ const CreatorMyPage = () => {
       loadUserData()
     }
   }, [user])
+
+  // URL state에서 section 파라미터 처리 (포인트 페이지에서 계좌 등록으로 이동 시)
+  useEffect(() => {
+    if (location.state?.section) {
+      setActiveSection(location.state.section)
+    }
+  }, [location.state])
 
   const loadUserData = async () => {
     try {
