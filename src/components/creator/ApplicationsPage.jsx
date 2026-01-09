@@ -711,7 +711,52 @@ const ApplicationsPage = () => {
             filteredApps.map((app, idx) => {
               const statusInfo = getStatusInfo(app.status)
               const StatusIcon = statusInfo.icon
-              const deadline = app.campaigns?.content_submission_deadline
+
+              // 캠페인 유형에 따른 마감일 결정
+              let deadline = app.campaigns?.content_submission_deadline
+              let deadlineLabel = '마감'
+
+              if (app.campaigns?.campaign_type === '4week_challenge') {
+                // 4주 챌린지: 현재 진행 중인 주차의 마감일 또는 가장 가까운 미래 마감일
+                const weekDeadlines = [
+                  { week: 1, date: app.campaigns?.week1_deadline },
+                  { week: 2, date: app.campaigns?.week2_deadline },
+                  { week: 3, date: app.campaigns?.week3_deadline },
+                  { week: 4, date: app.campaigns?.week4_deadline }
+                ].filter(w => w.date)
+
+                const now = new Date()
+                const upcomingDeadline = weekDeadlines.find(w => new Date(w.date) >= now)
+                if (upcomingDeadline) {
+                  deadline = upcomingDeadline.date
+                  deadlineLabel = `${upcomingDeadline.week}주차 마감`
+                } else if (weekDeadlines.length > 0) {
+                  // 모든 마감일이 지났으면 마지막 마감일 표시
+                  const lastDeadline = weekDeadlines[weekDeadlines.length - 1]
+                  deadline = lastDeadline.date
+                  deadlineLabel = `${lastDeadline.week}주차 마감`
+                }
+              } else if (app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) {
+                // 올영: 현재 진행 중인 스텝의 마감일 또는 가장 가까운 미래 마감일
+                const stepDeadlines = [
+                  { step: 1, date: app.campaigns?.step1_deadline },
+                  { step: 2, date: app.campaigns?.step2_deadline },
+                  { step: 3, date: app.campaigns?.step3_deadline }
+                ].filter(s => s.date)
+
+                const now = new Date()
+                const upcomingDeadline = stepDeadlines.find(s => new Date(s.date) >= now)
+                if (upcomingDeadline) {
+                  deadline = upcomingDeadline.date
+                  deadlineLabel = `${upcomingDeadline.step}차 마감`
+                } else if (stepDeadlines.length > 0) {
+                  // 모든 마감일이 지났으면 마지막 마감일 표시
+                  const lastDeadline = stepDeadlines[stepDeadlines.length - 1]
+                  deadline = lastDeadline.date
+                  deadlineLabel = `${lastDeadline.step}차 마감`
+                }
+              }
+
               const dDay = getDDay(deadline)
               const reward = app.campaigns?.creator_points_override || app.campaigns?.reward_points
 
@@ -768,7 +813,7 @@ const ApplicationsPage = () => {
                               dDay?.urgent ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'
                             }`}>
                               <Calendar size={10} />
-                              마감 {formatDate(deadline)}
+                              {deadlineLabel} {formatDate(deadline)}
                             </span>
                           )}
                           {app.campaigns?.product_shipping_date && ['approved', 'selected', 'virtual_selected'].includes(app.status) && (
