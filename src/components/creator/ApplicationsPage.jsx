@@ -715,49 +715,28 @@ const ApplicationsPage = () => {
               // 캠페인 유형에 따른 마감일 결정
               let deadline = app.campaigns?.content_submission_deadline
               let deadlineLabel = '마감'
+              let multipleDeadlines = null // 4주/올영용 다중 마감일
 
               if (app.campaigns?.campaign_type === '4week_challenge') {
-                // 4주 챌린지: 현재 진행 중인 주차의 마감일 또는 가장 가까운 미래 마감일
-                const weekDeadlines = [
-                  { week: 1, date: app.campaigns?.week1_deadline },
-                  { week: 2, date: app.campaigns?.week2_deadline },
-                  { week: 3, date: app.campaigns?.week3_deadline },
-                  { week: 4, date: app.campaigns?.week4_deadline }
+                // 4주 챌린지: 4개 주차별 마감일 모두 표시
+                multipleDeadlines = [
+                  { label: '1주차', date: app.campaigns?.week1_deadline },
+                  { label: '2주차', date: app.campaigns?.week2_deadline },
+                  { label: '3주차', date: app.campaigns?.week3_deadline },
+                  { label: '4주차', date: app.campaigns?.week4_deadline }
                 ].filter(w => w.date)
-
-                const now = new Date()
-                const upcomingDeadline = weekDeadlines.find(w => new Date(w.date) >= now)
-                if (upcomingDeadline) {
-                  deadline = upcomingDeadline.date
-                  deadlineLabel = `${upcomingDeadline.week}주차 마감`
-                } else if (weekDeadlines.length > 0) {
-                  // 모든 마감일이 지났으면 마지막 마감일 표시
-                  const lastDeadline = weekDeadlines[weekDeadlines.length - 1]
-                  deadline = lastDeadline.date
-                  deadlineLabel = `${lastDeadline.week}주차 마감`
-                }
+                deadline = null // 단일 마감일 표시 안 함
               } else if (app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) {
-                // 올영: 현재 진행 중인 스텝의 마감일 또는 가장 가까운 미래 마감일
-                const stepDeadlines = [
-                  { step: 1, date: app.campaigns?.step1_deadline },
-                  { step: 2, date: app.campaigns?.step2_deadline },
-                  { step: 3, date: app.campaigns?.step3_deadline }
+                // 올영: 3개 스텝별 마감일 모두 표시
+                multipleDeadlines = [
+                  { label: '1차', date: app.campaigns?.step1_deadline },
+                  { label: '2차', date: app.campaigns?.step2_deadline },
+                  { label: '3차', date: app.campaigns?.step3_deadline }
                 ].filter(s => s.date)
-
-                const now = new Date()
-                const upcomingDeadline = stepDeadlines.find(s => new Date(s.date) >= now)
-                if (upcomingDeadline) {
-                  deadline = upcomingDeadline.date
-                  deadlineLabel = `${upcomingDeadline.step}차 마감`
-                } else if (stepDeadlines.length > 0) {
-                  // 모든 마감일이 지났으면 마지막 마감일 표시
-                  const lastDeadline = stepDeadlines[stepDeadlines.length - 1]
-                  deadline = lastDeadline.date
-                  deadlineLabel = `${lastDeadline.step}차 마감`
-                }
+                deadline = null // 단일 마감일 표시 안 함
               }
 
-              const dDay = getDDay(deadline)
+              const dDay = getDDay(deadline || (multipleDeadlines?.[0]?.date))
               const reward = app.campaigns?.creator_points_override || app.campaigns?.reward_points
 
               return (
@@ -808,6 +787,7 @@ const ApplicationsPage = () => {
                               {formatCurrency(reward)}P
                             </span>
                           )}
+                          {/* 기획형: 단일 마감일 */}
                           {deadline && (
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               dDay?.urgent ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'
@@ -815,6 +795,21 @@ const ApplicationsPage = () => {
                               <Calendar size={10} />
                               {deadlineLabel} {formatDate(deadline)}
                             </span>
+                          )}
+                          {/* 4주/올영: 다중 마감일 */}
+                          {multipleDeadlines && multipleDeadlines.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {multipleDeadlines.map((dl, dlIdx) => {
+                                const dlDDay = getDDay(dl.date)
+                                return (
+                                  <span key={dlIdx} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                    dlDDay?.urgent ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'
+                                  }`}>
+                                    {dl.label} {formatDate(dl.date)}
+                                  </span>
+                                )
+                              })}
+                            </div>
                           )}
                           {app.campaigns?.product_shipping_date && ['approved', 'selected', 'virtual_selected'].includes(app.status) && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold">
