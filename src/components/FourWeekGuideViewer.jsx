@@ -22,6 +22,16 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
     }
   }
 
+  // 배열 형식인 경우 객체 형식으로 변환
+  // [guide1, guide2, guide3, guide4] -> {week1: guide1, week2: guide2, week3: guide3, week4: guide4}
+  if (Array.isArray(parsedGuides)) {
+    const converted = {}
+    parsedGuides.forEach((guide, idx) => {
+      converted[`week${idx + 1}`] = guide
+    })
+    parsedGuides = converted
+  }
+
   // 기본 가이드 파싱
   let parsedBasicGuides = basicGuides
   if (typeof basicGuides === 'string') {
