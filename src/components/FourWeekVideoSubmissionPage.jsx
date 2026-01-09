@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 import {
   ArrowLeft, Upload, CheckCircle, AlertCircle, FileVideo,
   Video, Scissors, Hash, Copy, ExternalLink, Loader2,
-  Check, ChevronDown, ChevronUp, Calendar
+  Check, ChevronDown, ChevronUp, Calendar, History
 } from 'lucide-react'
 
 export default function FourWeekVideoSubmissionPage() {
@@ -20,12 +20,12 @@ export default function FourWeekVideoSubmissionPage() {
   const [campaign, setCampaign] = useState(null)
   const [application, setApplication] = useState(null)
 
-  // 주차별 영상 데이터
+  // 주차별 영상 데이터 (4개 슬롯, 각각 버전 관리)
   const [weekVideos, setWeekVideos] = useState({
-    1: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, expanded: true },
-    2: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, expanded: false },
-    3: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, expanded: false },
-    4: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, expanded: false }
+    1: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, allVersions: [], expanded: true },
+    2: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, allVersions: [], expanded: false },
+    3: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, allVersions: [], expanded: false },
+    4: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, allVersions: [], expanded: false }
   })
 
   // SNS 업로드 정보
@@ -44,6 +44,7 @@ export default function FourWeekVideoSubmissionPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [copiedCode, setCopiedCode] = useState(false)
+  const [showVersionHistory, setShowVersionHistory] = useState({ 1: false, 2: false, 3: false, 4: false })
 
   useEffect(() => {
     fetchData()
@@ -78,36 +79,38 @@ export default function FourWeekVideoSubmissionPage() {
       if (appError) throw appError
       setApplication(appData)
 
-      // 주차별 데이터 로드
+      // 주차별 데이터 로드 (각각 모든 버전)
       const newWeekVideos = { ...weekVideos }
       let hasSubmission = false
 
       for (let week = 1; week <= 4; week++) {
-        const { data: weekData } = await supabase
+        const { data: allVersionsData } = await supabase
           .from('video_submissions')
           .select('*')
           .eq('application_id', appData.id)
           .eq('week_number', week)
           .order('version', { ascending: false })
-          .limit(1)
-          .maybeSingle()
 
-        if (weekData) {
+        if (allVersionsData && allVersionsData.length > 0) {
           hasSubmission = true
+          const latestSubmission = allVersionsData[0]
           newWeekVideos[week] = {
             ...newWeekVideos[week],
-            cleanUrl: weekData.clean_video_url || '',
-            editedUrl: weekData.video_file_url || '',
-            title: weekData.sns_title || '',
-            content: weekData.sns_content || '',
-            hashtags: weekData.hashtags || '',
-            submission: weekData,
-            expanded: !weekData.video_file_url || weekData.status === 'revision_requested'
+            cleanFile: null,
+            cleanUrl: latestSubmission.clean_video_url || '',
+            editedFile: null,
+            editedUrl: latestSubmission.video_file_url || '',
+            title: latestSubmission.sns_title || '',
+            content: latestSubmission.sns_content || '',
+            hashtags: latestSubmission.hashtags || '',
+            submission: latestSubmission,
+            allVersions: allVersionsData,
+            expanded: !latestSubmission.video_file_url || latestSubmission.status === 'revision_requested'
           }
 
           setSnsForm(prev => ({
             ...prev,
-            [`week${week}_url`]: weekData.sns_upload_url || ''
+            [`week${week}_url`]: latestSubmission.sns_upload_url || ''
           }))
         }
       }
@@ -211,10 +214,16 @@ export default function FourWeekVideoSubmissionPage() {
 
       const { data: { user } } = await supabase.auth.getUser()
 
-      // 버전 계산 (제한 없음)
+      // 버전 계산 (v1 ~ v10)
       let nextVersion = 1
       if (weekData.submission) {
         nextVersion = (weekData.submission.version || 0) + 1
+      }
+
+      // 버전 제한 체크 (최대 v10)
+      if (nextVersion > 10) {
+        setError(`${week}주차는 최대 10번까지만 재제출할 수 있습니다.`)
+        return
       }
 
       let uploadedCleanUrl = weekData.cleanUrl
@@ -253,10 +262,8 @@ export default function FourWeekVideoSubmissionPage() {
       try {
         const companyName = campaign?.company_name || '기업'
 
-        // 1. 캠페인에 저장된 company_phone 먼저 확인
         let companyPhone = campaign?.company_phone
 
-        // 2. 없으면 user_profiles에서 조회
         if (!companyPhone && campaign?.company_id) {
           const { data: companyProfile } = await supabase
             .from('user_profiles')
@@ -297,6 +304,10 @@ export default function FourWeekVideoSubmissionPage() {
       setSuccess(`${week}주차 영상 V${nextVersion}이 제출되었습니다!`)
       setShowSnsSection(true)
       updateWeekData(week, 'expanded', false)
+      setWeekVideos(prev => ({
+        ...prev,
+        [week]: { ...prev[week], cleanFile: null, editedFile: null }
+      }))
       await fetchData()
 
     } catch (err) {
@@ -341,10 +352,8 @@ export default function FourWeekVideoSubmissionPage() {
       try {
         const companyName = campaign?.company_name || '기업'
 
-        // 1. 캠페인에 저장된 company_phone 먼저 확인
         let companyPhone = campaign?.company_phone
 
-        // 2. 없으면 user_profiles에서 조회
         if (!companyPhone && campaign?.company_id) {
           const { data: companyProfile } = await supabase
             .from('user_profiles')
@@ -421,6 +430,8 @@ export default function FourWeekVideoSubmissionPage() {
     const weekData = weekVideos[week]
     const colors = weekColors[week]
     const isUploading = uploadingInfo?.week === week
+    const currentVersion = weekData.submission?.version || 0
+    const canResubmit = currentVersion < 10
 
     return (
       <div key={week} className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -455,6 +466,39 @@ export default function FourWeekVideoSubmissionPage() {
         {/* 콘텐츠 */}
         {weekData.expanded && (
           <div className="p-4 space-y-4">
+            {/* 버전 히스토리 */}
+            {weekData.allVersions.length > 1 && (
+              <div className="mb-4">
+                <button
+                  onClick={() => setShowVersionHistory(prev => ({ ...prev, [week]: !prev[week] }))}
+                  className={`flex items-center gap-2 text-sm ${colors.text} hover:opacity-80`}
+                >
+                  <History size={14} />
+                  버전 히스토리 ({weekData.allVersions.length}개)
+                </button>
+                {showVersionHistory[week] && (
+                  <div className="mt-2 bg-gray-50 rounded-xl p-3 space-y-2">
+                    {weekData.allVersions.map((v) => (
+                      <div key={v.id} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-bold ${colors.text}`}>V{v.version}</span>
+                          <span className="text-gray-500">
+                            {new Date(v.submitted_at).toLocaleDateString('ko-KR')}
+                          </span>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${
+                          v.status === 'approved' ? 'bg-green-500' :
+                          v.status === 'revision_requested' ? 'bg-yellow-500' : 'bg-blue-500'
+                        }`}>
+                          {v.status === 'approved' ? '승인' : v.status === 'revision_requested' ? '수정요청' : '검토중'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* 피드백 */}
             {weekData.submission?.status === 'revision_requested' && weekData.submission?.feedback && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
@@ -499,16 +543,17 @@ export default function FourWeekVideoSubmissionPage() {
               </div>
             )}
 
-            {/* 업로드 폼 - 언제든 재제출 가능 */}
-            <>
-              {weekData.submission?.video_file_url && weekData.submission?.status !== 'revision_requested' && (
-                <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 mb-3">
-                  <p className="text-xs text-violet-700 font-medium">
-                    수정된 영상이 있다면 다시 업로드해주세요. 새 버전으로 제출됩니다.
-                  </p>
-                </div>
-              )}
-              {/* 클린본 */}
+            {/* 업로드 폼 - 재제출 가능 (v10까지) */}
+            {canResubmit && (
+              <>
+                {weekData.submission?.video_file_url && weekData.submission?.status !== 'revision_requested' && (
+                  <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 mb-3">
+                    <p className="text-xs text-violet-700 font-medium">
+                      수정된 영상이 있다면 다시 업로드해주세요. V{currentVersion + 1}로 제출됩니다. (최대 V10)
+                    </p>
+                  </div>
+                )}
+                {/* 클린본 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     클린본 <span className="text-xs text-gray-400">(선택)</span>
@@ -653,11 +698,21 @@ export default function FourWeekVideoSubmissionPage() {
                   ) : (
                     <>
                       <Upload size={16} />
-                      {weekData.submission?.video_file_url ? `${week}주차 재제출` : `${week}주차 제출`}
+                      {weekData.submission?.video_file_url ? `V${currentVersion + 1} 재제출` : `${week}주차 제출`}
                     </>
                   )}
                 </button>
-            </>
+              </>
+            )}
+
+            {/* v10 도달 시 */}
+            {!canResubmit && weekData.submission && (
+              <div className="bg-gray-100 border border-gray-200 rounded-xl p-3 text-center">
+                <p className="text-sm text-gray-600">
+                  최대 재제출 횟수(V10)에 도달했습니다.
+                </p>
+              </div>
+            )}
 
             {/* 현재 상태 */}
             {weekData.submission?.video_file_url && (
@@ -700,7 +755,7 @@ export default function FourWeekVideoSubmissionPage() {
           >
             <ArrowLeft size={20} className="text-gray-700" />
           </button>
-          <h1 className="flex-1 text-center font-bold text-gray-900">🏆 4주 챌린지 영상</h1>
+          <h1 className="flex-1 text-center font-bold text-gray-900">4주 챌린지 영상</h1>
           <div className="w-10" />
         </div>
       </div>
@@ -733,7 +788,7 @@ export default function FourWeekVideoSubmissionPage() {
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-xs font-bold text-blue-800 mb-1">📢 관리자 메시지</p>
+                <p className="text-xs font-bold text-blue-800 mb-1">관리자 메시지</p>
                 <p className="text-sm text-blue-700 whitespace-pre-wrap">{application.individualMessage}</p>
               </div>
             </div>
@@ -762,13 +817,44 @@ export default function FourWeekVideoSubmissionPage() {
         {/* 주차별 영상 */}
         {[1, 2, 3, 4].map(week => renderWeekSection(week))}
 
+        {/* SNS 업로드 섹션 */}
+        {showSnsSection && hasAnySubmission && (
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <ExternalLink size={18} className="text-indigo-600" />
+              SNS 업로드 정보
+            </h3>
+            <form onSubmit={handleSnsSubmit} className="space-y-4">
+              {[1, 2, 3, 4].map(week => weekVideos[week].submission && (
+                <div key={week}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{week}주차 SNS URL</label>
+                  <input
+                    type="url"
+                    value={snsForm[`week${week}_url`]}
+                    onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_url`]: e.target.value }))}
+                    placeholder="https://www.instagram.com/..."
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              ))}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {submitting ? '저장 중...' : 'SNS 정보 저장'}
+              </button>
+            </form>
+          </div>
+        )}
+
         {/* 안내 */}
         <div className="bg-indigo-50 rounded-2xl p-4">
           <h3 className="text-sm font-bold text-indigo-900 mb-2">📌 안내 사항</h3>
           <ul className="text-xs text-indigo-800 space-y-1">
-            <li>• 1~4주차 영상을 순차적으로 제출해주세요.</li>
+            <li>• 1~4주차 편집 영상과 클린본을 각각 제출합니다.</li>
+            <li>• 수정이 필요하면 재업로드하세요. (V1 → V2 → ... V10)</li>
             <li>• 클린본은 자막/효과 없는 원본입니다.</li>
-            <li>• 각 주차별로 개별 제출 가능합니다.</li>
             <li>• 검수 완료 후 SNS에 업로드해주세요.</li>
           </ul>
         </div>
