@@ -1495,10 +1495,10 @@ const ApplicationsPage = () => {
                     if (!guides) return <p className="text-sm text-gray-500 text-center py-8">가이드 정보를 불러올 수 없습니다.</p>
 
                     const weekStyles = [
-                      { bg: 'bg-red-50', border: 'border-red-100', icon: 'bg-red-500', title: 'text-red-900' },
-                      { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900' },
-                      { bg: 'bg-yellow-50', border: 'border-yellow-100', icon: 'bg-yellow-500', title: 'text-yellow-900' },
-                      { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900' }
+                      { bg: 'bg-red-50', border: 'border-red-100', icon: 'bg-red-500', title: 'text-red-900', accent: 'text-red-600', accentBg: 'bg-red-100' },
+                      { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900', accent: 'text-orange-600', accentBg: 'bg-orange-100' },
+                      { bg: 'bg-yellow-50', border: 'border-yellow-100', icon: 'bg-yellow-500', title: 'text-yellow-900', accent: 'text-yellow-600', accentBg: 'bg-yellow-100' },
+                      { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900', accent: 'text-green-600', accentBg: 'bg-green-100' }
                     ]
                     const weekDeadlines = [
                       selectedGuide.campaigns?.week1_deadline,
@@ -1506,6 +1506,115 @@ const ApplicationsPage = () => {
                       selectedGuide.campaigns?.week3_deadline,
                       selectedGuide.campaigns?.week4_deadline
                     ]
+
+                    // 가이드 객체를 깔끔하게 렌더링하는 함수
+                    const renderGuideContent = (guide, style) => {
+                      if (typeof guide === 'string') {
+                        return <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{guide}</p>
+                      }
+
+                      if (typeof guide !== 'object') return null
+
+                      return (
+                        <div className="space-y-3">
+                          {/* 상품 정보 / 미션 설명 */}
+                          {guide.product_info && (
+                            <div className="bg-white rounded-xl p-3 border border-gray-100">
+                              <h6 className="text-xs font-bold text-gray-800 mb-1.5 flex items-center gap-1">
+                                <span>📦</span> 상품 정보 / 미션
+                              </h6>
+                              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{guide.product_info}</p>
+                            </div>
+                          )}
+
+                          {/* 필수 대사 */}
+                          {guide.required_dialogues && (
+                            <div className="bg-purple-50 rounded-xl p-3 border border-purple-100">
+                              <h6 className="text-xs font-bold text-purple-800 mb-2 flex items-center gap-1">
+                                <span>💬</span> 필수 대사
+                              </h6>
+                              {Array.isArray(guide.required_dialogues) ? (
+                                <ul className="space-y-1.5">
+                                  {guide.required_dialogues.map((dialogue, dIdx) => (
+                                    <li key={dIdx} className="flex items-start gap-2">
+                                      <span className="w-5 h-5 bg-purple-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{dIdx + 1}</span>
+                                      <span className="text-sm text-purple-900">{dialogue}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-purple-900 whitespace-pre-wrap">{guide.required_dialogues}</p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* 필수 촬영 장면 */}
+                          {guide.required_scenes && (
+                            <div className="bg-green-50 rounded-xl p-3 border border-green-100">
+                              <h6 className="text-xs font-bold text-green-800 mb-2 flex items-center gap-1">
+                                <span>🎥</span> 필수 촬영 장면
+                              </h6>
+                              {Array.isArray(guide.required_scenes) ? (
+                                <ul className="space-y-1.5">
+                                  {guide.required_scenes.map((scene, sIdx) => (
+                                    <li key={sIdx} className="flex items-start gap-2">
+                                      <span className="w-5 h-5 bg-green-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{sIdx + 1}</span>
+                                      <span className="text-sm text-green-900">{scene}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-green-900 whitespace-pre-wrap">{guide.required_scenes}</p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* 해시태그 */}
+                          {guide.hashtags && (
+                            <div className="bg-blue-50 rounded-xl p-3 border border-blue-100">
+                              <h6 className="text-xs font-bold text-blue-800 mb-2 flex items-center gap-1">
+                                <span>#️⃣</span> 필수 해시태그
+                              </h6>
+                              <div className="flex flex-wrap gap-1.5">
+                                {(Array.isArray(guide.hashtags) ? guide.hashtags : guide.hashtags.split(/[,\n•]/).filter(t => t.trim())).map((tag, tIdx) => (
+                                  <span key={tIdx} className="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                    {tag.trim().startsWith('#') ? tag.trim() : `#${tag.trim()}`}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 주의사항 */}
+                          {guide.cautions && (
+                            <div className="bg-amber-50 rounded-xl p-3 border border-amber-200">
+                              <h6 className="text-xs font-bold text-amber-800 mb-1.5 flex items-center gap-1">
+                                <span>⚠️</span> 주의사항
+                              </h6>
+                              <p className="text-sm text-amber-800 whitespace-pre-wrap">{guide.cautions}</p>
+                            </div>
+                          )}
+
+                          {/* 참고 영상 */}
+                          {guide.reference_urls && guide.reference_urls.length > 0 && guide.reference_urls.some(url => url) && (
+                            <div className="bg-white rounded-xl p-3 border border-gray-100">
+                              <h6 className="text-xs font-bold text-gray-800 mb-1.5 flex items-center gap-1">
+                                <span>🔗</span> 참고 영상
+                              </h6>
+                              <ul className="space-y-1">
+                                {guide.reference_urls.filter(url => url).map((url, uIdx) => (
+                                  <li key={uIdx}>
+                                    <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline break-all">
+                                      {url}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    }
 
                     return Array.isArray(guides) ? guides.map((guide, idx) => {
                       const style = weekStyles[idx] || weekStyles[3]
@@ -1528,13 +1637,15 @@ const ApplicationsPage = () => {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(guide)}</p>
+                            {renderGuideContent(guide, style)}
                           </div>
                         </div>
                       )
                     }) : (
                       <div className="rounded-3xl bg-indigo-50 border border-indigo-100 p-5">
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{renderValue(guides)}</p>
+                        {typeof guides === 'object' ? renderGuideContent(guides, weekStyles[0]) : (
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{renderValue(guides)}</p>
+                        )}
                       </div>
                     )
                   })()}
