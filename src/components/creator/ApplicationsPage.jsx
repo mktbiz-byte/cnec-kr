@@ -268,7 +268,7 @@ const ApplicationsPage = () => {
         ['approved', 'selected', 'virtual_selected'].includes(a.status)
       ).length || 0
       const inProgress = applicationsData?.filter(a =>
-        ['filming', 'video_submitted'].includes(a.status)
+        ['filming', 'video_submitted', 'sns_uploaded'].includes(a.status)
       ).length || 0
       const completed = applicationsData?.filter(a =>
         ['completed', 'paid'].includes(a.status)
@@ -293,7 +293,7 @@ const ApplicationsPage = () => {
         )
       case 'inProgress':
         return applications.filter(a =>
-          ['filming', 'video_submitted'].includes(a.status)
+          ['filming', 'video_submitted', 'sns_uploaded'].includes(a.status)
         )
       case 'completed':
         return applications.filter(a =>
@@ -1116,21 +1116,28 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 4주 챌린지: sns_uploaded에서도 영상 추가 가능 (4주차 영상 모두 제출해야 함) */}
+                      {/* completed/paid 상태에서도 영상 4개 미제출시 수정 가능 */}
                       {app.campaigns?.campaign_type === '4week_challenge' &&
-                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) && (
+                       (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
+                        (['completed', 'paid'].includes(app.status) &&
+                         (() => {
+                           const submittedWeeks = new Set(app.video_submissions?.map(vs => vs.week_number).filter(Boolean) || [])
+                           return submittedWeeks.size < 4
+                         })())) && (
                         <button
                           onClick={() => handleVideoUpload(app, '4week')}
                           className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Video size={14} /> {['video_submitted', 'sns_uploaded'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
+                          <Video size={14} /> {['video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
                         </button>
                       )}
 
                       {/* 4주 챌린지 캠페인 SNS 업로드 버튼 (별도 표시) */}
                       {/* sns_uploaded에서도 수정 가능 (기업 확정 전까지) */}
+                      {/* completed/paid 상태에서도 4개 URL 미제출시 수정 가능 */}
                       {app.campaigns?.campaign_type === '4week_challenge' &&
                        (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
-                        (['completed', 'paid'].includes(app.status) && !app.week1_url)) && (
+                        (['completed', 'paid'].includes(app.status) && (!app.week1_url || !app.week2_url || !app.week3_url || !app.week4_url))) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
