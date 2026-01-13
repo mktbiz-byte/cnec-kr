@@ -170,6 +170,39 @@ GMAIL_APP_PASSWORD  # mkt_biz@cnec.co.kr 앱 비밀번호
 
 ---
 
+## Supabase Storage 버킷 (중요!)
+
+### 필수 버킷 목록
+| 버킷명 | 용도 | 공개 |
+|--------|------|------|
+| `campaign-images` | 캠페인 이미지 | ✅ |
+| `campaign-videos` | 크리에이터 영상 업로드 | ✅ |
+| `creator-videos` | 크리에이터 영상 (대체) | ✅ |
+| `creator-materials` | 크리에이터 자료 | ❌ |
+
+### 버킷 생성 SQL (Supabase SQL Editor에서 실행)
+```sql
+-- 버킷이 없으면 "Bucket not found" 오류 발생!
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('campaign-videos', 'campaign-videos', true)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('creator-videos', 'creator-videos', true)
+ON CONFLICT (id) DO NOTHING;
+```
+
+### 코드에서 사용하는 버킷
+```javascript
+// VideoSubmissionPage.jsx, OliveyoungVideoSubmissionPage.jsx 등
+supabase.storage.from('campaign-videos').upload(...)
+
+// ApplicationsPage.jsx
+supabase.storage.from('creator-videos').upload(...)
+```
+
+---
+
 ## 주요 페이지 경로
 
 ### 크리에이터
@@ -214,6 +247,17 @@ await supabaseAdmin.auth.admin.updateUserById(userId, {
 ```javascript
 // 스키마에 없을 수 있는 테이블들 (환경에 따라 다름)
 notifications, ai_guide_requests, guide_feedbacks, account_deletions
+```
+
+### 4. Storage 버킷 오류 (Bucket not found)
+```javascript
+// ❌ 버킷이 Supabase에 생성되지 않은 경우
+// "Bucket not found" 오류 발생
+
+// ✅ 해결: Supabase SQL Editor에서 버킷 생성
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('campaign-videos', 'campaign-videos', true)
+ON CONFLICT (id) DO NOTHING;
 ```
 
 ---
