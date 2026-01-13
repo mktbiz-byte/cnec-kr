@@ -94,19 +94,10 @@ exports.handler = async (event, context) => {
       }
     })
 
-    // 탈퇴 기록 저장 (선택사항 - 테이블이 있는 경우)
-    try {
-      await supabaseAdmin.from('account_deletions').insert({
-        user_id: userId,
-        email: user.email,
-        reason: reason || '미선택',
-        details: details || '',
-        deleted_at: new Date().toISOString()
-      })
-    } catch (logError) {
-      // 테이블이 없어도 계속 진행
-      console.log('탈퇴 기록 저장 실패 (테이블 없음 가능):', logError.message)
-    }
+    // 사용자 정보 미리 저장 (탈퇴 기록용)
+    const userEmail = user.email
+    const deletionReason = reason || '미선택'
+    const deletionDetails = details || ''
 
     // 1. 포인트 확인
     const { data: profile } = await supabaseAdmin
@@ -121,6 +112,17 @@ exports.handler = async (event, context) => {
 
     // 2. 관련 데이터 수동 삭제 (CASCADE가 작동하지 않는 경우를 위해)
     console.log(`사용자 ${userId} 관련 데이터 삭제 시작`)
+
+    // 2-0. account_deletions에서 기존 기록 삭제 (FK 제약 해제)
+    const { error: accountDeletionsError } = await supabaseAdmin
+      .from('account_deletions')
+      .delete()
+      .eq('user_id', userId)
+    if (accountDeletionsError) {
+      console.log('account_deletions 삭제 오류 (무시):', accountDeletionsError.message)
+    } else {
+      console.log('account_deletions 삭제 완료')
+    }
 
     // 2-1. applications 삭제
     const { error: appDeleteError } = await supabaseAdmin
@@ -181,6 +183,20 @@ exports.handler = async (event, context) => {
           details: deleteError.message
         })
       }
+    }
+
+    // 4. 탈퇴 기록 저장 (Auth 삭제 후 - user_id 없이 저장)
+    try {
+      await supabaseAdmin.from('account_deletions').insert({
+        email: userEmail,
+        reason: deletionReason,
+        details: deletionDetails,
+        deleted_at: new Date().toISOString()
+      })
+      console.log('탈퇴 기록 저장 완료')
+    } catch (logError) {
+      // 테이블이 없어도 계속 진행
+      console.log('탈퇴 기록 저장 실패 (무시):', logError.message)
     }
 
     return {
