@@ -8,14 +8,14 @@ const nodemailer = require('nodemailer')
 
 // 탈퇴 완료 이메일 발송 함수
 async function sendDeletionEmail(email) {
-  // SMTP 환경변수 확인
-  const smtpHost = process.env.SMTP_HOST || process.env.GMAIL_SMTP_HOST
-  const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER
-  const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD
-  const smtpPort = process.env.SMTP_PORT || 587
+  // Gmail SMTP 설정 (하드코딩)
+  const smtpHost = 'smtp.gmail.com'
+  const smtpUser = 'mkt_biz@cnec.co.kr'
+  const smtpPass = process.env.GMAIL_APP_PASSWORD
+  const smtpPort = 587
 
-  if (!smtpHost || !smtpUser || !smtpPass) {
-    console.log('SMTP 설정이 없어 탈퇴 이메일을 발송하지 않습니다.')
+  if (!smtpPass) {
+    console.log('GMAIL_APP_PASSWORD가 없어 탈퇴 이메일을 발송하지 않습니다.')
     return false
   }
 
