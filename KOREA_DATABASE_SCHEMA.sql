@@ -349,10 +349,60 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('creator-materials', 'creator-materials', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- campaign-videos 버킷 (공개) - 크리에이터 영상 업로드용
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('campaign-videos', 'campaign-videos', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- creator-videos 버킷 (공개) - 크리에이터 영상 업로드용 (대체 버킷)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('creator-videos', 'creator-videos', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- 스토리지 정책
 CREATE POLICY "Public can view campaign images"
     ON storage.objects FOR SELECT
     USING (bucket_id = 'campaign-images');
+
+-- campaign-videos 버킷 정책
+CREATE POLICY "Public can view campaign videos"
+    ON storage.objects FOR SELECT
+    USING (bucket_id = 'campaign-videos');
+
+CREATE POLICY "Authenticated users can upload campaign videos"
+    ON storage.objects FOR INSERT
+    WITH CHECK (
+        bucket_id = 'campaign-videos'
+        AND auth.role() = 'authenticated'
+    );
+
+CREATE POLICY "Authenticated users can update campaign videos"
+    ON storage.objects FOR UPDATE
+    USING (bucket_id = 'campaign-videos' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can delete campaign videos"
+    ON storage.objects FOR DELETE
+    USING (bucket_id = 'campaign-videos' AND auth.role() = 'authenticated');
+
+-- creator-videos 버킷 정책
+CREATE POLICY "Public can view creator videos"
+    ON storage.objects FOR SELECT
+    USING (bucket_id = 'creator-videos');
+
+CREATE POLICY "Authenticated users can upload creator videos"
+    ON storage.objects FOR INSERT
+    WITH CHECK (
+        bucket_id = 'creator-videos'
+        AND auth.role() = 'authenticated'
+    );
+
+CREATE POLICY "Authenticated users can update creator videos"
+    ON storage.objects FOR UPDATE
+    USING (bucket_id = 'creator-videos' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can delete creator videos"
+    ON storage.objects FOR DELETE
+    USING (bucket_id = 'creator-videos' AND auth.role() = 'authenticated');
 
 CREATE POLICY "Authenticated users can upload creator materials"
     ON storage.objects FOR INSERT
