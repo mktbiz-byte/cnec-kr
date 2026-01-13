@@ -14,7 +14,20 @@ const ExternalGuideViewer = ({
   className = ''
 }) => {
   // Google 문서 타입별 아이콘 및 라벨
-  const getGoogleTypeInfo = (type) => {
+  const getGoogleTypeInfo = (type, url) => {
+    // URL에서 타입 감지
+    if (url) {
+      if (url.includes('docs.google.com/document')) {
+        return { label: 'Google 문서', color: 'bg-blue-600 hover:bg-blue-700' }
+      }
+      if (url.includes('docs.google.com/spreadsheets') || url.includes('sheets.google.com')) {
+        return { label: 'Google 스프레드시트', color: 'bg-green-600 hover:bg-green-700' }
+      }
+      if (url.includes('docs.google.com/presentation')) {
+        return { label: 'Google 슬라이드', color: 'bg-yellow-600 hover:bg-yellow-700' }
+      }
+    }
+    // 타입으로 감지
     switch (type) {
       case 'google_docs':
         return { label: 'Google 문서', color: 'bg-blue-600 hover:bg-blue-700' }
@@ -27,17 +40,28 @@ const ExternalGuideViewer = ({
     }
   }
 
-  // PDF 파일인 경우
-  if (guideType === 'pdf' && fileUrl) {
+  // URL이 Google 문서인지 확인
+  const isGoogleUrl = (url) => {
+    if (!url) return false
+    return url.includes('docs.google.com') ||
+           url.includes('sheets.google.com') ||
+           url.includes('drive.google.com')
+  }
+
+  // 파일 URL이 있는 경우 (PDF 또는 기타 파일) - 최우선 처리
+  if (fileUrl) {
+    const isPdf = guideType === 'pdf' || fileName?.toLowerCase().endsWith('.pdf') || fileUrl.toLowerCase().includes('.pdf')
+    const displayName = fileName || title || (isPdf ? 'PDF 가이드' : '가이드 파일')
+
     return (
       <div className={`bg-gray-50 border border-gray-200 rounded-xl p-4 ${className}`}>
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-            <FileText size={20} className="text-red-600" />
+          <div className={`w-10 h-10 ${isPdf ? 'bg-red-100' : 'bg-blue-100'} rounded-lg flex items-center justify-center`}>
+            <FileText size={20} className={isPdf ? 'text-red-600' : 'text-blue-600'} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-gray-900 text-sm truncate">
-              {title || 'PDF 가이드'}
+              {title || displayName}
             </p>
             {fileName && (
               <p className="text-xs text-gray-500 truncate">{fileName}</p>
@@ -56,8 +80,8 @@ const ExternalGuideViewer = ({
           </a>
           <a
             href={fileUrl}
-            download={fileName || 'guide.pdf'}
-            className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+            download={fileName || (isPdf ? 'guide.pdf' : 'guide')}
+            className={`flex-1 py-2.5 ${isPdf ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2`}
           >
             <Download size={14} />
             다운로드
@@ -67,9 +91,9 @@ const ExternalGuideViewer = ({
     )
   }
 
-  // Google 문서인 경우
-  if (guideUrl && guideType?.startsWith('google_')) {
-    const typeInfo = getGoogleTypeInfo(guideType)
+  // Google 문서인 경우 (guideType으로 지정되거나 URL로 감지)
+  if (guideUrl && (guideType?.startsWith('google_') || isGoogleUrl(guideUrl))) {
+    const typeInfo = getGoogleTypeInfo(guideType, guideUrl)
 
     return (
       <div className={`bg-gray-50 border border-gray-200 rounded-xl p-4 ${className}`}>
@@ -97,7 +121,7 @@ const ExternalGuideViewer = ({
     )
   }
 
-  // URL만 있는 경우 (타입 없이)
+  // 일반 URL인 경우 (외부 링크)
   if (guideUrl) {
     return (
       <div className={`bg-gray-50 border border-gray-200 rounded-xl p-4 ${className}`}>
@@ -118,7 +142,7 @@ const ExternalGuideViewer = ({
           className="w-full py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors flex items-center justify-center gap-2"
         >
           <ExternalLink size={14} />
-          가이드 열기
+          링크 열기
         </a>
       </div>
     )
