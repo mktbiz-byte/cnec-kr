@@ -541,7 +541,7 @@ const CreatorMyPage = () => {
     return {
       pending: applications.filter(a => a.status === 'pending').length,
       approved: applications.filter(a => ['approved', 'selected', 'virtual_selected'].includes(a.status)).length,
-      inProgress: applications.filter(a => ['filming', 'video_submitted'].includes(a.status)).length,
+      inProgress: applications.filter(a => ['filming', 'video_submitted', 'sns_uploaded'].includes(a.status)).length,
       completed: applications.filter(a => ['completed', 'paid'].includes(a.status)).length
     }
   }

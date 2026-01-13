@@ -268,7 +268,7 @@ const ApplicationsPage = () => {
         ['approved', 'selected', 'virtual_selected'].includes(a.status)
       ).length || 0
       const inProgress = applicationsData?.filter(a =>
-        ['filming', 'video_submitted'].includes(a.status)
+        ['filming', 'video_submitted', 'sns_uploaded'].includes(a.status)
       ).length || 0
       const completed = applicationsData?.filter(a =>
         ['completed', 'paid'].includes(a.status)
@@ -293,7 +293,7 @@ const ApplicationsPage = () => {
         )
       case 'inProgress':
         return applications.filter(a =>
-          ['filming', 'video_submitted'].includes(a.status)
+          ['filming', 'video_submitted', 'sns_uploaded'].includes(a.status)
         )
       case 'completed':
         return applications.filter(a =>
@@ -1003,9 +1003,9 @@ const ApplicationsPage = () => {
                     </div>
                   )}
 
-                  {/* 선정됨/진행중 상태일 때 가이드 및 액션 버튼 */}
-                  {/* sns_uploaded도 포함 - 기업 확정 전까지 수정 가능 */}
-                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded'].includes(app.status) && (
+                  {/* 선정됨/진행중/완료 상태일 때 가이드 및 액션 버튼 */}
+                  {/* completed/paid 상태에서도 영상/SNS 수정 가능 */}
+                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
                       {/* 기획형 캠페인 가이드 */}
                       {app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (
@@ -1068,22 +1068,21 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 올리브영 캠페인 영상 업로드 버튼 (별도 표시) */}
-                      {/* 올리브영: sns_uploaded에서도 영상 추가 가능 (영상 2개 모두 제출해야 함) */}
+                      {/* 올리브영: completed/paid 상태에서도 항상 수정 가능 */}
                       {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) &&
-                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) && (
+                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                         <button
                           onClick={() => handleVideoUpload(app, 'oliveyoung')}
                           className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Video size={14} /> {['video_submitted', 'sns_uploaded'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
+                          <Video size={14} /> {['video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
                         </button>
                       )}
 
                       {/* 올리브영 캠페인 SNS 업로드 버튼 (별도 표시) */}
-                      {/* sns_uploaded에서도 수정 가능 (기업 확정 전까지) */}
+                      {/* completed/paid 상태에서도 항상 수정 가능 */}
                       {(app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) &&
-                       (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
-                        (['completed', 'paid'].includes(app.status) && !app.step1_url)) && (
+                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
@@ -1115,22 +1114,21 @@ const ApplicationsPage = () => {
                         </div>
                       )}
 
-                      {/* 4주 챌린지: sns_uploaded에서도 영상 추가 가능 (4주차 영상 모두 제출해야 함) */}
+                      {/* 4주 챌린지: completed/paid 상태에서도 항상 수정 가능 */}
                       {app.campaigns?.campaign_type === '4week_challenge' &&
-                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) && (
+                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                         <button
                           onClick={() => handleVideoUpload(app, '4week')}
                           className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Video size={14} /> {['video_submitted', 'sns_uploaded'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
+                          <Video size={14} /> {['video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) ? '영상 추가/수정' : '영상 업로드하기'}
                         </button>
                       )}
 
                       {/* 4주 챌린지 캠페인 SNS 업로드 버튼 (별도 표시) */}
-                      {/* sns_uploaded에서도 수정 가능 (기업 확정 전까지) */}
+                      {/* completed/paid 상태에서도 항상 수정 가능 */}
                       {app.campaigns?.campaign_type === '4week_challenge' &&
-                       (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
-                        (['completed', 'paid'].includes(app.status) && !app.week1_url)) && (
+                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
@@ -1241,9 +1239,9 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* 기획형/일반 캠페인 - video_submitted, sns_uploaded 상태일 때 영상 재제출 버튼 */}
+                      {/* 기획형/일반 캠페인 - completed/paid 상태에서도 항상 수정 가능 */}
                       {/* 올리브영, 4주 챌린지는 위에서 별도 처리 */}
-                      {['video_submitted', 'sns_uploaded'].includes(app.status) &&
+                      {['video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) &&
                        app.campaigns?.campaign_type !== 'oliveyoung' &&
                        app.campaigns?.campaign_type !== '4week_challenge' &&
                        !app.campaigns?.is_oliveyoung_sale && (
@@ -1256,13 +1254,12 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 기획형/일반 캠페인 - SNS 업로드 버튼 */}
-                      {/* sns_uploaded에서도 수정 가능 (기업 확정 전까지) */}
+                      {/* completed/paid 상태에서도 항상 수정 가능 */}
                       {/* 올리브영, 4주 챌린지는 위에서 별도 처리 */}
                       {app.campaigns?.campaign_type !== 'oliveyoung' &&
                        app.campaigns?.campaign_type !== '4week_challenge' &&
                        !app.campaigns?.is_oliveyoung_sale &&
-                       (['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded'].includes(app.status) ||
-                        (['completed', 'paid'].includes(app.status) && !app.sns_upload_url)) && (
+                       ['filming', 'approved', 'selected', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                         <button
                           onClick={() => openSnsUploadModal(app)}
                           className="w-full py-2.5 bg-pink-600 text-white rounded-xl text-sm font-bold hover:bg-pink-700 transition-colors flex items-center justify-center gap-1"
