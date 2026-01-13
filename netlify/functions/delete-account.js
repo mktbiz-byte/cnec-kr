@@ -108,8 +108,7 @@ exports.handler = async (event, context) => {
       console.log('탈퇴 기록 저장 실패 (테이블 없음 가능):', logError.message)
     }
 
-    // 1. 관련 데이터 삭제 (user_profiles, applications 등은 CASCADE로 자동 삭제됨)
-    // 포인트가 있는 경우 처리 (선택사항)
+    // 1. 포인트 확인
     const { data: profile } = await supabaseAdmin
       .from('user_profiles')
       .select('points')
@@ -120,7 +119,56 @@ exports.handler = async (event, context) => {
       console.log(`주의: 사용자 ${userId}의 미출금 포인트: ${profile.points}`)
     }
 
-    // 2. Auth 사용자 삭제 (CASCADE로 user_profiles도 삭제됨)
+    // 2. 관련 데이터 수동 삭제 (CASCADE가 작동하지 않는 경우를 위해)
+    console.log(`사용자 ${userId} 관련 데이터 삭제 시작`)
+
+    // 2-1. applications 삭제
+    const { error: appDeleteError } = await supabaseAdmin
+      .from('applications')
+      .delete()
+      .eq('user_id', userId)
+    if (appDeleteError) {
+      console.log('applications 삭제 오류 (무시):', appDeleteError.message)
+    } else {
+      console.log('applications 삭제 완료')
+    }
+
+    // 2-2. withdrawal_requests 삭제
+    const { error: withdrawalDeleteError } = await supabaseAdmin
+      .from('withdrawal_requests')
+      .delete()
+      .eq('user_id', userId)
+    if (withdrawalDeleteError) {
+      console.log('withdrawal_requests 삭제 오류 (무시):', withdrawalDeleteError.message)
+    } else {
+      console.log('withdrawal_requests 삭제 완료')
+    }
+
+    // 2-3. notifications 삭제
+    const { error: notifDeleteError } = await supabaseAdmin
+      .from('notifications')
+      .delete()
+      .eq('user_id', userId)
+    if (notifDeleteError) {
+      console.log('notifications 삭제 오류 (무시):', notifDeleteError.message)
+    } else {
+      console.log('notifications 삭제 완료')
+    }
+
+    // 2-4. user_profiles 삭제
+    const { error: profileDeleteError } = await supabaseAdmin
+      .from('user_profiles')
+      .delete()
+      .eq('id', userId)
+    if (profileDeleteError) {
+      console.log('user_profiles 삭제 오류 (무시):', profileDeleteError.message)
+    } else {
+      console.log('user_profiles 삭제 완료')
+    }
+
+    console.log(`사용자 ${userId} 관련 데이터 삭제 완료, Auth 사용자 삭제 시작`)
+
+    // 3. Auth 사용자 삭제
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
     if (deleteError) {
