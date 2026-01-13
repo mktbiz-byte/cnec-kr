@@ -301,3 +301,20 @@ ON CONFLICT (id) DO NOTHING;
 npm run build   # 프로덕션 빌드
 npm run dev     # 개발 서버
 ```
+
+---
+
+## 📌 Claude 작업 규칙
+
+### 이 파일 업데이트 시점
+다음 상황에서 CLAUDE.md를 업데이트해주세요:
+1. **새로운 오류 패턴 발견** - "자주 발생하는 오류" 섹션에 추가
+2. **DB 스키마 변경** - 컬럼/테이블 추가/삭제 시 반영
+3. **새 Storage 버킷 추가** - 버킷 목록 업데이트
+4. **중요한 비즈니스 로직 변경** - 회원 탈퇴, 결제 등
+
+### 작업 전 확인사항
+- [ ] user_profiles 컬럼명 확인 (bank_account_number, NOT bank_account)
+- [ ] FK CASCADE 동작 확인 (Auth 삭제 시 데이터 삭제됨)
+- [ ] Storage 버킷 존재 여부 확인
+- [ ] 환경변수 확인 (GMAIL_APP_PASSWORD 등)
