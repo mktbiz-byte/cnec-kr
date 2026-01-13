@@ -47,9 +47,9 @@ exports.handler = async (event, context) => {
 
     const token = authHeader.replace('Bearer ', '')
 
-    // 환경변수 확인
-    const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+    // 환경변수 확인 (VITE_ 접두사와 일반 변수 모두 지원)
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
