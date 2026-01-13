@@ -4,6 +4,74 @@
  */
 
 const { createClient } = require('@supabase/supabase-js')
+const nodemailer = require('nodemailer')
+
+// 탈퇴 완료 이메일 발송 함수
+async function sendDeletionEmail(email) {
+  // SMTP 환경변수 확인
+  const smtpHost = process.env.SMTP_HOST || process.env.GMAIL_SMTP_HOST
+  const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER
+  const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD
+  const smtpPort = process.env.SMTP_PORT || 587
+
+  if (!smtpHost || !smtpUser || !smtpPass) {
+    console.log('SMTP 설정이 없어 탈퇴 이메일을 발송하지 않습니다.')
+    return false
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: parseInt(smtpPort),
+      secure: smtpPort === '465',
+      auth: { user: smtpUser, pass: smtpPass },
+      tls: { rejectUnauthorized: false }
+    })
+
+    await transporter.sendMail({
+      from: `CNEC Korea <${smtpUser}>`,
+      to: email,
+      subject: '[CNEC] 회원 탈퇴가 완료되었습니다',
+      html: `
+        <div style="font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+          <div style="background-color: white; padding: 40px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #1f2937; margin: 0; font-size: 24px;">회원 탈퇴 완료</h1>
+            </div>
+
+            <div style="background-color: #f3f4f6; padding: 24px; border-radius: 12px; margin-bottom: 24px;">
+              <p style="color: #374151; margin: 0; line-height: 1.8; font-size: 15px;">
+                안녕하세요,<br><br>
+                CNEC 회원 탈퇴가 정상적으로 처리되었습니다.<br>
+                그동안 CNEC를 이용해 주셔서 감사합니다.
+              </p>
+            </div>
+
+            <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+              <p style="color: #92400e; margin: 0; font-size: 14px;">
+                ⚠️ 탈퇴 후에는 동일한 이메일로 재가입이 불가능합니다.<br>
+                기존에 진행했던 캠페인 기록은 기업 정산을 위해 일부 보존됩니다.
+              </p>
+            </div>
+
+            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; margin: 0; font-size: 13px;">
+                본 메일은 발신 전용이며, 문의사항은 고객센터로 연락해 주세요.<br>
+                © CNEC Korea. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      `
+    })
+
+    console.log(`탈퇴 완료 이메일 발송 성공: ${email}`)
+    return true
+  } catch (error) {
+    console.log('탈퇴 이메일 발송 실패 (무시):', error.message)
+    return false
+  }
+}
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -166,6 +234,9 @@ exports.handler = async (event, context) => {
     }
 
     console.log('Auth 사용자 완전 차단 완료 (ban + 이메일/비밀번호 변경)')
+
+    // 4. 탈퇴 완료 이메일 발송 (원래 이메일로)
+    await sendDeletionEmail(userEmail)
 
     // 5. 탈퇴 기록 저장 (Auth 삭제 후 - user_id 없이 저장)
     try {
