@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import FourWeekGuideViewer from '../FourWeekGuideViewer'
 import ExternalGuideViewer from '../common/ExternalGuideViewer'
+import OliveYoungGuideViewer from '../OliveYoungGuideViewer'
 
 // 안전하게 값을 문자열로 변환하는 헬퍼 함수
 const renderValue = (value) => {
@@ -1581,7 +1582,7 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step1_guide_ai)}</p>
+                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai} />
                       </div>
                     </div>
                   )}
@@ -1605,7 +1606,7 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step2_guide_ai)}</p>
+                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai} />
                       </div>
                     </div>
                   )}
@@ -1629,7 +1630,7 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step3_guide_ai)}</p>
+                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step3_guide_ai} />
                       </div>
                     </div>
                   )}
