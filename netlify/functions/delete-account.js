@@ -113,51 +113,55 @@ exports.handler = async (event, context) => {
     // 2. 관련 데이터 수동 삭제 (CASCADE가 작동하지 않는 경우를 위해)
     console.log(`사용자 ${userId} 관련 데이터 삭제 시작`)
 
-    // 2-0. account_deletions에서 기존 기록 삭제 (FK 제약 해제)
-    const { error: accountDeletionsError } = await supabaseAdmin
-      .from('account_deletions')
-      .delete()
-      .eq('user_id', userId)
-    if (accountDeletionsError) {
-      console.log('account_deletions 삭제 오류 (무시):', accountDeletionsError.message)
-    } else {
-      console.log('account_deletions 삭제 완료')
+    // 삭제할 테이블 목록 (user_id 컬럼 기준)
+    const tablesToDelete = [
+      { name: 'account_deletions', column: 'user_id' },
+      { name: 'applications', column: 'user_id' },
+      { name: 'withdrawal_requests', column: 'user_id' },
+      { name: 'withdrawals', column: 'user_id' },
+      { name: 'notifications', column: 'user_id' },
+      { name: 'creator_materials', column: 'creator_id' },
+      { name: 'video_references', column: 'user_id' },
+      { name: 'video_submissions', column: 'user_id' },
+      { name: 'cnecplus_applications', column: 'user_id' },
+      { name: 'ai_guide_requests', column: 'user_id' },
+      { name: 'guide_feedbacks', column: 'user_id' },
+    ]
+
+    // 각 테이블에서 사용자 데이터 삭제
+    for (const table of tablesToDelete) {
+      const { error } = await supabaseAdmin
+        .from(table.name)
+        .delete()
+        .eq(table.column, userId)
+      if (error) {
+        console.log(`${table.name} 삭제 오류 (무시):`, error.message)
+      } else {
+        console.log(`${table.name} 삭제 완료`)
+      }
     }
 
-    // 2-1. applications 삭제
-    const { error: appDeleteError } = await supabaseAdmin
-      .from('applications')
-      .delete()
-      .eq('user_id', userId)
-    if (appDeleteError) {
-      console.log('applications 삭제 오류 (무시):', appDeleteError.message)
-    } else {
-      console.log('applications 삭제 완료')
+    // FK가 CASCADE 없이 참조만 하는 테이블들은 NULL로 업데이트
+    const tablesToNullify = [
+      { name: 'faq', column: 'created_by' },
+      { name: 'cnecplus_applications', column: 'reviewed_by' },
+      { name: 'withdrawals', column: 'approved_by' },
+      { name: 'withdrawal_requests', column: 'processed_by' },
+    ]
+
+    for (const table of tablesToNullify) {
+      const { error } = await supabaseAdmin
+        .from(table.name)
+        .update({ [table.column]: null })
+        .eq(table.column, userId)
+      if (error) {
+        console.log(`${table.name}.${table.column} NULL 업데이트 오류 (무시):`, error.message)
+      } else {
+        console.log(`${table.name}.${table.column} NULL 업데이트 완료`)
+      }
     }
 
-    // 2-2. withdrawal_requests 삭제
-    const { error: withdrawalDeleteError } = await supabaseAdmin
-      .from('withdrawal_requests')
-      .delete()
-      .eq('user_id', userId)
-    if (withdrawalDeleteError) {
-      console.log('withdrawal_requests 삭제 오류 (무시):', withdrawalDeleteError.message)
-    } else {
-      console.log('withdrawal_requests 삭제 완료')
-    }
-
-    // 2-3. notifications 삭제
-    const { error: notifDeleteError } = await supabaseAdmin
-      .from('notifications')
-      .delete()
-      .eq('user_id', userId)
-    if (notifDeleteError) {
-      console.log('notifications 삭제 오류 (무시):', notifDeleteError.message)
-    } else {
-      console.log('notifications 삭제 완료')
-    }
-
-    // 2-4. user_profiles 삭제
+    // user_profiles 삭제 (마지막에)
     const { error: profileDeleteError } = await supabaseAdmin
       .from('user_profiles')
       .delete()
