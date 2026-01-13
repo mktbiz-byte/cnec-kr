@@ -1479,6 +1479,28 @@ const ApplicationsPage = () => {
                     const guideData = selectedGuide.personalized_guide
                     const isObject = typeof guideData === 'object' && guideData !== null
 
+                    // 외부 가이드 형식인지 확인 (type이 external_url 또는 url/fileUrl 필드가 있는 경우)
+                    const isExternalGuide = isObject && (
+                      guideData.type === 'external_url' ||
+                      guideData.type === 'pdf' ||
+                      guideData.type?.startsWith('google_') ||
+                      ('url' in guideData && !guideData.hookingPoint && !guideData.coreMessage) ||
+                      ('fileUrl' in guideData && !guideData.hookingPoint && !guideData.coreMessage)
+                    )
+
+                    // 외부 가이드인 경우 ExternalGuideViewer로 렌더링
+                    if (isExternalGuide) {
+                      return (
+                        <ExternalGuideViewer
+                          guideType={guideData.type}
+                          guideUrl={guideData.url}
+                          fileUrl={guideData.fileUrl}
+                          title={guideData.title || selectedGuide.campaigns?.external_guide_title}
+                          fileName={guideData.fileName || selectedGuide.campaigns?.external_guide_file_name}
+                        />
+                      )
+                    }
+
                     // 가이드 섹션들을 카드로 분리
                     const renderGuideSection = (key, value, colorScheme) => {
                       const colors = {
