@@ -110,74 +110,60 @@ exports.handler = async (event, context) => {
       console.log(`주의: 사용자 ${userId}의 미출금 포인트: ${profile.points}`)
     }
 
-    // 2. 개인정보만 삭제/익명화 - 비즈니스 데이터(영상, 지원서 등)는 보존
-    // 기업이 구매한 영상 데이터는 삭제하면 안 됨
-    console.log(`사용자 ${userId} 개인정보 처리 시작`)
+    // 2. 개인정보 익명화 - 비즈니스 데이터(영상, 지원서 등)는 보존
+    // 스키마가 ON DELETE CASCADE로 설정되어 있어서 Auth 삭제 시 모든 데이터가 삭제됨
+    // 따라서 소프트 삭제 방식 사용: Auth는 유지하되 로그인 불가 + 개인정보 익명화
+    console.log(`사용자 ${userId} 개인정보 익명화 시작`)
 
-    // 개인정보 관련 데이터만 삭제 (비즈니스 데이터는 보존)
-    const tablesToDelete = [
-      { name: 'notifications', column: 'user_id' },
-      { name: 'ai_guide_requests', column: 'user_id' },
-      { name: 'guide_feedbacks', column: 'user_id' },
-    ]
-
-    for (const table of tablesToDelete) {
-      const { error } = await supabaseAdmin
-        .from(table.name)
-        .delete()
-        .eq(table.column, userId)
-      if (error) {
-        console.log(`${table.name} 삭제 오류 (무시):`, error.message)
-      } else {
-        console.log(`${table.name} 삭제 완료`)
-      }
-    }
-
-    // user_profiles 개인정보 익명화 (프로필은 삭제하지 않고 익명화)
-    // 이렇게 하면 기존 applications, video_submissions 등의 FK 참조가 유지됨
+    // user_profiles 개인정보 익명화 (실제 존재하는 컬럼만)
     const { error: profileUpdateError } = await supabaseAdmin
       .from('user_profiles')
       .update({
         name: '탈퇴한 사용자',
         phone: null,
-        email: null,
-        profile_image_url: null,
+        bio: null,
         bank_name: null,
-        bank_account: null,
-        bank_holder: null,
-        address: null,
-        detailed_address: null,
-        zip_code: null,
-        is_deleted: true,
-        deleted_at: new Date().toISOString()
+        bank_account_number: null,
+        bank_account_holder: null,
+        resident_number_encrypted: null,
+        instagram_url: null,
+        tiktok_url: null,
+        youtube_url: null,
+        other_sns_url: null
       })
       .eq('id', userId)
 
     if (profileUpdateError) {
-      console.log('user_profiles 익명화 오류 (무시):', profileUpdateError.message)
+      console.log('user_profiles 익명화 오류:', profileUpdateError.message)
     } else {
       console.log('user_profiles 익명화 완료')
     }
 
-    console.log(`사용자 ${userId} 개인정보 처리 완료, Auth 사용자 삭제 시작`)
+    // 3. Auth 사용자 비활성화 (이메일/비밀번호 변경으로 로그인 차단)
+    // 완전 삭제 시 ON DELETE CASCADE로 비즈니스 데이터가 모두 삭제되므로 소프트 삭제 사용
+    const deletedEmail = `deleted_${userId}@deleted.local`
+    const randomPassword = Math.random().toString(36).slice(-16) + Math.random().toString(36).slice(-16)
 
-    // 비즈니스 데이터(applications, video_submissions, withdrawals 등)는 보존
-    // 영상 파일도 삭제하지 않음 - 기업이 구매한 자산이므로
+    const { error: updateAuthError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+      email: deletedEmail,
+      password: randomPassword,
+      email_confirm: true,
+      user_metadata: { deleted: true, deleted_at: new Date().toISOString() }
+    })
 
-    // 4. Auth 사용자 삭제
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
-
-    if (deleteError) {
-      console.error('사용자 삭제 오류:', deleteError)
+    if (updateAuthError) {
+      console.error('Auth 사용자 비활성화 오류:', updateAuthError)
       return {
         statusCode: 500,
         headers,
         body: JSON.stringify({
           error: '회원 탈퇴 처리 중 오류가 발생했습니다.',
-          details: deleteError.message
+          details: updateAuthError.message
         })
       }
     }
+
+    console.log('Auth 사용자 비활성화 완료 (로그인 차단)')
 
     // 5. 탈퇴 기록 저장 (Auth 삭제 후 - user_id 없이 저장)
     try {
