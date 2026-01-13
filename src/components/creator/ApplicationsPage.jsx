@@ -10,6 +10,8 @@ import {
   ShoppingBag, Store, ExternalLink
 } from 'lucide-react'
 import FourWeekGuideViewer from '../FourWeekGuideViewer'
+import ExternalGuideViewer from '../common/ExternalGuideViewer'
+import OliveYoungGuideViewer from '../OliveYoungGuideViewer'
 
 // 안전하게 값을 문자열로 변환하는 헬퍼 함수
 const renderValue = (value) => {
@@ -1008,63 +1010,145 @@ const ApplicationsPage = () => {
                   {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
                       {/* 기획형 캠페인 가이드 */}
-                      {app.campaigns?.campaign_type === 'planned' && app.personalized_guide && (
-                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <BookOpen size={14} className="text-purple-600" />
-                            <span className="text-xs font-semibold text-purple-900">촬영 가이드가 전달되었습니다</span>
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                let guideData = app.personalized_guide
-                                if (typeof guideData === 'string') {
-                                  try { guideData = JSON.parse(guideData) } catch(e) {}
-                                }
-                                setSelectedGuide({
-                                  type: 'planned',
-                                  personalized_guide: guideData,
-                                  additional_message: app.additional_message,
-                                  campaigns: app.campaigns
-                                })
-                                setShowGuideModal(true)
-                              }}
-                              className="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 flex items-center justify-center gap-1"
-                            >
-                              <Eye size={12} /> 가이드 보기
-                            </button>
-                            {app.status === 'filming' && (
-                              <button
-                                onClick={() => handleVideoUpload(app)}
-                                className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
-                              >
-                                <Video size={12} /> 영상 업로드
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                      {app.campaigns?.campaign_type === 'planned' && (
+                        <>
+                          {/* 외부 가이드 모드 */}
+                          {app.campaigns?.guide_delivery_mode === 'external' && (app.campaigns?.external_guide_url || app.campaigns?.external_guide_file_url) && (
+                            <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <BookOpen size={14} className="text-purple-600" />
+                                <span className="text-xs font-semibold text-purple-900">촬영 가이드가 전달되었습니다</span>
+                              </div>
+                              <ExternalGuideViewer
+                                guideType={app.campaigns.external_guide_type}
+                                guideUrl={app.campaigns.external_guide_url}
+                                fileUrl={app.campaigns.external_guide_file_url}
+                                title={app.campaigns.external_guide_title}
+                                fileName={app.campaigns.external_guide_file_name}
+                              />
+                              {app.status === 'filming' && (
+                                <button
+                                  onClick={() => handleVideoUpload(app)}
+                                  className="w-full mt-2 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                                >
+                                  <Video size={12} /> 영상 업로드
+                                </button>
+                              )}
+                            </div>
+                          )}
+                          {/* AI 가이드 모드 (기존) */}
+                          {app.campaigns?.guide_delivery_mode !== 'external' && app.personalized_guide && (
+                            <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <BookOpen size={14} className="text-purple-600" />
+                                <span className="text-xs font-semibold text-purple-900">촬영 가이드가 전달되었습니다</span>
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    let guideData = app.personalized_guide
+                                    if (typeof guideData === 'string') {
+                                      try { guideData = JSON.parse(guideData) } catch(e) {}
+                                    }
+                                    setSelectedGuide({
+                                      type: 'planned',
+                                      personalized_guide: guideData,
+                                      additional_message: app.additional_message,
+                                      campaigns: app.campaigns
+                                    })
+                                    setShowGuideModal(true)
+                                  }}
+                                  className="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 flex items-center justify-center gap-1"
+                                >
+                                  <Eye size={12} /> 가이드 보기
+                                </button>
+                                {app.status === 'filming' && (
+                                  <button
+                                    onClick={() => handleVideoUpload(app)}
+                                    className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                                  >
+                                    <Video size={12} /> 영상 업로드
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* 올리브영 캠페인 가이드 */}
-                      {app.campaigns?.campaign_type === 'oliveyoung' && (app.campaigns?.oliveyoung_step1_guide_ai || app.campaigns?.oliveyoung_step2_guide_ai) && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <BookOpen size={14} className="text-green-600" />
-                            <span className="text-xs font-semibold text-green-900">올리브영 촬영 가이드</span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setSelectedGuide({
-                                type: 'oliveyoung',
-                                campaigns: app.campaigns
-                              })
-                              setShowGuideModal(true)
-                            }}
-                            className="w-full py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
-                          >
-                            <Eye size={12} /> 가이드 보기
-                          </button>
-                        </div>
+                      {app.campaigns?.campaign_type === 'oliveyoung' && (
+                        <>
+                          {/* 외부 가이드 모드 - step별로 표시 */}
+                          {(app.campaigns?.step1_guide_mode === 'external' || app.campaigns?.step2_guide_mode === 'external' || app.campaigns?.step3_guide_mode === 'external') && (
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-3">
+                              <div className="flex items-center gap-2">
+                                <BookOpen size={14} className="text-green-600" />
+                                <span className="text-xs font-semibold text-green-900">올리브영 촬영 가이드</span>
+                              </div>
+                              {/* Step 1 외부 가이드 */}
+                              {app.campaigns?.step1_guide_mode === 'external' && (app.campaigns?.step1_external_url || app.campaigns?.step1_external_file_url) && (
+                                <div>
+                                  <p className="text-xs font-medium text-green-800 mb-2">STEP 1</p>
+                                  <ExternalGuideViewer
+                                    guideType={app.campaigns.step1_external_type}
+                                    guideUrl={app.campaigns.step1_external_url}
+                                    fileUrl={app.campaigns.step1_external_file_url}
+                                    title={app.campaigns.step1_external_title}
+                                    fileName={app.campaigns.step1_external_file_name}
+                                  />
+                                </div>
+                              )}
+                              {/* Step 2 외부 가이드 */}
+                              {app.campaigns?.step2_guide_mode === 'external' && (app.campaigns?.step2_external_url || app.campaigns?.step2_external_file_url) && (
+                                <div>
+                                  <p className="text-xs font-medium text-green-800 mb-2">STEP 2</p>
+                                  <ExternalGuideViewer
+                                    guideType={app.campaigns.step2_external_type}
+                                    guideUrl={app.campaigns.step2_external_url}
+                                    fileUrl={app.campaigns.step2_external_file_url}
+                                    title={app.campaigns.step2_external_title}
+                                    fileName={app.campaigns.step2_external_file_name}
+                                  />
+                                </div>
+                              )}
+                              {/* Step 3 외부 가이드 */}
+                              {app.campaigns?.step3_guide_mode === 'external' && (app.campaigns?.step3_external_url || app.campaigns?.step3_external_file_url) && (
+                                <div>
+                                  <p className="text-xs font-medium text-green-800 mb-2">STEP 3</p>
+                                  <ExternalGuideViewer
+                                    guideType={app.campaigns.step3_external_type}
+                                    guideUrl={app.campaigns.step3_external_url}
+                                    fileUrl={app.campaigns.step3_external_file_url}
+                                    title={app.campaigns.step3_external_title}
+                                    fileName={app.campaigns.step3_external_file_name}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {/* AI 가이드 모드 (기존) */}
+                          {app.campaigns?.step1_guide_mode !== 'external' && app.campaigns?.step2_guide_mode !== 'external' && app.campaigns?.step3_guide_mode !== 'external' && (app.campaigns?.oliveyoung_step1_guide_ai || app.campaigns?.oliveyoung_step2_guide_ai) && (
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <BookOpen size={14} className="text-green-600" />
+                                <span className="text-xs font-semibold text-green-900">올리브영 촬영 가이드</span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  setSelectedGuide({
+                                    type: 'oliveyoung',
+                                    campaigns: app.campaigns
+                                  })
+                                  setShowGuideModal(true)
+                                }}
+                                className="w-full py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                              >
+                                <Eye size={12} /> 가이드 보기
+                              </button>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* 올리브영 캠페인 영상 업로드 버튼 (별도 표시) */}
@@ -1092,26 +1176,92 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 4주 챌린지 캠페인 가이드 */}
-                      {app.campaigns?.campaign_type === '4week_challenge' && app.campaigns?.challenge_weekly_guides_ai && (
-                        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <BookOpen size={14} className="text-indigo-600" />
-                            <span className="text-xs font-semibold text-indigo-900">4주 챌린지 가이드</span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setSelectedGuide({
-                                type: '4week_challenge',
-                                campaigns: app.campaigns,
-                                additional_message: app.additional_message
-                              })
-                              setShowGuideModal(true)
-                            }}
-                            className="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center justify-center gap-1"
-                          >
-                            <Eye size={12} /> 가이드 보기
-                          </button>
-                        </div>
+                      {app.campaigns?.campaign_type === '4week_challenge' && (
+                        <>
+                          {/* 외부 가이드 모드 - week별로 표시 */}
+                          {(app.campaigns?.week1_guide_mode === 'external' || app.campaigns?.week2_guide_mode === 'external' || app.campaigns?.week3_guide_mode === 'external' || app.campaigns?.week4_guide_mode === 'external') && (
+                            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 space-y-3">
+                              <div className="flex items-center gap-2">
+                                <BookOpen size={14} className="text-indigo-600" />
+                                <span className="text-xs font-semibold text-indigo-900">4주 챌린지 가이드</span>
+                              </div>
+                              {/* Week 1 외부 가이드 */}
+                              {app.campaigns?.week1_guide_mode === 'external' && (app.campaigns?.week1_external_url || app.campaigns?.week1_external_file_url) && (
+                                <div>
+                                  <p className="text-xs font-medium text-indigo-800 mb-2">1주차</p>
+                                  <ExternalGuideViewer
+                                    guideType={app.campaigns.week1_external_type}
+                                    guideUrl={app.campaigns.week1_external_url}
+                                    fileUrl={app.campaigns.week1_external_file_url}
+                                    title={app.campaigns.week1_external_title}
+                                    fileName={app.campaigns.week1_external_file_name}
+                                  />
+                                </div>
+                              )}
+                              {/* Week 2 외부 가이드 */}
+                              {app.campaigns?.week2_guide_mode === 'external' && (app.campaigns?.week2_external_url || app.campaigns?.week2_external_file_url) && (
+                                <div>
+                                  <p className="text-xs font-medium text-indigo-800 mb-2">2주차</p>
+                                  <ExternalGuideViewer
+                                    guideType={app.campaigns.week2_external_type}
+                                    guideUrl={app.campaigns.week2_external_url}
+                                    fileUrl={app.campaigns.week2_external_file_url}
+                                    title={app.campaigns.week2_external_title}
+                                    fileName={app.campaigns.week2_external_file_name}
+                                  />
+                                </div>
+                              )}
+                              {/* Week 3 외부 가이드 */}
+                              {app.campaigns?.week3_guide_mode === 'external' && (app.campaigns?.week3_external_url || app.campaigns?.week3_external_file_url) && (
+                                <div>
+                                  <p className="text-xs font-medium text-indigo-800 mb-2">3주차</p>
+                                  <ExternalGuideViewer
+                                    guideType={app.campaigns.week3_external_type}
+                                    guideUrl={app.campaigns.week3_external_url}
+                                    fileUrl={app.campaigns.week3_external_file_url}
+                                    title={app.campaigns.week3_external_title}
+                                    fileName={app.campaigns.week3_external_file_name}
+                                  />
+                                </div>
+                              )}
+                              {/* Week 4 외부 가이드 */}
+                              {app.campaigns?.week4_guide_mode === 'external' && (app.campaigns?.week4_external_url || app.campaigns?.week4_external_file_url) && (
+                                <div>
+                                  <p className="text-xs font-medium text-indigo-800 mb-2">4주차</p>
+                                  <ExternalGuideViewer
+                                    guideType={app.campaigns.week4_external_type}
+                                    guideUrl={app.campaigns.week4_external_url}
+                                    fileUrl={app.campaigns.week4_external_file_url}
+                                    title={app.campaigns.week4_external_title}
+                                    fileName={app.campaigns.week4_external_file_name}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {/* AI 가이드 모드 (기존) */}
+                          {app.campaigns?.week1_guide_mode !== 'external' && app.campaigns?.week2_guide_mode !== 'external' && app.campaigns?.week3_guide_mode !== 'external' && app.campaigns?.week4_guide_mode !== 'external' && app.campaigns?.challenge_weekly_guides_ai && (
+                            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <BookOpen size={14} className="text-indigo-600" />
+                                <span className="text-xs font-semibold text-indigo-900">4주 챌린지 가이드</span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  setSelectedGuide({
+                                    type: '4week_challenge',
+                                    campaigns: app.campaigns,
+                                    additional_message: app.additional_message
+                                  })
+                                  setShowGuideModal(true)
+                                }}
+                                className="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center justify-center gap-1"
+                              >
+                                <Eye size={12} /> 가이드 보기
+                              </button>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* 4주 챌린지: completed/paid 상태에서도 항상 수정 가능 */}
@@ -1329,6 +1479,28 @@ const ApplicationsPage = () => {
                     const guideData = selectedGuide.personalized_guide
                     const isObject = typeof guideData === 'object' && guideData !== null
 
+                    // 외부 가이드 형식인지 확인 (type이 external_url 또는 url/fileUrl 필드가 있는 경우)
+                    const isExternalGuide = isObject && (
+                      guideData.type === 'external_url' ||
+                      guideData.type === 'pdf' ||
+                      guideData.type?.startsWith('google_') ||
+                      ('url' in guideData && !guideData.hookingPoint && !guideData.coreMessage) ||
+                      ('fileUrl' in guideData && !guideData.hookingPoint && !guideData.coreMessage)
+                    )
+
+                    // 외부 가이드인 경우 ExternalGuideViewer로 렌더링
+                    if (isExternalGuide) {
+                      return (
+                        <ExternalGuideViewer
+                          guideType={guideData.type}
+                          guideUrl={guideData.url}
+                          fileUrl={guideData.fileUrl}
+                          title={guideData.title || selectedGuide.campaigns?.external_guide_title}
+                          fileName={guideData.fileName || selectedGuide.campaigns?.external_guide_file_name}
+                        />
+                      )
+                    }
+
                     // 가이드 섹션들을 카드로 분리
                     const renderGuideSection = (key, value, colorScheme) => {
                       const colors = {
@@ -1432,7 +1604,7 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step1_guide_ai)}</p>
+                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai} />
                       </div>
                     </div>
                   )}
@@ -1456,7 +1628,7 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step2_guide_ai)}</p>
+                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai} />
                       </div>
                     </div>
                   )}
@@ -1480,7 +1652,7 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(selectedGuide.campaigns.oliveyoung_step3_guide_ai)}</p>
+                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step3_guide_ai} />
                       </div>
                     </div>
                   )}
