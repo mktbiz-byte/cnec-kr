@@ -110,25 +110,17 @@ exports.handler = async (event, context) => {
       console.log(`주의: 사용자 ${userId}의 미출금 포인트: ${profile.points}`)
     }
 
-    // 2. 관련 데이터 수동 삭제 (CASCADE가 작동하지 않는 경우를 위해)
-    console.log(`사용자 ${userId} 관련 데이터 삭제 시작`)
+    // 2. 개인정보만 삭제/익명화 - 비즈니스 데이터(영상, 지원서 등)는 보존
+    // 기업이 구매한 영상 데이터는 삭제하면 안 됨
+    console.log(`사용자 ${userId} 개인정보 처리 시작`)
 
-    // 삭제할 테이블 목록 (user_id 컬럼 기준)
+    // 개인정보 관련 데이터만 삭제 (비즈니스 데이터는 보존)
     const tablesToDelete = [
-      { name: 'account_deletions', column: 'user_id' },
-      { name: 'applications', column: 'user_id' },
-      { name: 'withdrawal_requests', column: 'user_id' },
-      { name: 'withdrawals', column: 'user_id' },
       { name: 'notifications', column: 'user_id' },
-      { name: 'creator_materials', column: 'creator_id' },
-      { name: 'video_references', column: 'user_id' },
-      { name: 'video_submissions', column: 'user_id' },
-      { name: 'cnecplus_applications', column: 'user_id' },
       { name: 'ai_guide_requests', column: 'user_id' },
       { name: 'guide_feedbacks', column: 'user_id' },
     ]
 
-    // 각 테이블에서 사용자 데이터 삭제
     for (const table of tablesToDelete) {
       const { error } = await supabaseAdmin
         .from(table.name)
@@ -141,73 +133,36 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // FK가 CASCADE 없이 참조만 하는 테이블들은 NULL로 업데이트
-    const tablesToNullify = [
-      { name: 'faq', column: 'created_by' },
-      { name: 'cnecplus_applications', column: 'reviewed_by' },
-      { name: 'withdrawals', column: 'approved_by' },
-      { name: 'withdrawal_requests', column: 'processed_by' },
-    ]
-
-    for (const table of tablesToNullify) {
-      const { error } = await supabaseAdmin
-        .from(table.name)
-        .update({ [table.column]: null })
-        .eq(table.column, userId)
-      if (error) {
-        console.log(`${table.name}.${table.column} NULL 업데이트 오류 (무시):`, error.message)
-      } else {
-        console.log(`${table.name}.${table.column} NULL 업데이트 완료`)
-      }
-    }
-
-    // user_profiles 삭제 (마지막에)
-    const { error: profileDeleteError } = await supabaseAdmin
+    // user_profiles 개인정보 익명화 (프로필은 삭제하지 않고 익명화)
+    // 이렇게 하면 기존 applications, video_submissions 등의 FK 참조가 유지됨
+    const { error: profileUpdateError } = await supabaseAdmin
       .from('user_profiles')
-      .delete()
+      .update({
+        name: '탈퇴한 사용자',
+        phone: null,
+        email: null,
+        profile_image_url: null,
+        bank_name: null,
+        bank_account: null,
+        bank_holder: null,
+        address: null,
+        detailed_address: null,
+        zip_code: null,
+        is_deleted: true,
+        deleted_at: new Date().toISOString()
+      })
       .eq('id', userId)
-    if (profileDeleteError) {
-      console.log('user_profiles 삭제 오류 (무시):', profileDeleteError.message)
+
+    if (profileUpdateError) {
+      console.log('user_profiles 익명화 오류 (무시):', profileUpdateError.message)
     } else {
-      console.log('user_profiles 삭제 완료')
+      console.log('user_profiles 익명화 완료')
     }
 
-    console.log(`사용자 ${userId} 관련 데이터 삭제 완료, Storage 파일 삭제 시작`)
+    console.log(`사용자 ${userId} 개인정보 처리 완료, Auth 사용자 삭제 시작`)
 
-    // 3. Storage 파일 삭제 (사용자 폴더)
-    const storageBuckets = ['campaign-videos', 'profile-images', 'creator-materials']
-    for (const bucket of storageBuckets) {
-      try {
-        // 사용자 ID로 시작하는 파일들 목록 조회
-        const { data: files, error: listError } = await supabaseAdmin.storage
-          .from(bucket)
-          .list(userId)
-
-        if (listError) {
-          console.log(`${bucket} 파일 목록 조회 오류 (무시):`, listError.message)
-          continue
-        }
-
-        if (files && files.length > 0) {
-          const filePaths = files.map(f => `${userId}/${f.name}`)
-          const { error: deleteStorageError } = await supabaseAdmin.storage
-            .from(bucket)
-            .remove(filePaths)
-
-          if (deleteStorageError) {
-            console.log(`${bucket} 파일 삭제 오류 (무시):`, deleteStorageError.message)
-          } else {
-            console.log(`${bucket} 파일 ${files.length}개 삭제 완료`)
-          }
-        } else {
-          console.log(`${bucket} 삭제할 파일 없음`)
-        }
-      } catch (storageErr) {
-        console.log(`${bucket} Storage 처리 오류 (무시):`, storageErr.message)
-      }
-    }
-
-    console.log('Storage 파일 삭제 완료, Auth 사용자 삭제 시작')
+    // 비즈니스 데이터(applications, video_submissions, withdrawals 등)는 보존
+    // 영상 파일도 삭제하지 않음 - 기업이 구매한 자산이므로
 
     // 4. Auth 사용자 삭제
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)

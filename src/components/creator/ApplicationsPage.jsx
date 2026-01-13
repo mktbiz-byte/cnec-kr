@@ -7,7 +7,7 @@ import {
   Upload, Target, Loader2, Calendar, Truck, Camera,
   Eye, X, BookOpen, Video, CheckCircle2, AlertCircle,
   Play, Copy, Gift, Zap, MessageSquare, Ban, Hash, Tag,
-  ShoppingBag, Store, ExternalLink
+  ShoppingBag, Store, ExternalLink, Link2, AlertTriangle
 } from 'lucide-react'
 import FourWeekGuideViewer from '../FourWeekGuideViewer'
 import ExternalGuideViewer from '../common/ExternalGuideViewer'
@@ -1585,7 +1585,8 @@ const ApplicationsPage = () => {
               {/* 올리브영 가이드 내용 */}
               {selectedGuide.type === 'oliveyoung' && (
                 <div className="space-y-4">
-                  {selectedGuide.campaigns?.oliveyoung_step1_guide_ai && (
+                  {/* STEP 1 */}
+                  {(selectedGuide.campaigns?.step1_guide_mode === 'external' || selectedGuide.campaigns?.oliveyoung_step1_guide_ai) && (
                     <div className="relative overflow-hidden rounded-3xl bg-green-50 border border-green-100 p-5">
                       <div className="absolute top-0 right-0 p-4 opacity-5">
                         <Video size={80} className="text-green-900" />
@@ -1596,7 +1597,7 @@ const ApplicationsPage = () => {
                             <div className="bg-green-500 text-white p-1.5 rounded-lg shadow-sm">
                               <Play size={16} fill="white" />
                             </div>
-                            <span className="font-bold text-green-900 text-base">1차 촬영 가이드</span>
+                            <span className="font-bold text-green-900 text-base">STEP 1: 세일 전 영상</span>
                           </div>
                           {selectedGuide.campaigns?.step1_deadline && (
                             <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-lg">
@@ -1604,12 +1605,24 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai} />
+                        {/* 외부 가이드 모드 */}
+                        {selectedGuide.campaigns?.step1_guide_mode === 'external' && (selectedGuide.campaigns?.step1_external_url || selectedGuide.campaigns?.step1_external_file_url) ? (
+                          <ExternalGuideViewer
+                            guideType={selectedGuide.campaigns.step1_external_type}
+                            guideUrl={selectedGuide.campaigns.step1_external_url}
+                            fileUrl={selectedGuide.campaigns.step1_external_file_url}
+                            title={selectedGuide.campaigns.step1_external_title}
+                            fileName={selectedGuide.campaigns.step1_external_file_name}
+                          />
+                        ) : selectedGuide.campaigns?.oliveyoung_step1_guide_ai ? (
+                          <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai} />
+                        ) : null}
                       </div>
                     </div>
                   )}
 
-                  {selectedGuide.campaigns?.oliveyoung_step2_guide_ai && (
+                  {/* STEP 2 */}
+                  {(selectedGuide.campaigns?.step2_guide_mode === 'external' || selectedGuide.campaigns?.oliveyoung_step2_guide_ai) && (
                     <div className="relative overflow-hidden rounded-3xl bg-blue-50 border border-blue-100 p-5">
                       <div className="absolute top-0 right-0 p-4 opacity-5">
                         <Video size={80} className="text-blue-900" />
@@ -1620,7 +1633,7 @@ const ApplicationsPage = () => {
                             <div className="bg-blue-500 text-white p-1.5 rounded-lg shadow-sm">
                               <Play size={16} fill="white" />
                             </div>
-                            <span className="font-bold text-blue-900 text-base">2차 촬영 가이드</span>
+                            <span className="font-bold text-blue-900 text-base">STEP 2: 세일 당일 영상</span>
                           </div>
                           {selectedGuide.campaigns?.step2_deadline && (
                             <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-lg">
@@ -1628,23 +1641,35 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai} />
+                        {/* 외부 가이드 모드 */}
+                        {selectedGuide.campaigns?.step2_guide_mode === 'external' && (selectedGuide.campaigns?.step2_external_url || selectedGuide.campaigns?.step2_external_file_url) ? (
+                          <ExternalGuideViewer
+                            guideType={selectedGuide.campaigns.step2_external_type}
+                            guideUrl={selectedGuide.campaigns.step2_external_url}
+                            fileUrl={selectedGuide.campaigns.step2_external_file_url}
+                            title={selectedGuide.campaigns.step2_external_title}
+                            fileName={selectedGuide.campaigns.step2_external_file_name}
+                          />
+                        ) : selectedGuide.campaigns?.oliveyoung_step2_guide_ai ? (
+                          <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai} />
+                        ) : null}
                       </div>
                     </div>
                   )}
 
-                  {selectedGuide.campaigns?.oliveyoung_step3_guide_ai && (
-                    <div className="relative overflow-hidden rounded-3xl bg-purple-50 border border-purple-100 p-5">
+                  {/* STEP 3: 스토리 링크 업로드 안내 */}
+                  {(selectedGuide.campaigns?.step3_deadline || selectedGuide.campaigns?.product_link) && (
+                    <div className="relative overflow-hidden rounded-3xl bg-pink-50 border border-pink-200 p-5">
                       <div className="absolute top-0 right-0 p-4 opacity-5">
-                        <Video size={80} className="text-purple-900" />
+                        <Link2 size={80} className="text-pink-900" />
                       </div>
                       <div className="relative z-10">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <div className="bg-purple-500 text-white p-1.5 rounded-lg shadow-sm">
-                              <Play size={16} fill="white" />
+                            <div className="bg-pink-500 text-white p-1.5 rounded-lg shadow-sm">
+                              <Link2 size={16} />
                             </div>
-                            <span className="font-bold text-purple-900 text-base">3차 촬영 가이드</span>
+                            <span className="font-bold text-pink-900 text-base">🚀 STEP 3: 인스타그램 스토리 링크 업로드 안내</span>
                           </div>
                           {selectedGuide.campaigns?.step3_deadline && (
                             <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-lg">
@@ -1652,7 +1677,58 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step3_guide_ai} />
+
+                        {/* 안내 문구 */}
+                        <p className="text-sm text-gray-700 mb-4">
+                          STEP 2 영상에 아래 제품 구매 링크(URL)를 삽입하여 지정된 날짜에 맞춰 업로드해 주세요.
+                        </p>
+
+                        {/* 중요 사항 */}
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <AlertTriangle size={16} className="text-yellow-600" />
+                            <span className="text-sm font-bold text-yellow-800">중요 사항:</span>
+                          </div>
+                          <ul className="text-sm text-gray-700 space-y-1.5">
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600">•</span>
+                              <span><strong>플랫폼:</strong> 인스타그램 스토리 한정</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600">•</span>
+                              <span><strong>업로드 기한:</strong> {selectedGuide.campaigns?.step3_deadline ? new Date(selectedGuide.campaigns.step3_deadline).toLocaleDateString('ko-KR', {year: 'numeric', month: 'long', day: 'numeric'}) : '-'}</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600">•</span>
+                              <span><strong>유지 기간:</strong> 24시간 이상 필수 유지</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600">•</span>
+                              <span><strong>URL 삽입 위치:</strong> 스토리 링크 스티커</span>
+                            </li>
+                          </ul>
+                          <p className="text-xs text-red-600 mt-3 font-medium">
+                            ※ 24시간 이내 삭제 시 캠페인 규정 위반으로 처리될 수 있습니다.
+                          </p>
+                        </div>
+
+                        {/* 제품 구매 링크 */}
+                        {selectedGuide.campaigns?.product_link && (
+                          <div className="bg-white border-2 border-pink-200 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                              <Link2 size={16} className="text-pink-600" />
+                              <span className="text-sm font-bold text-gray-800">스토리에 삽입할 제품 구매 링크</span>
+                            </div>
+                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                              <p className="text-sm text-blue-600 break-all font-mono">
+                                {selectedGuide.campaigns.product_link}
+                              </p>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                              <span>💡</span> 위 링크를 복사하여 인스타그램 스토리 링크 스티커에 삽입해 주세요.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1696,11 +1772,12 @@ const ApplicationsPage = () => {
               )}
 
               {/* 4주 챌린지 가이드 내용 */}
-              {selectedGuide.type === '4week_challenge' && selectedGuide.campaigns?.challenge_weekly_guides_ai && (
+              {selectedGuide.type === '4week_challenge' && (
                 <FourWeekGuideViewer
-                  guides={selectedGuide.campaigns.challenge_weekly_guides_ai}
-                  basicGuides={selectedGuide.campaigns.challenge_weekly_guides}
+                  guides={selectedGuide.campaigns?.challenge_weekly_guides_ai}
+                  basicGuides={selectedGuide.campaigns?.challenge_weekly_guides}
                   commonMessage={selectedGuide.additional_message}
+                  campaigns={selectedGuide.campaigns}
                 />
               )}
 
