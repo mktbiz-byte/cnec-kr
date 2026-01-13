@@ -172,9 +172,44 @@ exports.handler = async (event, context) => {
       console.log('user_profiles 삭제 완료')
     }
 
-    console.log(`사용자 ${userId} 관련 데이터 삭제 완료, Auth 사용자 삭제 시작`)
+    console.log(`사용자 ${userId} 관련 데이터 삭제 완료, Storage 파일 삭제 시작`)
 
-    // 3. Auth 사용자 삭제
+    // 3. Storage 파일 삭제 (사용자 폴더)
+    const storageBuckets = ['campaign-videos', 'profile-images', 'creator-materials']
+    for (const bucket of storageBuckets) {
+      try {
+        // 사용자 ID로 시작하는 파일들 목록 조회
+        const { data: files, error: listError } = await supabaseAdmin.storage
+          .from(bucket)
+          .list(userId)
+
+        if (listError) {
+          console.log(`${bucket} 파일 목록 조회 오류 (무시):`, listError.message)
+          continue
+        }
+
+        if (files && files.length > 0) {
+          const filePaths = files.map(f => `${userId}/${f.name}`)
+          const { error: deleteStorageError } = await supabaseAdmin.storage
+            .from(bucket)
+            .remove(filePaths)
+
+          if (deleteStorageError) {
+            console.log(`${bucket} 파일 삭제 오류 (무시):`, deleteStorageError.message)
+          } else {
+            console.log(`${bucket} 파일 ${files.length}개 삭제 완료`)
+          }
+        } else {
+          console.log(`${bucket} 삭제할 파일 없음`)
+        }
+      } catch (storageErr) {
+        console.log(`${bucket} Storage 처리 오류 (무시):`, storageErr.message)
+      }
+    }
+
+    console.log('Storage 파일 삭제 완료, Auth 사용자 삭제 시작')
+
+    // 4. Auth 사용자 삭제
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
     if (deleteError) {
@@ -189,7 +224,7 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // 4. 탈퇴 기록 저장 (Auth 삭제 후 - user_id 없이 저장)
+    // 5. 탈퇴 기록 저장 (Auth 삭제 후 - user_id 없이 저장)
     try {
       await supabaseAdmin.from('account_deletions').insert({
         email: userEmail,
