@@ -139,20 +139,22 @@ exports.handler = async (event, context) => {
       console.log('user_profiles 익명화 완료')
     }
 
-    // 3. Auth 사용자 비활성화 (이메일/비밀번호 변경으로 로그인 차단)
+    // 3. Auth 사용자 완전 차단 (ban + 이메일/비밀번호 변경)
     // 완전 삭제 시 ON DELETE CASCADE로 비즈니스 데이터가 모두 삭제되므로 소프트 삭제 사용
-    const deletedEmail = `deleted_${userId}@deleted.local`
-    const randomPassword = Math.random().toString(36).slice(-16) + Math.random().toString(36).slice(-16)
+    const deletedEmail = `deleted_${userId}_${Date.now()}@deleted.local`
+    const randomPassword = Math.random().toString(36).slice(-16) + Math.random().toString(36).slice(-16) + '!@#'
 
     const { error: updateAuthError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       email: deletedEmail,
       password: randomPassword,
       email_confirm: true,
-      user_metadata: { deleted: true, deleted_at: new Date().toISOString() }
+      ban_duration: '876000h', // 100년 밴 (영구 차단)
+      user_metadata: { deleted: true, deleted_at: new Date().toISOString() },
+      app_metadata: { banned: true, banned_at: new Date().toISOString() }
     })
 
     if (updateAuthError) {
-      console.error('Auth 사용자 비활성화 오류:', updateAuthError)
+      console.error('Auth 사용자 차단 오류:', updateAuthError)
       return {
         statusCode: 500,
         headers,
@@ -163,7 +165,7 @@ exports.handler = async (event, context) => {
       }
     }
 
-    console.log('Auth 사용자 비활성화 완료 (로그인 차단)')
+    console.log('Auth 사용자 완전 차단 완료 (ban + 이메일/비밀번호 변경)')
 
     // 5. 탈퇴 기록 저장 (Auth 삭제 후 - user_id 없이 저장)
     try {
