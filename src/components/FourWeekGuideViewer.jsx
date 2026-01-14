@@ -1,35 +1,57 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 /**
  * 4주 챌린지 캠페인 가이드 뷰어 컴포넌트
- * 주차별 탭으로 구분하여 표시
+ * 주차별 탭으로 구분하여 표시 (가이드가 있는 주차만 표시)
  */
 export default function FourWeekGuideViewer({ guides, individualMessages, currentWeek, basicGuides, commonMessage }) {
-  const [activeWeek, setActiveWeek] = useState(currentWeek || 'week1')
-
-  if (!guides) {
-    return null
-  }
-
-  // 문자열인 경우 파싱 시도
-  let parsedGuides = guides
-  if (typeof guides === 'string') {
-    try {
-      parsedGuides = JSON.parse(guides)
-    } catch (e) {
-      console.error('Failed to parse guides:', e)
-      return null
+  // 가이드가 있는 첫 번째 주차 찾기
+  const getFirstAvailableWeek = (parsedGuides) => {
+    if (!parsedGuides) return 'week1'
+    for (const week of ['week1', 'week2', 'week3', 'week4']) {
+      const guide = parsedGuides[week]
+      if (guide && (typeof guide === 'string' ? guide.trim() : Object.keys(guide).length > 0)) {
+        return week
+      }
     }
+    return 'week1'
   }
 
-  // 배열 형식인 경우 객체 형식으로 변환
-  // [guide1, guide2, guide3, guide4] -> {week1: guide1, week2: guide2, week3: guide3, week4: guide4}
-  if (Array.isArray(parsedGuides)) {
-    const converted = {}
-    parsedGuides.forEach((guide, idx) => {
-      converted[`week${idx + 1}`] = guide
-    })
-    parsedGuides = converted
+  // guides 파싱을 먼저 수행
+  const parsedGuidesInitial = useMemo(() => {
+    if (!guides) return null
+    if (typeof guides === 'string') {
+      try {
+        const parsed = JSON.parse(guides)
+        if (Array.isArray(parsed)) {
+          const converted = {}
+          parsed.forEach((guide, idx) => {
+            converted[`week${idx + 1}`] = guide
+          })
+          return converted
+        }
+        return parsed
+      } catch (e) {
+        return null
+      }
+    }
+    if (Array.isArray(guides)) {
+      const converted = {}
+      guides.forEach((guide, idx) => {
+        converted[`week${idx + 1}`] = guide
+      })
+      return converted
+    }
+    return guides
+  }, [guides])
+
+  const [activeWeek, setActiveWeek] = useState(currentWeek || getFirstAvailableWeek(parsedGuidesInitial))
+
+  // parsedGuidesInitial을 사용 (이미 useMemo로 파싱됨)
+  const parsedGuides = parsedGuidesInitial
+
+  if (!parsedGuides) {
+    return null
   }
 
   // 기본 가이드 파싱
@@ -95,21 +117,29 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
         </div>
       )}
 
-      {/* 주차 탭 */}
+      {/* 주차 탭 - 가이드가 있는 주차만 표시 */}
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {['week1', 'week2', 'week3', 'week4'].map((week, idx) => (
-          <button
-            key={week}
-            onClick={() => setActiveWeek(week)}
-            className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
-              activeWeek === week
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {idx + 1}주차
-          </button>
-        ))}
+        {['week1', 'week2', 'week3', 'week4'].map((week, idx) => {
+          // 해당 주차에 가이드 데이터가 있는지 확인
+          const hasGuide = parsedGuides[week] &&
+            (typeof parsedGuides[week] === 'string' ? parsedGuides[week].trim() : Object.keys(parsedGuides[week]).length > 0)
+
+          if (!hasGuide) return null
+
+          return (
+            <button
+              key={week}
+              onClick={() => setActiveWeek(week)}
+              className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
+                activeWeek === week
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {idx + 1}주차
+            </button>
+          )
+        })}
       </div>
 
       {/* 개별 전달사항 - 최상단 */}
