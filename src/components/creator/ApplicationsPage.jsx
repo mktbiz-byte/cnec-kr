@@ -1701,6 +1701,12 @@ const ApplicationsPage = () => {
                   guides={selectedGuide.campaigns.challenge_weekly_guides_ai}
                   basicGuides={selectedGuide.campaigns.challenge_weekly_guides}
                   commonMessage={selectedGuide.additional_message}
+                  guideDeliveryStatus={{
+                    week1: selectedGuide.week1_guide_delivered || false,
+                    week2: selectedGuide.week2_guide_delivered || false,
+                    week3: selectedGuide.week3_guide_delivered || false,
+                    week4: selectedGuide.week4_guide_delivered || false
+                  }}
                 />
               )}
 

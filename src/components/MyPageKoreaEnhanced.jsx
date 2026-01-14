@@ -1605,13 +1605,22 @@ const MyPageKoreaEnhanced = () => {
                   const weeklyGuides = customGuide || campaign.challenge_weekly_guides_ai
                   const basicGuides = campaign.challenge_weekly_guides
 
+                  // 주차별 가이드 발송 상태 구성
+                  const guideDeliveryStatus = {
+                    week1: selectedGuide.week1_guide_delivered || false,
+                    week2: selectedGuide.week2_guide_delivered || false,
+                    week3: selectedGuide.week3_guide_delivered || false,
+                    week4: selectedGuide.week4_guide_delivered || false
+                  }
+
                   return (
                     <div>
                       {weeklyGuides ? (
-                        <FourWeekGuideViewer 
+                        <FourWeekGuideViewer
                           guides={weeklyGuides}
                           basicGuides={basicGuides}
                           commonMessage={selectedGuide.additional_message}
+                          guideDeliveryStatus={guideDeliveryStatus}
                         />
                       ) : (
                         <div className="text-center py-8 text-gray-500">

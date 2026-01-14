@@ -2,15 +2,21 @@ import { useState, useMemo } from 'react'
 
 /**
  * 4주 챌린지 캠페인 가이드 뷰어 컴포넌트
- * 주차별 탭으로 구분하여 표시 (가이드가 있는 주차만 표시)
+ * 주차별 탭으로 구분하여 표시 (가이드가 발송된 주차만 표시)
+ *
+ * @param {Object} guideDeliveryStatus - 주차별 가이드 발송 상태
+ *   예: { week1: true, week2: false, week3: false, week4: false }
  */
-export default function FourWeekGuideViewer({ guides, individualMessages, currentWeek, basicGuides, commonMessage }) {
-  // 가이드가 있는 첫 번째 주차 찾기
-  const getFirstAvailableWeek = (parsedGuides) => {
+export default function FourWeekGuideViewer({ guides, individualMessages, currentWeek, basicGuides, commonMessage, guideDeliveryStatus }) {
+  // 가이드가 발송된 첫 번째 주차 찾기
+  const getFirstAvailableWeek = (parsedGuides, deliveryStatus) => {
     if (!parsedGuides) return 'week1'
     for (const week of ['week1', 'week2', 'week3', 'week4']) {
       const guide = parsedGuides[week]
-      if (guide && (typeof guide === 'string' ? guide.trim() : Object.keys(guide).length > 0)) {
+      const hasGuide = guide && (typeof guide === 'string' ? guide.trim() : Object.keys(guide).length > 0)
+      // 발송 상태가 전달된 경우 해당 조건도 체크
+      const isDelivered = !deliveryStatus || deliveryStatus[week]
+      if (hasGuide && isDelivered) {
         return week
       }
     }
@@ -45,7 +51,7 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
     return guides
   }, [guides])
 
-  const [activeWeek, setActiveWeek] = useState(currentWeek || getFirstAvailableWeek(parsedGuidesInitial))
+  const [activeWeek, setActiveWeek] = useState(currentWeek || getFirstAvailableWeek(parsedGuidesInitial, guideDeliveryStatus))
 
   // parsedGuidesInitial을 사용 (이미 useMemo로 파싱됨)
   const parsedGuides = parsedGuidesInitial
@@ -117,14 +123,18 @@ export default function FourWeekGuideViewer({ guides, individualMessages, curren
         </div>
       )}
 
-      {/* 주차 탭 - 가이드가 있는 주차만 표시 */}
+      {/* 주차 탭 - 가이드가 발송된 주차만 표시 */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {['week1', 'week2', 'week3', 'week4'].map((week, idx) => {
           // 해당 주차에 가이드 데이터가 있는지 확인
           const hasGuide = parsedGuides[week] &&
             (typeof parsedGuides[week] === 'string' ? parsedGuides[week].trim() : Object.keys(parsedGuides[week]).length > 0)
 
-          if (!hasGuide) return null
+          // 가이드 발송 상태 확인 (guideDeliveryStatus가 없으면 가이드 데이터 유무로만 판단)
+          const isDelivered = !guideDeliveryStatus || guideDeliveryStatus[week]
+
+          // 가이드가 없거나 발송되지 않은 주차는 표시하지 않음
+          if (!hasGuide || !isDelivered) return null
 
           return (
             <button
