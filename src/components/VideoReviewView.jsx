@@ -245,13 +245,13 @@ export default function VideoReviewView() {
       const filePath = `video-submissions/${fileName}`
 
       const { error: uploadError } = await supabase.storage
-        .from('videos')
+        .from('campaign-videos')
         .upload(filePath, file)
 
       if (uploadError) throw uploadError
 
       const { data: { publicUrl } } = supabase.storage
-        .from('videos')
+        .from('campaign-videos')
         .getPublicUrl(filePath)
 
       // 새 버전으로 INSERT (기존 레코드 덮어쓰기 대신)
