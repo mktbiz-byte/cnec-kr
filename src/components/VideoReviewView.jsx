@@ -456,6 +456,26 @@ export default function VideoReviewView() {
           </div>
         </div>
 
+        {/* 경고 배너 - 수정 요청 완료 대기 안내 */}
+        <div className="px-4 pt-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-bold">!</span>
+              </div>
+              <div>
+                <p className="text-sm text-amber-900 font-bold mb-1">
+                  수정 전 확인해 주세요!
+                </p>
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  기업에서 수정요청 알림톡 또는 메일을 받은 후에 수정을 시작해 주세요.
+                  수정요청서가 모두 작성되지 않은 상태에서 수정하시면 <strong>이중 수정작업</strong>이 발생할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 영상 플레이어 */}
         <div className="px-4 pt-4">
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
