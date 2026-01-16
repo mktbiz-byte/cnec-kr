@@ -448,6 +448,20 @@ const ProfileSettings = () => {
       <div className="max-w-md mx-auto px-4 py-6 space-y-8">
         {/* 프로필 사진 */}
         <div className="flex flex-col items-center">
+          {/* 프로필 사진 미등록 시 권유 배너 */}
+          {!photoPreview && (
+            <div className="w-full mb-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Camera className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm">프로필 사진을 꼭 등록해 주세요!</p>
+                  <p className="text-xs text-white/90 mt-0.5">프로필 사진이 있으면 캠페인 선정률이 3배 높아져요</p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="relative">
             <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
               {photoPreview ? (
