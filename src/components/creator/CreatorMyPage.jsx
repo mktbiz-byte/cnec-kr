@@ -52,8 +52,9 @@ const CreatorMyPage = () => {
   const [wishlistCampaigns, setWishlistCampaigns] = useState([])
   const [wishlistLoading, setWishlistLoading] = useState(false)
 
-  // 한국 주요 은행 목록 (레거시 18개 은행)
+  // 한국 주요 은행 목록 (팝빌 API 지원 은행)
   const koreanBanks = [
+    // 시중은행
     'KB국민은행',
     '신한은행',
     '우리은행',
@@ -63,15 +64,26 @@ const CreatorMyPage = () => {
     'SC제일은행',
     '한국씨티은행',
     'KDB산업은행',
+    // 지방은행
     '경남은행',
     '광주은행',
     '대구은행',
     '부산은행',
     '전북은행',
     '제주은행',
+    // 인터넷전문은행
     '카카오뱅크',
     '케이뱅크',
-    '토스뱅크'
+    '토스뱅크',
+    // 특수은행/금고
+    '새마을금고',
+    '신협',
+    '우체국',
+    '수협은행',
+    '농축협',
+    '산림조합중앙회',
+    // 저축은행
+    '저축은행'
   ]
 
   useEffect(() => {
