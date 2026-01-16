@@ -422,7 +422,7 @@ const ProfileSettings = () => {
       {/* 헤더 */}
       <div className="sticky top-0 z-10 bg-white border-b">
         <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
-          <button onClick={() => navigate('/my/applications')} className="p-2 -ml-2">
+          <button onClick={() => navigate('/')} className="p-2 -ml-2">
             <ArrowLeft size={24} className="text-gray-900" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">프로필 설정</h1>
