@@ -583,7 +583,7 @@ const CreatorMyPage = () => {
                     <p className="text-sm text-white/80">SNS 연결하고 캠페인에 지원하세요</p>
                   </div>
                   <button
-                    onClick={() => { setActiveSection('profile'); setIsEditing(true); }}
+                    onClick={() => navigate('/profile')}
                     className="px-4 py-2 bg-white text-violet-600 rounded-xl font-bold text-sm"
                   >
                     완성하기
