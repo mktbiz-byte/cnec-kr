@@ -5,7 +5,7 @@ popbill.config({
   LinkID: process.env.POPBILL_LINK_ID || 'HOWLAB',
   SecretKey: process.env.POPBILL_SECRET_KEY || '7UZg/CZJ4i7VDx49H27E+bczug5//kThjrjfEeu9JOk=',
   IsTest: process.env.POPBILL_TEST_MODE === 'true',
-  IPRestrictOnOff: true,
+  IPRestrictOnOff: false,
   UseStaticIP: false,
   UseLocalTimeYN: true,
   defaultErrorHandler: function (Error) {
