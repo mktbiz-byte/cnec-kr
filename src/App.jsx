@@ -62,6 +62,10 @@ import SecretAdminLogin from './components/SecretAdminLogin';
 import TestAdminLogin from './components/TestAdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// 법적 페이지
+import TermsPage from './components/legal/TermsPage';
+import PrivacyPage from './components/legal/PrivacyPage';
+
 const AppContent = () => {
   const { user } = useAuth();
 
@@ -117,6 +121,10 @@ const AppContent = () => {
         <Route path="/submit-oliveyoung-video/:campaignId" element={<OliveyoungVideoSubmissionPage />} />
         <Route path="/submit-4week-video/:campaignId" element={<FourWeekVideoSubmissionPage />} />
         <Route path="/video-review/:submissionId" element={<VideoReviewView />} />
+
+        {/* 법적 페이지 */}
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* 관리자 페이지 */}
         <Route path="/secret-admin-login" element={<SecretAdminLogin />} />

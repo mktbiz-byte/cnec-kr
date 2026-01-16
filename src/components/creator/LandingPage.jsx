@@ -318,17 +318,34 @@ const LandingPage = () => {
         </section>
 
         {/* 푸터 */}
-        <footer className="pt-6 border-t border-gray-200">
-          <div className="flex flex-col items-center">
+        <footer className="pt-8 pb-6 border-t border-gray-200">
+          <div className="flex flex-col items-center px-4">
             <img src={cnecLogo} alt="CNEC" className="h-5 opacity-40 mb-4" />
-            <div className="flex gap-4 text-xs text-gray-400 mb-4">
-              <a href="#" className="hover:text-gray-600">이용약관</a>
-              <a href="#" className="hover:text-gray-600">개인정보처리방침</a>
-              <a href="#" className="hover:text-gray-600">고객센터</a>
+
+            {/* 링크 */}
+            <div className="flex gap-4 text-xs text-gray-400 mb-6">
+              <Link to="/terms" className="hover:text-gray-600">이용약관</Link>
+              <Link to="/privacy" className="hover:text-gray-600 font-bold">개인정보처리방침</Link>
+              <a href="https://pf.kakao.com/_TjhGG" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600">고객센터</a>
             </div>
-            <p className="text-xs text-gray-400">
-              © 2024 CNEC. All rights reserved.
-            </p>
+
+            {/* 회사 정보 */}
+            <div className="text-center text-[11px] text-gray-400 leading-relaxed space-y-1">
+              <p>
+                <span className="font-medium">주식회사 하우파파</span>
+                <span className="mx-2">|</span>
+                대표 박현용
+              </p>
+              <p>
+                개인정보관리책임자: 이지훈 (howpapa@howpapa.co.kr)
+              </p>
+              <p>
+                주소: 서울 중구 퇴계로36길 2 동국대학교 충무로 영상센터 1009호
+              </p>
+              <p className="pt-2">
+                © 2024 CNEC. All rights reserved.
+              </p>
+            </div>
           </div>
         </footer>
       </div>

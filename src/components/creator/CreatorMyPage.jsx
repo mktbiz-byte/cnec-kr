@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { database, supabase } from '../../lib/supabase'
 import {
@@ -835,6 +835,21 @@ const CreatorMyPage = () => {
                 </div>
                 <ChevronRight size={18} className="text-gray-300" />
               </button>
+            </div>
+          </div>
+
+          {/* 푸터 */}
+          <div className="mx-5 mt-8 mb-4">
+            <div className="flex justify-center gap-4 text-xs text-gray-400 mb-4">
+              <Link to="/terms" className="hover:text-gray-600">이용약관</Link>
+              <Link to="/privacy" className="hover:text-gray-600 font-medium">개인정보처리방침</Link>
+              <a href="https://pf.kakao.com/_TjhGG" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600">고객센터</a>
+            </div>
+            <div className="text-center text-[10px] text-gray-400 leading-relaxed space-y-0.5">
+              <p>주식회사 하우파파 | 대표 박현용</p>
+              <p>개인정보관리책임자: 이지훈 (howpapa@howpapa.co.kr)</p>
+              <p>서울 중구 퇴계로36길 2 동국대학교 충무로 영상센터 1009호</p>
+              <p className="pt-1">© 2024 CNEC. All rights reserved.</p>
             </div>
           </div>
         </>
