@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { database, supabase } from '../../lib/supabase'
 import {
   DollarSign, FileText, ChevronRight,
-  Gift, Target, Loader2, Sparkles
+  Gift, Target, Loader2, Sparkles, Camera, X
 } from 'lucide-react'
 
 // 등급 설정 (PRD 기준)
@@ -157,6 +157,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
+  const [showProfilePhotoBanner, setShowProfilePhotoBanner] = useState(true)
   const [stats, setStats] = useState({
     pendingEarnings: 0,
     activeCampaigns: 0,
@@ -359,6 +360,34 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
   return (
     <div className="px-5 pt-5 pb-8">
+      {/* 프로필 사진 미등록 시 상단 배너 */}
+      {showProfilePhotoBanner && !profile?.profile_image && (
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 mb-5 text-white relative overflow-hidden">
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+          <button
+            onClick={() => setShowProfilePhotoBanner(false)}
+            className="absolute top-3 right-3 p-1 hover:bg-white/20 rounded-full transition-colors"
+          >
+            <X size={18} />
+          </button>
+          <div className="flex items-center gap-3 pr-6">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <Camera size={24} />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-base">프로필 사진을 등록하지 않으셨네요?</p>
+              <p className="text-sm text-white/90 mt-0.5">선정률 300% 높이는 방법, 지금 바로 등록하세요!</p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/profile')}
+            className="mt-3 w-full py-2.5 bg-white text-orange-600 font-bold text-sm rounded-xl hover:bg-white/90 transition-colors"
+          >
+            프로필 사진 등록하기
+          </button>
+        </div>
+      )}
+
       {/* 간소화된 등급 카드 */}
       <div
         className={`bg-gradient-to-br ${currentGrade.bgGradient} rounded-3xl p-6 text-white shadow-xl mb-6 relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform`}
