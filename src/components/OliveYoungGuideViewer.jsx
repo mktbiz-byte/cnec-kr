@@ -3,6 +3,7 @@ import { useState } from 'react'
 /**
  * 올리브영 세일 캠페인 가이드 뷰어 컴포넌트
  * 상품정보 / 해시태그 / 필수대사 / 필수장면 / 주의사항 / 참고영상 표시
+ * AI 가공 가이드(JSON) 우선, 없으면 원본 텍스트 표시
  */
 export default function OliveYoungGuideViewer({ guide, individualMessage }) {
   if (!guide) {
@@ -11,12 +12,15 @@ export default function OliveYoungGuideViewer({ guide, individualMessage }) {
 
   // 문자열인 경우 파싱 시도
   let parsedGuide = guide
+  let isPlainText = false
+
   if (typeof guide === 'string') {
     try {
       parsedGuide = JSON.parse(guide)
     } catch (e) {
-      console.error('Failed to parse guide:', e)
-      return null
+      // JSON 파싱 실패 시 원본 텍스트로 처리
+      isPlainText = true
+      parsedGuide = { text_guide: guide }
     }
   }
 
@@ -47,6 +51,14 @@ export default function OliveYoungGuideViewer({ guide, individualMessage }) {
         </div>
 
         <div className="space-y-4">
+          {/* 원본 텍스트 가이드 (fallback) */}
+          {parsedGuide.text_guide && (
+            <div className="bg-white rounded-lg p-3">
+              <h6 className="text-sm font-semibold text-gray-800 mb-2">📋 촬영 가이드</h6>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{parsedGuide.text_guide}</p>
+            </div>
+          )}
+
           {/* 상품 정보 */}
           {parsedGuide.product_info && (
             <div className="bg-white rounded-lg p-3">

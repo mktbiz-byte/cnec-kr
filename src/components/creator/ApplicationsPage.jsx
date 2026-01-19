@@ -1127,8 +1127,12 @@ const ApplicationsPage = () => {
                               )}
                             </div>
                           )}
-                          {/* AI 가이드 모드 (기존) */}
-                          {app.campaigns?.step1_guide_mode !== 'external' && app.campaigns?.step2_guide_mode !== 'external' && app.campaigns?.step3_guide_mode !== 'external' && (app.campaigns?.oliveyoung_step1_guide_ai || app.campaigns?.oliveyoung_step2_guide_ai) && (
+                          {/* AI/텍스트 가이드 모드 - 각 스텝별로 external이 아니면서 가이드가 있는 경우 표시 */}
+                          {(
+                            (app.campaigns?.step1_guide_mode !== 'external' && (app.campaigns?.oliveyoung_step1_guide_ai || app.campaigns?.oliveyoung_step1_guide)) ||
+                            (app.campaigns?.step2_guide_mode !== 'external' && (app.campaigns?.oliveyoung_step2_guide_ai || app.campaigns?.oliveyoung_step2_guide)) ||
+                            (app.campaigns?.step3_guide_mode !== 'external' && (app.campaigns?.oliveyoung_step3_guide_ai || app.campaigns?.oliveyoung_step3_guide))
+                          ) && (
                             <div className="bg-green-50 border border-green-200 rounded-xl p-3">
                               <div className="flex items-center gap-2 mb-2">
                                 <BookOpen size={14} className="text-green-600" />
@@ -1585,7 +1589,9 @@ const ApplicationsPage = () => {
               {/* 올리브영 가이드 내용 */}
               {selectedGuide.type === 'oliveyoung' && (
                 <div className="space-y-4">
-                  {selectedGuide.campaigns?.oliveyoung_step1_guide_ai && (
+                  {/* STEP 1 가이드 - external 모드가 아니고 가이드가 있을 때 (_ai 우선, 없으면 텍스트 fallback) */}
+                  {selectedGuide.campaigns?.step1_guide_mode !== 'external' &&
+                   (selectedGuide.campaigns?.oliveyoung_step1_guide_ai || selectedGuide.campaigns?.oliveyoung_step1_guide) && (
                     <div className="relative overflow-hidden rounded-3xl bg-green-50 border border-green-100 p-5">
                       <div className="absolute top-0 right-0 p-4 opacity-5">
                         <Video size={80} className="text-green-900" />
@@ -1604,12 +1610,16 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai} />
+                        <OliveYoungGuideViewer
+                          guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai || selectedGuide.campaigns.oliveyoung_step1_guide}
+                        />
                       </div>
                     </div>
                   )}
 
-                  {selectedGuide.campaigns?.oliveyoung_step2_guide_ai && (
+                  {/* STEP 2 가이드 - external 모드가 아니고 가이드가 있을 때 (_ai 우선, 없으면 텍스트 fallback) */}
+                  {selectedGuide.campaigns?.step2_guide_mode !== 'external' &&
+                   (selectedGuide.campaigns?.oliveyoung_step2_guide_ai || selectedGuide.campaigns?.oliveyoung_step2_guide) && (
                     <div className="relative overflow-hidden rounded-3xl bg-blue-50 border border-blue-100 p-5">
                       <div className="absolute top-0 right-0 p-4 opacity-5">
                         <Video size={80} className="text-blue-900" />
@@ -1628,12 +1638,16 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai} />
+                        <OliveYoungGuideViewer
+                          guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai || selectedGuide.campaigns.oliveyoung_step2_guide}
+                        />
                       </div>
                     </div>
                   )}
 
-                  {selectedGuide.campaigns?.oliveyoung_step3_guide_ai && (
+                  {/* STEP 3 가이드 - external 모드가 아니고 가이드가 있을 때 (_ai 우선, 없으면 텍스트 fallback) */}
+                  {selectedGuide.campaigns?.step3_guide_mode !== 'external' &&
+                   (selectedGuide.campaigns?.oliveyoung_step3_guide_ai || selectedGuide.campaigns?.oliveyoung_step3_guide) && (
                     <div className="relative overflow-hidden rounded-3xl bg-purple-50 border border-purple-100 p-5">
                       <div className="absolute top-0 right-0 p-4 opacity-5">
                         <Video size={80} className="text-purple-900" />
@@ -1652,7 +1666,9 @@ const ApplicationsPage = () => {
                             </span>
                           )}
                         </div>
-                        <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step3_guide_ai} />
+                        <OliveYoungGuideViewer
+                          guide={selectedGuide.campaigns.oliveyoung_step3_guide_ai || selectedGuide.campaigns.oliveyoung_step3_guide}
+                        />
                       </div>
                     </div>
                   )}
@@ -1662,9 +1678,9 @@ const ApplicationsPage = () => {
                     // 각 스텝 가이드에서 shooting_scenes 찾기
                     const allScenes = []
                     const guides = [
-                      selectedGuide.campaigns?.oliveyoung_step1_guide_ai,
-                      selectedGuide.campaigns?.oliveyoung_step2_guide_ai,
-                      selectedGuide.campaigns?.oliveyoung_step3_guide_ai
+                      selectedGuide.campaigns?.oliveyoung_step1_guide_ai || selectedGuide.campaigns?.oliveyoung_step1_guide,
+                      selectedGuide.campaigns?.oliveyoung_step2_guide_ai || selectedGuide.campaigns?.oliveyoung_step2_guide,
+                      selectedGuide.campaigns?.oliveyoung_step3_guide_ai || selectedGuide.campaigns?.oliveyoung_step3_guide
                     ]
                     guides.forEach((guideStr) => {
                       if (guideStr) {
