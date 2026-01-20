@@ -95,7 +95,229 @@ const ShootingScenesTable = ({ scenes }) => {
                   <p className="text-sm text-emerald-800 leading-relaxed">{scene.shooting_tip}</p>
                 </div>
               )}
+
+              {/* 자율 기획 공간 (flexibility_note) */}
+              {scene.flexibility_note && (
+                <div className="bg-orange-50 rounded-lg p-2.5 border-l-3 border-orange-400">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold text-orange-700 bg-orange-100 px-1.5 py-0.5 rounded">🎨 자율 기획</span>
+                  </div>
+                  <p className="text-sm text-orange-800 leading-relaxed">{scene.flexibility_note}</p>
+                </div>
+              )}
+
+              {/* 예시 시나리오 (example_scenario) */}
+              {scene.example_scenario && (
+                <div className="bg-violet-50 rounded-lg p-2.5 border-l-3 border-violet-400">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold text-violet-700 bg-violet-100 px-1.5 py-0.5 rounded">📝 예시</span>
+                  </div>
+                  <p className="text-sm text-violet-800 leading-relaxed italic">{scene.example_scenario}</p>
+                </div>
+              )}
+
+              {/* 캡션 (caption) */}
+              {scene.caption && (
+                <div className="bg-gray-50 rounded-lg p-2.5 border-l-3 border-gray-300">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold text-gray-600 bg-gray-200 px-1.5 py-0.5 rounded">📱 캡션</span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">{scene.caption}</p>
+                </div>
+              )}
             </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// 콘텐츠 철학 카드 (주황색)
+const ContentPhilosophyCard = ({ data }) => {
+  if (!data) return null
+  return (
+    <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 p-4 shadow-sm">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="bg-orange-500 p-1.5 rounded-lg">
+          <Target size={14} className="text-white" />
+        </div>
+        <span className="font-bold text-orange-900 text-sm">콘텐츠 철학</span>
+      </div>
+
+      <div className="space-y-3">
+        {/* 핵심 메시지 */}
+        {data.core_message && (
+          <div className="bg-white/60 rounded-xl p-3 border border-orange-100">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-[10px] font-bold text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded">💬 핵심 메시지</span>
+            </div>
+            <p className="text-sm text-orange-900 font-medium leading-relaxed">{data.core_message}</p>
+          </div>
+        )}
+
+        {/* 진정성 포인트 */}
+        {data.authenticity_note && (
+          <div className="bg-white/60 rounded-xl p-3 border border-orange-100">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-[10px] font-bold text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded">✨ 진정성 포인트</span>
+            </div>
+            <p className="text-sm text-orange-800 leading-relaxed">{data.authenticity_note}</p>
+          </div>
+        )}
+
+        {/* 피해야 할 표현 */}
+        {data.avoid && Array.isArray(data.avoid) && data.avoid.length > 0 && (
+          <div className="bg-red-50/80 rounded-xl p-3 border border-red-100">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded">🚫 피해야 할 표현</span>
+            </div>
+            <ul className="space-y-1.5">
+              {data.avoid.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-red-700">
+                  <X size={14} className="text-red-500 flex-shrink-0 mt-0.5" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// 스토리 흐름 카드 (파란색)
+const StoryFlowCard = ({ data }) => {
+  if (!data) return null
+  return (
+    <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-sky-50 border border-blue-200 p-4 shadow-sm">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="bg-blue-500 p-1.5 rounded-lg">
+          <Play size={14} className="text-white" />
+        </div>
+        <span className="font-bold text-blue-900 text-sm">스토리 흐름</span>
+      </div>
+
+      <div className="space-y-3">
+        {/* 내러티브 타입 */}
+        {data.narrative_type && (
+          <div className="bg-white/60 rounded-xl p-3 border border-blue-100">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">📖 내러티브 타입</span>
+            </div>
+            <p className="text-sm text-blue-900 font-medium">{data.narrative_type}</p>
+          </div>
+        )}
+
+        {/* 감정 흐름 */}
+        {data.emotional_arc && (
+          <div className="bg-white/60 rounded-xl p-3 border border-blue-100">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">🎭 감정 흐름</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {data.emotional_arc.split('→').map((stage, idx, arr) => (
+                <React.Fragment key={idx}>
+                  <span className="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full text-xs font-medium">
+                    {stage.trim()}
+                  </span>
+                  {idx < arr.length - 1 && (
+                    <ArrowRight size={14} className="text-blue-400" />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// 진정성 가이드라인 카드 (초록/빨강)
+const AuthenticityGuidelinesCard = ({ data }) => {
+  if (!data) return null
+  return (
+    <div className="rounded-2xl bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-200 p-4 shadow-sm">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="bg-slate-600 p-1.5 rounded-lg">
+          <CheckCircle size={14} className="text-white" />
+        </div>
+        <span className="font-bold text-slate-900 text-sm">진정성 가이드라인</span>
+      </div>
+
+      <div className="space-y-3">
+        {/* 이렇게 하세요 (DO) */}
+        {data.do && Array.isArray(data.do) && data.do.length > 0 && (
+          <div className="bg-green-50 rounded-xl p-3 border border-green-200">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-[10px] font-bold text-green-700 bg-green-200 px-1.5 py-0.5 rounded">✅ 이렇게 하세요</span>
+            </div>
+            <ul className="space-y-1.5">
+              {data.do.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-green-800">
+                  <CheckCircle2 size={14} className="text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 이것은 피하세요 (DON'T) */}
+        {data.dont && Array.isArray(data.dont) && data.dont.length > 0 && (
+          <div className="bg-red-50 rounded-xl p-3 border border-red-200">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-[10px] font-bold text-red-700 bg-red-200 px-1.5 py-0.5 rounded">❌ 이것은 피하세요</span>
+            </div>
+            <ul className="space-y-1.5">
+              {data.dont.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-red-800">
+                  <Ban size={14} className="text-red-600 flex-shrink-0 mt-0.5" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 예외 사항 */}
+        {data.exception && (
+          <div className="bg-yellow-50 rounded-xl p-3 border border-yellow-300">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-[10px] font-bold text-yellow-700 bg-yellow-200 px-1.5 py-0.5 rounded">⚠️ 예외 사항</span>
+            </div>
+            <p className="text-sm text-yellow-800 font-medium">{data.exception}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// 크리에이터 팁 카드 (시안색)
+const CreatorTipsCard = ({ tips }) => {
+  if (!tips || !Array.isArray(tips) || tips.length === 0) return null
+  return (
+    <div className="rounded-2xl bg-gradient-to-br from-cyan-50 to-teal-50 border border-cyan-200 p-4 shadow-sm">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="bg-cyan-500 p-1.5 rounded-lg">
+          <Zap size={14} className="text-white" />
+        </div>
+        <span className="font-bold text-cyan-900 text-sm">크리에이터 팁</span>
+        <span className="ml-auto text-xs text-cyan-600 font-medium bg-cyan-100 px-2 py-0.5 rounded-full">
+          {tips.length}개
+        </span>
+      </div>
+
+      <div className="space-y-2">
+        {tips.map((tip, idx) => (
+          <div key={idx} className="bg-white/60 rounded-xl p-3 border border-cyan-100 flex items-start gap-2">
+            <span className="bg-cyan-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              {idx + 1}
+            </span>
+            <p className="text-sm text-cyan-900 leading-relaxed">{tip}</p>
           </div>
         ))}
       </div>
@@ -1543,19 +1765,60 @@ const ApplicationsPage = () => {
                     }
 
                     if (isObject) {
+                      // 새로운 AI 가이드 필드들을 위한 전용 컴포넌트 렌더링
+                      const specialFields = ['content_philosophy', 'story_flow', 'authenticity_guidelines', 'creator_tips', 'shooting_scenes']
                       const entries = Object.entries(guideData)
                       const colorOrder = ['blue', 'green', 'purple', 'orange']
                       let colorIdx = 0
-                      return entries.map(([key, value], idx) => {
-                        // shooting_scenes는 특별한 테이블로 렌더링
-                        if (key === 'shooting_scenes' && Array.isArray(value)) {
-                          return <ShootingScenesTable key={key} scenes={value} />
-                        }
-                        // 다른 섹션은 기존 방식으로 렌더링
-                        const color = colorOrder[colorIdx % colorOrder.length]
-                        colorIdx++
-                        return renderGuideSection(key, value, color)
-                      })
+
+                      // 전용 컴포넌트들 먼저 렌더링
+                      const specialComponents = []
+
+                      // 콘텐츠 철학 카드
+                      if (guideData.content_philosophy) {
+                        specialComponents.push(
+                          <ContentPhilosophyCard key="content_philosophy" data={guideData.content_philosophy} />
+                        )
+                      }
+
+                      // 스토리 흐름 카드
+                      if (guideData.story_flow) {
+                        specialComponents.push(
+                          <StoryFlowCard key="story_flow" data={guideData.story_flow} />
+                        )
+                      }
+
+                      // 진정성 가이드라인 카드
+                      if (guideData.authenticity_guidelines) {
+                        specialComponents.push(
+                          <AuthenticityGuidelinesCard key="authenticity_guidelines" data={guideData.authenticity_guidelines} />
+                        )
+                      }
+
+                      // 크리에이터 팁 카드
+                      if (guideData.creator_tips && Array.isArray(guideData.creator_tips)) {
+                        specialComponents.push(
+                          <CreatorTipsCard key="creator_tips" tips={guideData.creator_tips} />
+                        )
+                      }
+
+                      // 촬영 장면 테이블
+                      if (guideData.shooting_scenes && Array.isArray(guideData.shooting_scenes)) {
+                        specialComponents.push(
+                          <ShootingScenesTable key="shooting_scenes" scenes={guideData.shooting_scenes} />
+                        )
+                      }
+
+                      // 나머지 필드들은 기존 방식으로 렌더링
+                      const regularSections = entries
+                        .filter(([key]) => !specialFields.includes(key))
+                        .map(([key, value]) => {
+                          const color = colorOrder[colorIdx % colorOrder.length]
+                          colorIdx++
+                          return renderGuideSection(key, value, color)
+                        })
+
+                      return [...specialComponents, ...regularSections]
                     }
 
                     return (
