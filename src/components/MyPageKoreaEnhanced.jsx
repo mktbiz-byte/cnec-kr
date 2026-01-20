@@ -253,7 +253,7 @@ const MyPageKoreaEnhanced = () => {
         if (campaignIds.length > 0) {
           const { data: campaignsData } = await supabase
             .from('campaigns')
-            .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, challenge_weekly_guides, challenge_weekly_guides_ai')
+            .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, oliveyoung_step1_guide, oliveyoung_step2_guide, oliveyoung_step3_guide, step1_guide_mode, step2_guide_mode, step3_guide_mode, challenge_weekly_guides, challenge_weekly_guides_ai')
             .in('id', campaignIds)
 
           // 비디오 제출 내역 조회
@@ -1555,17 +1555,24 @@ const MyPageKoreaEnhanced = () => {
 
                 // 올리브영 세일 캠페인
                 if (campaignType === 'oliveyoung' || campaignType === 'oliveyoung_sale') {
-                  // STEP별 가이드 표시
-                  const step1Guide = campaign.oliveyoung_step1_guide_ai
-                  const step2Guide = campaign.oliveyoung_step2_guide_ai
-                  const step3Guide = campaign.oliveyoung_step3_guide_ai
+                  // STEP별 가이드 표시 (_ai 우선, 없으면 텍스트 fallback)
+                  // step_guide_mode가 'external'인 경우는 외부 가이드이므로 제외
+                  const step1Guide = campaign.step1_guide_mode !== 'external'
+                    ? (campaign.oliveyoung_step1_guide_ai || campaign.oliveyoung_step1_guide)
+                    : null
+                  const step2Guide = campaign.step2_guide_mode !== 'external'
+                    ? (campaign.oliveyoung_step2_guide_ai || campaign.oliveyoung_step2_guide)
+                    : null
+                  const step3Guide = campaign.step3_guide_mode !== 'external'
+                    ? (campaign.oliveyoung_step3_guide_ai || campaign.oliveyoung_step3_guide)
+                    : null
 
                   return (
                     <div className="space-y-6">
                       {step1Guide && (
                         <div>
                           <h4 className="text-lg font-bold mb-3">📹 STEP 1: 세일 전 영상</h4>
-                          <OliveYoungGuideViewer 
+                          <OliveYoungGuideViewer
                             guide={step1Guide}
                             individualMessage={selectedGuide.additional_message}
                           />
@@ -1574,7 +1581,7 @@ const MyPageKoreaEnhanced = () => {
                       {step2Guide && (
                         <div>
                           <h4 className="text-lg font-bold mb-3">🛍️ STEP 2: 세일 당일 영상</h4>
-                          <OliveYoungGuideViewer 
+                          <OliveYoungGuideViewer
                             guide={step2Guide}
                             individualMessage={null}
                           />
@@ -1583,7 +1590,7 @@ const MyPageKoreaEnhanced = () => {
                       {step3Guide && (
                         <div>
                           <h4 className="text-lg font-bold mb-3">🔗 STEP 3: 스토리 URL 링크</h4>
-                          <OliveYoungGuideViewer 
+                          <OliveYoungGuideViewer
                             guide={step3Guide}
                             individualMessage={null}
                           />
