@@ -777,6 +777,8 @@ export const database = {
           offline_locations: profileData.offline_locations || [],
           languages: profileData.languages || [],
           linktree_channels: profileData.linktree_channels || [],
+          // AI 프로필 텍스트
+          ai_profile_text: profileData.ai_profile_text || null,
           // 타임스탬프
           updated_at: new Date().toISOString()
         }

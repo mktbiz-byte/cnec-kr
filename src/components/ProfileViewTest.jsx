@@ -97,12 +97,19 @@ const TagGroup = ({ tags, color = 'violet' }) => {
 }
 
 // AI 프로필 작성기 컴포넌트
-const AIProfileWriter = ({ profile, beautyProfile, onSave }) => {
-  const [aiProfile, setAiProfile] = useState('')
+const AIProfileWriter = ({ profile, beautyProfile, savedText, onSave, saving }) => {
+  const [aiProfile, setAiProfile] = useState(savedText || '')
   const [generating, setGenerating] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  // 저장된 텍스트가 있으면 표시
+  useEffect(() => {
+    if (savedText && !aiProfile) {
+      setAiProfile(savedText)
+    }
+  }, [savedText])
 
   const generateAIProfile = () => {
     setGenerating(true)
@@ -285,15 +292,24 @@ const AIProfileWriter = ({ profile, beautyProfile, onSave }) => {
                 {isEditing ? '미리보기' : '수정하기'}
               </button>
               <button
-                onClick={() => {
-                  if (onSave) onSave(aiProfile)
-                  setSaved(true)
-                  setTimeout(() => setSaved(false), 2000)
+                onClick={async () => {
+                  if (onSave) {
+                    await onSave(aiProfile)
+                    setSaved(true)
+                    setTimeout(() => setSaved(false), 2000)
+                  }
                 }}
-                className="flex-1 py-3 bg-violet-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-violet-700 transition-colors"
+                disabled={saving}
+                className="flex-1 py-3 bg-violet-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-violet-700 transition-colors disabled:opacity-70"
               >
-                {saved ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {saved ? '저장됨!' : '저장하기'}
+                {saving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : saved ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+                {saving ? '저장 중...' : saved ? '저장됨!' : '저장하기'}
               </button>
             </div>
           </div>
@@ -309,7 +325,9 @@ const ProfileViewTest = () => {
 
   const [profile, setProfile] = useState(null)
   const [beautyProfile, setBeautyProfile] = useState(null)
+  const [aiProfileText, setAiProfileText] = useState('')
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -376,12 +394,34 @@ const ProfileViewTest = () => {
           languages: data.languages || [],
           linktree_channels: data.linktree_channels || []
         })
+
+        // AI 프로필 텍스트 로드
+        if (data.ai_profile_text) {
+          setAiProfileText(data.ai_profile_text)
+        }
       }
     } catch (err) {
       console.error('프로필 로드 오류:', err)
       setError('프로필을 불러오는데 실패했습니다.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  // AI 프로필 텍스트 저장
+  const saveAiProfile = async (text) => {
+    try {
+      setSaving(true)
+      await database.userProfiles.update(user.id, {
+        ai_profile_text: text
+      })
+      setAiProfileText(text)
+      console.log('AI 프로필 저장 완료')
+    } catch (err) {
+      console.error('AI 프로필 저장 오류:', err)
+      setError('저장 중 오류가 발생했습니다.')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -487,7 +527,13 @@ const ProfileViewTest = () => {
         </div>
 
         {/* AI 프로필 작성기 */}
-        <AIProfileWriter profile={profile} beautyProfile={beautyProfile} />
+        <AIProfileWriter
+          profile={profile}
+          beautyProfile={beautyProfile}
+          savedText={aiProfileText}
+          onSave={saveAiProfile}
+          saving={saving}
+        />
 
         {/* 기본 정보 */}
         <Section title="기본 정보" icon={User}>
