@@ -372,6 +372,9 @@ const ProfileSettingsTest = () => {
       const data = await database.userProfiles.get(user.id)
       console.log('[DEBUG] 프로필 로드 - 전체 데이터:', data)
       console.log('[DEBUG] 프로필 로드 - age 값:', data?.age, '타입:', typeof data?.age)
+      console.log('[DEBUG] 프로필 로드 - skin_type:', data?.skin_type)
+      console.log('[DEBUG] 프로필 로드 - skin_concerns:', data?.skin_concerns)
+      console.log('[DEBUG] 프로필 로드 - gender:', data?.gender)
 
       if (data) {
         setProfile({
@@ -416,10 +419,24 @@ const ProfileSettingsTest = () => {
 
         if (data.profile_image) setPhotoPreview(data.profile_image)
 
+        console.log('[DEBUG] 상태 설정 완료 - profile.age:', data.age != null ? String(data.age) : '(empty)')
+        console.log('[DEBUG] 상태 설정 완료 - beautyProfile.skin_type:', data.skin_type || '(empty)')
+
+        // completedSteps는 데이터 기반으로 계산
         const completed = []
-        tabs.forEach(tab => {
-          if (checkStepComplete(tab.id)) completed.push(tab.id)
-        })
+        // 기본 정보: 이름, 연락처
+        if (data.name && data.phone) completed.push('basic')
+        // 뷰티: 피부타입, 피부고민, 헤어타입, 헤어고민
+        if (data.skin_type && data.skin_concerns?.length > 0 && data.hair_type && data.hair_concerns?.length > 0) completed.push('beauty')
+        // SNS: 최소 1개 입력
+        if (data.instagram_url || data.youtube_url || data.tiktok_url) completed.push('sns')
+        // 영상: 영상 길이 스타일
+        if (data.video_length_style) completed.push('video')
+        // 상세: 성별
+        if (data.gender) completed.push('detail')
+        completed.push('account') // 계정 관리는 항상 완료
+
+        console.log('[DEBUG] 완료된 단계:', completed)
         setCompletedSteps(completed)
       } else {
         setProfile(prev => ({ ...prev, email: user.email || '' }))
