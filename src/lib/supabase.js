@@ -749,6 +749,7 @@ export const database = {
           bio: profileData.bio || null,
           // === 뷰티 프로필 필드 추가 ===
           // 단일 선택
+          skin_tone: profileData.skin_tone || null,
           hair_type: profileData.hair_type || null,
           primary_interest: profileData.primary_interest || null,
           editing_level: profileData.editing_level || null,

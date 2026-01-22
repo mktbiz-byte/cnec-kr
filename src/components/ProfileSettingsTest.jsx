@@ -17,6 +17,7 @@ import {
 
 import {
   SKIN_TYPES,
+  SKIN_TONES,
   HAIR_TYPES,
   PRIMARY_INTERESTS,
   EDITING_LEVELS,
@@ -50,12 +51,12 @@ import {
 
 // 테스트 모드 배너
 const TestModeBanner = () => (
-  <div className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium">
-    테스트 버전 v4
+  <div className="bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white text-center py-1.5 px-4 text-xs font-medium">
+    Premium Profile v5
   </div>
 )
 
-// 단일 선택 버튼 그룹 (크기 증가)
+// 단일 선택 버튼 그룹
 const SingleSelectGroup = ({ options, value, onChange, size = 'normal' }) => (
   <div className="flex flex-wrap gap-2">
     {options.map((option) => (
@@ -67,11 +68,45 @@ const SingleSelectGroup = ({ options, value, onChange, size = 'normal' }) => (
           size === 'small' ? 'px-4 py-2.5 text-sm' : 'px-5 py-3 text-base'
         } ${
           value === option.value
-            ? 'bg-violet-600 text-white shadow-md'
+            ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-200'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
         {option.label}
+      </button>
+    ))}
+  </div>
+)
+
+// 설명이 포함된 선택 카드 그룹
+const SelectCardGroup = ({ options, value, onChange }) => (
+  <div className="space-y-2">
+    {options.map((option) => (
+      <button
+        key={option.value}
+        type="button"
+        onClick={() => onChange(option.value)}
+        className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-all ${
+          value === option.value
+            ? 'bg-violet-50 border-2 border-violet-500 shadow-sm'
+            : 'bg-white border-2 border-gray-200 hover:border-violet-300'
+        }`}
+      >
+        <div className="flex-1">
+          <p className={`font-bold ${value === option.value ? 'text-violet-700' : 'text-gray-900'}`}>
+            {option.label}
+          </p>
+          {option.description && (
+            <p className="text-sm text-gray-500 mt-0.5">{option.description}</p>
+          )}
+        </div>
+        <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ml-3 ${
+          value === option.value
+            ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600'
+            : 'border-2 border-gray-300'
+        }`}>
+          {value === option.value && <Check className="w-4 h-4 text-white" />}
+        </div>
       </button>
     ))}
   </div>
@@ -161,32 +196,128 @@ const ChildrenInput = ({ children = [], onChange }) => {
   )
 }
 
-// 진행 상태 표시 (크기 증가)
-const ProgressIndicator = ({ percentage }) => (
-  <div className="flex items-center gap-4 mb-6">
-    <div className="flex-1">
-      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-gradient-to-r from-violet-500 to-purple-600 rounded-full transition-all duration-500"
-          style={{ width: `${percentage}%` }}
+// 원형 프로그레스 인디케이터
+const CircleProgress = ({ percentage }) => {
+  const circumference = 2 * Math.PI * 45
+  const strokeDashoffset = circumference - (percentage / 100) * circumference
+
+  return (
+    <div className="relative w-28 h-28">
+      <svg className="w-full h-full transform -rotate-90">
+        <circle cx="56" cy="56" r="45" stroke="#E5E7EB" strokeWidth="8" fill="none" />
+        <circle
+          cx="56" cy="56" r="45"
+          stroke="url(#progressGradient)"
+          strokeWidth="8"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          className="transition-all duration-700 ease-out"
         />
+        <defs>
+          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#A855F7" />
+            <stop offset="100%" stopColor="#EC4899" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-xs text-gray-500">완성도</span>
+        <span className="text-2xl font-bold text-gray-900">{percentage}%</span>
       </div>
     </div>
-    <span className="text-lg font-bold text-violet-600 min-w-[60px] text-right">{percentage}%</span>
+  )
+}
+
+// 팁 섹션
+const TipSection = ({ title, description, highlight }) => (
+  <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-4 text-white">
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+        <Sparkles className="w-5 h-5 text-yellow-300" />
+      </div>
+      <div className="flex-1">
+        <p className="font-bold text-sm">{title}</p>
+        <p className="text-xs text-white/80 mt-1">
+          {description} <span className="text-yellow-300 font-semibold">{highlight}</span>
+        </p>
+      </div>
+      <ChevronRight className="w-5 h-5 text-white/60" />
+    </div>
   </div>
 )
 
-// 섹션 상단 동기부여 메시지 (새로운 컴포넌트)
+// 프리미엄 헤더 섹션
+const PremiumHeader = ({ percentage, tabs, activeTab, setActiveTab, canAccessTab, checkStepComplete }) => (
+  <div className="bg-gradient-to-br from-violet-50 via-fuchsia-50 to-pink-50 rounded-3xl p-6 mb-6 border border-violet-100/50">
+    <div className="flex items-center gap-5">
+      <CircleProgress percentage={percentage} />
+      <div className="flex-1">
+        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          매력적인 프로필이 브랜드의 마음을 움직여요!
+          <span className="text-pink-500">💕</span>
+        </h2>
+        <p className="text-sm text-gray-600 mt-2">
+          빈칸을 채울수록 브랜드 담당자에게 <span className="text-fuchsia-600 font-bold">노출될 확률이 2배</span> 높아집니다.
+        </p>
+        <p className="text-sm text-gray-500 mt-1">
+          크리에이터님만의 숨겨진 매력을 빠짐없이 알려주세요.
+        </p>
+      </div>
+      <div className="hidden sm:flex flex-col items-center bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center mb-2">
+          <Sparkles className="w-5 h-5 text-violet-600" />
+        </div>
+        <span className="text-xs text-gray-500">완성 시</span>
+        <span className="text-sm font-bold text-violet-600">혜택 보기</span>
+      </div>
+    </div>
+
+    {/* 탭 네비게이션 */}
+    <div className="flex gap-2 mt-5 overflow-x-auto scrollbar-hide">
+      {tabs.filter(t => t.id !== 'account').map((tab) => {
+        const isActive = activeTab === tab.id
+        const isComplete = checkStepComplete(tab.id)
+        const isAccessible = canAccessTab(tab.id)
+
+        return (
+          <button
+            key={tab.id}
+            onClick={() => isAccessible && setActiveTab(tab.id)}
+            disabled={!isAccessible}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+              isActive
+                ? 'bg-white text-violet-700 shadow-md border-2 border-violet-200'
+                : isComplete
+                  ? 'bg-white/60 text-gray-700 border border-gray-200'
+                  : isAccessible
+                    ? 'bg-white/40 text-gray-500 border border-gray-100 hover:bg-white/60'
+                    : 'bg-gray-100/50 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${
+              isActive ? 'bg-violet-500' : isComplete ? 'bg-green-500' : 'bg-gray-300'
+            }`} />
+            {tab.label} {isActive && <span className="text-violet-400 text-xs">(작성중)</span>}
+          </button>
+        )
+      })}
+    </div>
+  </div>
+)
+
+// 섹션 상단 동기부여 메시지
 const SectionBenefit = ({ icon: Icon, title, description, benefit }) => (
-  <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl p-5 border border-violet-100 mb-6">
+  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-5">
     <div className="flex items-start gap-4">
-      <div className="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
-        <Icon className="w-6 h-6 text-violet-600" />
+      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0">
+        <Icon className="w-5 h-5 text-white" />
       </div>
       <div className="flex-1">
-        <h3 className="font-bold text-gray-900 text-lg">{title}</h3>
-        <p className="text-sm text-gray-600 mt-1">{description}</p>
-        <div className="mt-3 flex items-center gap-2 text-violet-600 font-semibold text-sm">
+        <h3 className="font-bold text-gray-900">{title}</h3>
+        <p className="text-sm text-gray-500 mt-1">{description}</p>
+        <div className="mt-2 flex items-center gap-2 text-fuchsia-600 font-semibold text-sm">
           <Sparkles className="w-4 h-4" />
           {benefit}
         </div>
@@ -245,14 +376,15 @@ const ProfileSettingsTest = () => {
   })
 
   const [beautyProfile, setBeautyProfile] = useState({
-    skin_type: '', hair_type: '', primary_interest: '', editing_level: '', shooting_level: '',
+    skin_type: '', skin_tone: '', hair_type: '',
+    primary_interest: '', editing_level: '', shooting_level: '',
     follower_range: '', upload_frequency: '', gender: '', job_visibility: '',
     job: '', child_appearance: '', family_appearance: '',
     offline_visit: '', offline_region: '',
     linktree_available: '',
+    nail_usage: '', circle_lens_usage: '', glasses_usage: '',
     video_length_style: '', shortform_tempo: '',
-    video_style: '', // 단일선택으로 변경
-    category: '',
+    video_style: '', category: '',
     skin_concerns: [], hair_concerns: [], diet_concerns: [],
     content_formats: [], collaboration_preferences: [], children: [], family_members: [],
     offline_locations: [], languages: [], linktree_channels: []
@@ -715,49 +847,22 @@ const ProfileSettingsTest = () => {
   const progressPercentage = calculateProgress()
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-safe">
+    <div className="min-h-screen bg-gray-100 pb-safe">
       <TestModeBanner />
 
       {/* 헤더 */}
-      <div className="sticky top-0 z-10 bg-white border-b shadow-sm">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200/50">
+        <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
           <button onClick={() => navigate('/')} className="p-2 -ml-2">
-            <ArrowLeft size={24} className="text-gray-900" />
+            <ArrowLeft size={22} className="text-gray-700" />
           </button>
-          <h1 className="text-lg font-bold text-gray-900">프로필 설정</h1>
-          <div className="w-10" />
-        </div>
-
-        {/* 탭 네비게이션 - 스크롤 없이 한 줄에 표시 */}
-        <div className="max-w-lg mx-auto px-4 pb-3">
-          <div className="flex gap-1.5">
-            {tabs.map((tab) => {
-              const accessible = canAccessTab(tab.id)
-              const isActive = activeTab === tab.id
-              const isComplete = completedSteps.includes(tab.id) || checkStepComplete(tab.id)
-              const Icon = tab.icon
-
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => accessible && setActiveTab(tab.id)}
-                  disabled={!accessible}
-                  className={`flex-1 px-2 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1 ${
-                    isActive
-                      ? 'bg-violet-600 text-white'
-                      : accessible
-                        ? isComplete
-                          ? 'bg-violet-100 text-violet-700'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        : 'bg-gray-50 text-gray-300 cursor-not-allowed'
-                  }`}
-                >
-                  {isComplete && !isActive ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
-                  {tab.label}
-                </button>
-              )
-            })}
-          </div>
+          <h1 className="text-base font-bold text-gray-900">프로필 설정</h1>
+          <button
+            onClick={() => setActiveTab('account')}
+            className="p-2 -mr-2"
+          >
+            <Settings size={20} className="text-gray-500" />
+          </button>
         </div>
       </div>
 
@@ -770,12 +875,29 @@ const ProfileSettingsTest = () => {
         </div>
       )}
 
-      <div className="max-w-lg mx-auto px-4 py-6">
-        {activeTab !== 'account' && <ProgressIndicator percentage={progressPercentage} />}
+      <div className="max-w-lg mx-auto px-4 py-5">
+        {/* 프리미엄 헤더 - 계정 탭이 아닐 때만 표시 */}
+        {activeTab !== 'account' && (
+          <>
+            <PremiumHeader
+              percentage={progressPercentage}
+              tabs={tabs}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              canAccessTab={canAccessTab}
+              checkStepComplete={checkStepComplete}
+            />
+            <TipSection
+              title="Tip. 피부 고민을 자세히 적어보세요!"
+              description={`"여드름 흔적", "속건조" 같은 구체적인 키워드가 있으면 관련 브랜드 매칭 확률이`}
+              highlight="35% 더 올라갑니다."
+            />
+          </>
+        )}
 
         {/* === 기본 정보 탭 === */}
         {activeTab === 'basic' && (
-          <div className="space-y-6">
+          <div className="space-y-5 mt-5">
             <SectionBenefit
               icon={User}
               title="기본 정보를 입력하면"
@@ -903,6 +1025,16 @@ const ProfileSettingsTest = () => {
               </div>
 
               <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">피부 톤 (퍼스널 컬러)</p>
+                <SingleSelectGroup
+                  options={SKIN_TONES}
+                  value={beautyProfile.skin_tone}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, skin_tone: v }))}
+                  size="small"
+                />
+              </div>
+
+              <div>
                 <p className="text-sm font-semibold text-gray-700 mb-3">피부 고민 * (복수선택)</p>
                 <MultiSelectGroup
                   options={SKIN_CONCERNS}
@@ -1007,21 +1139,19 @@ const ProfileSettingsTest = () => {
 
               <div>
                 <p className="text-sm font-semibold text-gray-700 mb-3">편집 수준</p>
-                <SingleSelectGroup
+                <SelectCardGroup
                   options={EDITING_LEVELS}
                   value={beautyProfile.editing_level}
                   onChange={(v) => setBeautyProfile(prev => ({ ...prev, editing_level: v }))}
-                  size="small"
                 />
               </div>
 
               <div>
                 <p className="text-sm font-semibold text-gray-700 mb-3">촬영 수준</p>
-                <SingleSelectGroup
+                <SelectCardGroup
                   options={SHOOTING_LEVELS}
                   value={beautyProfile.shooting_level}
                   onChange={(v) => setBeautyProfile(prev => ({ ...prev, shooting_level: v }))}
-                  size="small"
                 />
               </div>
             </div>

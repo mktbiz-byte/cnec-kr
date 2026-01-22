@@ -7,11 +7,22 @@
 // 단일 선택 (Single Select)
 // ==========================================
 
-// 1. 피부타입 (단일선택) - 민감성 제거 (피부고민에서 선택)
+// 1. 피부타입 (단일선택)
 export const SKIN_TYPES = [
   { value: 'dry', label: '건성' },
   { value: 'oily', label: '지성' },
-  { value: 'combination', label: '복합성' }
+  { value: 'combination', label: '복합성' },
+  { value: 'sensitive', label: '민감성' }
+]
+
+// 1-2. 피부 톤 (단일선택) - 퍼스널 컬러
+export const SKIN_TONES = [
+  { value: 'tone_13', label: '13호' },
+  { value: 'tone_21', label: '21호' },
+  { value: 'tone_23', label: '23호' },
+  { value: 'warm', label: '웜톤' },
+  { value: 'cool', label: '쿨톤' },
+  { value: 'neutral', label: '뉴트럴' }
 ]
 
 // 2. 헤어타입 (단일선택) - 건성/지성은 상호배타적
@@ -30,18 +41,18 @@ export const PRIMARY_INTERESTS = [
   { value: 'wellness', label: '웰니스' }
 ]
 
-// 4. 편집 수준 (선택)
+// 4. 편집 수준 (선택) - 설명 포함
 export const EDITING_LEVELS = [
-  { value: 'beginner', label: '초보' },
-  { value: 'intermediate', label: '중급' },
-  { value: 'expert', label: '고급' }
+  { value: 'beginner', label: '초급', description: '캡컷으로 간단한 컷편집, 자막 가능' },
+  { value: 'intermediate', label: '중급', description: '프리미어/파컷 활용, 효과음/트랜지션 편집' },
+  { value: 'expert', label: '고급', description: '전문 편집툴 활용, 모션그래픽/색보정 가능' }
 ]
 
-// 4-2. 촬영 수준 (선택)
+// 4-2. 촬영 수준 (선택) - 설명 포함
 export const SHOOTING_LEVELS = [
-  { value: 'beginner', label: '초보' },
-  { value: 'intermediate', label: '중급' },
-  { value: 'expert', label: '고급' }
+  { value: 'beginner', label: '초급', description: '스마트폰 기본 촬영' },
+  { value: 'intermediate', label: '중급', description: '조명/삼각대 활용, 구도 이해' },
+  { value: 'expert', label: '고급', description: '미러리스/DSLR 촬영, 조명 세팅 가능' }
 ]
 
 // 5. 팔로워 규모 (선택)
@@ -141,16 +152,16 @@ export const VIDEO_STYLES = [
 // 다중 선택 (Multi Select)
 // ==========================================
 
-// 1. 피부 고민 (다중선택) - 건성/지성/복합성 제거 (피부타입에서 단일선택)
+// 1. 피부 고민 (다중선택)
 export const SKIN_CONCERNS = [
-  { value: 'sensitivity', label: '민감성' },
-  { value: 'acne', label: '여드름/트러블' },
-  { value: 'pigmentation', label: '색소침착/기미' },
-  { value: 'wrinkles', label: '주름/탄력' },
+  { value: 'acne', label: '여드름' },
   { value: 'pores', label: '모공' },
-  { value: 'dullness', label: '칙칙함/톤' },
-  { value: 'redness', label: '홍조/혈관' },
-  { value: 'texture', label: '각질/거칠음' }
+  { value: 'pigmentation', label: '기미/잡티' },
+  { value: 'wrinkles', label: '주름' },
+  { value: 'redness', label: '홍조' },
+  { value: 'atopy', label: '아토피' },
+  { value: 'dryness', label: '건조함' },
+  { value: 'oiliness', label: '유분과다' }
 ]
 
 // 2. 헤어 고민 (다중선택) - 건성/지성 제거 (헤어타입에서 단일선택)
@@ -262,6 +273,7 @@ export const DEFAULT_BEAUTY_PROFILE = {
 
   // 단일 선택 필드
   skin_type: '',
+  skin_tone: '', // 피부 톤 (퍼스널 컬러)
   hair_type: '',
   primary_interest: '',
   editing_level: '',
@@ -302,6 +314,7 @@ export const DEFAULT_BEAUTY_PROFILE = {
 export const PROFILE_OPTIONS = {
   singleSelect: {
     skinTypes: SKIN_TYPES,
+    skinTones: SKIN_TONES,
     hairTypes: HAIR_TYPES,
     primaryInterests: PRIMARY_INTERESTS,
     editingLevels: EDITING_LEVELS,
