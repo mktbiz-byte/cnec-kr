@@ -341,10 +341,17 @@ const ProfileSettingsTest = () => {
   }
 
   // 다음 단계로 이동
-  const handleNext = () => {
+  // 다음 단계 이동 시 자동 저장
+  const handleNext = async () => {
     const currentIndex = tabs.findIndex(t => t.id === activeTab)
+
+    // 모든 단계에서 자동 저장 실행
+    await handleSaveProfile(true) // silent mode - 성공 메시지 숨김
+
     if (activeTab === 'detail') {
-      handleSaveProfile()
+      // 마지막 단계에서는 성공 메시지 표시
+      setSuccess('프로필이 저장되었습니다!')
+      setTimeout(() => setSuccess(''), 3000)
     } else if (currentIndex < tabs.length - 2) { // account 탭 제외
       if (!completedSteps.includes(activeTab)) {
         setCompletedSteps([...completedSteps, activeTab])
@@ -366,17 +373,21 @@ const ProfileSettingsTest = () => {
       if (data) {
         setProfile({
           name: data.name || '', email: data.email || user.email || '',
-          phone: data.phone || '', age: data.age || '', bio: data.bio || '',
+          phone: data.phone || '',
+          age: data.age != null ? String(data.age) : '', // 숫자 0도 유지
+          bio: data.bio || '',
           profile_image: data.profile_image || '',
           postcode: data.postcode || '', address: data.address || '',
           detail_address: data.detail_address || '',
           instagram_url: data.instagram_url || '', youtube_url: data.youtube_url || '',
           tiktok_url: data.tiktok_url || '', blog_url: data.blog_url || '',
-          instagram_followers: data.instagram_followers || '',
-          youtube_subscribers: data.youtube_subscribers || '',
-          tiktok_followers: data.tiktok_followers || '',
-          channel_name: data.channel_name || '', followers: data.followers || '',
-          avg_views: data.avg_views || '', target_audience: data.target_audience || ''
+          instagram_followers: data.instagram_followers != null ? String(data.instagram_followers) : '',
+          youtube_subscribers: data.youtube_subscribers != null ? String(data.youtube_subscribers) : '',
+          tiktok_followers: data.tiktok_followers != null ? String(data.tiktok_followers) : '',
+          channel_name: data.channel_name || '',
+          followers: data.followers != null ? String(data.followers) : '',
+          avg_views: data.avg_views != null ? String(data.avg_views) : '',
+          target_audience: data.target_audience || ''
         })
 
         setBeautyProfile({
@@ -417,14 +428,16 @@ const ProfileSettingsTest = () => {
     }
   }
 
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = async (silent = false) => {
     try {
       setSaving(true)
-      setError('')
-      setSuccess('')
+      if (!silent) {
+        setError('')
+        setSuccess('')
+      }
 
       if (!profile.name.trim()) {
-        setError('이름을 입력해주세요.')
+        if (!silent) setError('이름을 입력해주세요.')
         setSaving(false)
         return
       }
@@ -480,11 +493,13 @@ const ProfileSettingsTest = () => {
       }
 
       await database.userProfiles.upsert(profileData)
-      setSuccess('프로필이 저장되었습니다!')
-      setTimeout(() => setSuccess(''), 3000)
+      if (!silent) {
+        setSuccess('프로필이 저장되었습니다!')
+        setTimeout(() => setSuccess(''), 3000)
+      }
     } catch (err) {
       console.error('프로필 저장 오류:', err)
-      setError(`저장 실패: ${err.message}`)
+      if (!silent) setError(`저장 실패: ${err.message}`)
     } finally {
       setSaving(false)
     }
