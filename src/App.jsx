@@ -33,6 +33,7 @@ import AuthCallbackSafe from './components/AuthCallbackSafe';
 import HomePageExactReplica from './components/HomePageExactReplica';
 import MyPageKoreaEnhanced from './components/MyPageKoreaEnhanced';
 import ProfileSettings from './components/ProfileSettings';
+import ProfileSettingsTest from './components/ProfileSettingsTest';
 import NotificationSettings from './components/NotificationSettings';
 import CampaignApplicationUpdated from './components/CampaignApplicationUpdated';
 import CompanyReportNew from './components/CompanyReportNew';
@@ -113,6 +114,7 @@ const AppContent = () => {
         <Route path="/settings/notifications" element={<NotificationSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
+        <Route path="/profile-test-beta-2025" element={<ProfileSettingsTest />} />
         <Route path="/submit-video/:campaignId" element={<VideoSubmissionPage />} />
         <Route path="/submit-oliveyoung-video/:campaignId" element={<OliveyoungVideoSubmissionPage />} />
         <Route path="/submit-4week-video/:campaignId" element={<FourWeekVideoSubmissionPage />} />
