@@ -42,6 +42,10 @@ ADD COLUMN IF NOT EXISTS job TEXT;
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS child_appearance TEXT;
 
+-- 커플/가족 출연 가능 여부 (possible, impossible)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS family_appearance TEXT;
+
 -- 영상 길이 스타일 (longform, shortform, both)
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS video_length_style TEXT;
@@ -82,6 +86,10 @@ ADD COLUMN IF NOT EXISTS video_styles JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS children JSONB DEFAULT '[]'::jsonb;
 
+-- 가족 구성원 (husband, wife, parents 배열)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS family_members JSONB DEFAULT '[]'::jsonb;
+
 
 -- 3. 인덱스 추가 (검색 성능 향상)
 -- =====================================================
@@ -95,6 +103,7 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_upload_frequency ON user_profiles(u
 CREATE INDEX IF NOT EXISTS idx_user_profiles_gender ON user_profiles(gender);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_job_visibility ON user_profiles(job_visibility);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_child_appearance ON user_profiles(child_appearance);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_family_appearance ON user_profiles(family_appearance);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_video_length_style ON user_profiles(video_length_style);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_shortform_tempo ON user_profiles(shortform_tempo);
 
@@ -106,6 +115,7 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_content_formats ON user_profiles US
 CREATE INDEX IF NOT EXISTS idx_user_profiles_collaboration_preferences ON user_profiles USING GIN (collaboration_preferences);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_video_styles ON user_profiles USING GIN (video_styles);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_children ON user_profiles USING GIN (children);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_family_members ON user_profiles USING GIN (family_members);
 
 
 -- 4. 코멘트 추가 (문서화)
@@ -120,6 +130,7 @@ COMMENT ON COLUMN user_profiles.gender IS '성별: female, male';
 COMMENT ON COLUMN user_profiles.job_visibility IS '직업 공개 여부: public, private';
 COMMENT ON COLUMN user_profiles.job IS '직업 (job_visibility가 public일 때만 사용)';
 COMMENT ON COLUMN user_profiles.child_appearance IS '아이 출연 가능 여부: possible, impossible';
+COMMENT ON COLUMN user_profiles.family_appearance IS '커플/가족 출연 가능 여부: possible, impossible';
 COMMENT ON COLUMN user_profiles.video_length_style IS '영상 길이 스타일: longform, shortform, both';
 COMMENT ON COLUMN user_profiles.shortform_tempo IS '숏폼 템포 스타일: fast, normal, slow';
 COMMENT ON COLUMN user_profiles.skin_concerns IS '피부 고민 (JSONB 배열): sensitivity, acne, pigmentation, wrinkles, pores, dullness, redness, texture';
@@ -129,6 +140,7 @@ COMMENT ON COLUMN user_profiles.content_formats IS '선호 콘텐츠 형식 (JSO
 COMMENT ON COLUMN user_profiles.collaboration_preferences IS '협업 선호도 (JSONB 배열): product_review, unboxing, tutorial, sponsorship, ambassador';
 COMMENT ON COLUMN user_profiles.video_styles IS '영상 스타일 (JSONB 배열): emotional, review, tutorial, vlog, unboxing, comparison, haul, asmr';
 COMMENT ON COLUMN user_profiles.children IS '아이 정보 (JSONB 배열): [{gender: "boy"|"girl", age: number}]';
+COMMENT ON COLUMN user_profiles.family_members IS '가족 구성원 (JSONB 배열): ["husband", "wife", "parents"]';
 
 
 -- 5. 검증 쿼리 (실행 후 확인용)
@@ -148,6 +160,7 @@ AND column_name IN (
     'job_visibility',
     'job',
     'child_appearance',
+    'family_appearance',
     'video_length_style',
     'shortform_tempo',
     'skin_concerns',
@@ -156,7 +169,8 @@ AND column_name IN (
     'content_formats',
     'collaboration_preferences',
     'video_styles',
-    'children'
+    'children',
+    'family_members'
 );
 
 -- 인덱스 확인
@@ -182,6 +196,7 @@ ALTER TABLE user_profiles DROP COLUMN IF EXISTS gender;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS job_visibility;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS job;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS child_appearance;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS family_appearance;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS video_length_style;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS shortform_tempo;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS skin_concerns;
@@ -191,6 +206,7 @@ ALTER TABLE user_profiles DROP COLUMN IF EXISTS content_formats;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS collaboration_preferences;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS video_styles;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS children;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS family_members;
 */
 
 

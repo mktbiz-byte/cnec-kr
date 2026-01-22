@@ -70,27 +70,40 @@ export const CHILD_APPEARANCE = [
   { value: 'impossible', label: '불가능' }
 ]
 
-// 10. 아이 성별
+// 10. 커플/가족 출연 가능 여부
+export const FAMILY_APPEARANCE = [
+  { value: 'possible', label: '가능' },
+  { value: 'impossible', label: '불가능' }
+]
+
+// 11. 가족 구성원 (다중선택)
+export const FAMILY_MEMBERS = [
+  { value: 'husband', label: '남편' },
+  { value: 'wife', label: '아내' },
+  { value: 'parents', label: '부모님' }
+]
+
+// 12. 아이 성별
 export const CHILD_GENDERS = [
   { value: 'boy', label: '남아' },
   { value: 'girl', label: '여아' }
 ]
 
-// 11. 영상 길이 스타일 (롱폼/숏폼)
+// 13. 영상 길이 스타일 (롱폼/숏폼)
 export const VIDEO_LENGTH_STYLES = [
   { value: 'longform', label: '롱폼' },
   { value: 'shortform', label: '숏폼' },
   { value: 'both', label: '둘 다 가능' }
 ]
 
-// 12. 숏폼 템포 스타일
+// 14. 숏폼 템포 스타일
 export const SHORTFORM_TEMPO_STYLES = [
   { value: 'fast', label: '빠름', description: '빠른 컷 전환, 역동적인 편집' },
   { value: 'normal', label: '보통', description: '자연스러운 흐름, 균형 잡힌 편집' },
   { value: 'slow', label: '느림', description: '여유로운 전개, 감성적인 편집' }
 ]
 
-// 13. 영상 스타일 (다중선택)
+// 15. 영상 스타일 (다중선택)
 export const VIDEO_STYLES = [
   { value: 'emotional', label: '감성' },
   { value: 'review', label: '리뷰' },
@@ -193,6 +206,7 @@ export const DEFAULT_BEAUTY_PROFILE = {
   job_visibility: '',
   job: '',
   child_appearance: '',
+  family_appearance: '',
   video_length_style: '',
   shortform_tempo: '',
 
@@ -203,7 +217,8 @@ export const DEFAULT_BEAUTY_PROFILE = {
   content_formats: [],
   collaboration_preferences: [],
   video_styles: [],
-  children: [] // [{gender: 'boy', age: 5}, ...]
+  children: [], // [{gender: 'boy', age: 5}, ...]
+  family_members: [] // ['husband', 'parents']
 }
 
 // ==========================================
@@ -221,6 +236,8 @@ export const PROFILE_OPTIONS = {
     jobVisibility: JOB_VISIBILITY,
     childAppearance: CHILD_APPEARANCE,
     childGenders: CHILD_GENDERS,
+    familyAppearance: FAMILY_APPEARANCE,
+    familyMembers: FAMILY_MEMBERS,
     videoLengthStyles: VIDEO_LENGTH_STYLES,
     shortformTempoStyles: SHORTFORM_TEMPO_STYLES
   },
