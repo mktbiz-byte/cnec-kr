@@ -97,10 +97,12 @@ const TagGroup = ({ tags, color = 'violet' }) => {
 }
 
 // AI 프로필 작성기 컴포넌트
-const AIProfileWriter = ({ profile, beautyProfile }) => {
+const AIProfileWriter = ({ profile, beautyProfile, onSave }) => {
   const [aiProfile, setAiProfile] = useState('')
   const [generating, setGenerating] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   const generateAIProfile = () => {
     setGenerating(true)
@@ -245,37 +247,53 @@ const AIProfileWriter = ({ profile, beautyProfile }) => {
         {aiProfile && (
           <div className="mt-4 space-y-3">
             <div className="relative">
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
-                  {aiProfile}
-                </p>
-              </div>
-              <button
-                onClick={copyToClipboard}
-                className="absolute top-3 right-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-green-600" />
-                ) : (
-                  <Copy className="w-4 h-4 text-gray-500" />
-                )}
-              </button>
+              {isEditing ? (
+                <textarea
+                  value={aiProfile}
+                  onChange={(e) => setAiProfile(e.target.value)}
+                  className="w-full p-4 bg-white rounded-xl border-2 border-violet-300 text-sm text-gray-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                  rows={12}
+                  placeholder="프로필 내용을 수정하세요..."
+                />
+              ) : (
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+                    {aiProfile}
+                  </p>
+                </div>
+              )}
+              {!isEditing && (
+                <button
+                  onClick={copyToClipboard}
+                  className="absolute top-3 right-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-gray-500" />
+                  )}
+                </button>
+              )}
             </div>
 
             <div className="flex gap-2">
               <button
-                onClick={generateAIProfile}
+                onClick={() => setIsEditing(!isEditing)}
                 className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
               >
-                <RefreshCw className="w-4 h-4" />
-                다시 생성
+                <Edit3 className="w-4 h-4" />
+                {isEditing ? '미리보기' : '수정하기'}
               </button>
               <button
-                onClick={copyToClipboard}
-                className="flex-1 py-3 bg-violet-100 text-violet-700 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-violet-200 transition-colors"
+                onClick={() => {
+                  if (onSave) onSave(aiProfile)
+                  setSaved(true)
+                  setTimeout(() => setSaved(false), 2000)
+                }}
+                className="flex-1 py-3 bg-violet-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-violet-700 transition-colors"
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {copied ? '복사됨!' : '복사하기'}
+                {saved ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {saved ? '저장됨!' : '저장하기'}
               </button>
             </div>
           </div>
