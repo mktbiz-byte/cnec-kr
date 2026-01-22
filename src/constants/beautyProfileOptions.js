@@ -218,6 +218,27 @@ export const LINKTREE_CHANNELS = [
   { value: 'youtube', label: '유튜브' }
 ]
 
+// 8. 네일 사용 여부
+export const NAIL_USAGE = [
+  { value: 'always', label: '항상 함' },
+  { value: 'sometimes', label: '가끔' },
+  { value: 'never', label: '안함' }
+]
+
+// 9. 써클렌즈/컬러렌즈 사용 여부
+export const CIRCLE_LENS_USAGE = [
+  { value: 'always', label: '항상 착용' },
+  { value: 'sometimes', label: '가끔 착용' },
+  { value: 'never', label: '착용 안함' }
+]
+
+// 10. 안경 착용 여부
+export const GLASSES_USAGE = [
+  { value: 'always', label: '항상 착용' },
+  { value: 'sometimes', label: '가끔 착용' },
+  { value: 'never', label: '착용 안함' }
+]
+
 // ==========================================
 // 기존 호환용 - 관심 카테고리
 // ==========================================
@@ -255,6 +276,9 @@ export const DEFAULT_BEAUTY_PROFILE = {
   offline_visit: '',
   offline_region: '', // 오프라인 촬영 가능 지역 (텍스트)
   linktree_available: '', // 링크트리 설정 가능 여부
+  nail_usage: '', // 네일 사용 여부
+  circle_lens_usage: '', // 써클렌즈 사용 여부
+  glasses_usage: '', // 안경 착용 여부
   video_length_style: '',
   shortform_tempo: '',
 
@@ -294,6 +318,9 @@ export const PROFILE_OPTIONS = {
     offlineLocations: OFFLINE_LOCATIONS,
     linktreeAvailable: LINKTREE_AVAILABLE,
     linktreeChannels: LINKTREE_CHANNELS,
+    nailUsage: NAIL_USAGE,
+    circleLensUsage: CIRCLE_LENS_USAGE,
+    glassesUsage: GLASSES_USAGE,
     videoLengthStyles: VIDEO_LENGTH_STYLES,
     shortformTempoStyles: SHORTFORM_TEMPO_STYLES
   },

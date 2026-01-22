@@ -763,6 +763,9 @@ export const database = {
           offline_visit: profileData.offline_visit || null,
           offline_region: profileData.offline_region || null,
           linktree_available: profileData.linktree_available || null,
+          nail_usage: profileData.nail_usage || null,
+          circle_lens_usage: profileData.circle_lens_usage || null,
+          glasses_usage: profileData.glasses_usage || null,
           video_length_style: profileData.video_length_style || null,
           shortform_tempo: profileData.shortform_tempo || null,
           // 다중 선택 (JSONB)

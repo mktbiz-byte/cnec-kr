@@ -33,6 +33,9 @@ import {
   OFFLINE_LOCATIONS,
   LINKTREE_AVAILABLE,
   LINKTREE_CHANNELS,
+  NAIL_USAGE,
+  CIRCLE_LENS_USAGE,
+  GLASSES_USAGE,
   LANGUAGES,
   VIDEO_LENGTH_STYLES,
   SHORTFORM_TEMPO_STYLES,
@@ -929,6 +932,49 @@ const ProfileSettingsTest = () => {
                   options={HAIR_CONCERNS}
                   values={beautyProfile.hair_concerns}
                   onChange={(v) => setBeautyProfile(prev => ({ ...prev, hair_concerns: v }))}
+                />
+              </div>
+            </div>
+
+            {/* 뷰티 스타일 */}
+            <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl border border-pink-200 p-5 space-y-5">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">뷰티 스타일</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">네일/렌즈/안경 관련 캠페인 매칭에 활용돼요</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">네일 사용</p>
+                <SingleSelectGroup
+                  options={NAIL_USAGE}
+                  value={beautyProfile.nail_usage}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, nail_usage: v }))}
+                  size="small"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">써클렌즈/컬러렌즈</p>
+                <SingleSelectGroup
+                  options={CIRCLE_LENS_USAGE}
+                  value={beautyProfile.circle_lens_usage}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, circle_lens_usage: v }))}
+                  size="small"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">안경 착용</p>
+                <SingleSelectGroup
+                  options={GLASSES_USAGE}
+                  value={beautyProfile.glasses_usage}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, glasses_usage: v }))}
+                  size="small"
                 />
               </div>
             </div>
