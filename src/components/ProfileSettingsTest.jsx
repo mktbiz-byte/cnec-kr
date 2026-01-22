@@ -370,6 +370,8 @@ const ProfileSettingsTest = () => {
     try {
       setLoading(true)
       const data = await database.userProfiles.get(user.id)
+      console.log('[DEBUG] 프로필 로드 - 전체 데이터:', data)
+      console.log('[DEBUG] 프로필 로드 - age 값:', data?.age, '타입:', typeof data?.age)
 
       if (data) {
         setProfile({
