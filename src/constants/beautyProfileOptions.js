@@ -30,11 +30,18 @@ export const PRIMARY_INTERESTS = [
   { value: 'wellness', label: '웰니스' }
 ]
 
-// 4. 경험 수준 (선택)
-export const EXPERIENCE_LEVELS = [
-  { value: 'beginner', label: '초보자' },
-  { value: 'intermediate', label: '중급자' },
-  { value: 'expert', label: '전문가' }
+// 4. 편집 수준 (선택)
+export const EDITING_LEVELS = [
+  { value: 'beginner', label: '초보' },
+  { value: 'intermediate', label: '중급' },
+  { value: 'expert', label: '고급' }
+]
+
+// 4-2. 촬영 수준 (선택)
+export const SHOOTING_LEVELS = [
+  { value: 'beginner', label: '초보' },
+  { value: 'intermediate', label: '중급' },
+  { value: 'expert', label: '고급' }
 ]
 
 // 5. 팔로워 규모 (선택)
@@ -199,7 +206,8 @@ export const DEFAULT_BEAUTY_PROFILE = {
   skin_type: '',
   hair_type: '',
   primary_interest: '',
-  experience_level: '',
+  editing_level: '',
+  shooting_level: '',
   follower_range: '',
   upload_frequency: '',
   gender: '',
@@ -229,7 +237,8 @@ export const PROFILE_OPTIONS = {
     skinTypes: SKIN_TYPES,
     hairTypes: HAIR_TYPES,
     primaryInterests: PRIMARY_INTERESTS,
-    experienceLevels: EXPERIENCE_LEVELS,
+    editingLevels: EDITING_LEVELS,
+    shootingLevels: SHOOTING_LEVELS,
     followerRanges: FOLLOWER_RANGES,
     uploadFrequencies: UPLOAD_FREQUENCIES,
     genders: GENDERS,

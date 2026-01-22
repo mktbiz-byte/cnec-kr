@@ -14,9 +14,13 @@ ADD COLUMN IF NOT EXISTS hair_type TEXT;
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS primary_interest TEXT;
 
--- 경험 수준 (초보자, 중급자, 전문가)
+-- 편집 수준 (초보, 중급, 고급)
 ALTER TABLE user_profiles
-ADD COLUMN IF NOT EXISTS experience_level TEXT;
+ADD COLUMN IF NOT EXISTS editing_level TEXT;
+
+-- 촬영 수준 (초보, 중급, 고급)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS shooting_level TEXT;
 
 -- 팔로워 규모 (1K~10K, 10K~100K, 100K~1M, 1M+)
 ALTER TABLE user_profiles
@@ -97,7 +101,8 @@ ADD COLUMN IF NOT EXISTS family_members JSONB DEFAULT '[]'::jsonb;
 -- 단일 선택 필드 인덱스
 CREATE INDEX IF NOT EXISTS idx_user_profiles_hair_type ON user_profiles(hair_type);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_primary_interest ON user_profiles(primary_interest);
-CREATE INDEX IF NOT EXISTS idx_user_profiles_experience_level ON user_profiles(experience_level);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_editing_level ON user_profiles(editing_level);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_shooting_level ON user_profiles(shooting_level);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_follower_range ON user_profiles(follower_range);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_upload_frequency ON user_profiles(upload_frequency);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_gender ON user_profiles(gender);
@@ -123,7 +128,8 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_family_members ON user_profiles USI
 
 COMMENT ON COLUMN user_profiles.hair_type IS '헤어타입: dry, oily, normal';
 COMMENT ON COLUMN user_profiles.primary_interest IS '주요 관심 분야: skincare, haircare, diet_fitness, makeup, wellness';
-COMMENT ON COLUMN user_profiles.experience_level IS '경험 수준: beginner, intermediate, expert';
+COMMENT ON COLUMN user_profiles.editing_level IS '편집 수준: beginner, intermediate, expert';
+COMMENT ON COLUMN user_profiles.shooting_level IS '촬영 수준: beginner, intermediate, expert';
 COMMENT ON COLUMN user_profiles.follower_range IS '팔로워 규모: 1k_10k, 10k_100k, 100k_1m, 1m_plus';
 COMMENT ON COLUMN user_profiles.upload_frequency IS '업로드 빈도: weekly, biweekly, monthly';
 COMMENT ON COLUMN user_profiles.gender IS '성별: female, male';
@@ -153,7 +159,8 @@ WHERE table_name = 'user_profiles'
 AND column_name IN (
     'hair_type',
     'primary_interest',
-    'experience_level',
+    'editing_level',
+    'shooting_level',
     'follower_range',
     'upload_frequency',
     'gender',
@@ -189,7 +196,8 @@ AND indexname LIKE 'idx_user_profiles_%';
 
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS hair_type;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS primary_interest;
-ALTER TABLE user_profiles DROP COLUMN IF EXISTS experience_level;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS editing_level;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS shooting_level;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS follower_range;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS upload_frequency;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS gender;
