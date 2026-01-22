@@ -83,6 +83,21 @@ export const FAMILY_APPEARANCE = [
   { value: 'impossible', label: '불가능' }
 ]
 
+// 10-2. 오프라인 방문촬영 가능 여부
+export const OFFLINE_VISIT = [
+  { value: 'possible', label: '가능' },
+  { value: 'impossible', label: '불가능' }
+]
+
+// 10-3. 오프라인 촬영 장소 (다중선택)
+export const OFFLINE_LOCATIONS = [
+  { value: 'popup', label: '팝업스토어' },
+  { value: 'oliveyoung', label: '올리브영' },
+  { value: 'department', label: '백화점' },
+  { value: 'daiso', label: '다이소' },
+  { value: 'other', label: '기타' }
+]
+
 // 11. 가족 구성원 (다중선택)
 export const FAMILY_MEMBERS = [
   { value: 'husband', label: '남편' },
@@ -167,9 +182,10 @@ export const DIET_CONCERNS = [
 export const CONTENT_FORMATS = [
   { value: 'shorts', label: '숏폼(Shorts/Reels)' },
   { value: 'longform', label: '롱폼(YouTube)' },
-  { value: 'carousel', label: '카라셀(Carousel)' },
+  { value: 'feed', label: '피드(사진/이미지)' },
   { value: 'live', label: '라이브' },
-  { value: 'story', label: '스토리' }
+  { value: 'story', label: '스토리' },
+  { value: 'group_buy', label: '공동구매' }
 ]
 
 // 5. 협업 선호도 (다중선택)
@@ -179,6 +195,20 @@ export const COLLABORATION_PREFERENCES = [
   { value: 'tutorial', label: '튜토리얼' },
   { value: 'sponsorship', label: '스폰서십' },
   { value: 'ambassador', label: '앰배서더' }
+]
+
+// 6. 언어 능력 (다중선택)
+export const LANGUAGES = [
+  { value: 'korean', label: '한국어' },
+  { value: 'english', label: '영어' },
+  { value: 'japanese', label: '일본어' },
+  { value: 'chinese', label: '중국어' }
+]
+
+// 7. 링크트리 설정 가능 여부 (인스타/틱톡/유튜브)
+export const LINKTREE_AVAILABLE = [
+  { value: 'possible', label: '가능' },
+  { value: 'impossible', label: '불가능' }
 ]
 
 // ==========================================
@@ -215,6 +245,9 @@ export const DEFAULT_BEAUTY_PROFILE = {
   job: '',
   child_appearance: '',
   family_appearance: '',
+  offline_visit: '',
+  offline_region: '', // 오프라인 촬영 가능 지역 (텍스트)
+  linktree_available: '', // 링크트리 설정 가능 여부
   video_length_style: '',
   shortform_tempo: '',
 
@@ -226,7 +259,9 @@ export const DEFAULT_BEAUTY_PROFILE = {
   collaboration_preferences: [],
   video_styles: [],
   children: [], // [{gender: 'boy', age: 5}, ...]
-  family_members: [] // ['husband', 'parents']
+  family_members: [], // ['husband', 'parents']
+  offline_locations: [], // ['popup', 'oliveyoung', 'department', 'daiso']
+  languages: [] // ['korean', 'english', 'japanese', 'chinese']
 }
 
 // ==========================================
@@ -247,6 +282,9 @@ export const PROFILE_OPTIONS = {
     childGenders: CHILD_GENDERS,
     familyAppearance: FAMILY_APPEARANCE,
     familyMembers: FAMILY_MEMBERS,
+    offlineVisit: OFFLINE_VISIT,
+    offlineLocations: OFFLINE_LOCATIONS,
+    linktreeAvailable: LINKTREE_AVAILABLE,
     videoLengthStyles: VIDEO_LENGTH_STYLES,
     shortformTempoStyles: SHORTFORM_TEMPO_STYLES
   },
@@ -256,7 +294,8 @@ export const PROFILE_OPTIONS = {
     dietConcerns: DIET_CONCERNS,
     contentFormats: CONTENT_FORMATS,
     collaborationPreferences: COLLABORATION_PREFERENCES,
-    videoStyles: VIDEO_STYLES
+    videoStyles: VIDEO_STYLES,
+    languages: LANGUAGES
   },
   categories: CATEGORIES
 }

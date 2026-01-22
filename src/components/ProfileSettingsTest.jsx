@@ -29,6 +29,10 @@ import {
   CHILD_GENDERS,
   FAMILY_APPEARANCE,
   FAMILY_MEMBERS,
+  OFFLINE_VISIT,
+  OFFLINE_LOCATIONS,
+  LINKTREE_AVAILABLE,
+  LANGUAGES,
   VIDEO_LENGTH_STYLES,
   SHORTFORM_TEMPO_STYLES,
   VIDEO_STYLES,
@@ -239,11 +243,15 @@ const ProfileSettingsTest = () => {
   const [beautyProfile, setBeautyProfile] = useState({
     skin_type: '', hair_type: '', primary_interest: '', editing_level: '', shooting_level: '',
     follower_range: '', upload_frequency: '', gender: '', job_visibility: '',
-    job: '', child_appearance: '', family_appearance: '', video_length_style: '', shortform_tempo: '',
+    job: '', child_appearance: '', family_appearance: '',
+    offline_visit: '', offline_region: '',
+    linktree_available: '',
+    video_length_style: '', shortform_tempo: '',
     video_style: '', // 단일선택으로 변경
     category: '',
     skin_concerns: [], hair_concerns: [], diet_concerns: [],
-    content_formats: [], collaboration_preferences: [], children: [], family_members: []
+    content_formats: [], collaboration_preferences: [], children: [], family_members: [],
+    offline_locations: [], languages: []
   })
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -379,13 +387,16 @@ const ProfileSettingsTest = () => {
           gender: data.gender || '', job_visibility: data.job_visibility || '',
           job: data.job || '', child_appearance: data.child_appearance || '',
           family_appearance: data.family_appearance || '',
+          offline_visit: data.offline_visit || '', offline_region: data.offline_region || '',
+          linktree_available: data.linktree_available || '',
           video_length_style: data.video_length_style || '', shortform_tempo: data.shortform_tempo || '',
           video_style: data.video_styles?.[0] || '', // 첫 번째 값만 사용
           category: data.category || '',
           skin_concerns: data.skin_concerns || [], hair_concerns: data.hair_concerns || [],
           diet_concerns: data.diet_concerns || [], content_formats: data.content_formats || [],
           collaboration_preferences: data.collaboration_preferences || [],
-          children: data.children || [], family_members: data.family_members || []
+          children: data.children || [], family_members: data.family_members || [],
+          offline_locations: data.offline_locations || [], languages: data.languages || []
         })
 
         if (data.profile_image) setPhotoPreview(data.profile_image)
@@ -451,6 +462,9 @@ const ProfileSettingsTest = () => {
         job: beautyProfile.job_visibility === 'public' ? beautyProfile.job?.trim() || null : null,
         child_appearance: beautyProfile.child_appearance || null,
         family_appearance: beautyProfile.family_appearance || null,
+        offline_visit: beautyProfile.offline_visit || null,
+        offline_region: beautyProfile.offline_visit === 'possible' ? beautyProfile.offline_region?.trim() || null : null,
+        linktree_available: beautyProfile.linktree_available || null,
         video_length_style: beautyProfile.video_length_style || null,
         shortform_tempo: beautyProfile.shortform_tempo || null,
         skin_concerns: beautyProfile.skin_concerns,
@@ -460,7 +474,9 @@ const ProfileSettingsTest = () => {
         collaboration_preferences: beautyProfile.collaboration_preferences,
         video_styles: beautyProfile.video_style ? [beautyProfile.video_style] : [], // 단일값을 배열로 저장
         children: beautyProfile.child_appearance === 'possible' ? beautyProfile.children : [],
-        family_members: beautyProfile.family_appearance === 'possible' ? beautyProfile.family_members : []
+        family_members: beautyProfile.family_appearance === 'possible' ? beautyProfile.family_members : [],
+        offline_locations: beautyProfile.offline_visit === 'possible' ? beautyProfile.offline_locations : [],
+        languages: beautyProfile.languages
       }
 
       await database.userProfiles.upsert(profileData)
@@ -1020,7 +1036,7 @@ const ProfileSettingsTest = () => {
 
             {/* 채널 정보 */}
             <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-5">
-              <SectionTitle title="채널 정보" subtitle="브랜드 검색에 활용되는 정보예요" />
+              <SectionTitle title="메인채널 정보" subtitle="브랜드 검색에 활용되는 정보예요" />
 
               <div className="grid grid-cols-2 gap-3">
                 <input
@@ -1082,6 +1098,28 @@ const ProfileSettingsTest = () => {
                   onChange={(v) => setBeautyProfile(prev => ({ ...prev, collaboration_preferences: v }))}
                   columns={3}
                 />
+              </div>
+            </div>
+
+            {/* 링크트리 설정 */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-5">
+              <SectionTitle title="링크트리 설정" subtitle="인스타/틱톡/유튜브 프로필에 링크트리 추가 가능 여부" />
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">링크트리 설정 가능</p>
+                <SingleSelectGroup
+                  options={LINKTREE_AVAILABLE}
+                  value={beautyProfile.linktree_available}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, linktree_available: v }))}
+                  size="small"
+                />
+                {beautyProfile.linktree_available === 'possible' && (
+                  <div className="mt-3 p-3 bg-violet-50 rounded-xl border border-violet-200">
+                    <p className="text-sm text-violet-700 font-medium">
+                      링크트리 설정 가능 시 캠페인별 추가 지급 조건이 적용될 수 있습니다.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1233,6 +1271,49 @@ const ProfileSettingsTest = () => {
                     />
                   </div>
                 )}
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">오프라인 방문촬영 가능</p>
+                <SingleSelectGroup
+                  options={OFFLINE_VISIT}
+                  value={beautyProfile.offline_visit}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, offline_visit: v }))}
+                  size="small"
+                />
+                {beautyProfile.offline_visit === 'possible' && (
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <p className="text-sm text-gray-500 mb-3">촬영 가능 장소</p>
+                      <MultiSelectGroup
+                        options={OFFLINE_LOCATIONS}
+                        values={beautyProfile.offline_locations}
+                        onChange={(v) => setBeautyProfile(prev => ({ ...prev, offline_locations: v }))}
+                        columns={3}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 mb-2">촬영 가능 지역</p>
+                      <input
+                        type="text"
+                        value={beautyProfile.offline_region}
+                        onChange={(e) => setBeautyProfile(prev => ({ ...prev, offline_region: e.target.value }))}
+                        className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
+                        placeholder="예: 서울, 경기, 전국 등"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">언어 능력 (콘텐츠 제작 가능)</p>
+                <MultiSelectGroup
+                  options={LANGUAGES}
+                  values={beautyProfile.languages}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, languages: v }))}
+                  columns={2}
+                />
               </div>
             </div>
 

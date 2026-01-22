@@ -50,6 +50,18 @@ ADD COLUMN IF NOT EXISTS child_appearance TEXT;
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS family_appearance TEXT;
 
+-- 오프라인 방문촬영 가능 여부 (possible, impossible)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS offline_visit TEXT;
+
+-- 오프라인 촬영 가능 지역
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS offline_region TEXT;
+
+-- 링크트리 설정 가능 여부 (possible, impossible)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS linktree_available TEXT;
+
 -- 영상 길이 스타일 (longform, shortform, both)
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS video_length_style TEXT;
@@ -94,6 +106,14 @@ ADD COLUMN IF NOT EXISTS children JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS family_members JSONB DEFAULT '[]'::jsonb;
 
+-- 오프라인 촬영 장소 (popup, oliveyoung, department, daiso, other 배열)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS offline_locations JSONB DEFAULT '[]'::jsonb;
+
+-- 언어 능력 (korean, english, japanese, chinese 배열)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS languages JSONB DEFAULT '[]'::jsonb;
+
 
 -- 3. 인덱스 추가 (검색 성능 향상)
 -- =====================================================
@@ -109,6 +129,8 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_gender ON user_profiles(gender);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_job_visibility ON user_profiles(job_visibility);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_child_appearance ON user_profiles(child_appearance);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_family_appearance ON user_profiles(family_appearance);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_offline_visit ON user_profiles(offline_visit);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_linktree_available ON user_profiles(linktree_available);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_video_length_style ON user_profiles(video_length_style);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_shortform_tempo ON user_profiles(shortform_tempo);
 
@@ -121,6 +143,8 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_collaboration_preferences ON user_p
 CREATE INDEX IF NOT EXISTS idx_user_profiles_video_styles ON user_profiles USING GIN (video_styles);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_children ON user_profiles USING GIN (children);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_family_members ON user_profiles USING GIN (family_members);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_offline_locations ON user_profiles USING GIN (offline_locations);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_languages ON user_profiles USING GIN (languages);
 
 
 -- 4. 코멘트 추가 (문서화)
@@ -137,6 +161,9 @@ COMMENT ON COLUMN user_profiles.job_visibility IS '직업 공개 여부: public,
 COMMENT ON COLUMN user_profiles.job IS '직업 (job_visibility가 public일 때만 사용)';
 COMMENT ON COLUMN user_profiles.child_appearance IS '아이 출연 가능 여부: possible, impossible';
 COMMENT ON COLUMN user_profiles.family_appearance IS '커플/가족 출연 가능 여부: possible, impossible';
+COMMENT ON COLUMN user_profiles.offline_visit IS '오프라인 방문촬영 가능 여부: possible, impossible';
+COMMENT ON COLUMN user_profiles.offline_region IS '오프라인 촬영 가능 지역 (텍스트)';
+COMMENT ON COLUMN user_profiles.linktree_available IS '링크트리 설정 가능 여부: possible, impossible';
 COMMENT ON COLUMN user_profiles.video_length_style IS '영상 길이 스타일: longform, shortform, both';
 COMMENT ON COLUMN user_profiles.shortform_tempo IS '숏폼 템포 스타일: fast, normal, slow';
 COMMENT ON COLUMN user_profiles.skin_concerns IS '피부 고민 (JSONB 배열): sensitivity, acne, pigmentation, wrinkles, pores, dullness, redness, texture';
@@ -147,6 +174,8 @@ COMMENT ON COLUMN user_profiles.collaboration_preferences IS '협업 선호도 (
 COMMENT ON COLUMN user_profiles.video_styles IS '영상 스타일 (JSONB 배열): emotional, review, tutorial, vlog, unboxing, comparison, haul, asmr';
 COMMENT ON COLUMN user_profiles.children IS '아이 정보 (JSONB 배열): [{gender: "boy"|"girl", age: number}]';
 COMMENT ON COLUMN user_profiles.family_members IS '가족 구성원 (JSONB 배열): ["husband", "wife", "parents"]';
+COMMENT ON COLUMN user_profiles.offline_locations IS '오프라인 촬영 장소 (JSONB 배열): ["popup", "oliveyoung", "department", "daiso"]';
+COMMENT ON COLUMN user_profiles.languages IS '언어 능력 (JSONB 배열): ["korean", "english", "japanese", "chinese"]';
 
 
 -- 5. 검증 쿼리 (실행 후 확인용)
@@ -168,6 +197,9 @@ AND column_name IN (
     'job',
     'child_appearance',
     'family_appearance',
+    'offline_visit',
+    'offline_region',
+    'linktree_available',
     'video_length_style',
     'shortform_tempo',
     'skin_concerns',
@@ -177,7 +209,9 @@ AND column_name IN (
     'collaboration_preferences',
     'video_styles',
     'children',
-    'family_members'
+    'family_members',
+    'offline_locations',
+    'languages'
 );
 
 -- 인덱스 확인
@@ -205,6 +239,9 @@ ALTER TABLE user_profiles DROP COLUMN IF EXISTS job_visibility;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS job;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS child_appearance;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS family_appearance;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS offline_visit;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS offline_region;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS linktree_available;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS video_length_style;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS shortform_tempo;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS skin_concerns;
@@ -215,6 +252,8 @@ ALTER TABLE user_profiles DROP COLUMN IF EXISTS collaboration_preferences;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS video_styles;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS children;
 ALTER TABLE user_profiles DROP COLUMN IF EXISTS family_members;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS offline_locations;
+ALTER TABLE user_profiles DROP COLUMN IF EXISTS languages;
 */
 
 
