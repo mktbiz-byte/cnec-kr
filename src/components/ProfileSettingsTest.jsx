@@ -725,9 +725,9 @@ const ProfileSettingsTest = () => {
           <div className="w-10" />
         </div>
 
-        {/* 탭 네비게이션 */}
+        {/* 탭 네비게이션 - 스크롤 없이 한 줄에 표시 */}
         <div className="max-w-lg mx-auto px-4 pb-3">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1.5">
             {tabs.map((tab) => {
               const accessible = canAccessTab(tab.id)
               const isActive = activeTab === tab.id
@@ -739,7 +739,7 @@ const ProfileSettingsTest = () => {
                   key={tab.id}
                   onClick={() => accessible && setActiveTab(tab.id)}
                   disabled={!accessible}
-                  className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
+                  className={`flex-1 px-2 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1 ${
                     isActive
                       ? 'bg-violet-600 text-white'
                       : accessible
@@ -749,7 +749,7 @@ const ProfileSettingsTest = () => {
                         : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                   }`}
                 >
-                  {isComplete && !isActive ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                  {isComplete && !isActive ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
                   {tab.label}
                 </button>
               )
