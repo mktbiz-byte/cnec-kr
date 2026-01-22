@@ -446,6 +446,8 @@ const ProfileSettingsTest = () => {
         return
       }
 
+      console.log('[DEBUG] 저장 전 profile.age:', profile.age, '타입:', typeof profile.age)
+
       const profileData = {
         id: user.id, role: 'creator',
         name: profile.name.trim(), email: profile.email.trim(),
@@ -496,6 +498,9 @@ const ProfileSettingsTest = () => {
         languages: beautyProfile.languages,
         linktree_channels: beautyProfile.linktree_available === 'possible' ? beautyProfile.linktree_channels : []
       }
+
+      console.log('[DEBUG] 저장할 profileData:', profileData)
+      console.log('[DEBUG] 저장할 age 값:', profileData.age)
 
       await database.userProfiles.upsert(profileData)
       if (!silent) {
