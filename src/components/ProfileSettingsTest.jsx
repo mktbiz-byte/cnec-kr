@@ -196,86 +196,49 @@ const ChildrenInput = ({ children = [], onChange }) => {
   )
 }
 
-// 팁 섹션 (보라색 그라데이션)
-const TipSection = ({ title, description, highlight }) => (
-  <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-4 text-white mb-5">
-    <div className="flex items-start gap-3">
-      <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-        <Sparkles className="w-5 h-5 text-yellow-300" />
-      </div>
-      <div className="flex-1">
-        <p className="font-bold text-sm">{title}</p>
-        <p className="text-xs text-white/90 mt-1 leading-relaxed">
-          {description} <span className="text-yellow-300 font-semibold underline">{highlight}</span>
-        </p>
-      </div>
-      <ChevronRight className="w-5 h-5 text-white/60 flex-shrink-0 mt-1" />
-    </div>
-  </div>
-)
-
-// 통합 프리미엄 배너 (프로그레스 + 텍스트 + 혜택 + 탭)
-const UnifiedBanner = ({ percentage, tabs, activeTab, setActiveTab, canAccessTab, checkStepComplete }) => {
-  const circumference = 2 * Math.PI * 36
+// 컴팩트 통합 배너 (진행률 + 팁 + 100% 완성시 혜택 + 탭)
+const CompactBanner = ({ percentage, tabs, activeTab, setActiveTab, canAccessTab, checkStepComplete }) => {
+  const circumference = 2 * Math.PI * 24
   const strokeDashoffset = circumference - (percentage / 100) * circumference
 
   return (
-    <div className="bg-gradient-to-br from-fuchsia-50 via-violet-50 to-pink-50 rounded-2xl border border-violet-100/50 overflow-hidden mb-4">
+    <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl overflow-hidden mb-5">
       {/* 메인 콘텐츠 */}
       <div className="p-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {/* 원형 프로그레스 */}
-          <div className="relative w-20 h-20 flex-shrink-0">
+          <div className="relative w-14 h-14 flex-shrink-0">
             <svg className="w-full h-full transform -rotate-90">
-              <circle cx="40" cy="40" r="36" stroke="#E5E7EB" strokeWidth="6" fill="none" />
+              <circle cx="28" cy="28" r="24" stroke="rgba(255,255,255,0.3)" strokeWidth="4" fill="none" />
               <circle
-                cx="40" cy="40" r="36"
-                stroke="url(#progressGradient2)"
-                strokeWidth="6"
+                cx="28" cy="28" r="24"
+                stroke="white"
+                strokeWidth="4"
                 fill="none"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
                 className="transition-all duration-700 ease-out"
               />
-              <defs>
-                <linearGradient id="progressGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#A855F7" />
-                  <stop offset="100%" stopColor="#EC4899" />
-                </linearGradient>
-              </defs>
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[10px] text-gray-500">완성도</span>
-              <span className="text-lg font-bold text-gray-900">{percentage}%</span>
+              <span className="text-base font-bold text-white">{percentage}%</span>
             </div>
           </div>
 
           {/* 텍스트 */}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-sm font-bold text-gray-900 leading-snug">
-              매력적인 프로필이 브랜드의 마음을 움직여요! <span className="text-pink-500">💕</span>
-            </h2>
-            <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
-              빈칸을 채울수록 브랜드 담당자에게 <span className="text-fuchsia-600 font-bold">노출될 확률이 2배</span> 높아집니다.
+          <div className="flex-1 min-w-0 text-white">
+            <p className="text-sm font-bold leading-tight">
+              프로필을 채울수록 브랜드 매칭률 UP!
             </p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              크리에이터님만의 숨겨진 매력을 빠짐없이 알려주세요.
+            <p className="text-xs text-white/80 mt-1">
+              💡 100% 완성 시 <span className="text-yellow-300 font-bold">지원율 300%</span> 상승
             </p>
-          </div>
-
-          {/* 혜택 박스 */}
-          <div className="flex flex-col items-center bg-white rounded-xl p-2.5 shadow-sm border border-gray-100 flex-shrink-0">
-            <div className="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center mb-1">
-              <Sparkles className="w-4 h-4 text-violet-600" />
-            </div>
-            <span className="text-[10px] text-gray-400">완성 시</span>
-            <span className="text-xs font-bold text-violet-600">혜택 보기</span>
           </div>
         </div>
 
         {/* 탭 네비게이션 */}
-        <div className="flex gap-1.5 mt-4">
+        <div className="flex gap-1 mt-3">
           {tabs.filter(t => t.id !== 'account').map((tab) => {
             const isActive = activeTab === tab.id
             const isComplete = checkStepComplete(tab.id)
@@ -286,56 +249,26 @@ const UnifiedBanner = ({ percentage, tabs, activeTab, setActiveTab, canAccessTab
                 key={tab.id}
                 onClick={() => isAccessible && setActiveTab(tab.id)}
                 disabled={!isAccessible}
-                className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-full text-xs font-semibold transition-all ${
+                className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
                   isActive
-                    ? 'bg-white text-violet-700 shadow border border-violet-200'
+                    ? 'bg-white text-violet-700'
                     : isComplete
-                      ? 'bg-white/60 text-gray-600 border border-gray-200'
+                      ? 'bg-white/30 text-white'
                       : isAccessible
-                        ? 'bg-white/40 text-gray-500 border border-transparent hover:bg-white/60'
-                        : 'bg-gray-100/50 text-gray-300 cursor-not-allowed border border-transparent'
+                        ? 'bg-white/10 text-white/70 hover:bg-white/20'
+                        : 'bg-white/5 text-white/30 cursor-not-allowed'
                 }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${
-                  isActive ? 'bg-violet-500' : isComplete ? 'bg-green-500' : 'bg-gray-300'
-                }`} />
+                {isComplete && !isActive && '✓ '}
                 {tab.label}
-                {isActive && <span className="text-violet-400 text-[10px]">(작성중)</span>}
               </button>
             )
           })}
         </div>
       </div>
-
-      {/* 하단 프로그레스 바 */}
-      <div className="h-1 bg-gray-200">
-        <div
-          className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500"
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
     </div>
   )
 }
-
-// 섹션 상단 동기부여 메시지
-const SectionBenefit = ({ icon: Icon, title, description, benefit }) => (
-  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-5">
-    <div className="flex items-start gap-4">
-      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0">
-        <Icon className="w-5 h-5 text-white" />
-      </div>
-      <div className="flex-1">
-        <h3 className="font-bold text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-500 mt-1">{description}</p>
-        <div className="mt-2 flex items-center gap-2 text-fuchsia-600 font-semibold text-sm">
-          <Sparkles className="w-4 h-4" />
-          {benefit}
-        </div>
-      </div>
-    </div>
-  </div>
-)
 
 // 섹션 타이틀 (크기 증가)
 const SectionTitle = ({ title, required = false, subtitle }) => (
