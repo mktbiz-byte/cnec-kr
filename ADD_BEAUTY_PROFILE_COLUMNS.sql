@@ -114,6 +114,10 @@ ADD COLUMN IF NOT EXISTS offline_locations JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE user_profiles
 ADD COLUMN IF NOT EXISTS languages JSONB DEFAULT '[]'::jsonb;
 
+-- 링크트리 설정 가능 채널 (instagram, tiktok, youtube 배열)
+ALTER TABLE user_profiles
+ADD COLUMN IF NOT EXISTS linktree_channels JSONB DEFAULT '[]'::jsonb;
+
 
 -- 3. 인덱스 추가 (검색 성능 향상)
 -- =====================================================
@@ -145,6 +149,7 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_children ON user_profiles USING GIN
 CREATE INDEX IF NOT EXISTS idx_user_profiles_family_members ON user_profiles USING GIN (family_members);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_offline_locations ON user_profiles USING GIN (offline_locations);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_languages ON user_profiles USING GIN (languages);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_linktree_channels ON user_profiles USING GIN (linktree_channels);
 
 
 -- 4. 코멘트 추가 (문서화)

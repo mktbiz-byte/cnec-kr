@@ -32,6 +32,7 @@ import {
   OFFLINE_VISIT,
   OFFLINE_LOCATIONS,
   LINKTREE_AVAILABLE,
+  LINKTREE_CHANNELS,
   LANGUAGES,
   VIDEO_LENGTH_STYLES,
   SHORTFORM_TEMPO_STYLES,
@@ -251,7 +252,7 @@ const ProfileSettingsTest = () => {
     category: '',
     skin_concerns: [], hair_concerns: [], diet_concerns: [],
     content_formats: [], collaboration_preferences: [], children: [], family_members: [],
-    offline_locations: [], languages: []
+    offline_locations: [], languages: [], linktree_channels: []
   })
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -407,7 +408,8 @@ const ProfileSettingsTest = () => {
           diet_concerns: data.diet_concerns || [], content_formats: data.content_formats || [],
           collaboration_preferences: data.collaboration_preferences || [],
           children: data.children || [], family_members: data.family_members || [],
-          offline_locations: data.offline_locations || [], languages: data.languages || []
+          offline_locations: data.offline_locations || [], languages: data.languages || [],
+          linktree_channels: data.linktree_channels || []
         })
 
         if (data.profile_image) setPhotoPreview(data.profile_image)
@@ -489,7 +491,8 @@ const ProfileSettingsTest = () => {
         children: beautyProfile.child_appearance === 'possible' ? beautyProfile.children : [],
         family_members: beautyProfile.family_appearance === 'possible' ? beautyProfile.family_members : [],
         offline_locations: beautyProfile.offline_visit === 'possible' ? beautyProfile.offline_locations : [],
-        languages: beautyProfile.languages
+        languages: beautyProfile.languages,
+        linktree_channels: beautyProfile.linktree_available === 'possible' ? beautyProfile.linktree_channels : []
       }
 
       await database.userProfiles.upsert(profileData)
@@ -1118,7 +1121,10 @@ const ProfileSettingsTest = () => {
 
             {/* 링크트리 설정 */}
             <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-5">
-              <SectionTitle title="링크트리 설정" subtitle="인스타/틱톡/유튜브 프로필에 링크트리 추가 가능 여부" />
+              <div className="flex items-center justify-between">
+                <SectionTitle title="링크트리 설정" subtitle="인스타/틱톡/유튜브 프로필에 링크트리 추가 가능 여부" />
+                <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-lg">업데이트 예정</span>
+              </div>
 
               <div>
                 <p className="text-sm font-semibold text-gray-700 mb-3">링크트리 설정 가능</p>
@@ -1129,10 +1135,21 @@ const ProfileSettingsTest = () => {
                   size="small"
                 />
                 {beautyProfile.linktree_available === 'possible' && (
-                  <div className="mt-3 p-3 bg-violet-50 rounded-xl border border-violet-200">
-                    <p className="text-sm text-violet-700 font-medium">
-                      링크트리 설정 가능 시 캠페인별 추가 지급 조건이 적용될 수 있습니다.
-                    </p>
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <p className="text-sm text-gray-500 mb-3">설정 가능한 채널</p>
+                      <MultiSelectGroup
+                        options={LINKTREE_CHANNELS}
+                        values={beautyProfile.linktree_channels}
+                        onChange={(v) => setBeautyProfile(prev => ({ ...prev, linktree_channels: v }))}
+                        columns={3}
+                      />
+                    </div>
+                    <div className="p-3 bg-violet-50 rounded-xl border border-violet-200">
+                      <p className="text-sm text-violet-700 font-medium">
+                        링크트리 설정 가능 시 캠페인별 추가 지급 조건이 적용될 수 있습니다.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>

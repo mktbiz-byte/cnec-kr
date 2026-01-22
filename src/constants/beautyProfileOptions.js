@@ -211,6 +211,13 @@ export const LINKTREE_AVAILABLE = [
   { value: 'impossible', label: '불가능' }
 ]
 
+// 7-2. 링크트리 설정 가능 채널 (다중선택)
+export const LINKTREE_CHANNELS = [
+  { value: 'instagram', label: '인스타그램' },
+  { value: 'tiktok', label: '틱톡' },
+  { value: 'youtube', label: '유튜브' }
+]
+
 // ==========================================
 // 기존 호환용 - 관심 카테고리
 // ==========================================
@@ -261,7 +268,8 @@ export const DEFAULT_BEAUTY_PROFILE = {
   children: [], // [{gender: 'boy', age: 5}, ...]
   family_members: [], // ['husband', 'parents']
   offline_locations: [], // ['popup', 'oliveyoung', 'department', 'daiso']
-  languages: [] // ['korean', 'english', 'japanese', 'chinese']
+  languages: [], // ['korean', 'english', 'japanese', 'chinese']
+  linktree_channels: [] // ['instagram', 'tiktok', 'youtube']
 }
 
 // ==========================================
@@ -285,6 +293,7 @@ export const PROFILE_OPTIONS = {
     offlineVisit: OFFLINE_VISIT,
     offlineLocations: OFFLINE_LOCATIONS,
     linktreeAvailable: LINKTREE_AVAILABLE,
+    linktreeChannels: LINKTREE_CHANNELS,
     videoLengthStyles: VIDEO_LENGTH_STYLES,
     shortformTempoStyles: SHORTFORM_TEMPO_STYLES
   },
