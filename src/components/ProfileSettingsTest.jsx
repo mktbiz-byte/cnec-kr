@@ -2,10 +2,6 @@
  * ProfileSettingsTest.jsx
  * 뷰티 크리에이터 프로필 페이지 - 테스트 버전
  * 비공개 URL로만 접근 가능 (/profile-test-beta-2025)
- *
- * 새로운 필드 구조:
- * - 단일 선택: 피부타입, 주요 관심 분야, 경험 수준, 팔로워 규모, 업로드 빈도, 타겟 성별, 타겟 연령대
- * - 다중 선택: 피부 고민, 헤어 고민, 다이어트 고민, 선호 콘텐츠 형식, 협업 선호도, 타겟 관심사
  */
 
 import { useState, useEffect } from 'react'
@@ -14,23 +10,28 @@ import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
 import {
   Loader2, User, Instagram, Youtube, Hash, Camera, ArrowLeft, Search,
-  Lock, AlertTriangle, X, LogOut, ChevronDown, ChevronUp, Check, Info
+  Lock, AlertTriangle, X, LogOut, ChevronDown, ChevronUp, Check, Plus, Trash2, Video
 } from 'lucide-react'
 
 import {
   SKIN_TYPES,
+  HAIR_TYPES,
   PRIMARY_INTERESTS,
   EXPERIENCE_LEVELS,
   FOLLOWER_RANGES,
   UPLOAD_FREQUENCIES,
-  TARGET_GENDERS,
-  TARGET_AGE_GROUPS,
+  GENDERS,
+  JOB_VISIBILITY,
+  CHILD_APPEARANCE,
+  CHILD_GENDERS,
+  VIDEO_LENGTH_STYLES,
+  SHORTFORM_TEMPO_STYLES,
+  VIDEO_STYLES,
   SKIN_CONCERNS,
   HAIR_CONCERNS,
   DIET_CONCERNS,
   CONTENT_FORMATS,
   COLLABORATION_PREFERENCES,
-  TARGET_INTERESTS,
   CATEGORIES
 } from '../constants/beautyProfileOptions'
 
@@ -42,25 +43,18 @@ const TestModeBanner = () => (
 )
 
 // 섹션 헤더 컴포넌트
-const SectionHeader = ({ title, subtitle, required = false, icon: Icon }) => (
-  <div className="flex items-start gap-3 mb-4">
-    {Icon && (
-      <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
-        <Icon className="w-5 h-5 text-violet-600" />
-      </div>
-    )}
-    <div>
-      <h2 className="text-base font-bold text-gray-900">
-        {title}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </h2>
-      {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
-    </div>
+const SectionHeader = ({ title, subtitle, required = false }) => (
+  <div className="mb-4">
+    <h2 className="text-base font-bold text-gray-900">
+      {title}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </h2>
+    {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
   </div>
 )
 
-// 단일 선택 버튼 그룹 (라디오 버튼 스타일)
-const SingleSelectGroup = ({ options, value, onChange, name }) => (
+// 단일 선택 버튼 그룹
+const SingleSelectGroup = ({ options, value, onChange, showDescription = false }) => (
   <div className="flex flex-wrap gap-2">
     {options.map((option) => (
       <button
@@ -72,6 +66,7 @@ const SingleSelectGroup = ({ options, value, onChange, name }) => (
             ? 'bg-violet-600 text-white shadow-md shadow-violet-200'
             : 'bg-white border border-gray-200 text-gray-700 hover:border-violet-300 hover:bg-violet-50'
         }`}
+        title={option.description || ''}
       >
         {option.label}
       </button>
@@ -80,7 +75,7 @@ const SingleSelectGroup = ({ options, value, onChange, name }) => (
 )
 
 // 다중 선택 체크박스 그룹
-const MultiSelectGroup = ({ options, values = [], onChange, name, columns = 2 }) => {
+const MultiSelectGroup = ({ options, values = [], onChange, columns = 2 }) => {
   const handleToggle = (optionValue) => {
     const newValues = values.includes(optionValue)
       ? values.filter(v => v !== optionValue)
@@ -116,9 +111,9 @@ const MultiSelectGroup = ({ options, values = [], onChange, name, columns = 2 })
   )
 }
 
-// 접이식 섹션 컴포넌트
-const CollapsibleSection = ({ title, subtitle, required, children, defaultOpen = true, icon: Icon }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen)
+// 접이식 섹션 컴포넌트 - 모두 오픈
+const CollapsibleSection = ({ title, subtitle, required, children, icon: Icon }) => {
+  const [isOpen, setIsOpen] = useState(true)
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -152,6 +147,68 @@ const CollapsibleSection = ({ title, subtitle, required, children, defaultOpen =
   )
 }
 
+// 아이 정보 입력 컴포넌트
+const ChildrenInput = ({ children = [], onChange }) => {
+  const addChild = () => {
+    onChange([...children, { gender: '', age: '' }])
+  }
+
+  const removeChild = (index) => {
+    onChange(children.filter((_, i) => i !== index))
+  }
+
+  const updateChild = (index, field, value) => {
+    const updated = [...children]
+    updated[index] = { ...updated[index], [field]: value }
+    onChange(updated)
+  }
+
+  return (
+    <div className="space-y-3">
+      {children.map((child, index) => (
+        <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+          <div className="flex-1 grid grid-cols-2 gap-3">
+            <select
+              value={child.gender}
+              onChange={(e) => updateChild(index, 'gender', e.target.value)}
+              className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            >
+              <option value="">성별 선택</option>
+              {CHILD_GENDERS.map(g => (
+                <option key={g.value} value={g.value}>{g.label}</option>
+              ))}
+            </select>
+            <input
+              type="number"
+              value={child.age}
+              onChange={(e) => updateChild(index, 'age', e.target.value)}
+              placeholder="나이 (만)"
+              className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              min="0"
+              max="18"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => removeChild(index)}
+            className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addChild}
+        className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium flex items-center justify-center gap-2 hover:border-violet-300 hover:text-violet-600 transition-colors"
+      >
+        <Plus className="w-4 h-4" />
+        아이 추가
+      </button>
+    </div>
+  )
+}
+
 // 진행 상태 표시
 const ProgressIndicator = ({ currentStep, totalSteps }) => (
   <div className="flex items-center gap-2 px-4 py-3 bg-violet-50 rounded-xl mb-6">
@@ -171,7 +228,7 @@ const ProfileSettingsTest = () => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
 
-  // 기본 프로필 필드 (기존 호환)
+  // 기본 프로필 필드
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -182,7 +239,6 @@ const ProfileSettingsTest = () => {
     postcode: '',
     address: '',
     detail_address: '',
-    // SNS 정보
     instagram_url: '',
     youtube_url: '',
     tiktok_url: '',
@@ -190,31 +246,36 @@ const ProfileSettingsTest = () => {
     instagram_followers: '',
     youtube_subscribers: '',
     tiktok_followers: '',
-    // 대표 채널 정보
     channel_name: '',
     followers: '',
     avg_views: '',
     target_audience: ''
   })
 
-  // 새로운 뷰티 프로필 필드
+  // 뷰티 프로필 필드
   const [beautyProfile, setBeautyProfile] = useState({
     // 단일 선택
     skin_type: '',
+    hair_type: '',
     primary_interest: '',
     experience_level: '',
     follower_range: '',
     upload_frequency: '',
-    target_gender: '',
-    target_age_group: '',
-    category: '',  // 기존 호환
+    gender: '',
+    job_visibility: '',
+    job: '',
+    child_appearance: '',
+    video_length_style: '',
+    shortform_tempo: '',
+    category: '',
     // 다중 선택
     skin_concerns: [],
     hair_concerns: [],
     diet_concerns: [],
     content_formats: [],
     collaboration_preferences: [],
-    target_interests: []
+    video_styles: [],
+    children: []
   })
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -229,9 +290,8 @@ const ProfileSettingsTest = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showPostcodeLayer, setShowPostcodeLayer] = useState(false)
-  const [activeTab, setActiveTab] = useState('basic') // basic, beauty, sns, advanced
+  const [activeTab, setActiveTab] = useState('basic')
 
-  // 회원 탈퇴 관련 상태
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deletionReason, setDeletionReason] = useState('')
   const [deletionDetails, setDeletionDetails] = useState('')
@@ -241,17 +301,19 @@ const ProfileSettingsTest = () => {
   // 프로필 완성도 계산
   const calculateProgress = () => {
     let filled = 0
-    let total = 10 // 필수 항목 수
+    let total = 12
 
     if (profile.name) filled++
     if (profile.phone) filled++
     if (profile.address) filled++
     if (beautyProfile.skin_type) filled++
+    if (beautyProfile.hair_type) filled++
     if (beautyProfile.skin_concerns.length > 0) filled++
     if (beautyProfile.hair_concerns.length > 0) filled++
     if (beautyProfile.diet_concerns.length > 0) filled++
     if (profile.instagram_url || profile.youtube_url || profile.tiktok_url) filled++
-    if (profile.channel_name) filled++
+    if (beautyProfile.gender) filled++
+    if (beautyProfile.video_length_style) filled++
     if (photoPreview) filled++
 
     return filled
@@ -269,7 +331,6 @@ const ProfileSettingsTest = () => {
       const profileData = await database.userProfiles.get(user.id)
 
       if (profileData) {
-        // 기본 프로필 데이터 로드
         setProfile({
           name: profileData.name || '',
           email: profileData.email || user.email || '',
@@ -293,23 +354,27 @@ const ProfileSettingsTest = () => {
           target_audience: profileData.target_audience || ''
         })
 
-        // 뷰티 프로필 데이터 로드 (새 필드 + 기존 호환)
         setBeautyProfile({
           skin_type: profileData.skin_type || '',
+          hair_type: profileData.hair_type || '',
           primary_interest: profileData.primary_interest || '',
           experience_level: profileData.experience_level || '',
           follower_range: profileData.follower_range || '',
           upload_frequency: profileData.upload_frequency || '',
-          target_gender: profileData.target_gender || '',
-          target_age_group: profileData.target_age_group || '',
+          gender: profileData.gender || '',
+          job_visibility: profileData.job_visibility || '',
+          job: profileData.job || '',
+          child_appearance: profileData.child_appearance || '',
+          video_length_style: profileData.video_length_style || '',
+          shortform_tempo: profileData.shortform_tempo || '',
           category: profileData.category || '',
-          // 다중 선택 필드 (JSON 배열로 저장)
           skin_concerns: profileData.skin_concerns || [],
           hair_concerns: profileData.hair_concerns || [],
           diet_concerns: profileData.diet_concerns || [],
           content_formats: profileData.content_formats || [],
           collaboration_preferences: profileData.collaboration_preferences || [],
-          target_interests: profileData.target_interests || []
+          video_styles: profileData.video_styles || [],
+          children: profileData.children || []
         })
 
         if (profileData.profile_image) {
@@ -344,7 +409,6 @@ const ProfileSettingsTest = () => {
       const profileData = {
         id: user.id,
         role: 'creator',
-        // 기본 정보
         name: profile.name.trim(),
         email: profile.email.trim(),
         phone: profile.phone?.trim() || null,
@@ -353,7 +417,6 @@ const ProfileSettingsTest = () => {
         postcode: profile.postcode?.trim() || null,
         address: profile.address?.trim() || null,
         detail_address: profile.detail_address?.trim() || null,
-        // SNS 정보
         instagram_url: profile.instagram_url?.trim() || null,
         youtube_url: profile.youtube_url?.trim() || null,
         tiktok_url: profile.tiktok_url?.trim() || null,
@@ -361,27 +424,32 @@ const ProfileSettingsTest = () => {
         instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
         youtube_subscribers: profile.youtube_subscribers ? parseInt(profile.youtube_subscribers) : null,
         tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null,
-        // 대표 채널 정보
         channel_name: profile.channel_name?.trim() || null,
         followers: profile.followers ? parseInt(profile.followers) : null,
         avg_views: profile.avg_views ? parseInt(profile.avg_views) : null,
         target_audience: profile.target_audience?.trim() || null,
-        // 뷰티 프로필 - 단일 선택
+        // 뷰티 프로필
         skin_type: beautyProfile.skin_type || null,
+        hair_type: beautyProfile.hair_type || null,
         category: beautyProfile.category || null,
         primary_interest: beautyProfile.primary_interest || null,
         experience_level: beautyProfile.experience_level || null,
         follower_range: beautyProfile.follower_range || null,
         upload_frequency: beautyProfile.upload_frequency || null,
-        target_gender: beautyProfile.target_gender || null,
-        target_age_group: beautyProfile.target_age_group || null,
-        // 뷰티 프로필 - 다중 선택 (JSON 배열)
+        gender: beautyProfile.gender || null,
+        job_visibility: beautyProfile.job_visibility || null,
+        job: beautyProfile.job_visibility === 'public' ? beautyProfile.job?.trim() || null : null,
+        child_appearance: beautyProfile.child_appearance || null,
+        video_length_style: beautyProfile.video_length_style || null,
+        shortform_tempo: beautyProfile.shortform_tempo || null,
+        // 다중 선택
         skin_concerns: beautyProfile.skin_concerns,
         hair_concerns: beautyProfile.hair_concerns,
         diet_concerns: beautyProfile.diet_concerns,
         content_formats: beautyProfile.content_formats,
         collaboration_preferences: beautyProfile.collaboration_preferences,
-        target_interests: beautyProfile.target_interests
+        video_styles: beautyProfile.video_styles,
+        children: beautyProfile.child_appearance === 'possible' ? beautyProfile.children : []
       }
 
       await database.userProfiles.upsert(profileData)
@@ -636,12 +704,12 @@ const ProfileSettingsTest = () => {
     { id: 'basic', label: '기본정보' },
     { id: 'beauty', label: '뷰티프로필' },
     { id: 'sns', label: 'SNS채널' },
+    { id: 'video', label: '영상스타일' },
     { id: 'advanced', label: '상세설정' }
   ]
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 테스트 모드 배너 */}
       <TestModeBanner />
 
       {/* 헤더 */}
@@ -661,12 +729,12 @@ const ProfileSettingsTest = () => {
         </div>
 
         {/* 탭 네비게이션 */}
-        <div className="max-w-md mx-auto px-4 flex gap-1 pb-3">
+        <div className="max-w-md mx-auto px-4 flex gap-1 pb-3 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-violet-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -688,8 +756,7 @@ const ProfileSettingsTest = () => {
       )}
 
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-        {/* 프로필 완성도 */}
-        <ProgressIndicator currentStep={calculateProgress()} totalSteps={10} />
+        <ProgressIndicator currentStep={calculateProgress()} totalSteps={12} />
 
         {/* === 기본 정보 탭 === */}
         {activeTab === 'basic' && (
@@ -828,76 +895,78 @@ const ProfileSettingsTest = () => {
         {/* === 뷰티 프로필 탭 === */}
         {activeTab === 'beauty' && (
           <div className="space-y-4">
-            {/* 피부 타입 (단일 선택) */}
+            {/* 피부 타입 */}
             <CollapsibleSection title="피부 타입" required subtitle="현재 피부 상태를 선택해주세요">
               <SingleSelectGroup
                 options={SKIN_TYPES}
                 value={beautyProfile.skin_type}
                 onChange={(value) => setBeautyProfile(prev => ({ ...prev, skin_type: value }))}
-                name="skin_type"
               />
             </CollapsibleSection>
 
-            {/* 피부 고민 (다중 선택) */}
+            {/* 피부 고민 */}
             <CollapsibleSection title="피부 고민" required subtitle="해당하는 모든 피부 고민을 선택해주세요">
               <MultiSelectGroup
                 options={SKIN_CONCERNS}
                 values={beautyProfile.skin_concerns}
                 onChange={(values) => setBeautyProfile(prev => ({ ...prev, skin_concerns: values }))}
-                name="skin_concerns"
                 columns={2}
               />
             </CollapsibleSection>
 
-            {/* 헤어 고민 (다중 선택) */}
+            {/* 헤어 타입 */}
+            <CollapsibleSection title="헤어 타입" required subtitle="현재 헤어 상태를 선택해주세요">
+              <SingleSelectGroup
+                options={HAIR_TYPES}
+                value={beautyProfile.hair_type}
+                onChange={(value) => setBeautyProfile(prev => ({ ...prev, hair_type: value }))}
+              />
+            </CollapsibleSection>
+
+            {/* 헤어 고민 */}
             <CollapsibleSection title="헤어 고민" required subtitle="해당하는 모든 헤어 고민을 선택해주세요">
               <MultiSelectGroup
                 options={HAIR_CONCERNS}
                 values={beautyProfile.hair_concerns}
                 onChange={(values) => setBeautyProfile(prev => ({ ...prev, hair_concerns: values }))}
-                name="hair_concerns"
                 columns={2}
               />
             </CollapsibleSection>
 
-            {/* 다이어트 고민 (다중 선택) */}
+            {/* 다이어트 고민 */}
             <CollapsibleSection title="다이어트 고민" required subtitle="해당하는 모든 다이어트 고민을 선택해주세요">
               <MultiSelectGroup
                 options={DIET_CONCERNS}
                 values={beautyProfile.diet_concerns}
                 onChange={(values) => setBeautyProfile(prev => ({ ...prev, diet_concerns: values }))}
-                name="diet_concerns"
                 columns={2}
               />
             </CollapsibleSection>
 
-            {/* 주요 관심 분야 (단일 선택) */}
-            <CollapsibleSection title="주요 관심 분야" subtitle="크리에이터의 주력 분야를 선택해주세요" defaultOpen={false}>
+            {/* 주요 관심 분야 */}
+            <CollapsibleSection title="주요 관심 분야" subtitle="크리에이터의 주력 분야를 선택해주세요">
               <SingleSelectGroup
                 options={PRIMARY_INTERESTS}
                 value={beautyProfile.primary_interest}
                 onChange={(value) => setBeautyProfile(prev => ({ ...prev, primary_interest: value }))}
-                name="primary_interest"
               />
             </CollapsibleSection>
 
-            {/* 관심 카테고리 (단일 선택 - 기존 호환) */}
-            <CollapsibleSection title="관심 카테고리" subtitle="관심있는 제품 카테고리를 선택해주세요" defaultOpen={false}>
+            {/* 관심 카테고리 */}
+            <CollapsibleSection title="관심 카테고리" subtitle="관심있는 제품 카테고리를 선택해주세요">
               <SingleSelectGroup
                 options={CATEGORIES}
                 value={beautyProfile.category}
                 onChange={(value) => setBeautyProfile(prev => ({ ...prev, category: value }))}
-                name="category"
               />
             </CollapsibleSection>
 
-            {/* 경험 수준 (단일 선택) */}
-            <CollapsibleSection title="경험 수준" subtitle="해당 분야에서의 경험 수준" defaultOpen={false}>
+            {/* 경험 수준 */}
+            <CollapsibleSection title="경험 수준" subtitle="해당 분야에서의 경험 수준">
               <SingleSelectGroup
                 options={EXPERIENCE_LEVELS}
                 value={beautyProfile.experience_level}
                 onChange={(value) => setBeautyProfile(prev => ({ ...prev, experience_level: value }))}
-                name="experience_level"
               />
             </CollapsibleSection>
           </div>
@@ -1033,44 +1102,94 @@ const ProfileSettingsTest = () => {
               </div>
             </div>
 
-            {/* 팔로워 규모 (단일 선택) */}
-            <CollapsibleSection title="팔로워 규모" subtitle="현재 전체 팔로워 범위" defaultOpen={false}>
+            {/* 팔로워 규모 */}
+            <CollapsibleSection title="팔로워 규모" subtitle="현재 전체 팔로워 범위">
               <SingleSelectGroup
                 options={FOLLOWER_RANGES}
                 value={beautyProfile.follower_range}
                 onChange={(value) => setBeautyProfile(prev => ({ ...prev, follower_range: value }))}
-                name="follower_range"
               />
             </CollapsibleSection>
 
-            {/* 업로드 빈도 (단일 선택) */}
-            <CollapsibleSection title="업로드 빈도" subtitle="콘텐츠 업로드 주기" defaultOpen={false}>
+            {/* 업로드 빈도 */}
+            <CollapsibleSection title="업로드 빈도" subtitle="콘텐츠 업로드 주기">
               <SingleSelectGroup
                 options={UPLOAD_FREQUENCIES}
                 value={beautyProfile.upload_frequency}
                 onChange={(value) => setBeautyProfile(prev => ({ ...prev, upload_frequency: value }))}
-                name="upload_frequency"
               />
             </CollapsibleSection>
 
-            {/* 선호 콘텐츠 형식 (다중 선택) */}
-            <CollapsibleSection title="선호 콘텐츠 형식" subtitle="제작 가능한 모든 콘텐츠 형식을 선택해주세요" defaultOpen={false}>
+            {/* 선호 콘텐츠 형식 */}
+            <CollapsibleSection title="선호 콘텐츠 형식" subtitle="제작 가능한 모든 콘텐츠 형식을 선택해주세요">
               <MultiSelectGroup
                 options={CONTENT_FORMATS}
                 values={beautyProfile.content_formats}
                 onChange={(values) => setBeautyProfile(prev => ({ ...prev, content_formats: values }))}
-                name="content_formats"
                 columns={2}
               />
             </CollapsibleSection>
 
-            {/* 협업 선호도 (다중 선택) */}
-            <CollapsibleSection title="협업 선호도" subtitle="선호하는 모든 협업 형태를 선택해주세요" defaultOpen={false}>
+            {/* 협업 선호도 */}
+            <CollapsibleSection title="협업 선호도" subtitle="선호하는 모든 협업 형태를 선택해주세요">
               <MultiSelectGroup
                 options={COLLABORATION_PREFERENCES}
                 values={beautyProfile.collaboration_preferences}
                 onChange={(values) => setBeautyProfile(prev => ({ ...prev, collaboration_preferences: values }))}
-                name="collaboration_preferences"
+                columns={2}
+              />
+            </CollapsibleSection>
+          </div>
+        )}
+
+        {/* === 영상 스타일 탭 === */}
+        {activeTab === 'video' && (
+          <div className="space-y-4">
+            {/* 영상 길이 스타일 */}
+            <CollapsibleSection title="영상 길이" subtitle="제작 가능한 영상 형태를 선택해주세요" icon={Video}>
+              <SingleSelectGroup
+                options={VIDEO_LENGTH_STYLES}
+                value={beautyProfile.video_length_style}
+                onChange={(value) => setBeautyProfile(prev => ({ ...prev, video_length_style: value }))}
+              />
+            </CollapsibleSection>
+
+            {/* 숏폼 템포 스타일 */}
+            <CollapsibleSection title="숏폼 템포 스타일" subtitle="숏폼 영상의 편집 스타일을 선택해주세요">
+              <div className="space-y-2">
+                {SHORTFORM_TEMPO_STYLES.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setBeautyProfile(prev => ({ ...prev, shortform_tempo: option.value }))}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 ${
+                      beautyProfile.shortform_tempo === option.value
+                        ? 'bg-violet-50 border-2 border-violet-500'
+                        : 'bg-white border border-gray-200 hover:border-violet-300'
+                    }`}
+                  >
+                    <div className="text-left">
+                      <div className={`font-medium ${beautyProfile.shortform_tempo === option.value ? 'text-violet-700' : 'text-gray-900'}`}>
+                        {option.label}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">{option.description}</div>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      beautyProfile.shortform_tempo === option.value ? 'bg-violet-600' : 'border border-gray-300'
+                    }`}>
+                      {beautyProfile.shortform_tempo === option.value && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </CollapsibleSection>
+
+            {/* 영상 스타일 */}
+            <CollapsibleSection title="영상 스타일" subtitle="선호하는 영상 스타일을 모두 선택해주세요">
+              <MultiSelectGroup
+                options={VIDEO_STYLES}
+                values={beautyProfile.video_styles}
+                onChange={(values) => setBeautyProfile(prev => ({ ...prev, video_styles: values }))}
                 columns={2}
               />
             </CollapsibleSection>
@@ -1080,35 +1199,51 @@ const ProfileSettingsTest = () => {
         {/* === 상세 설정 탭 === */}
         {activeTab === 'advanced' && (
           <div className="space-y-4">
-            {/* 타겟 성별 (단일 선택) */}
-            <CollapsibleSection title="타겟 성별" subtitle="주요 타겟 성별">
+            {/* 성별 */}
+            <CollapsibleSection title="성별" subtitle="본인의 성별을 선택해주세요">
               <SingleSelectGroup
-                options={TARGET_GENDERS}
-                value={beautyProfile.target_gender}
-                onChange={(value) => setBeautyProfile(prev => ({ ...prev, target_gender: value }))}
-                name="target_gender"
+                options={GENDERS}
+                value={beautyProfile.gender}
+                onChange={(value) => setBeautyProfile(prev => ({ ...prev, gender: value }))}
               />
             </CollapsibleSection>
 
-            {/* 타겟 연령대 (단일 선택) */}
-            <CollapsibleSection title="타겟 연령대" subtitle="주요 타겟 연령대">
+            {/* 직업 공개 여부 */}
+            <CollapsibleSection title="직업 공개" subtitle="직업 정보 공개 여부를 선택해주세요">
               <SingleSelectGroup
-                options={TARGET_AGE_GROUPS}
-                value={beautyProfile.target_age_group}
-                onChange={(value) => setBeautyProfile(prev => ({ ...prev, target_age_group: value }))}
-                name="target_age_group"
+                options={JOB_VISIBILITY}
+                value={beautyProfile.job_visibility}
+                onChange={(value) => setBeautyProfile(prev => ({ ...prev, job_visibility: value }))}
               />
+              {beautyProfile.job_visibility === 'public' && (
+                <div className="mt-4">
+                  <input
+                    type="text"
+                    value={beautyProfile.job}
+                    onChange={(e) => setBeautyProfile(prev => ({ ...prev, job: e.target.value }))}
+                    className="w-full px-4 py-3 bg-gray-100 rounded-xl text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    placeholder="직업을 입력해주세요"
+                  />
+                </div>
+              )}
             </CollapsibleSection>
 
-            {/* 타겟 관심사 (다중 선택) */}
-            <CollapsibleSection title="타겟 관심사" subtitle="타겟이 관심 있는 모든 카테고리를 선택해주세요" defaultOpen={false}>
-              <MultiSelectGroup
-                options={TARGET_INTERESTS}
-                values={beautyProfile.target_interests}
-                onChange={(values) => setBeautyProfile(prev => ({ ...prev, target_interests: values }))}
-                name="target_interests"
-                columns={2}
+            {/* 아이 출연 가능 여부 */}
+            <CollapsibleSection title="아이 출연 가능 여부" subtitle="콘텐츠에 아이 출연이 가능한지 선택해주세요">
+              <SingleSelectGroup
+                options={CHILD_APPEARANCE}
+                value={beautyProfile.child_appearance}
+                onChange={(value) => setBeautyProfile(prev => ({ ...prev, child_appearance: value }))}
               />
+              {beautyProfile.child_appearance === 'possible' && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-600 mb-3">아이 정보를 입력해주세요</p>
+                  <ChildrenInput
+                    children={beautyProfile.children}
+                    onChange={(children) => setBeautyProfile(prev => ({ ...prev, children }))}
+                  />
+                </div>
+              )}
             </CollapsibleSection>
 
             {/* 비밀번호 변경 */}
