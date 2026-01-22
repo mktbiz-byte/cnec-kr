@@ -724,13 +724,13 @@ export const database = {
           name: profileData.name || null,
           email: profileData.email || null,
           phone: profileData.phone || null,
-          age: profileData.age || null,
+          age: profileData.age != null ? profileData.age : null, // 숫자 0도 유지
           skin_type: profileData.skin_type || null,
           category: profileData.category || null,
           // 대표 채널 정보 (브랜드 사이트 크리에이터 선택 시 사용)
           channel_name: profileData.channel_name || null,
-          followers: profileData.followers || null,
-          avg_views: profileData.avg_views || null,
+          followers: profileData.followers != null ? profileData.followers : null,
+          avg_views: profileData.avg_views != null ? profileData.avg_views : null,
           target_audience: profileData.target_audience || null,
           // 주소 정보
           address: profileData.address || null,
@@ -742,11 +742,42 @@ export const database = {
           tiktok_url: profileData.tiktok_url || null,
           blog_url: profileData.blog_url || null,
           // SNS 개별 팔로워/구독자
-          instagram_followers: profileData.instagram_followers || null,
-          youtube_subscribers: profileData.youtube_subscribers || null,
-          tiktok_followers: profileData.tiktok_followers || null,
+          instagram_followers: profileData.instagram_followers != null ? profileData.instagram_followers : null,
+          youtube_subscribers: profileData.youtube_subscribers != null ? profileData.youtube_subscribers : null,
+          tiktok_followers: profileData.tiktok_followers != null ? profileData.tiktok_followers : null,
           // 기타
           bio: profileData.bio || null,
+          // === 뷰티 프로필 필드 추가 ===
+          // 단일 선택
+          hair_type: profileData.hair_type || null,
+          primary_interest: profileData.primary_interest || null,
+          editing_level: profileData.editing_level || null,
+          shooting_level: profileData.shooting_level || null,
+          follower_range: profileData.follower_range || null,
+          upload_frequency: profileData.upload_frequency || null,
+          gender: profileData.gender || null,
+          job_visibility: profileData.job_visibility || null,
+          job: profileData.job || null,
+          child_appearance: profileData.child_appearance || null,
+          family_appearance: profileData.family_appearance || null,
+          offline_visit: profileData.offline_visit || null,
+          offline_region: profileData.offline_region || null,
+          linktree_available: profileData.linktree_available || null,
+          video_length_style: profileData.video_length_style || null,
+          shortform_tempo: profileData.shortform_tempo || null,
+          // 다중 선택 (JSONB)
+          skin_concerns: profileData.skin_concerns || [],
+          hair_concerns: profileData.hair_concerns || [],
+          diet_concerns: profileData.diet_concerns || [],
+          content_formats: profileData.content_formats || [],
+          collaboration_preferences: profileData.collaboration_preferences || [],
+          video_styles: profileData.video_styles || [],
+          children: profileData.children || [],
+          family_members: profileData.family_members || [],
+          offline_locations: profileData.offline_locations || [],
+          languages: profileData.languages || [],
+          linktree_channels: profileData.linktree_channels || [],
+          // 타임스탬프
           updated_at: new Date().toISOString()
         }
 
