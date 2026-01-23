@@ -5,7 +5,7 @@
  * 개선: UI 크기 증가, 계정관리 분리, 동기부여 상단 배치
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
@@ -386,6 +386,7 @@ const ProfileSettingsTest = () => {
   const [deletionDetails, setDeletionDetails] = useState('')
   const [confirmText, setConfirmText] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const hasLoadedRef = useRef(false) // 브라우저 탭 전환 시 재로드 방지
 
   // 탭 구성 - 계정관리 완전 분리
   const tabs = [
@@ -480,7 +481,11 @@ const ProfileSettingsTest = () => {
   }
 
   useEffect(() => {
-    if (user) loadProfile()
+    // 브라우저 탭 전환 시 재로드 방지 - 이미 로드했으면 스킵
+    if (user && !hasLoadedRef.current) {
+      hasLoadedRef.current = true
+      loadProfile()
+    }
   }, [user])
 
   const loadProfile = async () => {
