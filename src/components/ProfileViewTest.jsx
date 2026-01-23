@@ -40,16 +40,45 @@ const getLabels = (options, values) => {
   return values.map(v => getLabel(options, v)).filter(Boolean)
 }
 
-// 심플 해시태그 컴포넌트
-const SimpleTag = ({ children }) => (
-  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+// 색상별 태그 컴포넌트 - 카테고리에 따른 파스텔 색상
+const ColoredTag = ({ children, colorClass = 'bg-gray-100 text-gray-700 border-gray-200' }) => (
+  <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${colorClass}`}>
     #{children}
   </span>
 )
 
-// 카테고리 라벨
-const CategoryLabel = ({ children }) => (
-  <p className="text-xs font-medium text-gray-400 mb-2">{children}</p>
+// 카테고리별 색상 정의
+const TAG_COLORS = {
+  beauty: 'bg-pink-50 text-pink-700 border-pink-200',
+  diet: 'bg-green-50 text-green-700 border-green-200',
+  channel: 'bg-blue-50 text-blue-700 border-blue-200',
+  video: 'bg-purple-50 text-purple-700 border-purple-200',
+  activity: 'bg-orange-50 text-orange-700 border-orange-200',
+  special: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  language: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  personal: 'bg-gray-100 text-gray-700 border-gray-200'
+}
+
+// 탭 버튼 컴포넌트
+const TabButton = ({ active, onClick, children }) => (
+  <button
+    onClick={onClick}
+    className={`px-4 py-2 text-xs font-medium rounded-full whitespace-nowrap transition-all ${
+      active
+        ? 'bg-gray-900 text-white'
+        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+    }`}
+  >
+    {children}
+  </button>
+)
+
+// 섹션 헤더 컴포넌트
+const SectionHeader = ({ icon, title, colorClass }) => (
+  <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${colorClass}`}>
+    <span className="text-base">{icon}</span>
+    <span className="text-sm font-bold text-gray-800">{title}</span>
+  </div>
 )
 
 // AI 프로필 작성기 컴포넌트
@@ -218,6 +247,7 @@ const ProfileViewTest = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('all') // 탭 상태
 
   useEffect(() => {
     if (user) loadProfile()
@@ -602,100 +632,215 @@ const ProfileViewTest = () => {
           </div>
         )}
 
-        {/* 관심 키워드 */}
+        {/* 관심 키워드 - 탭 형태 */}
         <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4">
           <div className="flex items-center gap-2 mb-4">
             <Hash className="w-4 h-4 text-gray-900" />
             <span className="text-sm font-bold text-gray-900">관심 키워드</span>
           </div>
 
-          {/* 뷰티 & 메이크업 */}
-          {beautyTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>뷰티 & 메이크업</CategoryLabel>
+          {/* 탭 네비게이션 */}
+          <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
+            <TabButton active={activeTab === 'all'} onClick={() => setActiveTab('all')}>
+              전체 보기
+            </TabButton>
+            {beautyTags.length > 0 && (
+              <TabButton active={activeTab === 'beauty'} onClick={() => setActiveTab('beauty')}>
+                뷰티/스타일
+              </TabButton>
+            )}
+            {(channelTags.length > 0 || videoTags.length > 0 || expertiseTags.length > 0) && (
+              <TabButton active={activeTab === 'channel'} onClick={() => setActiveTab('channel')}>
+                채널/콘텐츠
+              </TabButton>
+            )}
+            {(activityTags.length > 0 || specialTags.length > 0) && (
+              <TabButton active={activeTab === 'activity'} onClick={() => setActiveTab('activity')}>
+                출연/활동
+              </TabButton>
+            )}
+            {(languageTags.length > 0 || personalTags.length > 0 || dietTags.length > 0) && (
+              <TabButton active={activeTab === 'other'} onClick={() => setActiveTab('other')}>
+                기타
+              </TabButton>
+            )}
+          </div>
+
+          {/* 전체 보기 */}
+          {activeTab === 'all' && (
+            <div className="space-y-5">
+              {/* 뷰티/스타일 */}
+              {beautyTags.length > 0 && (
+                <div>
+                  <SectionHeader icon="💄" title="뷰티/스타일" colorClass="border-pink-200" />
+                  <div className="flex flex-wrap gap-2">
+                    {beautyTags.map((tag, idx) => (
+                      <ColoredTag key={`beauty-${idx}`} colorClass={TAG_COLORS.beauty}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 채널/콘텐츠 */}
+              {(channelTags.length > 0 || videoTags.length > 0 || expertiseTags.length > 0) && (
+                <div>
+                  <SectionHeader icon="📺" title="채널/콘텐츠" colorClass="border-blue-200" />
+                  <div className="flex flex-wrap gap-2">
+                    {expertiseTags.map((tag, idx) => (
+                      <ColoredTag key={`exp-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
+                    ))}
+                    {channelTags.map((tag, idx) => (
+                      <ColoredTag key={`ch-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
+                    ))}
+                    {videoTags.map((tag, idx) => (
+                      <ColoredTag key={`vid-${idx}`} colorClass={TAG_COLORS.video}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 출연/활동 */}
+              {(activityTags.length > 0 || specialTags.length > 0) && (
+                <div>
+                  <SectionHeader icon="🎬" title="출연/활동" colorClass="border-orange-200" />
+                  <div className="flex flex-wrap gap-2">
+                    {activityTags.map((tag, idx) => (
+                      <ColoredTag key={`act-${idx}`} colorClass={TAG_COLORS.activity}>{tag}</ColoredTag>
+                    ))}
+                    {specialTags.map((tag, idx) => (
+                      <ColoredTag key={`spec-${idx}`} colorClass={TAG_COLORS.special}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 기타 */}
+              {(languageTags.length > 0 || personalTags.length > 0 || dietTags.length > 0) && (
+                <div>
+                  <SectionHeader icon="✨" title="기타" colorClass="border-gray-200" />
+                  <div className="flex flex-wrap gap-2">
+                    {dietTags.map((tag, idx) => (
+                      <ColoredTag key={`diet-${idx}`} colorClass={TAG_COLORS.diet}>{tag}</ColoredTag>
+                    ))}
+                    {languageTags.map((tag, idx) => (
+                      <ColoredTag key={`lang-${idx}`} colorClass={TAG_COLORS.language}>{tag}</ColoredTag>
+                    ))}
+                    {personalTags.map((tag, idx) => (
+                      <ColoredTag key={`pers-${idx}`} colorClass={TAG_COLORS.personal}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 뷰티/스타일 탭 */}
+          {activeTab === 'beauty' && beautyTags.length > 0 && (
+            <div>
+              <SectionHeader icon="💄" title="뷰티/스타일" colorClass="border-pink-200" />
               <div className="flex flex-wrap gap-2">
-                {beautyTags.map((tag, idx) => <SimpleTag key={`beauty-${idx}`}>{tag}</SimpleTag>)}
+                {beautyTags.map((tag, idx) => (
+                  <ColoredTag key={`beauty-${idx}`} colorClass={TAG_COLORS.beauty}>{tag}</ColoredTag>
+                ))}
               </div>
             </div>
           )}
 
-          {/* 다이어트 & 건강 */}
-          {dietTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>다이어트 & 건강</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {dietTags.map((tag, idx) => <SimpleTag key={`diet-${idx}`}>{tag}</SimpleTag>)}
-              </div>
+          {/* 채널/콘텐츠 탭 */}
+          {activeTab === 'channel' && (
+            <div className="space-y-4">
+              {expertiseTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">전문분야 & 역량</p>
+                  <div className="flex flex-wrap gap-2">
+                    {expertiseTags.map((tag, idx) => (
+                      <ColoredTag key={`exp-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {channelTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">채널 정보</p>
+                  <div className="flex flex-wrap gap-2">
+                    {channelTags.map((tag, idx) => (
+                      <ColoredTag key={`ch-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {videoTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">영상 스타일</p>
+                  <div className="flex flex-wrap gap-2">
+                    {videoTags.map((tag, idx) => (
+                      <ColoredTag key={`vid-${idx}`} colorClass={TAG_COLORS.video}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* 전문분야 & 역량 */}
-          {expertiseTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>전문분야 & 역량</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {expertiseTags.map((tag, idx) => <SimpleTag key={`exp-${idx}`}>{tag}</SimpleTag>)}
-              </div>
+          {/* 출연/활동 탭 */}
+          {activeTab === 'activity' && (
+            <div className="space-y-4">
+              {activityTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">출연 가능</p>
+                  <div className="flex flex-wrap gap-2">
+                    {activityTags.map((tag, idx) => (
+                      <ColoredTag key={`act-${idx}`} colorClass={TAG_COLORS.activity}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {specialTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">특별 기능</p>
+                  <div className="flex flex-wrap gap-2">
+                    {specialTags.map((tag, idx) => (
+                      <ColoredTag key={`spec-${idx}`} colorClass={TAG_COLORS.special}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* 채널 & 콘텐츠 */}
-          {channelTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>채널 & 콘텐츠</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {channelTags.map((tag, idx) => <SimpleTag key={`ch-${idx}`}>{tag}</SimpleTag>)}
-              </div>
-            </div>
-          )}
-
-          {/* 영상 스타일 */}
-          {videoTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>영상 스타일</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {videoTags.map((tag, idx) => <SimpleTag key={`vid-${idx}`}>{tag}</SimpleTag>)}
-              </div>
-            </div>
-          )}
-
-          {/* 출연 & 활동 */}
-          {activityTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>출연 & 활동</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {activityTags.map((tag, idx) => <SimpleTag key={`act-${idx}`}>{tag}</SimpleTag>)}
-              </div>
-            </div>
-          )}
-
-          {/* 특별 기능 */}
-          {specialTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>특별 기능</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {specialTags.map((tag, idx) => <SimpleTag key={`spec-${idx}`}>{tag}</SimpleTag>)}
-              </div>
-            </div>
-          )}
-
-          {/* 언어 */}
-          {languageTags.length > 0 && (
-            <div className="mb-4">
-              <CategoryLabel>언어</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {languageTags.map((tag, idx) => <SimpleTag key={`lang-${idx}`}>{tag}</SimpleTag>)}
-              </div>
-            </div>
-          )}
-
-          {/* 기본 정보 */}
-          {personalTags.length > 0 && (
-            <div className="mb-0">
-              <CategoryLabel>기본 정보</CategoryLabel>
-              <div className="flex flex-wrap gap-2">
-                {personalTags.map((tag, idx) => <SimpleTag key={`pers-${idx}`}>{tag}</SimpleTag>)}
-              </div>
+          {/* 기타 탭 */}
+          {activeTab === 'other' && (
+            <div className="space-y-4">
+              {dietTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">다이어트 & 건강</p>
+                  <div className="flex flex-wrap gap-2">
+                    {dietTags.map((tag, idx) => (
+                      <ColoredTag key={`diet-${idx}`} colorClass={TAG_COLORS.diet}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {languageTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">언어</p>
+                  <div className="flex flex-wrap gap-2">
+                    {languageTags.map((tag, idx) => (
+                      <ColoredTag key={`lang-${idx}`} colorClass={TAG_COLORS.language}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {personalTags.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">기본 정보</p>
+                  <div className="flex flex-wrap gap-2">
+                    {personalTags.map((tag, idx) => (
+                      <ColoredTag key={`pers-${idx}`} colorClass={TAG_COLORS.personal}>{tag}</ColoredTag>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
