@@ -273,6 +273,36 @@ const CompactBanner = ({ percentage, tabs, activeTab, setActiveTab, canAccessTab
   )
 }
 
+// 팁 섹션 컴포넌트
+const TipSection = ({ title, description, highlight }) => (
+  <div className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-xl p-4 mb-5 border border-indigo-100">
+    <p className="text-sm font-bold text-indigo-800">{title}</p>
+    <p className="text-xs text-indigo-600 mt-1">
+      {description} <span className="font-bold text-violet-600">{highlight}</span>
+    </p>
+  </div>
+)
+
+// 섹션 혜택 안내 컴포넌트
+const SectionBenefit = ({ icon: Icon, title, description, benefit }) => (
+  <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 rounded-xl p-4 border border-violet-100">
+    <div className="flex items-start gap-3">
+      {Icon && (
+        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0">
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+      )}
+      <div>
+        <p className="text-sm font-bold text-gray-900">{title}</p>
+        <p className="text-xs text-gray-600 mt-0.5">{description}</p>
+        {benefit && (
+          <p className="text-xs text-violet-600 font-semibold mt-1">💡 {benefit}</p>
+        )}
+      </div>
+    </div>
+  </div>
+)
+
 // 섹션 타이틀 (크기 증가)
 const SectionTitle = ({ title, required = false, subtitle }) => (
   <div className="mb-4">
@@ -833,7 +863,7 @@ const ProfileSettingsTest = () => {
         {/* 통합 배너 + 팁 - 계정 탭이 아닐 때만 표시 */}
         {activeTab !== 'account' && (
           <>
-            <UnifiedBanner
+            <CompactBanner
               percentage={progressPercentage}
               tabs={tabs}
               activeTab={activeTab}
