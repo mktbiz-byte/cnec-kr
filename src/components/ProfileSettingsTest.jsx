@@ -352,7 +352,7 @@ const ProfileSettingsTest = () => {
     instagram_url: '', youtube_url: '', tiktok_url: '', blog_url: '',
     instagram_followers: '', youtube_subscribers: '', tiktok_followers: '',
     channel_name: '', followers: '', avg_views: '', target_audience: '',
-    no_channel: false
+    no_instagram: false, no_youtube: false, no_tiktok: false
   })
 
   const [beautyProfile, setBeautyProfile] = useState({
@@ -406,7 +406,11 @@ const ProfileSettingsTest = () => {
         return !!beautyProfile.skin_type && beautyProfile.skin_concerns.length > 0 &&
                !!beautyProfile.hair_type && beautyProfile.hair_concerns.length > 0
       case 'sns':
-        return profile.no_channel || !!(profile.instagram_url || profile.youtube_url || profile.tiktok_url)
+        // 각 채널은 URL 입력 또는 "없음" 체크로 완료 처리
+        const instagramOk = profile.instagram_url || profile.no_instagram
+        const youtubeOk = profile.youtube_url || profile.no_youtube
+        const tiktokOk = profile.tiktok_url || profile.no_tiktok
+        return instagramOk && youtubeOk && tiktokOk
       case 'video':
         return !!beautyProfile.video_length_style
       case 'detail':
@@ -500,7 +504,9 @@ const ProfileSettingsTest = () => {
           detail_address: data.detail_address || '',
           instagram_url: data.instagram_url || '', youtube_url: data.youtube_url || '',
           tiktok_url: data.tiktok_url || '', blog_url: data.blog_url || '',
-          no_channel: data.no_channel || false,
+          no_instagram: data.no_instagram || false,
+          no_youtube: data.no_youtube || false,
+          no_tiktok: data.no_tiktok || false,
           instagram_followers: data.instagram_followers != null ? String(data.instagram_followers) : '',
           youtube_subscribers: data.youtube_subscribers != null ? String(data.youtube_subscribers) : '',
           tiktok_followers: data.tiktok_followers != null ? String(data.tiktok_followers) : '',
@@ -549,8 +555,11 @@ const ProfileSettingsTest = () => {
         if (data.name && data.phone) completed.push('basic')
         // 뷰티: 피부타입, 피부고민, 헤어타입, 헤어고민
         if (data.skin_type && data.skin_concerns?.length > 0 && data.hair_type && data.hair_concerns?.length > 0) completed.push('beauty')
-        // SNS: 최소 1개 입력 또는 채널없음 체크
-        if (data.no_channel || data.instagram_url || data.youtube_url || data.tiktok_url) completed.push('sns')
+        // SNS: 각 채널 URL 입력 또는 없음 체크
+        const igOk = data.instagram_url || data.no_instagram
+        const ytOk = data.youtube_url || data.no_youtube
+        const ttOk = data.tiktok_url || data.no_tiktok
+        if (igOk && ytOk && ttOk) completed.push('sns')
         // 영상: 영상 길이 스타일
         if (data.video_length_style) completed.push('video')
         // 상세: 성별
@@ -597,7 +606,9 @@ const ProfileSettingsTest = () => {
         youtube_url: profile.youtube_url?.trim() || null,
         tiktok_url: profile.tiktok_url?.trim() || null,
         blog_url: profile.blog_url?.trim() || null,
-        no_channel: profile.no_channel || false,
+        no_instagram: profile.no_instagram || false,
+        no_youtube: profile.no_youtube || false,
+        no_tiktok: profile.no_tiktok || false,
         instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
         youtube_subscribers: profile.youtube_subscribers ? parseInt(profile.youtube_subscribers) : null,
         tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null,
@@ -1169,160 +1180,180 @@ const ProfileSettingsTest = () => {
 
             {/* SNS 채널 */}
             <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
-              <SectionTitle title="SNS 채널" required subtitle="최소 1개 이상 입력해주세요" />
+              <SectionTitle title="SNS 채널" required subtitle="각 채널별로 URL 입력 또는 '없음' 체크" />
 
-              {/* 채널없음 체크박스 */}
-              <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={profile.no_channel}
-                  onChange={(e) => {
-                    const checked = e.target.checked
-                    setProfile(prev => ({
-                      ...prev,
-                      no_channel: checked,
-                      // 체크하면 SNS URL들 초기화
-                      ...(checked && {
-                        instagram_url: '',
-                        youtube_url: '',
-                        tiktok_url: '',
-                        instagram_followers: '',
-                        youtube_subscribers: '',
-                        tiktok_followers: ''
-                      })
-                    }))
-                  }}
-                  className="w-5 h-5 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-700">SNS 채널이 없어요</p>
-                  <p className="text-xs text-gray-400">채널이 없는 경우 체크해주세요</p>
+              {/* 경고 안내 */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                  <div className="text-xs text-amber-700">
+                    <p className="font-bold mb-1">URL을 정확히 입력해주세요!</p>
+                    <p>전체 URL을 복사해서 붙여넣기 해주세요.</p>
+                  </div>
                 </div>
-              </label>
+              </div>
 
-              {/* 경고 안내 및 SNS 입력 (채널없음이 아닐 때만) */}
-              {!profile.no_channel && (
-                <>
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
-                      <div className="text-xs text-amber-700">
-                        <p className="font-bold mb-1">URL을 정확히 입력해주세요!</p>
-                        <p>전체 URL을 복사해서 붙여넣기 해주세요.</p>
-                        <p className="text-amber-600 mt-1">예: https://www.instagram.com/username</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 인스타그램 */}
+              {/* 인스타그램 */}
               <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center flex-shrink-0">
-                    <Instagram size={18} className="text-white" />
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center flex-shrink-0">
+                    <Instagram size={16} className="text-white" />
                   </div>
-                  <div className="flex-1">
+                  <span className="text-sm font-medium text-gray-700 w-20">Instagram</span>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={profile.no_instagram}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setProfile(prev => ({
+                          ...prev,
+                          no_instagram: checked,
+                          ...(checked && { instagram_url: '', instagram_followers: '' })
+                        }))
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-gray-500 focus:ring-gray-400"
+                    />
+                    <span className="text-xs text-gray-500">없음</span>
+                  </label>
+                </div>
+                {!profile.no_instagram && (
+                  <div className="flex items-center gap-2 ml-11">
                     <input
                       type="text"
                       value={profile.instagram_url}
                       onChange={(e) => setProfile(prev => ({ ...prev, instagram_url: e.target.value }))}
-                      className="w-full px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
+                      className="flex-1 px-3 py-2 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
                       placeholder="https://www.instagram.com/username"
                     />
+                    <input
+                      type="number"
+                      value={profile.instagram_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, instagram_followers: e.target.value }))}
+                      className="w-20 px-2 py-2 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200 text-center"
+                      placeholder="팔로워"
+                    />
+                    {profile.instagram_url && (
+                      <a
+                        href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://www.instagram.com/${profile.instagram_url.replace(/^@+/, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-2 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200"
+                      >
+                        확인
+                      </a>
+                    )}
                   </div>
-                  <input
-                    type="number"
-                    value={profile.instagram_followers}
-                    onChange={(e) => setProfile(prev => ({ ...prev, instagram_followers: e.target.value }))}
-                    className="w-20 px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
-                    placeholder="팔로워"
-                  />
-                  {profile.instagram_url && (
-                    <a
-                      href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://www.instagram.com/${profile.instagram_url.replace(/^@+/, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2.5 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200 flex-shrink-0"
-                    >
-                      확인
-                    </a>
-                  )}
-                </div>
-                <p className="text-[10px] text-gray-400 ml-[52px]">프로필 URL 전체를 복사해서 붙여넣기 하세요</p>
+                )}
               </div>
 
               {/* 유튜브 */}
               <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center flex-shrink-0">
-                    <Youtube size={18} className="text-white" />
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center flex-shrink-0">
+                    <Youtube size={16} className="text-white" />
                   </div>
-                  <div className="flex-1">
+                  <span className="text-sm font-medium text-gray-700 w-20">YouTube</span>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={profile.no_youtube}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setProfile(prev => ({
+                          ...prev,
+                          no_youtube: checked,
+                          ...(checked && { youtube_url: '', youtube_subscribers: '' })
+                        }))
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-gray-500 focus:ring-gray-400"
+                    />
+                    <span className="text-xs text-gray-500">없음</span>
+                  </label>
+                </div>
+                {!profile.no_youtube && (
+                  <div className="flex items-center gap-2 ml-11">
                     <input
                       type="text"
                       value={profile.youtube_url}
                       onChange={(e) => setProfile(prev => ({ ...prev, youtube_url: e.target.value }))}
-                      className="w-full px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
+                      className="flex-1 px-3 py-2 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
                       placeholder="https://www.youtube.com/@channelname"
                     />
+                    <input
+                      type="number"
+                      value={profile.youtube_subscribers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, youtube_subscribers: e.target.value }))}
+                      className="w-20 px-2 py-2 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200 text-center"
+                      placeholder="구독자"
+                    />
+                    {profile.youtube_url && (
+                      <a
+                        href={profile.youtube_url.startsWith('http') ? profile.youtube_url : `https://www.youtube.com/@${profile.youtube_url.replace(/^@+/, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-2 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200"
+                      >
+                        확인
+                      </a>
+                    )}
                   </div>
-                  <input
-                    type="number"
-                    value={profile.youtube_subscribers}
-                    onChange={(e) => setProfile(prev => ({ ...prev, youtube_subscribers: e.target.value }))}
-                    className="w-20 px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
-                    placeholder="구독자"
-                  />
-                  {profile.youtube_url && (
-                    <a
-                      href={profile.youtube_url.startsWith('http') ? profile.youtube_url : `https://www.youtube.com/@${profile.youtube_url.replace(/^@+/, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2.5 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200 flex-shrink-0"
-                    >
-                      확인
-                    </a>
-                  )}
-                </div>
-                <p className="text-[10px] text-gray-400 ml-[52px]">채널 URL 전체를 복사해서 붙여넣기 하세요</p>
+                )}
               </div>
 
               {/* 틱톡 */}
               <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0">
-                    <Hash size={18} className="text-white" />
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-lg bg-gray-900 flex items-center justify-center flex-shrink-0">
+                    <Hash size={16} className="text-white" />
                   </div>
-                  <div className="flex-1">
+                  <span className="text-sm font-medium text-gray-700 w-20">TikTok</span>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={profile.no_tiktok}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setProfile(prev => ({
+                          ...prev,
+                          no_tiktok: checked,
+                          ...(checked && { tiktok_url: '', tiktok_followers: '' })
+                        }))
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-gray-500 focus:ring-gray-400"
+                    />
+                    <span className="text-xs text-gray-500">없음</span>
+                  </label>
+                </div>
+                {!profile.no_tiktok && (
+                  <div className="flex items-center gap-2 ml-11">
                     <input
                       type="text"
                       value={profile.tiktok_url}
                       onChange={(e) => setProfile(prev => ({ ...prev, tiktok_url: e.target.value }))}
-                      className="w-full px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
+                      className="flex-1 px-3 py-2 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
                       placeholder="https://www.tiktok.com/@username"
                     />
+                    <input
+                      type="number"
+                      value={profile.tiktok_followers}
+                      onChange={(e) => setProfile(prev => ({ ...prev, tiktok_followers: e.target.value }))}
+                      className="w-20 px-2 py-2 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200 text-center"
+                      placeholder="팔로워"
+                    />
+                    {profile.tiktok_url && (
+                      <a
+                        href={profile.tiktok_url.startsWith('http') ? profile.tiktok_url : `https://www.tiktok.com/@${profile.tiktok_url.replace(/^@+/, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-2 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200"
+                      >
+                        확인
+                      </a>
+                    )}
                   </div>
-                  <input
-                    type="number"
-                    value={profile.tiktok_followers}
-                    onChange={(e) => setProfile(prev => ({ ...prev, tiktok_followers: e.target.value }))}
-                    className="w-20 px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
-                    placeholder="팔로워"
-                  />
-                  {profile.tiktok_url && (
-                    <a
-                      href={profile.tiktok_url.startsWith('http') ? profile.tiktok_url : `https://www.tiktok.com/@${profile.tiktok_url.replace(/^@+/, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2.5 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200 flex-shrink-0"
-                    >
-                      확인
-                    </a>
-                  )}
-                </div>
-                  <p className="text-[10px] text-gray-400 ml-[52px]">프로필 URL 전체를 복사해서 붙여넣기 하세요</p>
-                </div>
-                </>
-              )}
+                )}
+              </div>
             </div>
 
             {/* 채널 정보 */}

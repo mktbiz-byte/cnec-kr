@@ -741,7 +741,9 @@ export const database = {
           youtube_url: profileData.youtube_url || null,
           tiktok_url: profileData.tiktok_url || null,
           blog_url: profileData.blog_url || null,
-          no_channel: profileData.no_channel || false,
+          no_instagram: profileData.no_instagram || false,
+          no_youtube: profileData.no_youtube || false,
+          no_tiktok: profileData.no_tiktok || false,
           // SNS 개별 팔로워/구독자
           instagram_followers: profileData.instagram_followers != null ? profileData.instagram_followers : null,
           youtube_subscribers: profileData.youtube_subscribers != null ? profileData.youtube_subscribers : null,
