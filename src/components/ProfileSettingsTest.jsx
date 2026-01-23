@@ -879,12 +879,7 @@ const ProfileSettingsTest = () => {
             <ArrowLeft size={22} className="text-gray-700" />
           </button>
           <h1 className="text-base font-bold text-gray-900">프로필 설정</h1>
-          <button
-            onClick={() => setActiveTab('account')}
-            className="p-2 -mr-2"
-          >
-            <Settings size={20} className="text-gray-500" />
-          </button>
+          <div className="w-10" />
         </div>
       </div>
 
