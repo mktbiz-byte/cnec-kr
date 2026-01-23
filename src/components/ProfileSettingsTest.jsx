@@ -622,6 +622,15 @@ const ProfileSettingsTest = () => {
         linktree_available: beautyProfile.linktree_available || null,
         video_length_style: beautyProfile.video_length_style || null,
         shortform_tempo: beautyProfile.shortform_tempo || null,
+        // 뷰티 스타일 필드 추가
+        skin_tone: beautyProfile.skin_tone || null,
+        nail_usage: beautyProfile.nail_usage || null,
+        circle_lens_usage: beautyProfile.circle_lens_usage || null,
+        glasses_usage: beautyProfile.glasses_usage || null,
+        // 미러링 & 스마트스토어 필드 추가
+        mirroring_available: beautyProfile.mirroring_available || null,
+        smartstore_purchase: beautyProfile.smartstore_purchase || null,
+        // 다중 선택 필드
         skin_concerns: beautyProfile.skin_concerns,
         hair_concerns: beautyProfile.hair_concerns,
         diet_concerns: beautyProfile.diet_concerns,
@@ -632,7 +641,8 @@ const ProfileSettingsTest = () => {
         family_members: beautyProfile.family_appearance === 'possible' ? beautyProfile.family_members : [],
         offline_locations: beautyProfile.offline_visit === 'possible' ? beautyProfile.offline_locations : [],
         languages: beautyProfile.languages,
-        linktree_channels: beautyProfile.linktree_available === 'possible' ? beautyProfile.linktree_channels : []
+        linktree_channels: beautyProfile.linktree_available === 'possible' ? beautyProfile.linktree_channels : [],
+        mirroring_channels: beautyProfile.mirroring_available === 'possible' ? beautyProfile.mirroring_channels : []
       }
 
       console.log('[DEBUG] 저장할 profileData:', profileData)
