@@ -919,26 +919,48 @@ const ProfileSettingsTest = () => {
             />
 
             {/* 프로필 사진 */}
-            <div className="flex items-center gap-5 p-5 bg-white rounded-2xl border border-gray-200">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-200">
-                  {photoPreview ? (
-                    <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-400 to-pink-400">
-                      <User className="w-10 h-10 text-white" />
-                    </div>
-                  )}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <div className="flex items-center gap-4">
+                <div className="relative flex-shrink-0">
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300">
+                    {photoPreview ? (
+                      <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-violet-50 to-pink-50">
+                        <User className="w-8 h-8 text-violet-300" />
+                      </div>
+                    )}
+                  </div>
+                  <label className="absolute -bottom-1 -right-1 w-8 h-8 bg-violet-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-violet-700 transition-colors">
+                    {uploadingPhoto ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
+                    <input type="file" accept="image/jpeg,image/png" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
+                  </label>
                 </div>
-                <label className="absolute -bottom-1 -right-1 w-8 h-8 bg-violet-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg">
-                  {uploadingPhoto ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
-                  <input type="file" accept="image/jpeg,image/png" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
-                </label>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-base font-bold text-gray-900">프로필 사진</p>
+                    <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded">필수</span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-0.5">얼굴이 잘 보이는 사진으로 등록해주세요</p>
+                  <p className="text-xs text-violet-500 mt-1">브랜드가 크리에이터님을 알아볼 수 있어야 해요!</p>
+                </div>
               </div>
-              <div>
-                <p className="text-lg font-bold text-gray-900">프로필 사진</p>
-                <p className="text-sm text-gray-500 mt-1">첫인상을 결정하는 중요한 요소예요</p>
-              </div>
+
+              {/* 업로드 버튼 */}
+              <label className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-semibold text-sm cursor-pointer hover:from-violet-600 hover:to-purple-600 transition-all shadow-sm">
+                {uploadingPhoto ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    업로드 중...
+                  </>
+                ) : (
+                  <>
+                    <Camera className="w-4 h-4" />
+                    {photoPreview ? '사진 변경하기' : '얼굴 사진 업로드'}
+                  </>
+                )}
+                <input type="file" accept="image/jpeg,image/png" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
+              </label>
             </div>
 
             {/* 기본 정보 */}
