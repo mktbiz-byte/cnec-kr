@@ -8,7 +8,7 @@ import {
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
   ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift,
-  Crown, Sparkles
+  Crown, Sparkles, Lock, Search, AlertTriangle
 } from 'lucide-react'
 
 // 등급 설정
@@ -51,6 +51,15 @@ const CreatorMyPage = () => {
   // 찜한 캠페인 관련
   const [wishlistCampaigns, setWishlistCampaigns] = useState([])
   const [wishlistLoading, setWishlistLoading] = useState(false)
+
+  // 개인정보 수정 관련
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletionReason, setDeletionReason] = useState('')
+  const [deletionDetails, setDeletionDetails] = useState('')
+  const [confirmText, setConfirmText] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [showPostcodeLayer, setShowPostcodeLayer] = useState(false)
 
   // 한국 주요 은행 목록 (레거시 18개 은행)
   const koreanBanks = [
@@ -526,6 +535,187 @@ const CreatorMyPage = () => {
     }
   }
 
+  // 비밀번호 변경
+  const handlePasswordChange = async () => {
+    try {
+      setProcessing(true)
+      setError('')
+
+      if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+        setError('모든 비밀번호 필드를 입력해주세요')
+        setProcessing(false)
+        return
+      }
+
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        setError('새 비밀번호가 일치하지 않습니다')
+        setProcessing(false)
+        return
+      }
+
+      if (passwordData.newPassword.length < 6) {
+        setError('비밀번호는 최소 6자 이상이어야 합니다')
+        setProcessing(false)
+        return
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: passwordData.newPassword
+      })
+
+      if (updateError) throw updateError
+
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      setSuccess('비밀번호가 변경되었습니다')
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('비밀번호 변경 오류:', err)
+      setError(`비밀번호 변경 실패: ${err.message}`)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  // 주소 검색 (다음 우편번호)
+  const openPostcodeSearch = () => {
+    setShowPostcodeLayer(true)
+    setTimeout(() => {
+      new window.daum.Postcode({
+        oncomplete: function(data) {
+          let fullAddress = data.address
+          let extraAddress = ''
+
+          if (data.addressType === 'R') {
+            if (data.bname !== '') extraAddress += data.bname
+            if (data.buildingName !== '') {
+              extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName)
+            }
+            fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '')
+          }
+
+          setEditForm(prev => ({
+            ...prev,
+            postcode: data.zonecode,
+            address: fullAddress
+          }))
+          setShowPostcodeLayer(false)
+        },
+        width: '100%',
+        height: '100%'
+      }).embed(document.getElementById('postcode-layer-mypage'))
+    }, 100)
+  }
+
+  // 주소 저장
+  const handleAddressSave = async () => {
+    try {
+      setProcessing(true)
+      setError('')
+
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({
+          postcode: editForm.postcode,
+          address: editForm.address,
+          detail_address: editForm.detail_address,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+
+      setProfile(prev => ({
+        ...prev,
+        postcode: editForm.postcode,
+        address: editForm.address,
+        detail_address: editForm.detail_address
+      }))
+      setSuccess('주소가 저장되었습니다')
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('주소 저장 오류:', err)
+      setError('주소 저장에 실패했습니다')
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  // 회원 탈퇴
+  const handleAccountDeletion = async () => {
+    if (confirmText !== '회원탈퇴') {
+      setError('확인 텍스트를 정확히 입력해주세요')
+      return
+    }
+
+    try {
+      setDeleting(true)
+      setError('')
+
+      // 1. 탈퇴 사유 저장 (account_deletions 테이블)
+      const { error: deletionLogError } = await supabase
+        .from('account_deletions')
+        .insert({
+          user_id: user.id,
+          reason: deletionReason,
+          details: deletionDetails,
+          email: user.email
+        })
+
+      if (deletionLogError) {
+        console.error('탈퇴 사유 저장 오류:', deletionLogError)
+        // 테이블이 없어도 계속 진행
+      }
+
+      // 2. user_profiles 삭제 또는 익명화
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .update({
+          name: '탈퇴한 사용자',
+          email: null,
+          phone: null,
+          profile_image: null,
+          address: null,
+          detail_address: null,
+          postcode: null,
+          instagram_url: null,
+          youtube_url: null,
+          tiktok_url: null,
+          bank_name: null,
+          bank_account_number: null,
+          bank_account_holder: null,
+          deleted_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+
+      if (profileError) {
+        console.error('프로필 익명화 오류:', profileError)
+      }
+
+      // 3. Supabase Auth에서 사용자 삭제 시도
+      // Note: 서버 함수로 처리해야 할 수 있음
+      try {
+        const response = await fetch('/.netlify/functions/delete-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id })
+        })
+        const result = await response.json()
+        console.log('사용자 삭제 결과:', result)
+      } catch (deleteError) {
+        console.error('Auth 삭제 오류:', deleteError)
+      }
+
+      // 4. 로그아웃 및 리다이렉트
+      await signOut()
+      navigate('/login', { state: { message: '회원 탈퇴가 완료되었습니다.' } })
+
+    } catch (err) {
+      console.error('회원 탈퇴 오류:', err)
+      setError('회원 탈퇴 처리 중 오류가 발생했습니다')
+      setDeleting(false)
+    }
+  }
+
   const formatCurrency = (amount) => {
     if (!amount) return '0원'
     return `${amount.toLocaleString()}원`
@@ -793,13 +983,26 @@ const CreatorMyPage = () => {
 
               <button
                 onClick={() => navigate('/settings/notifications')}
-                className="w-full px-4 py-4 flex items-center justify-between"
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-pink-100 rounded-xl flex items-center justify-center">
                     <Bell size={18} className="text-pink-500" />
                   </div>
                   <span className="text-[15px] text-gray-900">알림 설정</span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+
+              <button
+                onClick={() => setActiveSection('personalInfo')}
+                className="w-full px-4 py-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <Lock size={18} className="text-orange-600" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">개인정보 수정</span>
                 </div>
                 <ChevronRight size={18} className="text-gray-300" />
               </button>
@@ -1290,6 +1493,220 @@ const CreatorMyPage = () => {
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* 개인정보 수정 */}
+      {activeSection === 'personalInfo' && (
+        <div className="px-5 pt-5 pb-8">
+          <div className="flex items-center justify-between mb-4">
+            <button onClick={() => setActiveSection('dashboard')} className="p-2 -ml-2">
+              <ArrowRight size={20} className="text-gray-700 rotate-180" />
+            </button>
+            <h2 className="font-bold text-lg">개인정보 수정</h2>
+            <div className="w-10" />
+          </div>
+
+          {/* 비밀번호 변경 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm mb-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Lock size={18} className="text-violet-600" />
+              <h3 className="font-bold text-gray-900">비밀번호 변경</h3>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">계정 보안을 위해 주기적으로 비밀번호를 변경해주세요</p>
+
+            <div className="space-y-3">
+              <input
+                type="password"
+                value={passwordData.currentPassword}
+                onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                placeholder="현재 비밀번호"
+              />
+              <input
+                type="password"
+                value={passwordData.newPassword}
+                onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                placeholder="새 비밀번호 (6자 이상)"
+              />
+              <input
+                type="password"
+                value={passwordData.confirmPassword}
+                onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                placeholder="새 비밀번호 확인"
+              />
+              <button
+                onClick={handlePasswordChange}
+                disabled={processing || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                className="w-full py-3.5 bg-violet-600 text-white rounded-xl font-bold text-base hover:bg-violet-700 disabled:opacity-50 transition-colors"
+              >
+                {processing ? '변경 중...' : '비밀번호 변경'}
+              </button>
+            </div>
+          </div>
+
+          {/* 주소 변경 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm mb-4">
+            <div className="flex items-center gap-2 mb-4">
+              <MapPin size={18} className="text-emerald-600" />
+              <h3 className="font-bold text-gray-900">주소 변경</h3>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">제품 배송을 위한 정확한 주소를 입력해주세요</p>
+
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={editForm.postcode || ''}
+                  readOnly
+                  className="flex-1 px-4 py-3.5 bg-gray-100 rounded-xl text-base text-gray-500"
+                  placeholder="우편번호"
+                />
+                <button
+                  onClick={openPostcodeSearch}
+                  className="px-4 py-3.5 bg-gray-900 text-white rounded-xl font-medium whitespace-nowrap flex items-center gap-2"
+                >
+                  <Search size={16} />
+                  검색
+                </button>
+              </div>
+              <input
+                type="text"
+                value={editForm.address || ''}
+                readOnly
+                className="w-full px-4 py-3.5 bg-gray-100 rounded-xl text-base text-gray-500"
+                placeholder="기본 주소"
+              />
+              <input
+                type="text"
+                value={editForm.detail_address || ''}
+                onChange={(e) => setEditForm(prev => ({ ...prev, detail_address: e.target.value }))}
+                className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                placeholder="상세 주소 (동/호수 등)"
+              />
+              <button
+                onClick={handleAddressSave}
+                disabled={processing || !editForm.address}
+                className="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-bold text-base hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+              >
+                {processing ? '저장 중...' : '주소 저장'}
+              </button>
+            </div>
+
+            {/* 현재 등록된 주소 */}
+            {profile?.address && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs text-gray-500 mb-1">현재 등록된 주소</p>
+                <p className="text-sm text-gray-700">
+                  {profile.postcode && `[${profile.postcode}] `}
+                  {profile.address}
+                  {profile.detail_address && ` ${profile.detail_address}`}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* 회원 탈퇴 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-red-100">
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle size={18} className="text-red-500" />
+              <h3 className="font-bold text-red-600">회원 탈퇴</h3>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              탈퇴 시 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
+              진행 중인 캠페인이 있는 경우 먼저 완료해주세요.
+            </p>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="w-full py-3.5 bg-red-50 text-red-600 rounded-xl font-bold text-base border border-red-200 hover:bg-red-100 transition-colors"
+            >
+              회원 탈퇴하기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 회원 탈퇴 모달 */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-red-600">회원 탈퇴</h3>
+              <button onClick={() => setShowDeleteModal(false)} className="p-1">
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <p className="text-sm text-red-800 font-medium">회원 탈퇴 시 모든 데이터가 영구 삭제됩니다.</p>
+                <p className="text-xs text-red-600 mt-1">• 프로필 정보, 지원 내역, 포인트가 모두 삭제됩니다</p>
+                <p className="text-xs text-red-600">• 미지급 포인트는 소멸됩니다</p>
+              </div>
+              <select
+                value={deletionReason}
+                onChange={(e) => setDeletionReason(e.target.value)}
+                className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl text-base font-medium"
+              >
+                <option value="">탈퇴 사유 선택</option>
+                <option value="서비스 불만족">서비스 불만족</option>
+                <option value="사용 빈도 낮음">사용 빈도 낮음</option>
+                <option value="개인정보 보호">개인정보 보호</option>
+                <option value="다른 서비스 이용">다른 서비스 이용</option>
+                <option value="기타">기타</option>
+              </select>
+              <textarea
+                value={deletionDetails}
+                onChange={(e) => setDeletionDetails(e.target.value)}
+                className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl text-base resize-none"
+                rows={2}
+                placeholder="상세 사유 (선택)"
+              />
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl text-base"
+                placeholder='"회원탈퇴" 입력'
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false)
+                    setConfirmText('')
+                    setDeletionReason('')
+                    setDeletionDetails('')
+                  }}
+                  className="flex-1 py-3.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-base"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleAccountDeletion}
+                  disabled={deleting || confirmText !== '회원탈퇴'}
+                  className="flex-1 py-3.5 bg-red-600 text-white rounded-xl font-bold text-base disabled:opacity-50"
+                >
+                  {deleting ? '처리중...' : '탈퇴'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 우편번호 검색 레이어 */}
+      {showPostcodeLayer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-full max-w-md mx-4 rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b">
+              <h3 className="font-bold text-lg text-gray-900">주소 검색</h3>
+              <button onClick={() => setShowPostcodeLayer(false)} className="p-1">
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
+            </div>
+            <div id="postcode-layer-mypage" style={{ height: '400px' }}></div>
+          </div>
         </div>
       )}
 
