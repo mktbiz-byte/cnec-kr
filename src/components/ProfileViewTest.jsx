@@ -47,6 +47,41 @@ const formatNumber = (num) => {
   return num.toLocaleString()
 }
 
+// 소셜 URL 정규화 (@username, username, full URL 등 모든 형식 지원)
+const normalizeUrl = (input, platform) => {
+  if (!input) return null
+  const value = input.trim()
+
+  // 이미 전체 URL인 경우
+  if (value.startsWith('http://') || value.startsWith('https://')) {
+    return value
+  }
+
+  // @ 제거
+  const username = value.replace(/^@/, '')
+
+  switch (platform) {
+    case 'instagram':
+      return `https://instagram.com/${username}`
+    case 'youtube':
+      // 채널 ID 또는 사용자명
+      if (username.startsWith('UC') || username.startsWith('channel/')) {
+        return `https://youtube.com/${username.startsWith('channel/') ? '' : 'channel/'}${username}`
+      }
+      return `https://youtube.com/@${username}`
+    case 'tiktok':
+      return `https://tiktok.com/@${username}`
+    case 'blog':
+      // 네이버 블로그 등 처리
+      if (username.includes('.')) {
+        return `https://${username}`
+      }
+      return `https://blog.naver.com/${username}`
+    default:
+      return value.startsWith('http') ? value : `https://${value}`
+  }
+}
+
 // 컴팩트 태그
 const Tag = ({ children, color = 'gray' }) => {
   const colors = {
@@ -187,7 +222,8 @@ const ProfileViewTest = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [showAllTags, setShowAllTags] = useState(false)
+  const [activeTab, setActiveTab] = useState('all')
+  const [expandedSections, setExpandedSections] = useState({})
 
   useEffect(() => {
     if (user) loadProfile()
@@ -304,30 +340,102 @@ const ProfileViewTest = () => {
     )
   }
 
-  // 태그 생성
-  const allTags = []
+  // 카테고리별 태그 생성
+  const beautyTags = []
+  if (beautyProfile.skin_type) beautyTags.push(getLabel(SKIN_TYPES, beautyProfile.skin_type))
+  if (beautyProfile.skin_shade) beautyTags.push(getLabel(SKIN_SHADES, beautyProfile.skin_shade))
+  if (beautyProfile.personal_color) beautyTags.push(getLabel(PERSONAL_COLORS, beautyProfile.personal_color))
+  getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns).forEach(c => beautyTags.push(c))
+  if (beautyProfile.hair_type) beautyTags.push(getLabel(HAIR_TYPES, beautyProfile.hair_type))
+  getLabels(HAIR_CONCERNS, beautyProfile.hair_concerns).forEach(c => beautyTags.push(c))
+  if (beautyProfile.nail_usage && beautyProfile.nail_usage !== 'never') beautyTags.push(`네일 ${getLabel(NAIL_USAGE, beautyProfile.nail_usage)}`)
+  if (beautyProfile.circle_lens_usage && beautyProfile.circle_lens_usage !== 'never') beautyTags.push(`렌즈 ${getLabel(CIRCLE_LENS_USAGE, beautyProfile.circle_lens_usage)}`)
+  if (beautyProfile.glasses_usage && beautyProfile.glasses_usage !== 'never') beautyTags.push(`안경 ${getLabel(GLASSES_USAGE, beautyProfile.glasses_usage)}`)
 
-  // 뷰티 태그
-  if (beautyProfile.skin_type) allTags.push({ label: getLabel(SKIN_TYPES, beautyProfile.skin_type), color: 'pink' })
-  getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns).forEach(c => allTags.push({ label: c, color: 'pink' }))
-  if (beautyProfile.hair_type) allTags.push({ label: getLabel(HAIR_TYPES, beautyProfile.hair_type), color: 'pink' })
+  const channelTags = []
+  if (beautyProfile.primary_interest) channelTags.push(getLabel(CHANNEL_CONTENTS, beautyProfile.primary_interest))
+  if (beautyProfile.category) channelTags.push(getLabel(CATEGORIES, beautyProfile.category))
+  if (beautyProfile.follower_range) channelTags.push(getLabel(FOLLOWER_RANGES, beautyProfile.follower_range))
+  if (beautyProfile.upload_frequency) channelTags.push(getLabel(UPLOAD_FREQUENCIES, beautyProfile.upload_frequency))
+  if (beautyProfile.editing_level) channelTags.push(`편집 ${getLabel(EDITING_LEVELS, beautyProfile.editing_level)}`)
+  if (beautyProfile.shooting_level) channelTags.push(`촬영 ${getLabel(SHOOTING_LEVELS, beautyProfile.shooting_level)}`)
+  getLabels(CONTENT_FORMATS, beautyProfile.content_formats).forEach(f => channelTags.push(f))
+  getLabels(COLLABORATION_PREFERENCES, beautyProfile.collaboration_preferences).forEach(c => channelTags.push(c))
+  if (beautyProfile.video_length_style) channelTags.push(getLabel(VIDEO_LENGTH_STYLES, beautyProfile.video_length_style))
+  if (beautyProfile.shortform_tempo) channelTags.push(`${getLabel(SHORTFORM_TEMPO_STYLES, beautyProfile.shortform_tempo)} 템포`)
+  getLabels(VIDEO_STYLES, beautyProfile.video_styles).forEach(s => channelTags.push(s))
 
-  // 채널 태그
-  if (beautyProfile.primary_interest) allTags.push({ label: getLabel(CHANNEL_CONTENTS, beautyProfile.primary_interest), color: 'blue' })
-  if (beautyProfile.category) allTags.push({ label: getLabel(CATEGORIES, beautyProfile.category), color: 'blue' })
-  getLabels(CONTENT_FORMATS, beautyProfile.content_formats).forEach(f => allTags.push({ label: f, color: 'blue' }))
+  const activityTags = []
+  if (beautyProfile.child_appearance === 'possible') {
+    activityTags.push('아이출연가능')
+    beautyProfile.children?.forEach(child => {
+      activityTags.push(`${child.gender === 'boy' ? '남아' : '여아'} ${child.age}세`)
+    })
+  }
+  if (beautyProfile.family_appearance === 'possible') {
+    activityTags.push('가족출연가능')
+    getLabels(FAMILY_MEMBERS, beautyProfile.family_members).forEach(m => activityTags.push(`${m}출연`))
+  }
+  if (beautyProfile.offline_visit === 'possible') {
+    activityTags.push('오프라인촬영가능')
+    getLabels(OFFLINE_LOCATIONS, beautyProfile.offline_locations).forEach(l => activityTags.push(l))
+    if (beautyProfile.offline_region) activityTags.push(beautyProfile.offline_region)
+  }
+  if (beautyProfile.linktree_available === 'possible') {
+    activityTags.push('링크트리가능')
+    getLabels(LINKTREE_CHANNELS, beautyProfile.linktree_channels).forEach(c => activityTags.push(`${c} 링크트리`))
+  }
+  if (beautyProfile.mirroring_available === 'possible') {
+    activityTags.push('미러링가능')
+    beautyProfile.mirroring_channels?.forEach(c => {
+      const names = { naver_clip: '네이버클립', youtube: '유튜브', instagram: '인스타', tiktok: '틱톡' }
+      activityTags.push(`${names[c] || c} 미러링`)
+    })
+  }
+  if (beautyProfile.smartstore_purchase === 'possible') activityTags.push('스마트스토어구매가능')
 
-  // 활동 태그
-  if (beautyProfile.child_appearance === 'possible') allTags.push({ label: '아이출연가능', color: 'orange' })
-  if (beautyProfile.offline_visit === 'possible') allTags.push({ label: '오프라인촬영', color: 'orange' })
-  if (beautyProfile.linktree_available === 'possible') allTags.push({ label: '링크트리', color: 'yellow' })
-  if (beautyProfile.mirroring_available === 'possible') allTags.push({ label: '미러링', color: 'yellow' })
+  const otherTags = []
+  getLabels(DIET_CONCERNS, beautyProfile.diet_concerns).forEach(d => otherTags.push(d))
+  getLabels(LANGUAGES, beautyProfile.languages).forEach(l => otherTags.push(l))
+  if (beautyProfile.gender) otherTags.push(getLabel(GENDERS, beautyProfile.gender))
+  if (profile.age) otherTags.push(`${profile.age}세`)
+  if (beautyProfile.job_visibility === 'public' && beautyProfile.job) otherTags.push(beautyProfile.job)
 
-  // 기타
-  getLabels(LANGUAGES, beautyProfile.languages).forEach(l => allTags.push({ label: l, color: 'gray' }))
+  // 탭별 태그 개수
+  const tabCounts = {
+    beauty: beautyTags.length,
+    channel: channelTags.length,
+    activity: activityTags.length,
+    other: otherTags.length
+  }
+  const totalTags = beautyTags.length + channelTags.length + activityTags.length + otherTags.length
 
-  const displayTags = showAllTags ? allTags : allTags.slice(0, 8)
-  const hasMoreTags = allTags.length > 8
+  // 더보기 토글
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }))
+  }
+
+  // 태그 렌더링 (더보기 기능 포함)
+  const renderTags = (tags, color, section, limit = 6) => {
+    const isExpanded = expandedSections[section]
+    const displayTags = isExpanded ? tags : tags.slice(0, limit)
+    const hasMore = tags.length > limit
+
+    return (
+      <>
+        <div className="flex flex-wrap gap-1.5">
+          {displayTags.map((tag, idx) => (
+            <Tag key={idx} color={color}>{tag}</Tag>
+          ))}
+        </div>
+        {hasMore && (
+          <button onClick={() => toggleSection(section)} className="mt-1.5 text-[11px] text-violet-500 font-medium">
+            {isExpanded ? '접기' : `+${tags.length - limit}개 더보기`}
+          </button>
+        )}
+      </>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-safe">
@@ -377,28 +485,28 @@ const ProfileViewTest = () => {
               {/* 소셜 아이콘 */}
               <div className="flex gap-1.5 mt-2">
                 {profile.instagram_url && (
-                  <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://instagram.com/${profile.instagram_url.replace('@', '')}`}
+                  <a href={normalizeUrl(profile.instagram_url, 'instagram')}
                      target="_blank" rel="noopener noreferrer"
                      className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center">
                     <Instagram size={14} className="text-white" />
                   </a>
                 )}
                 {profile.youtube_url && (
-                  <a href={profile.youtube_url.startsWith('http') ? profile.youtube_url : `https://youtube.com/${profile.youtube_url}`}
+                  <a href={normalizeUrl(profile.youtube_url, 'youtube')}
                      target="_blank" rel="noopener noreferrer"
                      className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center">
                     <Youtube size={14} className="text-white" />
                   </a>
                 )}
                 {profile.tiktok_url && (
-                  <a href={profile.tiktok_url.startsWith('http') ? profile.tiktok_url : `https://tiktok.com/@${profile.tiktok_url.replace('@', '')}`}
+                  <a href={normalizeUrl(profile.tiktok_url, 'tiktok')}
                      target="_blank" rel="noopener noreferrer"
                      className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
                     <Hash size={14} className="text-white" />
                   </a>
                 )}
                 {profile.blog_url && (
-                  <a href={profile.blog_url.startsWith('http') ? profile.blog_url : `https://${profile.blog_url}`}
+                  <a href={normalizeUrl(profile.blog_url, 'blog')}
                      target="_blank" rel="noopener noreferrer"
                      className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center">
                     <ExternalLink size={14} className="text-white" />
@@ -481,23 +589,97 @@ const ProfileViewTest = () => {
           saving={saving}
         />
 
-        {/* 키워드 태그 */}
-        {allTags.length > 0 && (
+        {/* 키워드 태그 - 탭 형태 */}
+        {totalTags > 0 && (
           <div className="bg-white rounded-2xl p-4">
             <p className="text-xs font-bold text-gray-400 mb-3">KEYWORDS</p>
-            <div className="flex flex-wrap gap-1.5">
-              {displayTags.map((tag, idx) => (
-                <Tag key={idx} color={tag.color}>{tag.label}</Tag>
-              ))}
-            </div>
-            {hasMoreTags && (
+
+            {/* 탭 버튼 */}
+            <div className="flex gap-1.5 mb-3 overflow-x-auto">
               <button
-                onClick={() => setShowAllTags(!showAllTags)}
-                className="mt-2 text-xs text-violet-500 font-medium"
+                onClick={() => setActiveTab('all')}
+                className={`px-3 py-1.5 text-[11px] font-medium rounded-lg whitespace-nowrap ${
+                  activeTab === 'all' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
+                }`}
               >
-                {showAllTags ? '접기' : `+${allTags.length - 8}개 더보기`}
+                전체 {totalTags}
               </button>
+              {tabCounts.beauty > 0 && (
+                <button
+                  onClick={() => setActiveTab('beauty')}
+                  className={`px-3 py-1.5 text-[11px] font-medium rounded-lg whitespace-nowrap ${
+                    activeTab === 'beauty' ? 'bg-pink-500 text-white' : 'bg-pink-50 text-pink-600'
+                  }`}
+                >
+                  뷰티 {tabCounts.beauty}
+                </button>
+              )}
+              {tabCounts.channel > 0 && (
+                <button
+                  onClick={() => setActiveTab('channel')}
+                  className={`px-3 py-1.5 text-[11px] font-medium rounded-lg whitespace-nowrap ${
+                    activeTab === 'channel' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-600'
+                  }`}
+                >
+                  채널 {tabCounts.channel}
+                </button>
+              )}
+              {tabCounts.activity > 0 && (
+                <button
+                  onClick={() => setActiveTab('activity')}
+                  className={`px-3 py-1.5 text-[11px] font-medium rounded-lg whitespace-nowrap ${
+                    activeTab === 'activity' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-600'
+                  }`}
+                >
+                  활동 {tabCounts.activity}
+                </button>
+              )}
+              {tabCounts.other > 0 && (
+                <button
+                  onClick={() => setActiveTab('other')}
+                  className={`px-3 py-1.5 text-[11px] font-medium rounded-lg whitespace-nowrap ${
+                    activeTab === 'other' ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  기타 {tabCounts.other}
+                </button>
+              )}
+            </div>
+
+            {/* 탭 컨텐츠 */}
+            {activeTab === 'all' && (
+              <div className="space-y-3">
+                {beautyTags.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-pink-400 font-medium mb-1.5">💄 뷰티</p>
+                    {renderTags(beautyTags, 'pink', 'beauty-all')}
+                  </div>
+                )}
+                {channelTags.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-blue-400 font-medium mb-1.5">📺 채널</p>
+                    {renderTags(channelTags, 'blue', 'channel-all')}
+                  </div>
+                )}
+                {activityTags.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-orange-400 font-medium mb-1.5">🎬 활동</p>
+                    {renderTags(activityTags, 'orange', 'activity-all')}
+                  </div>
+                )}
+                {otherTags.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-medium mb-1.5">✨ 기타</p>
+                    {renderTags(otherTags, 'gray', 'other-all')}
+                  </div>
+                )}
+              </div>
             )}
+
+            {activeTab === 'beauty' && beautyTags.length > 0 && renderTags(beautyTags, 'pink', 'beauty', 12)}
+            {activeTab === 'channel' && channelTags.length > 0 && renderTags(channelTags, 'blue', 'channel', 12)}
+            {activeTab === 'activity' && activityTags.length > 0 && renderTags(activityTags, 'orange', 'activity', 12)}
+            {activeTab === 'other' && otherTags.length > 0 && renderTags(otherTags, 'gray', 'other', 12)}
           </div>
         )}
 
