@@ -1,7 +1,7 @@
 /**
  * ProfileViewTest.jsx
  * 뷰티 크리에이터 프로필 종합 보기 페이지
- * v4: 심플하고 깔끔한 디자인 (2번째 이미지 스타일)
+ * v5: 컴팩트 디자인 - 짧고 깔끔한 UI
  */
 
 import { useState, useEffect } from 'react'
@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { database } from '../lib/supabase'
 import {
   Loader2, User, Instagram, Youtube, Hash, ArrowLeft, Edit3,
-  Sparkles, Copy, Check, ExternalLink
+  Sparkles, Copy, Check, ExternalLink, ChevronDown, ChevronUp
 } from 'lucide-react'
 
 import {
@@ -27,74 +27,79 @@ import {
   FAMILY_MEMBERS
 } from '../constants/beautyProfileOptions'
 
-// 값을 라벨로 변환하는 헬퍼 함수
+// 헬퍼 함수
 const getLabel = (options, value) => {
   if (!value) return null
   const option = options.find(o => o.value === value)
   return option?.label || value
 }
 
-// 배열 값을 라벨 배열로 변환
 const getLabels = (options, values) => {
   if (!values || !Array.isArray(values) || values.length === 0) return []
   return values.map(v => getLabel(options, v)).filter(Boolean)
 }
 
-// 색상별 태그 컴포넌트 - 카테고리에 따른 파스텔 색상
-const ColoredTag = ({ children, colorClass = 'bg-gray-100 text-gray-700 border-gray-200' }) => (
-  <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${colorClass}`}>
-    #{children}
-  </span>
-)
-
-// 카테고리별 색상 정의
-const TAG_COLORS = {
-  beauty: 'bg-pink-50 text-pink-700 border-pink-200',
-  diet: 'bg-green-50 text-green-700 border-green-200',
-  channel: 'bg-blue-50 text-blue-700 border-blue-200',
-  video: 'bg-purple-50 text-purple-700 border-purple-200',
-  activity: 'bg-orange-50 text-orange-700 border-orange-200',
-  special: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  language: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  personal: 'bg-gray-100 text-gray-700 border-gray-200'
+// 숫자 포맷 (1000 -> 1K)
+const formatNumber = (num) => {
+  if (!num) return '-'
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
+  if (num >= 1000) return (num / 1000).toFixed(0) + 'K'
+  return num.toLocaleString()
 }
 
-// 탭 버튼 컴포넌트
-const TabButton = ({ active, onClick, children }) => (
-  <button
-    onClick={onClick}
-    className={`w-full py-2.5 text-xs font-medium rounded-xl transition-all ${
-      active
-        ? 'bg-gray-900 text-white shadow-sm'
-        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-    }`}
-  >
-    {children}
-  </button>
-)
+// 컴팩트 태그
+const Tag = ({ children, color = 'gray' }) => {
+  const colors = {
+    pink: 'bg-pink-50 text-pink-700',
+    blue: 'bg-blue-50 text-blue-700',
+    green: 'bg-green-50 text-green-700',
+    purple: 'bg-purple-50 text-purple-700',
+    orange: 'bg-orange-50 text-orange-700',
+    yellow: 'bg-yellow-50 text-yellow-700',
+    gray: 'bg-gray-100 text-gray-600'
+  }
+  return (
+    <span className={`px-2 py-1 rounded-md text-[11px] font-medium ${colors[color]}`}>
+      {children}
+    </span>
+  )
+}
 
-// 섹션 헤더 컴포넌트
-const SectionHeader = ({ icon, title, colorClass }) => (
-  <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${colorClass}`}>
-    <span className="text-base">{icon}</span>
-    <span className="text-sm font-bold text-gray-800">{title}</span>
+// 스펙 아이템
+const SpecItem = ({ label, value, icon }) => (
+  <div className="flex flex-col">
+    <span className="text-[10px] text-gray-400 uppercase tracking-wide">{label}</span>
+    <span className="text-sm font-semibold text-gray-900 flex items-center gap-1">
+      {icon && <span className="text-xs">{icon}</span>}
+      {value || '-'}
+    </span>
   </div>
 )
 
-// AI 프로필 작성기 컴포넌트
-const AIProfileWriter = ({ profile, beautyProfile, savedText, onSave, saving }) => {
+// 채널 아이콘
+const ChannelStat = ({ icon, count, label, color }) => (
+  <div className="flex flex-col items-center">
+    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-1`}>
+      {icon}
+    </div>
+    <span className="text-sm font-bold text-gray-900">{formatNumber(count)}</span>
+    <span className="text-[10px] text-gray-400">{label}</span>
+  </div>
+)
+
+// AI 프로필 (접이식)
+const AIProfileSection = ({ profile, beautyProfile, savedText, onSave, saving }) => {
+  const [expanded, setExpanded] = useState(false)
   const [aiProfile, setAiProfile] = useState('')
   const [generating, setGenerating] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [saved, setSaved] = useState(false)
   const [hasLoadedSaved, setHasLoadedSaved] = useState(false)
 
-  // 저장된 텍스트가 있으면 불러오기 (최초 1회)
   useEffect(() => {
     if (savedText && !hasLoadedSaved) {
       setAiProfile(savedText)
       setHasLoadedSaved(true)
+      setExpanded(true)
     }
   }, [savedText, hasLoadedSaved])
 
@@ -102,138 +107,68 @@ const AIProfileWriter = ({ profile, beautyProfile, savedText, onSave, saving }) 
     setGenerating(true)
     setTimeout(() => {
       const name = profile.name || '크리에이터'
-      const age = profile.age || ''
       const gender = getLabel(GENDERS, beautyProfile.gender) || ''
       const skinType = getLabel(SKIN_TYPES, beautyProfile.skin_type)
-      const hairType = getLabel(HAIR_TYPES, beautyProfile.hair_type)
       const primaryInterest = getLabel(PRIMARY_INTERESTS, beautyProfile.primary_interest)
-      const editingLevel = getLabel(EDITING_LEVELS, beautyProfile.editing_level)
-      const shootingLevel = getLabel(SHOOTING_LEVELS, beautyProfile.shooting_level)
       const followerRange = getLabel(FOLLOWER_RANGES, beautyProfile.follower_range)
       const skinConcerns = getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns)
-      const hairConcerns = getLabels(HAIR_CONCERNS, beautyProfile.hair_concerns)
-      const collabPrefs = getLabels(COLLABORATION_PREFERENCES, beautyProfile.collaboration_preferences)
-      const videoStyles = getLabels(VIDEO_STYLES, beautyProfile.video_styles)
 
-      // 자연스러운 한국어 프로필 생성
       let lines = []
-
-      // 인사 및 소개
-      let introLine = `안녕하세요, ${name}입니다.`
-      if (age && gender) {
-        introLine = `안녕하세요, ${age}세 ${gender} 뷰티 크리에이터 ${name}입니다.`
-      } else if (gender) {
-        introLine = `안녕하세요, ${gender} 뷰티 크리에이터 ${name}입니다.`
+      lines.push(`안녕하세요, ${gender ? `${gender} ` : ''}뷰티 크리에이터 ${name}입니다.`)
+      if (primaryInterest) lines.push(`${primaryInterest} 분야의 콘텐츠를 주로 제작합니다.`)
+      if (skinType && skinConcerns.length > 0) {
+        lines.push(`${skinType} 피부로 ${skinConcerns.slice(0, 2).join(', ')} 고민을 다룹니다.`)
       }
-      lines.push(introLine)
+      if (followerRange) lines.push(`${followerRange} 규모의 팔로워와 소통 중입니다.`)
+      lines.push(`협업 제안 환영합니다!`)
 
-      // 전문 분야
-      if (primaryInterest) {
-        lines.push(`${primaryInterest} 분야의 콘텐츠를 주로 제작하고 있으며, 진정성 있는 리뷰와 정보 전달을 추구합니다.`)
-      }
-
-      // 피부/헤어 특성 및 고민
-      const allConcerns = [...skinConcerns, ...hairConcerns]
-      if (skinType && allConcerns.length > 0) {
-        lines.push(`${skinType} 피부 타입으로 ${allConcerns.slice(0, 3).join(', ')} 등의 고민을 다루는 콘텐츠에 강점이 있습니다.`)
-      } else if (skinType) {
-        lines.push(`${skinType} 피부 타입의 특성을 살린 솔직한 제품 리뷰를 진행합니다.`)
-      }
-
-      // 채널 규모
-      if (followerRange) {
-        lines.push(`현재 ${followerRange} 규모의 팔로워와 소통하며 꾸준히 성장하고 있습니다.`)
-      }
-
-      // 영상 스타일
-      if (videoStyles.length > 0) {
-        lines.push(`${videoStyles.slice(0, 3).join(', ')} 스타일의 영상을 제작합니다.`)
-      }
-
-      // 역량
-      if (editingLevel && shootingLevel) {
-        lines.push(`편집 ${editingLevel}, 촬영 ${shootingLevel} 수준으로 퀄리티 높은 결과물을 제공해 드릴 수 있습니다.`)
-      }
-
-      // 협업 선호
-      if (collabPrefs.length > 0) {
-        lines.push(`${collabPrefs.join(', ')} 형태의 협업에 적극적으로 임하고 있습니다.`)
-      }
-
-      // 마무리
-      lines.push(`브랜드와의 시너지를 통해 좋은 결과물을 만들어 나가고 싶습니다. 협업 제안 언제든 환영합니다.`)
-
-      setAiProfile(lines.join('\n\n'))
+      setAiProfile(lines.join(' '))
       setGenerating(false)
-    }, 1000)
-  }
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(aiProfile)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('복사 실패:', err)
-    }
+      setExpanded(true)
+    }, 800)
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="w-4 h-4 text-violet-500" />
-        <span className="text-sm font-bold text-gray-900">AI 자기소개 생성</span>
-      </div>
-
+    <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-3">
       <button
-        onClick={generateAIProfile}
+        onClick={() => aiProfile ? setExpanded(!expanded) : generateAIProfile()}
         disabled={generating}
-        className="w-full py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-70"
+        className="w-full flex items-center justify-between"
       >
-        {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-        {generating ? '생성 중...' : 'AI 프로필 생성'}
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-violet-500" />
+          <span className="text-sm font-bold text-gray-800">AI 소개글</span>
+        </div>
+        {generating ? (
+          <Loader2 className="w-4 h-4 animate-spin text-violet-500" />
+        ) : aiProfile ? (
+          expanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />
+        ) : (
+          <span className="text-xs text-violet-600 font-medium">생성하기</span>
+        )}
       </button>
 
-      {aiProfile && (
-        <div className="mt-4 space-y-3">
-          <div className="relative">
-            {isEditing ? (
-              <textarea
-                value={aiProfile}
-                onChange={(e) => setAiProfile(e.target.value)}
-                className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 text-sm text-gray-700 leading-relaxed focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
-                rows={8}
-              />
-            ) : (
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{aiProfile}</p>
-              </div>
-            )}
-            {!isEditing && (
-              <button onClick={copyToClipboard} className="absolute top-3 right-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50">
-                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
-              </button>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200"
-            >
-              {isEditing ? '완료' : '수정'}
-            </button>
+      {expanded && aiProfile && (
+        <div className="mt-3 pt-3 border-t border-violet-100">
+          <p className="text-sm text-gray-700 leading-relaxed">{aiProfile}</p>
+          <div className="flex gap-2 mt-2">
             <button
               onClick={async () => {
-                if (onSave) {
-                  await onSave(aiProfile)
-                  setSaved(true)
-                  setTimeout(() => setSaved(false), 2000)
-                }
+                await navigator.clipboard.writeText(aiProfile)
+                setCopied(true)
+                setTimeout(() => setCopied(false), 1500)
               }}
-              disabled={saving}
-              className="flex-1 py-2.5 bg-violet-500 text-white rounded-xl font-medium text-sm disabled:opacity-70 hover:bg-violet-600"
+              className="flex-1 py-1.5 bg-white rounded-lg text-xs font-medium text-gray-600 flex items-center justify-center gap-1"
             >
-              {saving ? '저장 중...' : saved ? '저장됨!' : '저장'}
+              {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+              {copied ? '복사됨' : '복사'}
+            </button>
+            <button
+              onClick={() => { onSave(aiProfile) }}
+              disabled={saving}
+              className="flex-1 py-1.5 bg-violet-500 rounded-lg text-xs font-medium text-white"
+            >
+              {saving ? '저장중...' : '저장'}
             </button>
           </div>
         </div>
@@ -252,7 +187,7 @@ const ProfileViewTest = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState('all') // 탭 상태
+  const [showAllTags, setShowAllTags] = useState(false)
 
   useEffect(() => {
     if (user) loadProfile()
@@ -345,7 +280,6 @@ const ProfileViewTest = () => {
       setAiProfileText(text)
     } catch (err) {
       console.error('AI 프로필 저장 오류:', err)
-      setError('저장 중 오류가 발생했습니다.')
     } finally {
       setSaving(false)
     }
@@ -353,15 +287,15 @@ const ProfileViewTest = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
       </div>
     )
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <p className="text-gray-500 mb-4">프로필 정보가 없습니다.</p>
         <button onClick={() => navigate('/profile-test-beta-2025')} className="px-6 py-3 bg-violet-500 text-white rounded-xl font-bold">
           프로필 작성하기
@@ -370,181 +304,176 @@ const ProfileViewTest = () => {
     )
   }
 
-  // 카테고리별 태그 생성
-  const beautyTags = []
-  if (beautyProfile.skin_type) beautyTags.push(getLabel(SKIN_TYPES, beautyProfile.skin_type))
-  if (beautyProfile.skin_shade) beautyTags.push(getLabel(SKIN_SHADES, beautyProfile.skin_shade))
-  if (beautyProfile.personal_color) beautyTags.push(getLabel(PERSONAL_COLORS, beautyProfile.personal_color))
-  // 레거시 skin_tone 지원
-  if (beautyProfile.skin_tone && !beautyProfile.skin_shade && !beautyProfile.personal_color) {
-    beautyTags.push(getLabel(SKIN_TONES, beautyProfile.skin_tone))
-  }
-  getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns).forEach(c => beautyTags.push(c))
-  if (beautyProfile.hair_type) beautyTags.push(getLabel(HAIR_TYPES, beautyProfile.hair_type))
-  getLabels(HAIR_CONCERNS, beautyProfile.hair_concerns).forEach(c => beautyTags.push(c))
-  if (beautyProfile.nail_usage && beautyProfile.nail_usage !== 'never') beautyTags.push(`네일 ${getLabel(NAIL_USAGE, beautyProfile.nail_usage)}`)
-  if (beautyProfile.circle_lens_usage && beautyProfile.circle_lens_usage !== 'never') beautyTags.push(`렌즈 ${getLabel(CIRCLE_LENS_USAGE, beautyProfile.circle_lens_usage)}`)
-  if (beautyProfile.glasses_usage && beautyProfile.glasses_usage !== 'never') beautyTags.push(`안경 ${getLabel(GLASSES_USAGE, beautyProfile.glasses_usage)}`)
+  // 태그 생성
+  const allTags = []
 
-  const dietTags = getLabels(DIET_CONCERNS, beautyProfile.diet_concerns)
+  // 뷰티 태그
+  if (beautyProfile.skin_type) allTags.push({ label: getLabel(SKIN_TYPES, beautyProfile.skin_type), color: 'pink' })
+  getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns).forEach(c => allTags.push({ label: c, color: 'pink' }))
+  if (beautyProfile.hair_type) allTags.push({ label: getLabel(HAIR_TYPES, beautyProfile.hair_type), color: 'pink' })
 
-  const expertiseTags = []
-  if (beautyProfile.primary_interest) expertiseTags.push(getLabel(CHANNEL_CONTENTS, beautyProfile.primary_interest))
-  if (beautyProfile.category) expertiseTags.push(getLabel(CATEGORIES, beautyProfile.category))
-  if (beautyProfile.editing_level) expertiseTags.push(`편집 ${getLabel(EDITING_LEVELS, beautyProfile.editing_level)}`)
-  if (beautyProfile.shooting_level) expertiseTags.push(`촬영 ${getLabel(SHOOTING_LEVELS, beautyProfile.shooting_level)}`)
+  // 채널 태그
+  if (beautyProfile.primary_interest) allTags.push({ label: getLabel(CHANNEL_CONTENTS, beautyProfile.primary_interest), color: 'blue' })
+  if (beautyProfile.category) allTags.push({ label: getLabel(CATEGORIES, beautyProfile.category), color: 'blue' })
+  getLabels(CONTENT_FORMATS, beautyProfile.content_formats).forEach(f => allTags.push({ label: f, color: 'blue' }))
 
-  const channelTags = []
-  if (beautyProfile.follower_range) channelTags.push(getLabel(FOLLOWER_RANGES, beautyProfile.follower_range))
-  if (beautyProfile.upload_frequency) channelTags.push(getLabel(UPLOAD_FREQUENCIES, beautyProfile.upload_frequency))
-  getLabels(CONTENT_FORMATS, beautyProfile.content_formats).forEach(f => channelTags.push(f))
-  getLabels(COLLABORATION_PREFERENCES, beautyProfile.collaboration_preferences).forEach(c => channelTags.push(c))
+  // 활동 태그
+  if (beautyProfile.child_appearance === 'possible') allTags.push({ label: '아이출연가능', color: 'orange' })
+  if (beautyProfile.offline_visit === 'possible') allTags.push({ label: '오프라인촬영', color: 'orange' })
+  if (beautyProfile.linktree_available === 'possible') allTags.push({ label: '링크트리', color: 'yellow' })
+  if (beautyProfile.mirroring_available === 'possible') allTags.push({ label: '미러링', color: 'yellow' })
 
-  const videoTags = []
-  if (beautyProfile.video_length_style) videoTags.push(getLabel(VIDEO_LENGTH_STYLES, beautyProfile.video_length_style))
-  if (beautyProfile.shortform_tempo) videoTags.push(`${getLabel(SHORTFORM_TEMPO_STYLES, beautyProfile.shortform_tempo)} 템포`)
-  getLabels(VIDEO_STYLES, beautyProfile.video_styles).forEach(s => videoTags.push(s))
+  // 기타
+  getLabels(LANGUAGES, beautyProfile.languages).forEach(l => allTags.push({ label: l, color: 'gray' }))
 
-  const activityTags = []
-  if (beautyProfile.child_appearance === 'possible') activityTags.push('아이출연가능')
-  if (beautyProfile.family_appearance === 'possible') {
-    activityTags.push('가족출연가능')
-    getLabels(FAMILY_MEMBERS, beautyProfile.family_members).forEach(m => activityTags.push(`${m}출연`))
-  }
-  if (beautyProfile.offline_visit === 'possible') {
-    activityTags.push('오프라인촬영가능')
-    getLabels(OFFLINE_LOCATIONS, beautyProfile.offline_locations).forEach(l => activityTags.push(l))
-    if (beautyProfile.offline_region) activityTags.push(beautyProfile.offline_region)
-  }
-
-  const specialTags = []
-  if (beautyProfile.linktree_available === 'possible') {
-    specialTags.push('링크트리가능')
-    getLabels(LINKTREE_CHANNELS, beautyProfile.linktree_channels).forEach(c => specialTags.push(`${c} 링크트리`))
-  }
-  if (beautyProfile.mirroring_available === 'possible') {
-    specialTags.push('미러링가능')
-    beautyProfile.mirroring_channels?.forEach(c => {
-      const channelNames = { naver_clip: '네이버클립', youtube: '유튜브', instagram: '인스타', tiktok: '틱톡' }
-      specialTags.push(`${channelNames[c] || c} 미러링`)
-    })
-  }
-  if (beautyProfile.smartstore_purchase === 'possible') {
-    specialTags.push('스마트스토어구매가능')
-  }
-
-  const languageTags = getLabels(LANGUAGES, beautyProfile.languages)
-
-  const personalTags = []
-  if (beautyProfile.gender) personalTags.push(getLabel(GENDERS, beautyProfile.gender))
-  if (profile.age) personalTags.push(`${profile.age}세`)
-  if (beautyProfile.job_visibility === 'public' && beautyProfile.job) personalTags.push(beautyProfile.job)
+  const displayTags = showAllTags ? allTags : allTags.slice(0, 8)
+  const hasMoreTags = allTags.length > 8
 
   return (
-    <div className="min-h-screen bg-white pb-safe">
+    <div className="min-h-screen bg-gray-50 pb-safe">
       {/* 헤더 */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
-        <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="p-1.5 -ml-1.5">
-            <ArrowLeft size={22} className="text-gray-900" />
+        <div className="max-w-lg mx-auto px-4 h-11 flex items-center justify-between">
+          <button onClick={() => navigate(-1)} className="p-1 -ml-1">
+            <ArrowLeft size={20} className="text-gray-900" />
           </button>
-          <h1 className="text-base font-bold text-gray-900">프로필</h1>
-          <button onClick={() => navigate('/profile-test-beta-2025')} className="p-1.5 -mr-1.5">
-            <Edit3 size={18} className="text-violet-500" />
+          <h1 className="text-sm font-bold text-gray-900">프로필</h1>
+          <button onClick={() => navigate('/profile-test-beta-2025')} className="p-1 -mr-1">
+            <Edit3 size={16} className="text-violet-500" />
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="mx-4 mt-3 p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium">{error}</div>
-      )}
-
-      <div className="max-w-lg mx-auto px-4 py-6">
-        {/* 프로필 사진 & 기본 정보 */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="relative mb-3">
-            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
-              {profile.profile_image ? (
-                <img src={profile.profile_image} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-100 to-purple-100">
-                  <User className="w-10 h-10 text-violet-300" />
+      <div className="max-w-lg mx-auto px-4 py-4 space-y-3">
+        {/* 프로필 카드 */}
+        <div className="bg-white rounded-2xl p-4">
+          <div className="flex items-center gap-4">
+            {/* 프로필 사진 */}
+            <div className="relative shrink-0">
+              <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100">
+                {profile.profile_image ? (
+                  <img src={profile.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-100 to-purple-100">
+                    <User className="w-7 h-7 text-violet-300" />
+                  </div>
+                )}
+              </div>
+              {beautyProfile.primary_interest && (
+                <div className="absolute -bottom-1 -right-1 px-1.5 py-0.5 bg-violet-500 text-white text-[9px] font-bold rounded-md">
+                  {getLabel(PRIMARY_INTERESTS, beautyProfile.primary_interest)?.slice(0, 4)}
                 </div>
               )}
             </div>
-            {/* 뱃지 */}
-            {beautyProfile.primary_interest && (
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-violet-500 text-white text-[10px] font-bold rounded-full whitespace-nowrap">
-                {getLabel(PRIMARY_INTERESTS, beautyProfile.primary_interest)}
+
+            {/* 이름 & 소셜 */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-gray-900 truncate">{profile.name || '이름 없음'}</h2>
+              <p className="text-xs text-gray-500">
+                {getLabel(GENDERS, beautyProfile.gender)}
+                {profile.age ? ` · ${profile.age}세` : ''}
+              </p>
+
+              {/* 소셜 아이콘 */}
+              <div className="flex gap-1.5 mt-2">
+                {profile.instagram_url && (
+                  <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://instagram.com/${profile.instagram_url.replace('@', '')}`}
+                     target="_blank" rel="noopener noreferrer"
+                     className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center">
+                    <Instagram size={14} className="text-white" />
+                  </a>
+                )}
+                {profile.youtube_url && (
+                  <a href={profile.youtube_url.startsWith('http') ? profile.youtube_url : `https://youtube.com/${profile.youtube_url}`}
+                     target="_blank" rel="noopener noreferrer"
+                     className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center">
+                    <Youtube size={14} className="text-white" />
+                  </a>
+                )}
+                {profile.tiktok_url && (
+                  <a href={profile.tiktok_url.startsWith('http') ? profile.tiktok_url : `https://tiktok.com/@${profile.tiktok_url.replace('@', '')}`}
+                     target="_blank" rel="noopener noreferrer"
+                     className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
+                    <Hash size={14} className="text-white" />
+                  </a>
+                )}
+                {profile.blog_url && (
+                  <a href={profile.blog_url.startsWith('http') ? profile.blog_url : `https://${profile.blog_url}`}
+                     target="_blank" rel="noopener noreferrer"
+                     className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center">
+                    <ExternalLink size={14} className="text-white" />
+                  </a>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
-          <h2 className="text-xl font-bold text-gray-900 mt-2">{profile.name || '이름 없음'}</h2>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {getLabel(GENDERS, beautyProfile.gender)}
-            {profile.age ? ` · ${profile.age}세` : ''}
-          </p>
-
-          {/* SNS 아이콘 버튼 */}
-          <div className="flex items-center gap-3 mt-4">
-            {profile.instagram_url && (
-              <a href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://instagram.com/${profile.instagram_url.replace('@', '')}`}
-                 target="_blank" rel="noopener noreferrer"
-                 className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center text-white">
-                <Instagram size={18} />
-              </a>
-            )}
-            {profile.youtube_url && (
-              <a href={profile.youtube_url.startsWith('http') ? profile.youtube_url : `https://youtube.com/${profile.youtube_url}`}
-                 target="_blank" rel="noopener noreferrer"
-                 className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white">
-                <Youtube size={18} />
-              </a>
-            )}
-            {profile.tiktok_url && (
-              <a href={profile.tiktok_url.startsWith('http') ? profile.tiktok_url : `https://tiktok.com/@${profile.tiktok_url.replace('@', '')}`}
-                 target="_blank" rel="noopener noreferrer"
-                 className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white">
-                <Hash size={18} />
-              </a>
-            )}
-            {profile.blog_url && (
-              <a href={profile.blog_url.startsWith('http') ? profile.blog_url : `https://${profile.blog_url}`}
-                 target="_blank" rel="noopener noreferrer"
-                 className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white">
-                <ExternalLink size={18} />
-              </a>
-            )}
-          </div>
+          {/* 자기소개 */}
+          {profile.bio && (
+            <p className="mt-3 pt-3 border-t border-gray-100 text-sm text-gray-600 line-clamp-2">{profile.bio}</p>
+          )}
         </div>
 
-        {/* SNS 팔로워 정보 */}
+        {/* 채널 영향력 */}
         {(profile.instagram_followers || profile.youtube_subscribers || profile.tiktok_followers) && (
-          <div className="flex justify-center gap-4 mb-4">
-            {profile.instagram_url && profile.instagram_followers && (
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">{profile.instagram_followers.toLocaleString()}</p>
-                <p className="text-xs text-gray-400">인스타 팔로워</p>
-              </div>
-            )}
-            {profile.youtube_url && profile.youtube_subscribers && (
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">{profile.youtube_subscribers.toLocaleString()}</p>
-                <p className="text-xs text-gray-400">유튜브 구독자</p>
-              </div>
-            )}
-            {profile.tiktok_url && profile.tiktok_followers && (
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">{profile.tiktok_followers.toLocaleString()}</p>
-                <p className="text-xs text-gray-400">틱톡 팔로워</p>
-              </div>
-            )}
+          <div className="bg-white rounded-2xl p-4">
+            <p className="text-xs font-bold text-gray-400 mb-3">CHANNEL INFLUENCE</p>
+            <div className="flex justify-around">
+              {profile.youtube_subscribers && (
+                <ChannelStat
+                  icon={<Youtube size={18} className="text-white" />}
+                  count={profile.youtube_subscribers}
+                  label="YOUTUBE"
+                  color="bg-red-500"
+                />
+              )}
+              {profile.instagram_followers && (
+                <ChannelStat
+                  icon={<Instagram size={18} className="text-white" />}
+                  count={profile.instagram_followers}
+                  label="INSTAGRAM"
+                  color="bg-gradient-to-br from-purple-500 to-pink-500"
+                />
+              )}
+              {profile.tiktok_followers && (
+                <ChannelStat
+                  icon={<Hash size={18} className="text-white" />}
+                  count={profile.tiktok_followers}
+                  label="TIKTOK"
+                  color="bg-gray-900"
+                />
+              )}
+            </div>
           </div>
         )}
 
-        {/* AI 프로필 작성기 - 상단 배치 */}
-        <AIProfileWriter
+        {/* 뷰티 스펙 */}
+        <div className="bg-white rounded-2xl p-4">
+          <p className="text-xs font-bold text-gray-400 mb-3">BEAUTY SPEC</p>
+          <div className="grid grid-cols-3 gap-4">
+            <SpecItem label="피부" value={getLabel(SKIN_TYPES, beautyProfile.skin_type)} />
+            <SpecItem label="호수" value={getLabel(SKIN_SHADES, beautyProfile.skin_shade)} />
+            <SpecItem label="퍼스널컬러" value={getLabel(PERSONAL_COLORS, beautyProfile.personal_color)?.slice(0, 5)} />
+            <SpecItem label="헤어" value={getLabel(HAIR_TYPES, beautyProfile.hair_type)} />
+            <SpecItem label="편집" value={getLabel(EDITING_LEVELS, beautyProfile.editing_level)} />
+            <SpecItem label="촬영" value={getLabel(SHOOTING_LEVELS, beautyProfile.shooting_level)} />
+          </div>
+
+          {/* 피부 고민 */}
+          {beautyProfile.skin_concerns?.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <p className="text-[10px] text-gray-400 uppercase mb-2">CONCERNS</p>
+              <div className="flex flex-wrap gap-1">
+                {getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns).slice(0, 4).map((c, i) => (
+                  <span key={i} className="px-2 py-0.5 bg-pink-50 text-pink-600 rounded text-[11px]">{c}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* AI 소개글 */}
+        <AIProfileSection
           profile={profile}
           beautyProfile={beautyProfile}
           savedText={aiProfileText}
@@ -552,343 +481,35 @@ const ProfileViewTest = () => {
           saving={saving}
         />
 
-        {/* 채널 정보 */}
-        {(profile.channel_name || profile.avg_views) && (
-          <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-            <div className="flex items-center justify-between">
-              {profile.channel_name && (
-                <div>
-                  <p className="text-xs text-gray-400">대표 채널</p>
-                  <p className="text-sm font-bold text-gray-900">{profile.channel_name}</p>
-                </div>
-              )}
-              {profile.avg_views && (
-                <div className="text-right">
-                  <p className="text-xs text-gray-400">평균 조회수</p>
-                  <p className="text-sm font-bold text-gray-900">{profile.avg_views.toLocaleString()}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* 정보 카드 - 2열 그리드 */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-gray-50 rounded-2xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <User className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-400">나이</span>
-            </div>
-            <p className="text-base font-bold text-gray-900">{profile.age ? `${profile.age}세` : '-'}</p>
-          </div>
-          <div className="bg-gray-50 rounded-2xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-4 h-4 text-violet-400" />
-              <span className="text-xs text-gray-400">피부 타입</span>
-            </div>
-            <p className="text-base font-bold text-gray-900">
-              {beautyProfile.skin_type ? getLabel(SKIN_TYPES, beautyProfile.skin_type) : '-'}
-            </p>
-          </div>
-        </div>
-
-        {/* 피부 호수 & 헤어 타입 */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {beautyProfile.skin_shade && (
-            <div className="bg-gray-50 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-r from-amber-200 to-amber-400" />
-                <span className="text-xs text-gray-400">피부 호수</span>
-              </div>
-              <p className="text-base font-bold text-gray-900">{getLabel(SKIN_SHADES, beautyProfile.skin_shade)}</p>
-            </div>
-          )}
-          {beautyProfile.hair_type && (
-            <div className="bg-gray-50 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm">💇</span>
-                <span className="text-xs text-gray-400">헤어 타입</span>
-              </div>
-              <p className="text-base font-bold text-gray-900">{getLabel(HAIR_TYPES, beautyProfile.hair_type)}</p>
-            </div>
-          )}
-        </div>
-
-        {/* 퍼스널 컬러 */}
-        {(beautyProfile.personal_color || beautyProfile.skin_tone) && (
-          <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-r from-pink-300 to-orange-300" />
-              <span className="text-xs text-gray-400">퍼스널 컬러</span>
-            </div>
-            <p className="text-base font-bold text-gray-900">
-              {beautyProfile.personal_color
-                ? getLabel(PERSONAL_COLORS, beautyProfile.personal_color)
-                : getLabel(SKIN_TONES, beautyProfile.skin_tone)}
-            </p>
-          </div>
-        )}
-
-        {/* 자기소개 */}
-        {profile.bio && (
-          <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-            <p className="text-xs text-gray-400 mb-2">Introduction</p>
-            <p className="text-sm text-gray-700 leading-relaxed">{profile.bio}</p>
-          </div>
-        )}
-
-        {/* 관심 키워드 - 탭 형태 */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Hash className="w-4 h-4 text-gray-900" />
-            <span className="text-sm font-bold text-gray-900">관심 키워드</span>
-          </div>
-
-          {/* 탭 네비게이션 - 그리드 형태 */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <TabButton active={activeTab === 'all'} onClick={() => setActiveTab('all')}>
-              전체
-            </TabButton>
-            {beautyTags.length > 0 && (
-              <TabButton active={activeTab === 'beauty'} onClick={() => setActiveTab('beauty')}>
-                뷰티
-              </TabButton>
-            )}
-            {(channelTags.length > 0 || videoTags.length > 0 || expertiseTags.length > 0) && (
-              <TabButton active={activeTab === 'channel'} onClick={() => setActiveTab('channel')}>
-                채널
-              </TabButton>
-            )}
-            {(activityTags.length > 0 || specialTags.length > 0) && (
-              <TabButton active={activeTab === 'activity'} onClick={() => setActiveTab('activity')}>
-                출연/활동
-              </TabButton>
-            )}
-            {(languageTags.length > 0 || personalTags.length > 0 || dietTags.length > 0) && (
-              <TabButton active={activeTab === 'other'} onClick={() => setActiveTab('other')}>
-                기타
-              </TabButton>
-            )}
-          </div>
-
-          {/* 전체 보기 */}
-          {activeTab === 'all' && (
-            <div className="space-y-5">
-              {/* 뷰티/스타일 */}
-              {beautyTags.length > 0 && (
-                <div>
-                  <SectionHeader icon="💄" title="뷰티/스타일" colorClass="border-pink-200" />
-                  <div className="flex flex-wrap gap-2">
-                    {beautyTags.map((tag, idx) => (
-                      <ColoredTag key={`beauty-${idx}`} colorClass={TAG_COLORS.beauty}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 채널/콘텐츠 */}
-              {(channelTags.length > 0 || videoTags.length > 0 || expertiseTags.length > 0) && (
-                <div>
-                  <SectionHeader icon="📺" title="채널/콘텐츠" colorClass="border-blue-200" />
-                  <div className="flex flex-wrap gap-2">
-                    {expertiseTags.map((tag, idx) => (
-                      <ColoredTag key={`exp-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
-                    ))}
-                    {channelTags.map((tag, idx) => (
-                      <ColoredTag key={`ch-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
-                    ))}
-                    {videoTags.map((tag, idx) => (
-                      <ColoredTag key={`vid-${idx}`} colorClass={TAG_COLORS.video}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 출연/활동 */}
-              {(activityTags.length > 0 || specialTags.length > 0) && (
-                <div>
-                  <SectionHeader icon="🎬" title="출연/활동" colorClass="border-orange-200" />
-                  <div className="flex flex-wrap gap-2">
-                    {activityTags.map((tag, idx) => (
-                      <ColoredTag key={`act-${idx}`} colorClass={TAG_COLORS.activity}>{tag}</ColoredTag>
-                    ))}
-                    {specialTags.map((tag, idx) => (
-                      <ColoredTag key={`spec-${idx}`} colorClass={TAG_COLORS.special}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 기타 */}
-              {(languageTags.length > 0 || personalTags.length > 0 || dietTags.length > 0) && (
-                <div>
-                  <SectionHeader icon="✨" title="기타" colorClass="border-gray-200" />
-                  <div className="flex flex-wrap gap-2">
-                    {dietTags.map((tag, idx) => (
-                      <ColoredTag key={`diet-${idx}`} colorClass={TAG_COLORS.diet}>{tag}</ColoredTag>
-                    ))}
-                    {languageTags.map((tag, idx) => (
-                      <ColoredTag key={`lang-${idx}`} colorClass={TAG_COLORS.language}>{tag}</ColoredTag>
-                    ))}
-                    {personalTags.map((tag, idx) => (
-                      <ColoredTag key={`pers-${idx}`} colorClass={TAG_COLORS.personal}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* 뷰티/스타일 탭 */}
-          {activeTab === 'beauty' && beautyTags.length > 0 && (
-            <div>
-              <SectionHeader icon="💄" title="뷰티/스타일" colorClass="border-pink-200" />
-              <div className="flex flex-wrap gap-2">
-                {beautyTags.map((tag, idx) => (
-                  <ColoredTag key={`beauty-${idx}`} colorClass={TAG_COLORS.beauty}>{tag}</ColoredTag>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 채널/콘텐츠 탭 */}
-          {activeTab === 'channel' && (
-            <div className="space-y-4">
-              {expertiseTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">전문분야 & 역량</p>
-                  <div className="flex flex-wrap gap-2">
-                    {expertiseTags.map((tag, idx) => (
-                      <ColoredTag key={`exp-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {channelTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">채널 정보</p>
-                  <div className="flex flex-wrap gap-2">
-                    {channelTags.map((tag, idx) => (
-                      <ColoredTag key={`ch-${idx}`} colorClass={TAG_COLORS.channel}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {videoTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">영상 스타일</p>
-                  <div className="flex flex-wrap gap-2">
-                    {videoTags.map((tag, idx) => (
-                      <ColoredTag key={`vid-${idx}`} colorClass={TAG_COLORS.video}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* 출연/활동 탭 */}
-          {activeTab === 'activity' && (
-            <div className="space-y-4">
-              {activityTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">출연 가능</p>
-                  <div className="flex flex-wrap gap-2">
-                    {activityTags.map((tag, idx) => (
-                      <ColoredTag key={`act-${idx}`} colorClass={TAG_COLORS.activity}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {specialTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">특별 기능</p>
-                  <div className="flex flex-wrap gap-2">
-                    {specialTags.map((tag, idx) => (
-                      <ColoredTag key={`spec-${idx}`} colorClass={TAG_COLORS.special}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* 기타 탭 */}
-          {activeTab === 'other' && (
-            <div className="space-y-4">
-              {dietTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">다이어트 & 건강</p>
-                  <div className="flex flex-wrap gap-2">
-                    {dietTags.map((tag, idx) => (
-                      <ColoredTag key={`diet-${idx}`} colorClass={TAG_COLORS.diet}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {languageTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">언어</p>
-                  <div className="flex flex-wrap gap-2">
-                    {languageTags.map((tag, idx) => (
-                      <ColoredTag key={`lang-${idx}`} colorClass={TAG_COLORS.language}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {personalTags.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">기본 정보</p>
-                  <div className="flex flex-wrap gap-2">
-                    {personalTags.map((tag, idx) => (
-                      <ColoredTag key={`pers-${idx}`} colorClass={TAG_COLORS.personal}>{tag}</ColoredTag>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* 태그가 없는 경우 */}
-          {beautyTags.length === 0 && expertiseTags.length === 0 && channelTags.length === 0 && personalTags.length === 0 && (
-            <p className="text-sm text-gray-400 text-center py-4">프로필을 작성해주세요</p>
-          )}
-        </div>
-
-        {/* 아이 정보 */}
-        {beautyProfile.child_appearance === 'possible' && beautyProfile.children?.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4">
-            <p className="text-xs text-gray-400 mb-3">출연 가능 아이</p>
-            <div className="flex flex-wrap gap-2">
-              {beautyProfile.children.map((child, idx) => (
-                <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-pink-50 rounded-xl">
-                  <span className="text-base">{child.gender === 'boy' ? '👦' : '👧'}</span>
-                  <span className="text-sm font-medium text-pink-700">
-                    {child.gender === 'boy' ? '남아' : '여아'} {child.age}세
-                  </span>
-                </div>
+        {/* 키워드 태그 */}
+        {allTags.length > 0 && (
+          <div className="bg-white rounded-2xl p-4">
+            <p className="text-xs font-bold text-gray-400 mb-3">KEYWORDS</p>
+            <div className="flex flex-wrap gap-1.5">
+              {displayTags.map((tag, idx) => (
+                <Tag key={idx} color={tag.color}>{tag.label}</Tag>
               ))}
             </div>
+            {hasMoreTags && (
+              <button
+                onClick={() => setShowAllTags(!showAllTags)}
+                className="mt-2 text-xs text-violet-500 font-medium"
+              >
+                {showAllTags ? '접기' : `+${allTags.length - 8}개 더보기`}
+              </button>
+            )}
           </div>
         )}
 
-        {/* 연락처 & 배송지 */}
+        {/* 연락처 (간단히) */}
         {(profile.phone || profile.address) && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4">
-            {profile.phone && (
-              <div className="mb-3">
-                <p className="text-xs text-gray-400 mb-1">연락처</p>
-                <p className="text-sm font-medium text-gray-900">{profile.phone}</p>
-              </div>
-            )}
+          <div className="bg-white rounded-2xl p-4">
+            <p className="text-xs font-bold text-gray-400 mb-2">CONTACT</p>
+            {profile.phone && <p className="text-sm text-gray-700">{profile.phone}</p>}
             {profile.address && (
-              <div>
-                <p className="text-xs text-gray-400 mb-1">배송지</p>
-                <p className="text-sm text-gray-700">
-                  [{profile.postcode}] {profile.address}
-                  {profile.detail_address && ` ${profile.detail_address}`}
-                </p>
-              </div>
+              <p className="text-xs text-gray-500 mt-1 truncate">
+                {profile.address}
+              </p>
             )}
           </div>
         )}
@@ -896,10 +517,10 @@ const ProfileViewTest = () => {
         {/* 프로필 수정 버튼 */}
         <button
           onClick={() => navigate('/profile-test-beta-2025')}
-          className="w-full mt-4 py-4 bg-gray-900 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2"
+          className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2"
         >
           <Edit3 className="w-4 h-4" />
-          프로필 수정하기
+          프로필 수정
         </button>
       </div>
     </div>
