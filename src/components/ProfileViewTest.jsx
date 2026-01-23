@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { database } from '../lib/supabase'
 import {
   Loader2, User, Instagram, Youtube, Hash, ArrowLeft, Edit3,
-  Sparkles, Copy, Check, ExternalLink, ChevronDown, ChevronUp
+  Sparkles, Copy, Check, ChevronDown, ChevronUp
 } from 'lucide-react'
 
 import {
@@ -503,13 +503,6 @@ const ProfileViewTest = () => {
                      target="_blank" rel="noopener noreferrer"
                      className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
                     <Hash size={14} className="text-white" />
-                  </a>
-                )}
-                {profile.blog_url && (
-                  <a href={normalizeUrl(profile.blog_url, 'blog')}
-                     target="_blank" rel="noopener noreferrer"
-                     className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center">
-                    <ExternalLink size={14} className="text-white" />
                   </a>
                 )}
               </div>
