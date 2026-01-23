@@ -1163,76 +1163,127 @@ const ProfileSettingsTest = () => {
             />
 
             {/* SNS 채널 */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-5">
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
               <SectionTitle title="SNS 채널" required subtitle="최소 1개 이상 입력해주세요" />
 
-              {/* 인스타그램 */}
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center flex-shrink-0">
-                  <Instagram size={22} className="text-white" />
+              {/* 경고 안내 */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                  <div className="text-xs text-amber-700">
+                    <p className="font-bold mb-1">URL을 정확히 입력해주세요!</p>
+                    <p>전체 URL을 복사해서 붙여넣기 해주세요.</p>
+                    <p className="text-amber-600 mt-1">예: https://www.instagram.com/username</p>
+                  </div>
                 </div>
-                <div className="flex-1 grid grid-cols-5 gap-3">
-                  <input
-                    type="text"
-                    value={profile.instagram_url}
-                    onChange={(e) => setProfile(prev => ({ ...prev, instagram_url: e.target.value }))}
-                    className="col-span-3 px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
-                    placeholder="@username"
-                  />
+              </div>
+
+              {/* 인스타그램 */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center flex-shrink-0">
+                    <Instagram size={18} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={profile.instagram_url}
+                      onChange={(e) => setProfile(prev => ({ ...prev, instagram_url: e.target.value }))}
+                      className="w-full px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
+                      placeholder="https://www.instagram.com/username"
+                    />
+                  </div>
                   <input
                     type="number"
                     value={profile.instagram_followers}
                     onChange={(e) => setProfile(prev => ({ ...prev, instagram_followers: e.target.value }))}
-                    className="col-span-2 px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
+                    className="w-20 px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
                     placeholder="팔로워"
                   />
+                  {profile.instagram_url && (
+                    <a
+                      href={profile.instagram_url.startsWith('http') ? profile.instagram_url : `https://www.instagram.com/${profile.instagram_url.replace(/^@+/, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2.5 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200 flex-shrink-0"
+                    >
+                      확인
+                    </a>
+                  )}
                 </div>
+                <p className="text-[10px] text-gray-400 ml-[52px]">프로필 URL 전체를 복사해서 붙여넣기 하세요</p>
               </div>
 
               {/* 유튜브 */}
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center flex-shrink-0">
-                  <Youtube size={22} className="text-white" />
-                </div>
-                <div className="flex-1 grid grid-cols-5 gap-3">
-                  <input
-                    type="text"
-                    value={profile.youtube_url}
-                    onChange={(e) => setProfile(prev => ({ ...prev, youtube_url: e.target.value }))}
-                    className="col-span-3 px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
-                    placeholder="채널 URL"
-                  />
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center flex-shrink-0">
+                    <Youtube size={18} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={profile.youtube_url}
+                      onChange={(e) => setProfile(prev => ({ ...prev, youtube_url: e.target.value }))}
+                      className="w-full px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
+                      placeholder="https://www.youtube.com/@channelname"
+                    />
+                  </div>
                   <input
                     type="number"
                     value={profile.youtube_subscribers}
                     onChange={(e) => setProfile(prev => ({ ...prev, youtube_subscribers: e.target.value }))}
-                    className="col-span-2 px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
+                    className="w-20 px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
                     placeholder="구독자"
                   />
+                  {profile.youtube_url && (
+                    <a
+                      href={profile.youtube_url.startsWith('http') ? profile.youtube_url : `https://www.youtube.com/@${profile.youtube_url.replace(/^@+/, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2.5 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200 flex-shrink-0"
+                    >
+                      확인
+                    </a>
+                  )}
                 </div>
+                <p className="text-[10px] text-gray-400 ml-[52px]">채널 URL 전체를 복사해서 붙여넣기 하세요</p>
               </div>
 
               {/* 틱톡 */}
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0">
-                  <Hash size={22} className="text-white" />
-                </div>
-                <div className="flex-1 grid grid-cols-5 gap-3">
-                  <input
-                    type="text"
-                    value={profile.tiktok_url}
-                    onChange={(e) => setProfile(prev => ({ ...prev, tiktok_url: e.target.value }))}
-                    className="col-span-3 px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
-                    placeholder="@username"
-                  />
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0">
+                    <Hash size={18} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={profile.tiktok_url}
+                      onChange={(e) => setProfile(prev => ({ ...prev, tiktok_url: e.target.value }))}
+                      className="w-full px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
+                      placeholder="https://www.tiktok.com/@username"
+                    />
+                  </div>
                   <input
                     type="number"
                     value={profile.tiktok_followers}
                     onChange={(e) => setProfile(prev => ({ ...prev, tiktok_followers: e.target.value }))}
-                    className="col-span-2 px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
+                    className="w-20 px-3 py-2.5 bg-gray-50 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border border-gray-200"
                     placeholder="팔로워"
                   />
+                  {profile.tiktok_url && (
+                    <a
+                      href={profile.tiktok_url.startsWith('http') ? profile.tiktok_url : `https://www.tiktok.com/@${profile.tiktok_url.replace(/^@+/, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2.5 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200 flex-shrink-0"
+                    >
+                      확인
+                    </a>
+                  )}
                 </div>
+                <p className="text-[10px] text-gray-400 ml-[52px]">프로필 URL 전체를 복사해서 붙여넣기 하세요</p>
               </div>
             </div>
 
