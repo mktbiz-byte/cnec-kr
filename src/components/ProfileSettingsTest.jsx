@@ -273,16 +273,6 @@ const CompactBanner = ({ percentage, tabs, activeTab, setActiveTab, canAccessTab
   )
 }
 
-// 팁 섹션 컴포넌트
-const TipSection = ({ title, description, highlight }) => (
-  <div className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-xl p-4 mb-5 border border-indigo-100">
-    <p className="text-sm font-bold text-indigo-800">{title}</p>
-    <p className="text-xs text-indigo-600 mt-1">
-      {description} <span className="font-bold text-violet-600">{highlight}</span>
-    </p>
-  </div>
-)
-
 // 섹션 혜택 안내 컴포넌트
 const SectionBenefit = ({ icon: Icon, title, description, benefit }) => (
   <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 rounded-xl p-4 border border-violet-100">
@@ -870,23 +860,16 @@ const ProfileSettingsTest = () => {
       )}
 
       <div className="max-w-lg mx-auto px-4 py-5">
-        {/* 통합 배너 + 팁 - 계정 탭이 아닐 때만 표시 */}
+        {/* 통합 배너 - 계정 탭이 아닐 때만 표시 */}
         {activeTab !== 'account' && (
-          <>
-            <CompactBanner
-              percentage={progressPercentage}
-              tabs={tabs}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              canAccessTab={canAccessTab}
-              checkStepComplete={checkStepComplete}
-            />
-            <TipSection
-              title="Tip. 피부 고민을 자세히 적어보세요!"
-              description={`"여드름 흔적", "속건조" 같은 구체적인 키워드가 있으면 관련 브랜드 매칭 확률이`}
-              highlight="35% 더 올라갑니다."
-            />
-          </>
+          <CompactBanner
+            percentage={progressPercentage}
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            canAccessTab={canAccessTab}
+            checkStepComplete={checkStepComplete}
+          />
         )}
 
         {/* === 기본 정보 탭 === */}
