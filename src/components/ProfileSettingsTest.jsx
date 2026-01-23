@@ -6,13 +6,13 @@
  */
 
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
 import {
   Loader2, User, Instagram, Youtube, Hash, Camera, ArrowLeft, Search,
   AlertTriangle, X, LogOut, Check, Plus, Trash2, Video, ChevronRight,
-  Sparkles, Target, TrendingUp, Settings, Shield, Link2
+  Sparkles, Target, TrendingUp, Settings, Shield, Link2, Home
 } from 'lucide-react'
 
 import {
@@ -338,6 +338,7 @@ const BottomNavigation = ({ isLastStep, onNext, onSave, canProceed, saving }) =>
 const ProfileSettingsTest = () => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [profile, setProfile] = useState({
     name: '', email: '', phone: '', age: '', bio: '', profile_image: '',
@@ -859,8 +860,18 @@ const ProfileSettingsTest = () => {
   const canProceed = checkStepComplete(activeTab)
   const progressPercentage = calculateProgress()
 
+  // 현재 경로에 따라 활성 탭 결정
+  const getActiveTab = () => {
+    const path = location.pathname
+    if (path === '/campaigns') return 'search'
+    if (path === '/mypage' || path.startsWith('/my/')) return 'my'
+    if (path.startsWith('/profile')) return 'my'
+    return 'home'
+  }
+  const currentNavTab = getActiveTab()
+
   return (
-    <div className="min-h-screen bg-gray-100 pb-safe">
+    <div className="min-h-screen bg-gray-100 pb-24">
       {/* 헤더 */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200/50">
         <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
@@ -2038,6 +2049,41 @@ const ProfileSettingsTest = () => {
           </div>
         </div>
       )}
+
+      {/* 앱 전체 하단 네비게이션 */}
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white border-t border-gray-100 z-30">
+        <div className="flex justify-between items-center py-3 px-8 pb-6">
+          <button
+            onClick={() => navigate('/')}
+            className={`flex flex-col items-center gap-1 transition-colors ${
+              currentNavTab === 'home' ? 'text-gray-900' : 'text-gray-300'
+            }`}
+          >
+            <Home size={24} strokeWidth={currentNavTab === 'home' ? 2.5 : 2} />
+            <span className="text-[10px] font-bold">홈</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/campaigns')}
+            className={`flex flex-col items-center gap-1 transition-colors ${
+              currentNavTab === 'search' ? 'text-gray-900' : 'text-gray-300'
+            }`}
+          >
+            <Search size={24} strokeWidth={currentNavTab === 'search' ? 2.5 : 2} />
+            <span className="text-[10px] font-bold">캠페인</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/mypage')}
+            className={`flex flex-col items-center gap-1 transition-colors ${
+              currentNavTab === 'my' ? 'text-purple-600' : 'text-gray-300'
+            }`}
+          >
+            <User size={24} strokeWidth={currentNavTab === 'my' ? 2.5 : 2} />
+            <span className="text-[10px] font-bold">마이</span>
+          </button>
+        </div>
+      </nav>
     </div>
   )
 }
