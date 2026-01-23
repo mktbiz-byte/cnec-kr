@@ -1513,11 +1513,8 @@ const ProfileSettingsTest = () => {
                     <Target className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-gray-900">스마트스토어 구매</h3>
-                      <span className="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-full">4주 챌린지</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-0.5">네이버 스마트스토어에서 한달 구매가 가능하신가요?</p>
+                    <h3 className="font-bold text-gray-900">스마트스토어 한달 후기 가능여부</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">네이버 스마트스토어에서 한달 후기 작성이 가능하신가요?</p>
                   </div>
                 </div>
 
@@ -1549,14 +1546,6 @@ const ProfileSettingsTest = () => {
                 </div>
               </div>
 
-              {beautyProfile.smartstore_purchase === 'possible' && (
-                <div className="px-5 py-3 bg-orange-500/10 border-t border-orange-200">
-                  <p className="text-xs text-orange-700 font-medium flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    4주 챌린지 캠페인 지원 시 추가 보상이 적용됩니다!
-                  </p>
-                </div>
-              )}
             </div>
 
             <BottomNavigation isLastStep={isLastStep} onNext={handleNext} canProceed={canProceed} saving={saving} />
