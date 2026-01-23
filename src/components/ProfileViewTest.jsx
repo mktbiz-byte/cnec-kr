@@ -399,7 +399,7 @@ const ProfileViewTest = () => {
         {/* 프로필 사진 & 기본 정보 */}
         <div className="flex flex-col items-center mb-6">
           <div className="relative mb-3">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
+            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
               {profile.profile_image ? (
                 <img src={profile.profile_image} alt="Profile" className="w-full h-full object-cover" />
               ) : (

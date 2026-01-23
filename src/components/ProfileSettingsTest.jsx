@@ -902,7 +902,7 @@ const ProfileSettingsTest = () => {
             {/* 프로필 사진 */}
             <div className="flex items-center gap-5 p-5 bg-white rounded-2xl border border-gray-200">
               <div className="relative">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200">
+                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-200">
                   {photoPreview ? (
                     <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
