@@ -47,38 +47,57 @@ const formatNumber = (num) => {
   return num.toLocaleString()
 }
 
-// 소셜 URL 정규화 (@username, username, full URL 등 모든 형식 지원)
+// 소셜 URL 정규화 (모든 형식 지원: @username, username, full URL, 한글 등)
 const normalizeUrl = (input, platform) => {
   if (!input) return null
-  const value = input.trim()
+  let value = input.trim()
 
-  // 이미 전체 URL인 경우
+  // 이미 전체 URL인 경우 - 그대로 반환
   if (value.startsWith('http://') || value.startsWith('https://')) {
     return value
   }
 
-  // @ 제거
-  const username = value.replace(/^@/, '')
+  // 플랫폼 도메인이 포함된 경우 (http 없이 입력한 경우)
+  const domainPatterns = {
+    instagram: /(?:www\.)?instagram\.com\//i,
+    youtube: /(?:www\.)?(?:youtube\.com\/|youtu\.be\/)/i,
+    tiktok: /(?:www\.)?tiktok\.com\//i
+  }
+
+  if (domainPatterns[platform]?.test(value)) {
+    return value.startsWith('www.') ? `https://${value}` : `https://www.${value}`
+  }
+
+  // @ 제거 및 사용자명 추출
+  let username = value.replace(/^@+/, '') // 여러 개의 @도 제거
+
+  // 한글이나 특수문자가 포함된 경우 인코딩
+  const needsEncoding = /[^\x00-\x7F]/.test(username)
+  if (needsEncoding) {
+    username = encodeURIComponent(username)
+  }
 
   switch (platform) {
     case 'instagram':
-      return `https://instagram.com/${username}`
+      return `https://www.instagram.com/${username}`
     case 'youtube':
-      // 채널 ID 또는 사용자명
-      if (username.startsWith('UC') || username.startsWith('channel/')) {
-        return `https://youtube.com/${username.startsWith('channel/') ? '' : 'channel/'}${username}`
+      // 채널 ID (UC로 시작) 또는 핸들
+      if (username.startsWith('UC')) {
+        return `https://www.youtube.com/channel/${username}`
       }
-      return `https://youtube.com/@${username}`
+      if (username.startsWith('channel/')) {
+        return `https://www.youtube.com/${username}`
+      }
+      // c/ 또는 user/ 경로
+      if (username.startsWith('c/') || username.startsWith('user/')) {
+        return `https://www.youtube.com/${username}`
+      }
+      // 일반 핸들 (@없이 저장)
+      return `https://www.youtube.com/@${username}`
     case 'tiktok':
-      return `https://tiktok.com/@${username}`
-    case 'blog':
-      // 네이버 블로그 등 처리
-      if (username.includes('.')) {
-        return `https://${username}`
-      }
-      return `https://blog.naver.com/${username}`
+      return `https://www.tiktok.com/@${username}`
     default:
-      return value.startsWith('http') ? value : `https://${value}`
+      return `https://${value}`
   }
 }
 
