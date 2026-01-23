@@ -351,7 +351,8 @@ const ProfileSettingsTest = () => {
     postcode: '', address: '', detail_address: '',
     instagram_url: '', youtube_url: '', tiktok_url: '', blog_url: '',
     instagram_followers: '', youtube_subscribers: '', tiktok_followers: '',
-    channel_name: '', followers: '', avg_views: '', target_audience: ''
+    channel_name: '', followers: '', avg_views: '', target_audience: '',
+    no_channel: false
   })
 
   const [beautyProfile, setBeautyProfile] = useState({
@@ -405,7 +406,7 @@ const ProfileSettingsTest = () => {
         return !!beautyProfile.skin_type && beautyProfile.skin_concerns.length > 0 &&
                !!beautyProfile.hair_type && beautyProfile.hair_concerns.length > 0
       case 'sns':
-        return !!(profile.instagram_url || profile.youtube_url || profile.tiktok_url)
+        return profile.no_channel || !!(profile.instagram_url || profile.youtube_url || profile.tiktok_url)
       case 'video':
         return !!beautyProfile.video_length_style
       case 'detail':
@@ -499,6 +500,7 @@ const ProfileSettingsTest = () => {
           detail_address: data.detail_address || '',
           instagram_url: data.instagram_url || '', youtube_url: data.youtube_url || '',
           tiktok_url: data.tiktok_url || '', blog_url: data.blog_url || '',
+          no_channel: data.no_channel || false,
           instagram_followers: data.instagram_followers != null ? String(data.instagram_followers) : '',
           youtube_subscribers: data.youtube_subscribers != null ? String(data.youtube_subscribers) : '',
           tiktok_followers: data.tiktok_followers != null ? String(data.tiktok_followers) : '',
@@ -547,8 +549,8 @@ const ProfileSettingsTest = () => {
         if (data.name && data.phone) completed.push('basic')
         // 뷰티: 피부타입, 피부고민, 헤어타입, 헤어고민
         if (data.skin_type && data.skin_concerns?.length > 0 && data.hair_type && data.hair_concerns?.length > 0) completed.push('beauty')
-        // SNS: 최소 1개 입력
-        if (data.instagram_url || data.youtube_url || data.tiktok_url) completed.push('sns')
+        // SNS: 최소 1개 입력 또는 채널없음 체크
+        if (data.no_channel || data.instagram_url || data.youtube_url || data.tiktok_url) completed.push('sns')
         // 영상: 영상 길이 스타일
         if (data.video_length_style) completed.push('video')
         // 상세: 성별
@@ -595,6 +597,7 @@ const ProfileSettingsTest = () => {
         youtube_url: profile.youtube_url?.trim() || null,
         tiktok_url: profile.tiktok_url?.trim() || null,
         blog_url: profile.blog_url?.trim() || null,
+        no_channel: profile.no_channel || false,
         instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
         youtube_subscribers: profile.youtube_subscribers ? parseInt(profile.youtube_subscribers) : null,
         tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null,
@@ -1168,19 +1171,50 @@ const ProfileSettingsTest = () => {
             <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
               <SectionTitle title="SNS 채널" required subtitle="최소 1개 이상 입력해주세요" />
 
-              {/* 경고 안내 */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-amber-700">
-                    <p className="font-bold mb-1">URL을 정확히 입력해주세요!</p>
-                    <p>전체 URL을 복사해서 붙여넣기 해주세요.</p>
-                    <p className="text-amber-600 mt-1">예: https://www.instagram.com/username</p>
-                  </div>
+              {/* 채널없음 체크박스 */}
+              <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={profile.no_channel}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    setProfile(prev => ({
+                      ...prev,
+                      no_channel: checked,
+                      // 체크하면 SNS URL들 초기화
+                      ...(checked && {
+                        instagram_url: '',
+                        youtube_url: '',
+                        tiktok_url: '',
+                        instagram_followers: '',
+                        youtube_subscribers: '',
+                        tiktok_followers: ''
+                      })
+                    }))
+                  }}
+                  className="w-5 h-5 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-700">SNS 채널이 없어요</p>
+                  <p className="text-xs text-gray-400">채널이 없는 경우 체크해주세요</p>
                 </div>
-              </div>
+              </label>
 
-              {/* 인스타그램 */}
+              {/* 경고 안내 및 SNS 입력 (채널없음이 아닐 때만) */}
+              {!profile.no_channel && (
+                <>
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                      <div className="text-xs text-amber-700">
+                        <p className="font-bold mb-1">URL을 정확히 입력해주세요!</p>
+                        <p>전체 URL을 복사해서 붙여넣기 해주세요.</p>
+                        <p className="text-amber-600 mt-1">예: https://www.instagram.com/username</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 인스타그램 */}
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center flex-shrink-0">
@@ -1285,8 +1319,10 @@ const ProfileSettingsTest = () => {
                     </a>
                   )}
                 </div>
-                <p className="text-[10px] text-gray-400 ml-[52px]">프로필 URL 전체를 복사해서 붙여넣기 하세요</p>
-              </div>
+                  <p className="text-[10px] text-gray-400 ml-[52px]">프로필 URL 전체를 복사해서 붙여넣기 하세요</p>
+                </div>
+                </>
+              )}
             </div>
 
             {/* 채널 정보 */}
