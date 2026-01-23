@@ -6,12 +6,12 @@
  */
 
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { database } from '../lib/supabase'
 import {
   Loader2, User, Instagram, Youtube, Hash, ArrowLeft, Edit3,
-  Sparkles, Copy, Check, ChevronDown, ChevronUp
+  Sparkles, Copy, Check, ChevronDown, ChevronUp, Home, Search
 } from 'lucide-react'
 
 import {
@@ -235,6 +235,17 @@ const AIProfileSection = ({ profile, beautyProfile, savedText, onSave, saving })
 const ProfileViewTest = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // 현재 경로에 따라 활성 탭 결정
+  const getActiveNavTab = () => {
+    const path = location.pathname
+    if (path === '/campaigns') return 'search'
+    if (path === '/mypage' || path.startsWith('/my/')) return 'my'
+    if (path.startsWith('/profile')) return 'my'
+    return 'home'
+  }
+  const currentNavTab = getActiveNavTab()
 
   const [profile, setProfile] = useState(null)
   const [beautyProfile, setBeautyProfile] = useState(null)
@@ -458,7 +469,7 @@ const ProfileViewTest = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-safe">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* 헤더 */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
         <div className="max-w-lg mx-auto px-4 h-11 flex items-center justify-between">
@@ -718,6 +729,41 @@ const ProfileViewTest = () => {
           프로필 수정
         </button>
       </div>
+
+      {/* 앱 전체 하단 네비게이션 */}
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white border-t border-gray-100 z-30">
+        <div className="flex justify-between items-center py-3 px-8 pb-6">
+          <button
+            onClick={() => navigate('/')}
+            className={`flex flex-col items-center gap-1 transition-colors ${
+              currentNavTab === 'home' ? 'text-gray-900' : 'text-gray-300'
+            }`}
+          >
+            <Home size={24} strokeWidth={currentNavTab === 'home' ? 2.5 : 2} />
+            <span className="text-[10px] font-bold">홈</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/campaigns')}
+            className={`flex flex-col items-center gap-1 transition-colors ${
+              currentNavTab === 'search' ? 'text-gray-900' : 'text-gray-300'
+            }`}
+          >
+            <Search size={24} strokeWidth={currentNavTab === 'search' ? 2.5 : 2} />
+            <span className="text-[10px] font-bold">캠페인</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/mypage')}
+            className={`flex flex-col items-center gap-1 transition-colors ${
+              currentNavTab === 'my' ? 'text-purple-600' : 'text-gray-300'
+            }`}
+          >
+            <User size={24} strokeWidth={currentNavTab === 'my' ? 2.5 : 2} />
+            <span className="text-[10px] font-bold">마이</span>
+          </button>
+        </div>
+      </nav>
     </div>
   )
 }
