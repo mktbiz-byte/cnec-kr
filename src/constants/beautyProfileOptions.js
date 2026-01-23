@@ -15,7 +15,27 @@ export const SKIN_TYPES = [
   { value: 'sensitive', label: '민감성' }
 ]
 
-// 1-2. 피부 톤 (단일선택) - 퍼스널 컬러
+// 1-2. 피부 톤/호수 (단일선택)
+export const SKIN_SHADES = [
+  { value: 'shade_13', label: '13호 (밝은 피부)' },
+  { value: 'shade_17', label: '17호' },
+  { value: 'shade_21', label: '21호 (보통 피부)' },
+  { value: 'shade_23', label: '23호 (어두운 피부)' },
+  { value: 'shade_25', label: '25호 이상' }
+]
+
+// 1-3. 퍼스널 컬러 (단일선택) - 한국인 이해하기 쉽게 세분화
+export const PERSONAL_COLORS = [
+  { value: 'spring_warm', label: '봄 웜톤', description: '밝고 화사한 컬러 (코랄, 피치, 라이트 오렌지)' },
+  { value: 'summer_cool', label: '여름 쿨톤', description: '부드럽고 차분한 컬러 (로즈, 라벤더, 소프트 핑크)' },
+  { value: 'autumn_warm', label: '가을 웜톤', description: '깊고 따뜻한 컬러 (브릭, 테라코타, 머스타드)' },
+  { value: 'winter_cool', label: '겨울 쿨톤', description: '선명하고 차가운 컬러 (버건디, 푸시아, 블루레드)' },
+  { value: 'warm_neutral', label: '웜 뉴트럴', description: '따뜻한 중간톤 (다양한 웜톤 소화 가능)' },
+  { value: 'cool_neutral', label: '쿨 뉴트럴', description: '차가운 중간톤 (다양한 쿨톤 소화 가능)' },
+  { value: 'true_neutral', label: '뉴트럴', description: '웜/쿨 모두 소화 가능' }
+]
+
+// 기존 호환용 (레거시)
 export const SKIN_TONES = [
   { value: 'tone_13', label: '13호' },
   { value: 'tone_21', label: '21호' },
@@ -32,14 +52,20 @@ export const HAIR_TYPES = [
   { value: 'normal', label: '보통' }
 ]
 
-// 3. 주요 관심 분야 (선택)
-export const PRIMARY_INTERESTS = [
+// 3. 채널 주요 컨텐츠 (선택) - 기존 "주요 관심 분야"에서 명칭 변경
+export const CHANNEL_CONTENTS = [
   { value: 'skincare', label: '피부 미용' },
   { value: 'haircare', label: '헤어 케어' },
   { value: 'diet_fitness', label: '다이어트/피트니스' },
   { value: 'makeup', label: '메이크업' },
-  { value: 'wellness', label: '웰니스' }
+  { value: 'wellness', label: '웰니스' },
+  { value: 'fashion', label: '패션' },
+  { value: 'travel', label: '여행' },
+  { value: 'parenting', label: '육아' }
 ]
+
+// 기존 호환용 (레거시)
+export const PRIMARY_INTERESTS = CHANNEL_CONTENTS
 
 // 4. 편집 수준 (선택) - 설명 포함
 export const EDITING_LEVELS = [
@@ -154,13 +180,14 @@ export const VIDEO_STYLES = [
 
 // 1. 피부 고민 (다중선택)
 export const SKIN_CONCERNS = [
+  { value: 'trouble', label: '트러블' },
   { value: 'acne', label: '여드름' },
   { value: 'pores', label: '모공' },
   { value: 'pigmentation', label: '기미/잡티' },
   { value: 'wrinkles', label: '주름' },
   { value: 'redness', label: '홍조' },
   { value: 'atopy', label: '아토피' },
-  { value: 'dryness', label: '건조함' },
+  { value: 'inner_dryness', label: '속건조' },
   { value: 'oiliness', label: '유분과다' }
 ]
 
@@ -281,6 +308,7 @@ export const CATEGORIES = [
   { value: 'haircare', label: '헤어' },
   { value: 'bodycare', label: '바디케어' },
   { value: 'fragrance', label: '향수' },
+  { value: 'health_supplement', label: '건기식' },
   { value: 'other', label: '기타' }
 ]
 
@@ -293,9 +321,11 @@ export const DEFAULT_BEAUTY_PROFILE = {
 
   // 단일 선택 필드
   skin_type: '',
-  skin_tone: '', // 피부 톤 (퍼스널 컬러)
+  skin_shade: '', // 피부 호수 (13호, 21호 등)
+  personal_color: '', // 퍼스널 컬러 (봄 웜톤 등)
+  skin_tone: '', // 레거시 호환용
   hair_type: '',
-  primary_interest: '',
+  primary_interest: '', // 채널 주요 컨텐츠 (레거시명)
   editing_level: '',
   shooting_level: '',
   follower_range: '',
@@ -337,9 +367,12 @@ export const DEFAULT_BEAUTY_PROFILE = {
 export const PROFILE_OPTIONS = {
   singleSelect: {
     skinTypes: SKIN_TYPES,
-    skinTones: SKIN_TONES,
+    skinShades: SKIN_SHADES,
+    personalColors: PERSONAL_COLORS,
+    skinTones: SKIN_TONES, // 레거시 호환
     hairTypes: HAIR_TYPES,
-    primaryInterests: PRIMARY_INTERESTS,
+    channelContents: CHANNEL_CONTENTS,
+    primaryInterests: PRIMARY_INTERESTS, // 레거시 호환
     editingLevels: EDITING_LEVELS,
     shootingLevels: SHOOTING_LEVELS,
     followerRanges: FOLLOWER_RANGES,

@@ -17,8 +17,11 @@ import {
 
 import {
   SKIN_TYPES,
+  SKIN_SHADES,
+  PERSONAL_COLORS,
   SKIN_TONES,
   HAIR_TYPES,
+  CHANNEL_CONTENTS,
   PRIMARY_INTERESTS,
   EDITING_LEVELS,
   SHOOTING_LEVELS,
@@ -343,7 +346,7 @@ const ProfileSettingsTest = () => {
   })
 
   const [beautyProfile, setBeautyProfile] = useState({
-    skin_type: '', skin_tone: '', hair_type: '',
+    skin_type: '', skin_shade: '', personal_color: '', skin_tone: '', hair_type: '',
     primary_interest: '', editing_level: '', shooting_level: '',
     follower_range: '', upload_frequency: '', gender: '', job_visibility: '',
     job: '', child_appearance: '', family_appearance: '',
@@ -500,7 +503,8 @@ const ProfileSettingsTest = () => {
         })
 
         setBeautyProfile({
-          skin_type: data.skin_type || '', skin_tone: data.skin_tone || '',
+          skin_type: data.skin_type || '', skin_shade: data.skin_shade || '',
+          personal_color: data.personal_color || '', skin_tone: data.skin_tone || '',
           hair_type: data.hair_type || '',
           primary_interest: data.primary_interest || '',
           editing_level: data.editing_level || '', shooting_level: data.shooting_level || '',
@@ -613,6 +617,8 @@ const ProfileSettingsTest = () => {
         video_length_style: beautyProfile.video_length_style || null,
         shortform_tempo: beautyProfile.shortform_tempo || null,
         // 뷰티 스타일 필드 추가
+        skin_shade: beautyProfile.skin_shade || null,
+        personal_color: beautyProfile.personal_color || null,
         skin_tone: beautyProfile.skin_tone || null,
         nail_usage: beautyProfile.nail_usage || null,
         circle_lens_usage: beautyProfile.circle_lens_usage || null,
@@ -1002,12 +1008,21 @@ const ProfileSettingsTest = () => {
               </div>
 
               <div>
-                <p className="text-sm font-semibold text-gray-700 mb-3">피부 톤 (퍼스널 컬러)</p>
+                <p className="text-sm font-semibold text-gray-700 mb-3">피부 호수</p>
                 <SingleSelectGroup
-                  options={SKIN_TONES}
-                  value={beautyProfile.skin_tone}
-                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, skin_tone: v }))}
+                  options={SKIN_SHADES}
+                  value={beautyProfile.skin_shade}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, skin_shade: v }))}
                   size="small"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">퍼스널 컬러</p>
+                <SelectCardGroup
+                  options={PERSONAL_COLORS}
+                  value={beautyProfile.personal_color}
+                  onChange={(v) => setBeautyProfile(prev => ({ ...prev, personal_color: v }))}
                 />
               </div>
 
@@ -1095,9 +1110,9 @@ const ProfileSettingsTest = () => {
               <SectionTitle title="크리에이터 정보" subtitle="브랜드가 당신의 전문성을 파악해요 (선택)" />
 
               <div>
-                <p className="text-sm font-semibold text-gray-700 mb-3">주요 관심 분야</p>
+                <p className="text-sm font-semibold text-gray-700 mb-3">채널 주요 컨텐츠</p>
                 <SingleSelectGroup
-                  options={PRIMARY_INTERESTS}
+                  options={CHANNEL_CONTENTS}
                   value={beautyProfile.primary_interest}
                   onChange={(v) => setBeautyProfile(prev => ({ ...prev, primary_interest: v }))}
                   size="small"
