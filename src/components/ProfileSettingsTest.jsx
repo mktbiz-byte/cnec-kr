@@ -448,18 +448,15 @@ const ProfileSettingsTest = () => {
   }
 
   // 다음 단계로 이동
-  // 다음 단계 이동 시 자동 저장
+  // 마지막 단계에서만 저장, 중간 단계에서는 저장 없이 이동만
   const handleNext = async () => {
     const currentIndex = tabs.findIndex(t => t.id === activeTab)
 
-    // 모든 단계에서 자동 저장 실행
-    await handleSaveProfile(true) // silent mode - 성공 메시지 숨김
-
     if (activeTab === 'detail') {
-      // 마지막 단계에서는 성공 메시지 표시
-      setSuccess('프로필이 저장되었습니다!')
-      setTimeout(() => setSuccess(''), 3000)
+      // 마지막 단계에서만 저장 실행
+      await handleSaveProfile(false)
     } else if (currentIndex < tabs.length - 2) { // account 탭 제외
+      // 중간 단계: 저장 없이 다음으로 이동
       if (!completedSteps.includes(activeTab)) {
         setCompletedSteps([...completedSteps, activeTab])
       }
