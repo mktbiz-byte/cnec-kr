@@ -308,7 +308,7 @@ const SectionTitle = ({ title, required = false, subtitle }) => (
 )
 
 // 하단 네비게이션 버튼
-const BottomNavigation = ({ isLastStep, onNext, canProceed, saving }) => (
+const BottomNavigation = ({ isLastStep, onNext, onSave, canProceed, saving }) => (
   <div className="mt-8 space-y-3">
     {isLastStep ? (
       <button
@@ -319,13 +319,22 @@ const BottomNavigation = ({ isLastStep, onNext, canProceed, saving }) => (
         {saving ? '저장 중...' : '프로필 저장하기'}
       </button>
     ) : (
-      <button
-        onClick={onNext}
-        disabled={!canProceed}
-        className="w-full py-4.5 bg-violet-600 text-white rounded-2xl font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-      >
-        다음 단계로 <ChevronRight className="w-5 h-5" />
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={onSave}
+          disabled={saving}
+          className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-2xl font-bold text-base disabled:opacity-50 transition-all"
+        >
+          {saving ? '저장 중...' : '임시저장'}
+        </button>
+        <button
+          onClick={onNext}
+          disabled={!canProceed}
+          className="flex-[2] py-4 bg-violet-600 text-white rounded-2xl font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+        >
+          다음 단계로 <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
     )}
     {!canProceed && !isLastStep && (
       <p className="text-center text-sm text-gray-400">필수 항목을 입력하면 다음 단계로 진행할 수 있어요</p>
@@ -559,16 +568,14 @@ const ProfileSettingsTest = () => {
     }
   }
 
-  const handleSaveProfile = async (silent = false) => {
+  const handleSaveProfile = async (isTemporarySave = false) => {
     try {
       setSaving(true)
-      if (!silent) {
-        setError('')
-        setSuccess('')
-      }
+      setError('')
+      setSuccess('')
 
       if (!profile.name.trim()) {
-        if (!silent) setError('이름을 입력해주세요.')
+        setError('이름을 입력해주세요.')
         setSaving(false)
         return
       }
@@ -642,13 +649,11 @@ const ProfileSettingsTest = () => {
       console.log('[DEBUG] 저장할 age 값:', profileData.age)
 
       await database.userProfiles.upsert(profileData)
-      if (!silent) {
-        setSuccess('프로필이 저장되었습니다!')
-        setTimeout(() => setSuccess(''), 3000)
-      }
+      setSuccess(isTemporarySave ? '임시저장 되었습니다!' : '프로필이 저장되었습니다!')
+      setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       console.error('프로필 저장 오류:', err)
-      if (!silent) setError(`저장 실패: ${err.message}`)
+      setError(`저장 실패: ${err.message}`)
     } finally {
       setSaving(false)
     }
@@ -976,7 +981,7 @@ const ProfileSettingsTest = () => {
               </div>
             </div>
 
-            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} canProceed={canProceed} saving={saving} />
+            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} onSave={() => handleSaveProfile(true)} canProceed={canProceed} saving={saving} />
           </div>
         )}
 
@@ -1145,7 +1150,7 @@ const ProfileSettingsTest = () => {
               </div>
             </div>
 
-            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} canProceed={canProceed} saving={saving} />
+            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} onSave={() => handleSaveProfile(true)} canProceed={canProceed} saving={saving} />
           </div>
         )}
 
@@ -1594,7 +1599,7 @@ const ProfileSettingsTest = () => {
 
             </div>
 
-            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} canProceed={canProceed} saving={saving} />
+            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} onSave={() => handleSaveProfile(true)} canProceed={canProceed} saving={saving} />
           </div>
         )}
 
@@ -1659,7 +1664,7 @@ const ProfileSettingsTest = () => {
               </div>
             </div>
 
-            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} canProceed={canProceed} saving={saving} />
+            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} onSave={() => handleSaveProfile(true)} canProceed={canProceed} saving={saving} />
           </div>
         )}
 
@@ -1788,7 +1793,7 @@ const ProfileSettingsTest = () => {
               </div>
             </div>
 
-            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} canProceed={canProceed} saving={saving} />
+            <BottomNavigation isLastStep={isLastStep} onNext={handleNext} onSave={() => handleSaveProfile(true)} canProceed={canProceed} saving={saving} />
           </div>
         )}
 
