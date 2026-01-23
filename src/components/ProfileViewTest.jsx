@@ -67,7 +67,7 @@ const AIProfileWriter = ({ profile, beautyProfile, savedText, onSave, saving }) 
     setGenerating(true)
     setTimeout(() => {
       const name = profile.name || '크리에이터'
-      const age = profile.age ? `${profile.age}세` : ''
+      const age = profile.age || ''
       const gender = getLabel(GENDERS, beautyProfile.gender) || ''
       const skinType = getLabel(SKIN_TYPES, beautyProfile.skin_type)
       const hairType = getLabel(HAIR_TYPES, beautyProfile.hair_type)
@@ -78,36 +78,57 @@ const AIProfileWriter = ({ profile, beautyProfile, savedText, onSave, saving }) 
       const skinConcerns = getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns)
       const hairConcerns = getLabels(HAIR_CONCERNS, beautyProfile.hair_concerns)
       const collabPrefs = getLabels(COLLABORATION_PREFERENCES, beautyProfile.collaboration_preferences)
+      const videoStyles = getLabels(VIDEO_STYLES, beautyProfile.video_styles)
 
-      let intro = `안녕하세요! ${gender ? gender + ' ' : ''}${age ? age + ' ' : ''}뷰티 크리에이터 ${name}입니다.`
-      let expertise = primaryInterest ? `\n\n${primaryInterest} 분야를 중심으로 활동하고 있습니다.` : ''
-      let features = ''
-      if (skinType || hairType) {
-        features = '\n\n'
-        if (skinType) features += `${skinType} 피부`
-        if (skinType && hairType) features += ', '
-        if (hairType) features += `${hairType} 헤어`
-        features += ' 타입으로, '
-        const concerns = [...skinConcerns.slice(0, 2), ...hairConcerns.slice(0, 2)]
-        if (concerns.length > 0) {
-          features += `${concerns.join(', ')} 관련 콘텐츠를 만들고 있어요.`
-        } else {
-          features += '관련 콘텐츠를 제작하고 있어요.'
-        }
-      }
-      let skills = ''
-      if (editingLevel || shootingLevel) {
-        skills = '\n\n'
-        if (editingLevel) skills += `편집 ${editingLevel}`
-        if (editingLevel && shootingLevel) skills += ', '
-        if (shootingLevel) skills += `촬영 ${shootingLevel}`
-        skills += ' 수준의 역량을 갖추고 있습니다.'
-      }
-      let channel = followerRange ? `\n\n현재 ${followerRange} 규모의 팔로워와 함께하고 있습니다.` : ''
-      let collab = collabPrefs.length > 0 ? `\n\n${collabPrefs.join(', ')} 협업을 선호합니다.` : ''
-      const closing = '\n\n좋은 기회로 함께할 수 있기를 기대합니다!'
+      // 자연스러운 한국어 프로필 생성
+      let lines = []
 
-      setAiProfile(intro + expertise + features + skills + channel + collab + closing)
+      // 인사 및 소개
+      let introLine = `안녕하세요, ${name}입니다.`
+      if (age && gender) {
+        introLine = `안녕하세요, ${age}세 ${gender} 뷰티 크리에이터 ${name}입니다.`
+      } else if (gender) {
+        introLine = `안녕하세요, ${gender} 뷰티 크리에이터 ${name}입니다.`
+      }
+      lines.push(introLine)
+
+      // 전문 분야
+      if (primaryInterest) {
+        lines.push(`${primaryInterest} 분야의 콘텐츠를 주로 제작하고 있으며, 진정성 있는 리뷰와 정보 전달을 추구합니다.`)
+      }
+
+      // 피부/헤어 특성 및 고민
+      const allConcerns = [...skinConcerns, ...hairConcerns]
+      if (skinType && allConcerns.length > 0) {
+        lines.push(`${skinType} 피부 타입으로 ${allConcerns.slice(0, 3).join(', ')} 등의 고민을 다루는 콘텐츠에 강점이 있습니다.`)
+      } else if (skinType) {
+        lines.push(`${skinType} 피부 타입의 특성을 살린 솔직한 제품 리뷰를 진행합니다.`)
+      }
+
+      // 채널 규모
+      if (followerRange) {
+        lines.push(`현재 ${followerRange} 규모의 팔로워와 소통하며 꾸준히 성장하고 있습니다.`)
+      }
+
+      // 영상 스타일
+      if (videoStyles.length > 0) {
+        lines.push(`${videoStyles.slice(0, 3).join(', ')} 스타일의 영상을 제작합니다.`)
+      }
+
+      // 역량
+      if (editingLevel && shootingLevel) {
+        lines.push(`편집 ${editingLevel}, 촬영 ${shootingLevel} 수준으로 퀄리티 높은 결과물을 제공해 드릴 수 있습니다.`)
+      }
+
+      // 협업 선호
+      if (collabPrefs.length > 0) {
+        lines.push(`${collabPrefs.join(', ')} 형태의 협업에 적극적으로 임하고 있습니다.`)
+      }
+
+      // 마무리
+      lines.push(`브랜드와의 시너지를 통해 좋은 결과물을 만들어 나가고 싶습니다. 협업 제안 언제든 환영합니다.`)
+
+      setAiProfile(lines.join('\n\n'))
       setGenerating(false)
     }, 1000)
   }
@@ -479,6 +500,15 @@ const ProfileViewTest = () => {
           </div>
         )}
 
+        {/* AI 프로필 작성기 - 상단 배치 */}
+        <AIProfileWriter
+          profile={profile}
+          beautyProfile={beautyProfile}
+          savedText={aiProfileText}
+          onSave={saveAiProfile}
+          saving={saving}
+        />
+
         {/* 채널 정보 */}
         {(profile.channel_name || profile.avg_views) && (
           <div className="bg-gray-50 rounded-2xl p-4 mb-4">
@@ -689,15 +719,6 @@ const ProfileViewTest = () => {
             )}
           </div>
         )}
-
-        {/* AI 프로필 작성기 */}
-        <AIProfileWriter
-          profile={profile}
-          beautyProfile={beautyProfile}
-          savedText={aiProfileText}
-          onSave={saveAiProfile}
-          saving={saving}
-        />
 
         {/* 프로필 수정 버튼 */}
         <button
