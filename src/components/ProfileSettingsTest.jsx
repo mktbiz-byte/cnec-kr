@@ -37,6 +37,9 @@ import {
   NAIL_USAGE,
   CIRCLE_LENS_USAGE,
   GLASSES_USAGE,
+  MIRRORING_AVAILABLE,
+  MIRRORING_CHANNELS,
+  SMARTSTORE_PURCHASE,
   LANGUAGES,
   VIDEO_LENGTH_STYLES,
   SHORTFORM_TEMPO_STYLES,
@@ -327,11 +330,12 @@ const ProfileSettingsTest = () => {
     offline_visit: '', offline_region: '',
     linktree_available: '',
     nail_usage: '', circle_lens_usage: '', glasses_usage: '',
+    mirroring_available: '', smartstore_purchase: '',
     video_length_style: '', shortform_tempo: '',
     video_style: '', category: '',
     skin_concerns: [], hair_concerns: [], diet_concerns: [],
     content_formats: [], collaboration_preferences: [], children: [], family_members: [],
-    offline_locations: [], languages: [], linktree_channels: []
+    offline_locations: [], languages: [], linktree_channels: [], mirroring_channels: []
   })
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -476,7 +480,8 @@ const ProfileSettingsTest = () => {
         })
 
         setBeautyProfile({
-          skin_type: data.skin_type || '', hair_type: data.hair_type || '',
+          skin_type: data.skin_type || '', skin_tone: data.skin_tone || '',
+          hair_type: data.hair_type || '',
           primary_interest: data.primary_interest || '',
           editing_level: data.editing_level || '', shooting_level: data.shooting_level || '',
           follower_range: data.follower_range || '', upload_frequency: data.upload_frequency || '',
@@ -485,6 +490,10 @@ const ProfileSettingsTest = () => {
           family_appearance: data.family_appearance || '',
           offline_visit: data.offline_visit || '', offline_region: data.offline_region || '',
           linktree_available: data.linktree_available || '',
+          nail_usage: data.nail_usage || '', circle_lens_usage: data.circle_lens_usage || '',
+          glasses_usage: data.glasses_usage || '',
+          mirroring_available: data.mirroring_available || '',
+          smartstore_purchase: data.smartstore_purchase || '',
           video_length_style: data.video_length_style || '', shortform_tempo: data.shortform_tempo || '',
           video_style: data.video_styles?.[0] || '', // 첫 번째 값만 사용
           category: data.category || '',
@@ -493,7 +502,8 @@ const ProfileSettingsTest = () => {
           collaboration_preferences: data.collaboration_preferences || [],
           children: data.children || [], family_members: data.family_members || [],
           offline_locations: data.offline_locations || [], languages: data.languages || [],
-          linktree_channels: data.linktree_channels || []
+          linktree_channels: data.linktree_channels || [],
+          mirroring_channels: data.mirroring_channels || []
         })
 
         if (data.profile_image) setPhotoPreview(data.profile_image)
@@ -1350,6 +1360,160 @@ const ProfileSettingsTest = () => {
                   <p className="text-xs text-emerald-700 font-medium flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     링크트리 설정 시 캠페인별 추가 보상이 적용될 수 있어요!
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 미러링 가능 여부 */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 overflow-hidden">
+              <div className="p-5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
+                    <Video className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-gray-900">미러링 가능</h3>
+                      <span className="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full">NEW</span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-0.5">같은 콘텐츠를 여러 채널에 동시 업로드할 수 있나요?</p>
+                  </div>
+                </div>
+
+                {/* 토글 선택 */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBeautyProfile(prev => ({ ...prev, mirroring_available: 'possible' }))}
+                    className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
+                      beautyProfile.mirroring_available === 'possible'
+                        ? 'bg-blue-500 text-white shadow-lg shadow-blue-200'
+                        : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'
+                    }`}
+                  >
+                    {beautyProfile.mirroring_available === 'possible' && <Check className="w-4 h-4" />}
+                    가능해요
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBeautyProfile(prev => ({ ...prev, mirroring_available: 'impossible', mirroring_channels: [] }))}
+                    className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
+                      beautyProfile.mirroring_available === 'impossible'
+                        ? 'bg-gray-700 text-white'
+                        : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    어려워요
+                  </button>
+                </div>
+
+                {beautyProfile.mirroring_available === 'possible' && (
+                  <div className="space-y-3 pt-2">
+                    <p className="text-sm font-medium text-gray-700">어떤 채널에 미러링 가능하세요? (복수선택)</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { value: 'naver_clip', label: '네이버 클립', color: 'from-green-500 to-green-600' },
+                        { value: 'youtube', label: '유튜브', color: 'from-red-500 to-red-600' },
+                        { value: 'instagram', label: '인스타', color: 'from-purple-500 via-pink-500 to-orange-400' },
+                        { value: 'tiktok', label: '틱톡', color: 'from-gray-800 to-gray-900' }
+                      ].map((channel) => {
+                        const isSelected = beautyProfile.mirroring_channels?.includes(channel.value)
+                        return (
+                          <button
+                            key={channel.value}
+                            type="button"
+                            onClick={() => {
+                              const current = beautyProfile.mirroring_channels || []
+                              const updated = isSelected
+                                ? current.filter(v => v !== channel.value)
+                                : [...current, channel.value]
+                              setBeautyProfile(prev => ({ ...prev, mirroring_channels: updated }))
+                            }}
+                            className={`relative p-3 rounded-xl transition-all flex items-center gap-3 ${
+                              isSelected
+                                ? 'bg-white border-2 border-blue-500 shadow-md'
+                                : 'bg-white/60 border-2 border-transparent hover:bg-white'
+                            }`}
+                          >
+                            {isSelected && (
+                              <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                            <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${channel.color} flex items-center justify-center`}>
+                              <Video className="w-4 h-4 text-white" />
+                            </div>
+                            <span className={`text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
+                              {channel.label}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {beautyProfile.mirroring_available === 'possible' && (
+                <div className="px-5 py-3 bg-blue-500/10 border-t border-blue-200">
+                  <p className="text-xs text-blue-700 font-medium flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    미러링 가능 시 더 많은 캠페인 기회가 제공됩니다!
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 네이버 스마트스토어 한달 구매 가능 (4주 챌린지) */}
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 overflow-hidden">
+              <div className="p-5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center flex-shrink-0">
+                    <Target className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-gray-900">스마트스토어 구매</h3>
+                      <span className="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-full">4주 챌린지</span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-0.5">네이버 스마트스토어에서 한달 구매가 가능하신가요?</p>
+                  </div>
+                </div>
+
+                {/* 토글 선택 */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBeautyProfile(prev => ({ ...prev, smartstore_purchase: 'possible' }))}
+                    className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
+                      beautyProfile.smartstore_purchase === 'possible'
+                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
+                        : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    {beautyProfile.smartstore_purchase === 'possible' && <Check className="w-4 h-4" />}
+                    가능해요
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBeautyProfile(prev => ({ ...prev, smartstore_purchase: 'impossible' }))}
+                    className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
+                      beautyProfile.smartstore_purchase === 'impossible'
+                        ? 'bg-gray-700 text-white'
+                        : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    어려워요
+                  </button>
+                </div>
+              </div>
+
+              {beautyProfile.smartstore_purchase === 'possible' && (
+                <div className="px-5 py-3 bg-orange-500/10 border-t border-orange-200">
+                  <p className="text-xs text-orange-700 font-medium flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    4주 챌린지 캠페인 지원 시 추가 보상이 적용됩니다!
                   </p>
                 </div>
               )}

@@ -767,6 +767,8 @@ export const database = {
           nail_usage: profileData.nail_usage || null,
           circle_lens_usage: profileData.circle_lens_usage || null,
           glasses_usage: profileData.glasses_usage || null,
+          mirroring_available: profileData.mirroring_available || null,
+          smartstore_purchase: profileData.smartstore_purchase || null,
           video_length_style: profileData.video_length_style || null,
           shortform_tempo: profileData.shortform_tempo || null,
           // 다중 선택 (JSONB)
@@ -781,6 +783,7 @@ export const database = {
           offline_locations: profileData.offline_locations || [],
           languages: profileData.languages || [],
           linktree_channels: profileData.linktree_channels || [],
+          mirroring_channels: profileData.mirroring_channels || [],
           // AI 프로필 텍스트
           ai_profile_text: profileData.ai_profile_text || null,
           // 타임스탬프

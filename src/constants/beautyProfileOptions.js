@@ -250,6 +250,26 @@ export const GLASSES_USAGE = [
   { value: 'never', label: '착용 안함' }
 ]
 
+// 11. 미러링 가능 여부
+export const MIRRORING_AVAILABLE = [
+  { value: 'possible', label: '가능' },
+  { value: 'impossible', label: '불가능' }
+]
+
+// 11-2. 미러링 가능 채널 (다중선택)
+export const MIRRORING_CHANNELS = [
+  { value: 'naver_clip', label: '네이버 클립' },
+  { value: 'youtube', label: '유튜브' },
+  { value: 'instagram', label: '인스타' },
+  { value: 'tiktok', label: '틱톡' }
+]
+
+// 12. 네이버 스마트스토어 한달 구매 가능 여부 (4주 챌린지)
+export const SMARTSTORE_PURCHASE = [
+  { value: 'possible', label: '가능' },
+  { value: 'impossible', label: '불가능' }
+]
+
 // ==========================================
 // 기존 호환용 - 관심 카테고리
 // ==========================================
@@ -291,6 +311,8 @@ export const DEFAULT_BEAUTY_PROFILE = {
   nail_usage: '', // 네일 사용 여부
   circle_lens_usage: '', // 써클렌즈 사용 여부
   glasses_usage: '', // 안경 착용 여부
+  mirroring_available: '', // 미러링 가능 여부
+  smartstore_purchase: '', // 스마트스토어 한달 구매 가능 여부
   video_length_style: '',
   shortform_tempo: '',
 
@@ -305,7 +327,8 @@ export const DEFAULT_BEAUTY_PROFILE = {
   family_members: [], // ['husband', 'parents']
   offline_locations: [], // ['popup', 'oliveyoung', 'department', 'daiso']
   languages: [], // ['korean', 'english', 'japanese', 'chinese']
-  linktree_channels: [] // ['instagram', 'tiktok', 'youtube']
+  linktree_channels: [], // ['instagram', 'tiktok', 'youtube']
+  mirroring_channels: [] // ['naver_clip', 'youtube', 'instagram', 'tiktok']
 }
 
 // ==========================================
@@ -334,6 +357,9 @@ export const PROFILE_OPTIONS = {
     nailUsage: NAIL_USAGE,
     circleLensUsage: CIRCLE_LENS_USAGE,
     glassesUsage: GLASSES_USAGE,
+    mirroringAvailable: MIRRORING_AVAILABLE,
+    mirroringChannels: MIRRORING_CHANNELS,
+    smartstorePurchase: SMARTSTORE_PURCHASE,
     videoLengthStyles: VIDEO_LENGTH_STYLES,
     shortformTempoStyles: SHORTFORM_TEMPO_STYLES
   },

@@ -21,7 +21,8 @@ import {
   VIDEO_LENGTH_STYLES, SHORTFORM_TEMPO_STYLES, VIDEO_STYLES,
   SKIN_CONCERNS, HAIR_CONCERNS, DIET_CONCERNS,
   CONTENT_FORMATS, COLLABORATION_PREFERENCES, CATEGORIES,
-  NAIL_USAGE, CIRCLE_LENS_USAGE, GLASSES_USAGE
+  NAIL_USAGE, CIRCLE_LENS_USAGE, GLASSES_USAGE,
+  MIRRORING_AVAILABLE, MIRRORING_CHANNELS, SMARTSTORE_PURCHASE
 } from '../constants/beautyProfileOptions'
 
 // 값을 라벨로 변환하는 헬퍼 함수
@@ -267,6 +268,8 @@ const ProfileViewTest = () => {
           nail_usage: data.nail_usage || '',
           circle_lens_usage: data.circle_lens_usage || '',
           glasses_usage: data.glasses_usage || '',
+          mirroring_available: data.mirroring_available || '',
+          smartstore_purchase: data.smartstore_purchase || '',
           category: data.category || '',
           skin_concerns: data.skin_concerns || [],
           hair_concerns: data.hair_concerns || [],
@@ -278,7 +281,8 @@ const ProfileViewTest = () => {
           family_members: data.family_members || [],
           offline_locations: data.offline_locations || [],
           languages: data.languages || [],
-          linktree_channels: data.linktree_channels || []
+          linktree_channels: data.linktree_channels || [],
+          mirroring_channels: data.mirroring_channels || []
         })
 
         if (data.ai_profile_text) setAiProfileText(data.ai_profile_text)
