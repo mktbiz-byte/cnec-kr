@@ -273,6 +273,26 @@ const CompactBanner = ({ percentage, tabs, activeTab, setActiveTab, canAccessTab
   )
 }
 
+// 섹션 혜택 안내 컴포넌트
+const SectionBenefit = ({ icon: Icon, title, description, benefit }) => (
+  <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 rounded-xl p-4 border border-violet-100">
+    <div className="flex items-start gap-3">
+      {Icon && (
+        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0">
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+      )}
+      <div>
+        <p className="text-sm font-bold text-gray-900">{title}</p>
+        <p className="text-xs text-gray-600 mt-0.5">{description}</p>
+        {benefit && (
+          <p className="text-xs text-violet-600 font-semibold mt-1">💡 {benefit}</p>
+        )}
+      </div>
+    </div>
+  </div>
+)
+
 // 섹션 타이틀 (크기 증가)
 const SectionTitle = ({ title, required = false, subtitle }) => (
   <div className="mb-4">
@@ -592,6 +612,15 @@ const ProfileSettingsTest = () => {
         linktree_available: beautyProfile.linktree_available || null,
         video_length_style: beautyProfile.video_length_style || null,
         shortform_tempo: beautyProfile.shortform_tempo || null,
+        // 뷰티 스타일 필드 추가
+        skin_tone: beautyProfile.skin_tone || null,
+        nail_usage: beautyProfile.nail_usage || null,
+        circle_lens_usage: beautyProfile.circle_lens_usage || null,
+        glasses_usage: beautyProfile.glasses_usage || null,
+        // 미러링 & 스마트스토어 필드 추가
+        mirroring_available: beautyProfile.mirroring_available || null,
+        smartstore_purchase: beautyProfile.smartstore_purchase || null,
+        // 다중 선택 필드
         skin_concerns: beautyProfile.skin_concerns,
         hair_concerns: beautyProfile.hair_concerns,
         diet_concerns: beautyProfile.diet_concerns,
@@ -602,7 +631,8 @@ const ProfileSettingsTest = () => {
         family_members: beautyProfile.family_appearance === 'possible' ? beautyProfile.family_members : [],
         offline_locations: beautyProfile.offline_visit === 'possible' ? beautyProfile.offline_locations : [],
         languages: beautyProfile.languages,
-        linktree_channels: beautyProfile.linktree_available === 'possible' ? beautyProfile.linktree_channels : []
+        linktree_channels: beautyProfile.linktree_available === 'possible' ? beautyProfile.linktree_channels : [],
+        mirroring_channels: beautyProfile.mirroring_available === 'possible' ? beautyProfile.mirroring_channels : []
       }
 
       console.log('[DEBUG] 저장할 profileData:', profileData)
@@ -830,23 +860,16 @@ const ProfileSettingsTest = () => {
       )}
 
       <div className="max-w-lg mx-auto px-4 py-5">
-        {/* 통합 배너 + 팁 - 계정 탭이 아닐 때만 표시 */}
+        {/* 통합 배너 - 계정 탭이 아닐 때만 표시 */}
         {activeTab !== 'account' && (
-          <>
-            <UnifiedBanner
-              percentage={progressPercentage}
-              tabs={tabs}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              canAccessTab={canAccessTab}
-              checkStepComplete={checkStepComplete}
-            />
-            <TipSection
-              title="Tip. 피부 고민을 자세히 적어보세요!"
-              description={`"여드름 흔적", "속건조" 같은 구체적인 키워드가 있으면 관련 브랜드 매칭 확률이`}
-              highlight="35% 더 올라갑니다."
-            />
-          </>
+          <CompactBanner
+            percentage={progressPercentage}
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            canAccessTab={canAccessTab}
+            checkStepComplete={checkStepComplete}
+          />
         )}
 
         {/* === 기본 정보 탭 === */}
@@ -862,7 +885,7 @@ const ProfileSettingsTest = () => {
             {/* 프로필 사진 */}
             <div className="flex items-center gap-5 p-5 bg-white rounded-2xl border border-gray-200">
               <div className="relative">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200">
+                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-200">
                   {photoPreview ? (
                     <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
@@ -1473,11 +1496,8 @@ const ProfileSettingsTest = () => {
                     <Target className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-gray-900">스마트스토어 구매</h3>
-                      <span className="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-full">4주 챌린지</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-0.5">네이버 스마트스토어에서 한달 구매가 가능하신가요?</p>
+                    <h3 className="font-bold text-gray-900">스마트스토어 한달 후기 가능여부</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">네이버 스마트스토어에서 한달 후기 작성이 가능하신가요?</p>
                   </div>
                 </div>
 
@@ -1509,14 +1529,6 @@ const ProfileSettingsTest = () => {
                 </div>
               </div>
 
-              {beautyProfile.smartstore_purchase === 'possible' && (
-                <div className="px-5 py-3 bg-orange-500/10 border-t border-orange-200">
-                  <p className="text-xs text-orange-700 font-medium flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    4주 챌린지 캠페인 지원 시 추가 보상이 적용됩니다!
-                  </p>
-                </div>
-              )}
             </div>
 
             <BottomNavigation isLastStep={isLastStep} onNext={handleNext} canProceed={canProceed} saving={saving} />
