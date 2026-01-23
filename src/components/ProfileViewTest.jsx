@@ -14,7 +14,8 @@ import {
 } from 'lucide-react'
 
 import {
-  SKIN_TYPES, SKIN_TONES, HAIR_TYPES, PRIMARY_INTERESTS, EDITING_LEVELS, SHOOTING_LEVELS,
+  SKIN_TYPES, SKIN_SHADES, PERSONAL_COLORS, SKIN_TONES,
+  HAIR_TYPES, CHANNEL_CONTENTS, PRIMARY_INTERESTS, EDITING_LEVELS, SHOOTING_LEVELS,
   FOLLOWER_RANGES, UPLOAD_FREQUENCIES, GENDERS, JOB_VISIBILITY,
   CHILD_APPEARANCE, FAMILY_APPEARANCE, OFFLINE_VISIT, OFFLINE_LOCATIONS,
   LINKTREE_AVAILABLE, LINKTREE_CHANNELS, LANGUAGES,
@@ -253,6 +254,8 @@ const ProfileViewTest = () => {
 
         setBeautyProfile({
           skin_type: data.skin_type || '',
+          skin_shade: data.skin_shade || '',
+          personal_color: data.personal_color || '',
           skin_tone: data.skin_tone || '',
           hair_type: data.hair_type || '',
           primary_interest: data.primary_interest || '',
@@ -335,7 +338,12 @@ const ProfileViewTest = () => {
   // 카테고리별 태그 생성
   const beautyTags = []
   if (beautyProfile.skin_type) beautyTags.push(getLabel(SKIN_TYPES, beautyProfile.skin_type))
-  if (beautyProfile.skin_tone) beautyTags.push(getLabel(SKIN_TONES, beautyProfile.skin_tone))
+  if (beautyProfile.skin_shade) beautyTags.push(getLabel(SKIN_SHADES, beautyProfile.skin_shade))
+  if (beautyProfile.personal_color) beautyTags.push(getLabel(PERSONAL_COLORS, beautyProfile.personal_color))
+  // 레거시 skin_tone 지원
+  if (beautyProfile.skin_tone && !beautyProfile.skin_shade && !beautyProfile.personal_color) {
+    beautyTags.push(getLabel(SKIN_TONES, beautyProfile.skin_tone))
+  }
   getLabels(SKIN_CONCERNS, beautyProfile.skin_concerns).forEach(c => beautyTags.push(c))
   if (beautyProfile.hair_type) beautyTags.push(getLabel(HAIR_TYPES, beautyProfile.hair_type))
   getLabels(HAIR_CONCERNS, beautyProfile.hair_concerns).forEach(c => beautyTags.push(c))
@@ -346,7 +354,7 @@ const ProfileViewTest = () => {
   const dietTags = getLabels(DIET_CONCERNS, beautyProfile.diet_concerns)
 
   const expertiseTags = []
-  if (beautyProfile.primary_interest) expertiseTags.push(getLabel(PRIMARY_INTERESTS, beautyProfile.primary_interest))
+  if (beautyProfile.primary_interest) expertiseTags.push(getLabel(CHANNEL_CONTENTS, beautyProfile.primary_interest))
   if (beautyProfile.category) expertiseTags.push(getLabel(CATEGORIES, beautyProfile.category))
   if (beautyProfile.editing_level) expertiseTags.push(`편집 ${getLabel(EDITING_LEVELS, beautyProfile.editing_level)}`)
   if (beautyProfile.shooting_level) expertiseTags.push(`촬영 ${getLabel(SHOOTING_LEVELS, beautyProfile.shooting_level)}`)
@@ -549,8 +557,17 @@ const ProfileViewTest = () => {
           </div>
         </div>
 
-        {/* 헤어 타입 & 퍼스널 컬러 */}
+        {/* 피부 호수 & 헤어 타입 */}
         <div className="grid grid-cols-2 gap-3 mb-4">
+          {beautyProfile.skin_shade && (
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-4 h-4 rounded-full bg-gradient-to-r from-amber-200 to-amber-400" />
+                <span className="text-xs text-gray-400">피부 호수</span>
+              </div>
+              <p className="text-base font-bold text-gray-900">{getLabel(SKIN_SHADES, beautyProfile.skin_shade)}</p>
+            </div>
+          )}
           {beautyProfile.hair_type && (
             <div className="bg-gray-50 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -560,16 +577,22 @@ const ProfileViewTest = () => {
               <p className="text-base font-bold text-gray-900">{getLabel(HAIR_TYPES, beautyProfile.hair_type)}</p>
             </div>
           )}
-          {beautyProfile.skin_tone && (
-            <div className="bg-gray-50 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-r from-pink-300 to-orange-300" />
-                <span className="text-xs text-gray-400">퍼스널 컬러</span>
-              </div>
-              <p className="text-base font-bold text-gray-900">{getLabel(SKIN_TONES, beautyProfile.skin_tone)}</p>
-            </div>
-          )}
         </div>
+
+        {/* 퍼스널 컬러 */}
+        {(beautyProfile.personal_color || beautyProfile.skin_tone) && (
+          <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-4 h-4 rounded-full bg-gradient-to-r from-pink-300 to-orange-300" />
+              <span className="text-xs text-gray-400">퍼스널 컬러</span>
+            </div>
+            <p className="text-base font-bold text-gray-900">
+              {beautyProfile.personal_color
+                ? getLabel(PERSONAL_COLORS, beautyProfile.personal_color)
+                : getLabel(SKIN_TONES, beautyProfile.skin_tone)}
+            </p>
+          </div>
+        )}
 
         {/* 자기소개 */}
         {profile.bio && (
