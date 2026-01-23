@@ -1,8 +1,8 @@
 /**
  * ProfileSettingsTest.jsx
- * 뷰티 크리에이터 프로필 페이지 - 테스트 버전 v4
- * 비공개 URL로만 접근 가능 (/profile-test-beta-2025)
- * 개선: UI 크기 증가, 계정관리 분리, 동기부여 상단 배치
+ * 뷰티 크리에이터 프로필 설정 페이지
+ * URL: /profile/settings (정식) | /profile-test-beta-2025 (레거시)
+ * 프로필 완료 시 /profile/view로 이동
  */
 
 import { useState, useEffect, useRef } from 'react'
@@ -402,7 +402,7 @@ const ProfileSettingsTest = () => {
   const checkStepComplete = (step) => {
     switch (step) {
       case 'basic':
-        return !!profile.name && !!profile.phone
+        return !!profile.name && !!profile.phone && !!profile.profile_image
       case 'beauty':
         return !!beautyProfile.skin_type && beautyProfile.skin_concerns.length > 0 &&
                !!beautyProfile.hair_type && beautyProfile.hair_concerns.length > 0
@@ -556,8 +556,8 @@ const ProfileSettingsTest = () => {
 
         // completedSteps는 데이터 기반으로 계산
         const completed = []
-        // 기본 정보: 이름, 연락처
-        if (data.name && data.phone) completed.push('basic')
+        // 기본 정보: 이름, 연락처, 프로필 사진 (필수)
+        if (data.name && data.phone && data.profile_image) completed.push('basic')
         // 뷰티: 피부타입, 피부고민, 헤어타입, 헤어고민
         if (data.skin_type && data.skin_concerns?.length > 0 && data.hair_type && data.hair_concerns?.length > 0) completed.push('beauty')
         // SNS: 각 채널 URL 입력 또는 없음 체크
@@ -668,8 +668,17 @@ const ProfileSettingsTest = () => {
       console.log('[DEBUG] 저장할 age 값:', profileData.age)
 
       await database.userProfiles.upsert(profileData)
-      setSuccess(isTemporarySave ? '임시저장 되었습니다!' : '프로필이 저장되었습니다!')
-      setTimeout(() => setSuccess(''), 3000)
+
+      if (isTemporarySave) {
+        setSuccess('임시저장 되었습니다!')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        // 최종 저장 완료 시 프로필 뷰 페이지로 이동
+        setSuccess('프로필이 저장되었습니다!')
+        setTimeout(() => {
+          navigate('/profile/view')
+        }, 1500)
+      }
     } catch (err) {
       console.error('프로필 저장 오류:', err)
       setError(`저장 실패: ${err.message}`)

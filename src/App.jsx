@@ -35,6 +35,7 @@ import MyPageKoreaEnhanced from './components/MyPageKoreaEnhanced';
 import ProfileSettings from './components/ProfileSettings';
 import ProfileSettingsTest from './components/ProfileSettingsTest';
 import ProfileViewTest from './components/ProfileViewTest';
+import ProfileRouter from './components/ProfileRouter';
 import NotificationSettings from './components/NotificationSettings';
 import CampaignApplicationUpdated from './components/CampaignApplicationUpdated';
 import CompanyReportNew from './components/CompanyReportNew';
@@ -111,7 +112,9 @@ const AppContent = () => {
 
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/profile" element={<ProfileRouter />} />
+        <Route path="/profile/settings" element={<ProfileSettingsTest />} />
+        <Route path="/profile/view" element={<ProfileViewTest />} />
         <Route path="/settings/notifications" element={<NotificationSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />

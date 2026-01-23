@@ -1,7 +1,8 @@
 /**
  * ProfileViewTest.jsx
- * 뷰티 크리에이터 프로필 종합 보기 페이지
- * v5: 컴팩트 디자인 - 짧고 깔끔한 UI
+ * 뷰티 크리에이터 프로필 뷰 페이지
+ * URL: /profile/view (정식) | /profile-view-beta-2025 (레거시)
+ * 컴팩트 디자인 - 짧고 깔끔한 UI
  */
 
 import { useState, useEffect } from 'react'
@@ -352,7 +353,7 @@ const ProfileViewTest = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <p className="text-gray-500 mb-4">프로필 정보가 없습니다.</p>
-        <button onClick={() => navigate('/profile-test-beta-2025')} className="px-6 py-3 bg-violet-500 text-white rounded-xl font-bold">
+        <button onClick={() => navigate('/profile/settings')} className="px-6 py-3 bg-violet-500 text-white rounded-xl font-bold">
           프로필 작성하기
         </button>
       </div>
@@ -465,7 +466,7 @@ const ProfileViewTest = () => {
             <ArrowLeft size={20} className="text-gray-900" />
           </button>
           <h1 className="text-sm font-bold text-gray-900">프로필</h1>
-          <button onClick={() => navigate('/profile-test-beta-2025')} className="p-1 -mr-1">
+          <button onClick={() => navigate('/profile/settings')} className="p-1 -mr-1">
             <Edit3 size={16} className="text-violet-500" />
           </button>
         </div>
@@ -710,7 +711,7 @@ const ProfileViewTest = () => {
 
         {/* 프로필 수정 버튼 */}
         <button
-          onClick={() => navigate('/profile-test-beta-2025')}
+          onClick={() => navigate('/profile/settings')}
           className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2"
         >
           <Edit3 className="w-4 h-4" />

@@ -102,12 +102,31 @@ const CampaignApplyPage = () => {
     }
 
     const missing = []
-    if (!userProfile.skin_type) missing.push('피부타입')
-    if (!userProfile.address) missing.push('주소')
-    if (!userProfile.instagram_url && !userProfile.youtube_url && !userProfile.tiktok_url) {
-      missing.push('SNS 계정')
-    }
+
+    // 기본 정보 (필수)
+    if (!userProfile.profile_image) missing.push('프로필 사진')
+    if (!userProfile.name) missing.push('이름')
     if (!userProfile.phone) missing.push('연락처')
+
+    // 뷰티 정보 (필수)
+    if (!userProfile.skin_type) missing.push('피부타입')
+    if (!userProfile.skin_concerns || userProfile.skin_concerns.length === 0) missing.push('피부고민')
+    if (!userProfile.hair_type) missing.push('헤어타입')
+    if (!userProfile.hair_concerns || userProfile.hair_concerns.length === 0) missing.push('헤어고민')
+
+    // SNS 정보 (필수 - 각 채널별 URL 또는 없음 체크)
+    const instagramOk = userProfile.instagram_url || userProfile.no_instagram
+    const youtubeOk = userProfile.youtube_url || userProfile.no_youtube
+    const tiktokOk = userProfile.tiktok_url || userProfile.no_tiktok
+    if (!instagramOk || !youtubeOk || !tiktokOk) {
+      missing.push('SNS 채널 설정')
+    }
+
+    // 영상 스타일 (필수)
+    if (!userProfile.video_length_style) missing.push('영상 스타일')
+
+    // 상세 정보 (필수)
+    if (!userProfile.gender) missing.push('성별')
 
     return { isComplete: missing.length === 0, missing }
   }
@@ -304,8 +323,8 @@ const CampaignApplyPage = () => {
             ))}
           </div>
           <button
-            onClick={() => navigate('/profile')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            onClick={() => navigate('/profile/settings')}
+            className="px-6 py-3 bg-violet-600 text-white rounded-xl font-bold"
           >
             프로필 완성하기
           </button>
