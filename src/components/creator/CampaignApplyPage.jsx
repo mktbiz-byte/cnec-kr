@@ -114,13 +114,7 @@ const CampaignApplyPage = () => {
     if (!userProfile.hair_type) missing.push('헤어타입')
     if (!userProfile.hair_concerns || userProfile.hair_concerns.length === 0) missing.push('헤어고민')
 
-    // SNS 정보 (필수 - 각 채널별 URL 또는 없음 체크)
-    const instagramOk = userProfile.instagram_url || userProfile.no_instagram
-    const youtubeOk = userProfile.youtube_url || userProfile.no_youtube
-    const tiktokOk = userProfile.tiktok_url || userProfile.no_tiktok
-    if (!instagramOk || !youtubeOk || !tiktokOk) {
-      missing.push('SNS 채널 설정')
-    }
+    // SNS 정보: URL 미입력 시 자동으로 채널 없음 처리 (별도 검증 불필요)
 
     // 영상 스타일 (필수)
     if (!userProfile.video_length_style) missing.push('영상 스타일')

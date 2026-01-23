@@ -401,11 +401,8 @@ const ProfileSettingsTest = () => {
         return !!beautyProfile.skin_type && beautyProfile.skin_concerns.length > 0 &&
                !!beautyProfile.hair_type && beautyProfile.hair_concerns.length > 0
       case 'sns':
-        // 각 채널은 URL 입력 또는 "없음" 체크로 완료 처리
-        const instagramOk = profile.instagram_url || profile.no_instagram
-        const youtubeOk = profile.youtube_url || profile.no_youtube
-        const tiktokOk = profile.tiktok_url || profile.no_tiktok
-        return instagramOk && youtubeOk && tiktokOk
+        // URL 미입력 시 자동으로 채널 없음 처리 (체크박스 없이도 다음 단계 가능)
+        return true
       case 'video':
         return !!beautyProfile.video_length_style
       case 'detail':

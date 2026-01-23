@@ -37,9 +37,8 @@ const ProfileRouter = () => {
       const basicComplete = data.name && data.phone && data.profile_image
       const beautyComplete = data.skin_type && data.skin_concerns?.length > 0 &&
                             data.hair_type && data.hair_concerns?.length > 0
-      const snsComplete = (data.no_instagram || data.instagram_url) &&
-                         (data.no_youtube || data.youtube_url) &&
-                         (data.no_tiktok || data.tiktok_url)
+      // SNS: URL 미입력 시 자동으로 채널 없음 처리
+      const snsComplete = true
       const videoComplete = !!data.video_length_style
       const detailComplete = !!data.gender
 
