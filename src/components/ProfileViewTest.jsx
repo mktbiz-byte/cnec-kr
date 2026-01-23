@@ -455,6 +455,50 @@ const ProfileViewTest = () => {
           </div>
         </div>
 
+        {/* SNS 팔로워 정보 */}
+        {(profile.instagram_followers || profile.youtube_subscribers || profile.tiktok_followers) && (
+          <div className="flex justify-center gap-4 mb-4">
+            {profile.instagram_url && profile.instagram_followers && (
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">{profile.instagram_followers.toLocaleString()}</p>
+                <p className="text-xs text-gray-400">인스타 팔로워</p>
+              </div>
+            )}
+            {profile.youtube_url && profile.youtube_subscribers && (
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">{profile.youtube_subscribers.toLocaleString()}</p>
+                <p className="text-xs text-gray-400">유튜브 구독자</p>
+              </div>
+            )}
+            {profile.tiktok_url && profile.tiktok_followers && (
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">{profile.tiktok_followers.toLocaleString()}</p>
+                <p className="text-xs text-gray-400">틱톡 팔로워</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 채널 정보 */}
+        {(profile.channel_name || profile.avg_views) && (
+          <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+            <div className="flex items-center justify-between">
+              {profile.channel_name && (
+                <div>
+                  <p className="text-xs text-gray-400">대표 채널</p>
+                  <p className="text-sm font-bold text-gray-900">{profile.channel_name}</p>
+                </div>
+              )}
+              {profile.avg_views && (
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">평균 조회수</p>
+                  <p className="text-sm font-bold text-gray-900">{profile.avg_views.toLocaleString()}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* 정보 카드 - 2열 그리드 */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-gray-50 rounded-2xl p-4">
@@ -475,16 +519,27 @@ const ProfileViewTest = () => {
           </div>
         </div>
 
-        {/* 퍼스널 컬러 */}
-        {beautyProfile.skin_tone && (
-          <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-r from-pink-300 to-orange-300" />
-              <span className="text-xs text-gray-400">퍼스널 컬러</span>
+        {/* 헤어 타입 & 퍼스널 컬러 */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {beautyProfile.hair_type && (
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm">💇</span>
+                <span className="text-xs text-gray-400">헤어 타입</span>
+              </div>
+              <p className="text-base font-bold text-gray-900">{getLabel(HAIR_TYPES, beautyProfile.hair_type)}</p>
             </div>
-            <p className="text-base font-bold text-gray-900">{getLabel(SKIN_TONES, beautyProfile.skin_tone)}</p>
-          </div>
-        )}
+          )}
+          {beautyProfile.skin_tone && (
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-4 h-4 rounded-full bg-gradient-to-r from-pink-300 to-orange-300" />
+                <span className="text-xs text-gray-400">퍼스널 컬러</span>
+              </div>
+              <p className="text-base font-bold text-gray-900">{getLabel(SKIN_TONES, beautyProfile.skin_tone)}</p>
+            </div>
+          )}
+        </div>
 
         {/* 자기소개 */}
         {profile.bio && (
@@ -611,6 +666,27 @@ const ProfileViewTest = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* 연락처 & 배송지 */}
+        {(profile.phone || profile.address) && (
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4">
+            {profile.phone && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-400 mb-1">연락처</p>
+                <p className="text-sm font-medium text-gray-900">{profile.phone}</p>
+              </div>
+            )}
+            {profile.address && (
+              <div>
+                <p className="text-xs text-gray-400 mb-1">배송지</p>
+                <p className="text-sm text-gray-700">
+                  [{profile.postcode}] {profile.address}
+                  {profile.detail_address && ` ${profile.detail_address}`}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
