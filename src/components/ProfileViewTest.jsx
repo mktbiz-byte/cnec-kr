@@ -63,9 +63,9 @@ const TAG_COLORS = {
 const TabButton = ({ active, onClick, children }) => (
   <button
     onClick={onClick}
-    className={`px-4 py-2 text-xs font-medium rounded-full whitespace-nowrap transition-all ${
+    className={`w-full py-2.5 text-xs font-medium rounded-xl transition-all ${
       active
-        ? 'bg-gray-900 text-white'
+        ? 'bg-gray-900 text-white shadow-sm'
         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
     }`}
   >
@@ -83,15 +83,20 @@ const SectionHeader = ({ icon, title, colorClass }) => (
 
 // AI 프로필 작성기 컴포넌트
 const AIProfileWriter = ({ profile, beautyProfile, savedText, onSave, saving }) => {
-  const [aiProfile, setAiProfile] = useState(savedText || '')
+  const [aiProfile, setAiProfile] = useState('')
   const [generating, setGenerating] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [hasLoadedSaved, setHasLoadedSaved] = useState(false)
 
+  // 저장된 텍스트가 있으면 불러오기 (최초 1회)
   useEffect(() => {
-    if (savedText && !aiProfile) setAiProfile(savedText)
-  }, [savedText])
+    if (savedText && !hasLoadedSaved) {
+      setAiProfile(savedText)
+      setHasLoadedSaved(true)
+    }
+  }, [savedText, hasLoadedSaved])
 
   const generateAIProfile = () => {
     setGenerating(true)
@@ -639,19 +644,19 @@ const ProfileViewTest = () => {
             <span className="text-sm font-bold text-gray-900">관심 키워드</span>
           </div>
 
-          {/* 탭 네비게이션 */}
-          <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
+          {/* 탭 네비게이션 - 그리드 형태 */}
+          <div className="grid grid-cols-3 gap-2 mb-4">
             <TabButton active={activeTab === 'all'} onClick={() => setActiveTab('all')}>
-              전체 보기
+              전체
             </TabButton>
             {beautyTags.length > 0 && (
               <TabButton active={activeTab === 'beauty'} onClick={() => setActiveTab('beauty')}>
-                뷰티/스타일
+                뷰티
               </TabButton>
             )}
             {(channelTags.length > 0 || videoTags.length > 0 || expertiseTags.length > 0) && (
               <TabButton active={activeTab === 'channel'} onClick={() => setActiveTab('channel')}>
-                채널/콘텐츠
+                채널
               </TabButton>
             )}
             {(activityTags.length > 0 || specialTags.length > 0) && (
