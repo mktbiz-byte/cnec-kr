@@ -469,7 +469,7 @@ const ProfileViewTest = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-32">
       {/* 헤더 */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
         <div className="max-w-lg mx-auto px-4 h-11 flex items-center justify-between">
