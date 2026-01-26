@@ -772,61 +772,93 @@ const ApplicationsPage = () => {
       const isOliveYoungSale = selectedApplication?.campaigns?.is_oliveyoung_sale
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올영세일: 3개 URL + 2개 광고코드 + 2개 클린본 필수 (step1, step2)
-        if (!snsUploadForm.step1_url || !snsUploadForm.step2_url || !snsUploadForm.step3_url) {
-          setError('STEP 1, 2, 3 URL을 모두 입력해주세요.')
+        // 올영세일: 각 STEP별로 부분 제출 가능
+        // 입력한 STEP에 대해서만 URL + 광고코드(STEP1,2만) + 클린본(STEP1,2만) 검증
+        const hasStep1 = snsUploadForm.step1_url || snsUploadForm.step1_partnership_code || snsUploadForm.step1_clean_video_file
+        const hasStep2 = snsUploadForm.step2_url || snsUploadForm.step2_partnership_code || snsUploadForm.step2_clean_video_file
+        const hasStep3 = snsUploadForm.step3_url
+
+        // 최소 1개 STEP은 입력해야 함
+        if (!hasStep1 && !hasStep2 && !hasStep3) {
+          setError('최소 1개의 STEP 정보를 입력해주세요.')
           setProcessing(false)
           return
         }
-        if (!snsUploadForm.step1_partnership_code || !snsUploadForm.step2_partnership_code) {
-          setError('광고코드를 모두 입력해주세요. (STEP 1용, STEP 2용)')
-          setProcessing(false)
-          return
+
+        // STEP 1 입력 시 필수 검증
+        if (hasStep1) {
+          if (!snsUploadForm.step1_url) {
+            setError('STEP 1 URL을 입력해주세요.')
+            setProcessing(false)
+            return
+          }
+          if (!snsUploadForm.step1_partnership_code) {
+            setError('STEP 1 광고코드를 입력해주세요.')
+            setProcessing(false)
+            return
+          }
+          if (!snsUploadForm.step1_clean_video_file) {
+            setError('STEP 1 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
+            setProcessing(false)
+            return
+          }
         }
-        // 클린본 필수 검증 (step1, step2)
-        if (!snsUploadForm.step1_clean_video_file) {
-          setError('STEP 1 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
-          setProcessing(false)
-          return
+
+        // STEP 2 입력 시 필수 검증
+        if (hasStep2) {
+          if (!snsUploadForm.step2_url) {
+            setError('STEP 2 URL을 입력해주세요.')
+            setProcessing(false)
+            return
+          }
+          if (!snsUploadForm.step2_partnership_code) {
+            setError('STEP 2 광고코드를 입력해주세요.')
+            setProcessing(false)
+            return
+          }
+          if (!snsUploadForm.step2_clean_video_file) {
+            setError('STEP 2 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
+            setProcessing(false)
+            return
+          }
         }
-        if (!snsUploadForm.step2_clean_video_file) {
-          setError('STEP 2 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
-          setProcessing(false)
-          return
-        }
+
+        // STEP 3은 URL만 필요 (스토리라 광고코드/클린본 불필요)
       } else if (campaignType === '4week_challenge') {
-        // 4주 챌린지: 4개 URL + 4개 광고코드 + 4개 클린본 필수
-        if (!snsUploadForm.week1_url || !snsUploadForm.week2_url || !snsUploadForm.week3_url || !snsUploadForm.week4_url) {
-          setError('Week 1, 2, 3, 4 URL을 모두 입력해주세요.')
+        // 4주 챌린지: 각 Week별로 부분 제출 가능
+        // 입력한 Week에 대해서만 URL + 광고코드 + 클린본 검증
+        const hasWeek1 = snsUploadForm.week1_url || snsUploadForm.week1_partnership_code || snsUploadForm.week1_clean_video_file
+        const hasWeek2 = snsUploadForm.week2_url || snsUploadForm.week2_partnership_code || snsUploadForm.week2_clean_video_file
+        const hasWeek3 = snsUploadForm.week3_url || snsUploadForm.week3_partnership_code || snsUploadForm.week3_clean_video_file
+        const hasWeek4 = snsUploadForm.week4_url || snsUploadForm.week4_partnership_code || snsUploadForm.week4_clean_video_file
+
+        // 최소 1개 Week는 입력해야 함
+        if (!hasWeek1 && !hasWeek2 && !hasWeek3 && !hasWeek4) {
+          setError('최소 1개의 Week 정보를 입력해주세요.')
           setProcessing(false)
           return
         }
-        if (!snsUploadForm.week1_partnership_code || !snsUploadForm.week2_partnership_code ||
-            !snsUploadForm.week3_partnership_code || !snsUploadForm.week4_partnership_code) {
-          setError('각 Week별 광고코드를 모두 입력해주세요.')
-          setProcessing(false)
-          return
-        }
-        // 클린본 필수 검증 (week1~4)
-        if (!snsUploadForm.week1_clean_video_file) {
-          setError('Week 1 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
-          setProcessing(false)
-          return
-        }
-        if (!snsUploadForm.week2_clean_video_file) {
-          setError('Week 2 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
-          setProcessing(false)
-          return
-        }
-        if (!snsUploadForm.week3_clean_video_file) {
-          setError('Week 3 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
-          setProcessing(false)
-          return
-        }
-        if (!snsUploadForm.week4_clean_video_file) {
-          setError('Week 4 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
-          setProcessing(false)
-          return
+
+        // 각 Week별 필수 검증
+        for (let week = 1; week <= 4; week++) {
+          const hasWeek = snsUploadForm[`week${week}_url`] || snsUploadForm[`week${week}_partnership_code`] || snsUploadForm[`week${week}_clean_video_file`]
+          if (hasWeek) {
+            if (!snsUploadForm[`week${week}_url`]) {
+              setError(`Week ${week} URL을 입력해주세요.`)
+              setProcessing(false)
+              return
+            }
+            if (!snsUploadForm[`week${week}_partnership_code`]) {
+              setError(`Week ${week} 광고코드를 입력해주세요.`)
+              setProcessing(false)
+              return
+            }
+            if (!snsUploadForm[`week${week}_clean_video_file`]) {
+              setError(`Week ${week} 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.`)
+              setProcessing(false)
+              return
+            }
+          }
         }
       } else {
         // 일반 캠페인: 1개 URL + 1개 광고코드 + 1개 클린본 필수
