@@ -187,14 +187,15 @@ const CampaignCreationKorea = () => {
         campaignForm.question4
       ].filter(q => q && q.trim() !== '').map(q => ({ question: q }))
 
-      const { question1, question2, question3, question4, target_platforms, ...restForm } = campaignForm
+      const { question1, question2, question3, question4, ...restForm } = campaignForm
 
       const campaignData = {
         ...restForm,
         reward_points: parseInt(campaignForm.reward_points) || 0,
         total_slots: parseInt(campaignForm.total_slots) || 0,
         remaining_slots: parseInt(campaignForm.remaining_slots) || parseInt(campaignForm.total_slots) || 0,
-        questions: questions.length > 0 ? questions : null
+        questions: questions.length > 0 ? questions : null,
+        target_platforms: campaignForm.target_platforms
       }
 
       if (editId) {

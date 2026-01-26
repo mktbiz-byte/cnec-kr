@@ -1223,6 +1223,26 @@ const ApplicationsPage = () => {
                               발송 {formatDate(app.campaigns.product_shipping_date)}
                             </span>
                           )}
+                          {/* 업로드 채널 표시 */}
+                          {app.campaigns?.target_platforms && (
+                            <div className="flex items-center gap-1">
+                              {app.campaigns.target_platforms.instagram && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-pink-50 text-pink-600 rounded-full text-[10px] font-bold">
+                                  📸 인스타
+                                </span>
+                              )}
+                              {app.campaigns.target_platforms.youtube && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 rounded-full text-[10px] font-bold">
+                                  🎬 유튜브
+                                </span>
+                              )}
+                              {app.campaigns.target_platforms.tiktok && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-800 text-white rounded-full text-[10px] font-bold">
+                                  🎵 틱톡
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
 
