@@ -364,8 +364,13 @@ const ApplicationsPage = () => {
     week3_partnership_code: '',
     week4_partnership_code: '',
     // 일반/기획형
-    partnership_code: ''
+    partnership_code: '',
+    // 클린본 (필수)
+    clean_video_file: null,
+    clean_video_url: ''
   })
+  const [cleanVideoUploading, setCleanVideoUploading] = useState(false)
+  const [cleanUploadProgress, setCleanUploadProgress] = useState(0)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -695,6 +700,60 @@ const ApplicationsPage = () => {
     }
   }
 
+  // 클린본 영상 업로드 함수
+  const uploadCleanVideo = async (file) => {
+    try {
+      setCleanVideoUploading(true)
+      setCleanUploadProgress(0)
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('로그인이 필요합니다.')
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}_${selectedApplication.campaign_id}_clean_sns_${Date.now()}.${fileExt}`
+      const filePath = `videos/${fileName}`
+
+      const { data, error } = await supabase.storage
+        .from('campaign-videos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          onUploadProgress: (progress) => {
+            const percent = (progress.loaded / progress.total) * 100
+            setCleanUploadProgress(Math.round(percent))
+          }
+        })
+
+      if (error) throw error
+      setCleanUploadProgress(100)
+
+      const { data: urlData } = supabase.storage
+        .from('campaign-videos')
+        .getPublicUrl(filePath)
+
+      return urlData.publicUrl
+    } catch (err) {
+      console.error('클린본 업로드 오류:', err)
+      throw err
+    } finally {
+      setCleanVideoUploading(false)
+    }
+  }
+
+  // 클린본 파일 선택 핸들러
+  const handleCleanVideoSelect = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // 파일 크기 체크 (500MB)
+      if (file.size > 500 * 1024 * 1024) {
+        setError('파일 크기는 500MB 이하여야 합니다.')
+        return
+      }
+      setSnsUploadForm(prev => ({ ...prev, clean_video_file: file }))
+      setError('')
+    }
+  }
+
   // SNS 업로드 제출 (레거시 코드 기반)
   const handleSnsUploadSubmit = async () => {
     try {
@@ -744,6 +803,25 @@ const ApplicationsPage = () => {
         }
       }
 
+      // 클린본 필수 검증 (모든 캠페인 타입 공통)
+      if (!snsUploadForm.clean_video_file && !snsUploadForm.clean_video_url) {
+        setError('클린본(자막/효과 없는 원본 영상)을 업로드해주세요. 클린본 첨부는 필수입니다.')
+        setProcessing(false)
+        return
+      }
+
+      // 클린본 업로드
+      let uploadedCleanUrl = snsUploadForm.clean_video_url
+      if (snsUploadForm.clean_video_file) {
+        try {
+          uploadedCleanUrl = await uploadCleanVideo(snsUploadForm.clean_video_file)
+        } catch (uploadErr) {
+          setError('클린본 업로드 중 오류가 발생했습니다: ' + uploadErr.message)
+          setProcessing(false)
+          return
+        }
+      }
+
       let updateData
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
@@ -754,6 +832,7 @@ const ApplicationsPage = () => {
           step3_url: snsUploadForm.step3_url,
           step1_partnership_code: snsUploadForm.step1_partnership_code || null,
           step2_partnership_code: snsUploadForm.step2_partnership_code || null,
+          clean_video_url: uploadedCleanUrl,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -773,6 +852,7 @@ const ApplicationsPage = () => {
           week2_partnership_code: snsUploadForm.week2_partnership_code || null,
           week3_partnership_code: snsUploadForm.week3_partnership_code || null,
           week4_partnership_code: snsUploadForm.week4_partnership_code || null,
+          clean_video_url: uploadedCleanUrl,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -781,6 +861,7 @@ const ApplicationsPage = () => {
         updateData = {
           sns_upload_url: snsUploadForm.sns_upload_url,
           partnership_code: snsUploadForm.partnership_code || null,
+          clean_video_url: uploadedCleanUrl,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -2479,6 +2560,76 @@ const ApplicationsPage = () => {
                   </p>
                 </div>
               )}
+
+              {/* 클린본 업로드 (필수) */}
+              <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle size={18} className="text-red-600" />
+                  <label className="text-sm font-bold text-red-800">
+                    클린본 업로드 (필수) *
+                  </label>
+                </div>
+                <div className="bg-red-100 border border-red-200 rounded-lg p-3 mb-3">
+                  <p className="text-xs text-red-700 font-semibold leading-relaxed">
+                    ⚠️ 클린본(자막/효과 없는 원본 영상)을 반드시 첨부해야 포인트가 지급됩니다!
+                  </p>
+                  <p className="text-xs text-red-600 mt-1">
+                    클린본 미첨부 시 포인트 지급이 불가합니다.
+                  </p>
+                </div>
+
+                {snsUploadForm.clean_video_file ? (
+                  <div className="bg-white border border-green-300 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={16} className="text-green-600" />
+                        <span className="text-sm text-gray-700 truncate max-w-[200px]">
+                          {snsUploadForm.clean_video_file.name}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSnsUploadForm(prev => ({ ...prev, clean_video_file: null }))}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {(snsUploadForm.clean_video_file.size / (1024 * 1024)).toFixed(1)}MB
+                    </p>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-red-300 border-dashed rounded-lg cursor-pointer bg-white hover:bg-red-50 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-2 pb-2">
+                      <Upload size={24} className="text-red-400 mb-1" />
+                      <p className="text-xs text-red-600 font-medium">클린본 영상 선택</p>
+                      <p className="text-[10px] text-gray-400">MP4, MOV (최대 500MB)</p>
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="video/*"
+                      onChange={handleCleanVideoSelect}
+                    />
+                  </label>
+                )}
+
+                {cleanVideoUploading && (
+                  <div className="mt-2">
+                    <div className="flex items-center gap-2 text-sm text-purple-600">
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>업로드 중... {cleanUploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div
+                        className="bg-purple-600 h-1.5 rounded-full transition-all"
+                        style={{ width: `${cleanUploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* 메모 */}
               <div>
