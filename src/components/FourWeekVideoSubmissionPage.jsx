@@ -593,8 +593,12 @@ export default function FourWeekVideoSubmissionPage() {
                   </label>
                   {isUploading && uploadingInfo?.type === 'clean' && (
                     <div className="mt-2">
-                      <div className="w-full bg-gray-200 rounded-full h-1">
-                        <div className={`bg-gradient-to-r ${colors.bg} h-1 rounded-full`} style={{ width: `${uploadProgress}%` }} />
+                      <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                        <span>업로드 중...</span>
+                        <span className="font-bold">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className={`bg-gradient-to-r ${colors.bg} h-2 rounded-full transition-all duration-300`} style={{ width: `${uploadProgress}%` }} />
                       </div>
                     </div>
                   )}
@@ -638,8 +642,12 @@ export default function FourWeekVideoSubmissionPage() {
                   </label>
                   {isUploading && uploadingInfo?.type === 'edited' && (
                     <div className="mt-2">
-                      <div className="w-full bg-gray-200 rounded-full h-1">
-                        <div className={`bg-gradient-to-r ${colors.bg} h-1 rounded-full`} style={{ width: `${uploadProgress}%` }} />
+                      <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                        <span>업로드 중...</span>
+                        <span className="font-bold">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className={`bg-gradient-to-r ${colors.bg} h-2 rounded-full transition-all duration-300`} style={{ width: `${uploadProgress}%` }} />
                       </div>
                     </div>
                   )}
@@ -693,7 +701,7 @@ export default function FourWeekVideoSubmissionPage() {
                   {submitting || isUploading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      {isUploading ? '업로드 중...' : '제출 중...'}
+                      {isUploading ? `업로드 중... ${uploadProgress}%` : '제출 중...'}
                     </>
                   ) : (
                     <>

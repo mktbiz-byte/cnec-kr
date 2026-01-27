@@ -546,6 +546,20 @@ export default function VideoSubmissionPage() {
                       </>
                     )}
                   </label>
+                  {uploadingType === 'clean' && uploading && (
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between text-xs text-purple-600 mb-1">
+                        <span>업로드 중...</span>
+                        <span className="font-bold">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* 편집본 */}
@@ -586,6 +600,20 @@ export default function VideoSubmissionPage() {
                       </>
                     )}
                   </label>
+                  {uploadingType === 'edited' && uploading && (
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between text-xs text-purple-600 mb-1">
+                        <span>업로드 중...</span>
+                        <span className="font-bold">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* 제목 */}
@@ -636,7 +664,7 @@ export default function VideoSubmissionPage() {
                   {submitting || isUploading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      {isUploading ? '업로드 중...' : '제출 중...'}
+                      {isUploading ? `업로드 중... ${uploadProgress}%` : '제출 중...'}
                     </>
                   ) : (
                     <>
