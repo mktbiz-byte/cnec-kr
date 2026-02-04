@@ -476,11 +476,7 @@ const ProfileSettingsTest = () => {
     try {
       setLoading(true)
       const data = await database.userProfiles.get(user.id)
-      console.log('[DEBUG] 프로필 로드 - 전체 데이터:', data)
-      console.log('[DEBUG] 프로필 로드 - age 값:', data?.age, '타입:', typeof data?.age)
-      console.log('[DEBUG] 프로필 로드 - skin_type:', data?.skin_type)
-      console.log('[DEBUG] 프로필 로드 - skin_concerns:', data?.skin_concerns)
-      console.log('[DEBUG] 프로필 로드 - gender:', data?.gender)
+      console.log('[DEBUG] 프로필 로드 완료')
 
       if (data) {
         setProfile({
@@ -532,8 +528,7 @@ const ProfileSettingsTest = () => {
 
         if (data.profile_image) setPhotoPreview(data.profile_image)
 
-        console.log('[DEBUG] 상태 설정 완료 - profile.age:', data.age != null ? String(data.age) : '(empty)')
-        console.log('[DEBUG] 상태 설정 완료 - beautyProfile.skin_type:', data.skin_type || '(empty)')
+        console.log('[DEBUG] 상태 설정 완료')
 
         // completedSteps는 데이터 기반으로 계산
         const completed = []

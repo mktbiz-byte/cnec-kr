@@ -33,7 +33,7 @@ const SecretAdminLogin = () => {
             .eq('user_id', user.id)
             .single()
           
-          console.log('사용자 프로필 확인:', profile)
+          console.log('사용자 프로필 확인:', profile?.role)
           
           // 관리자 또는 매니저 권한이 있는 경우에만 리다이렉트
           if (profile?.role === 'admin' || profile?.role === 'manager') {
@@ -90,7 +90,7 @@ const SecretAdminLogin = () => {
       setError('')
       
       const result = await signInWithEmail(formData.email, formData.password)
-      console.log('로그인 결과:', result)
+      console.log('로그인 성공')
       
       // 로그인 성공 시 잠시 대기 후 관리자 페이지로 이동
       setTimeout(() => {

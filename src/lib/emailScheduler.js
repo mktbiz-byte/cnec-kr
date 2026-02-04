@@ -226,7 +226,7 @@ class EmailScheduler {
         content: emailContent
       })
       
-      console.log(`${templateId} 알림을 ${user.email}에게 발송함`)
+      console.log(`${templateId} 알림 발송 완료`)
       
     } catch (error) {
       console.error('알림 이메일 발송 중 오류:', error)

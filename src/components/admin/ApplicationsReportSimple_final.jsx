@@ -263,7 +263,7 @@ const ApplicationsReportSimple = () => {
             }
 
             if (campaign && user.email) {
-              console.log('승인 이메일 발송 시도:', user.email)
+              console.log('승인 이메일 발송 시도')
               await emailTriggersKorean.onApplicationApproved(application, campaign, user)
               console.log('승인 이메일 발송 완료')
             } else {

@@ -117,12 +117,12 @@ export const emailTemplates = {
 // 이메일 발송 서비스
 export const emailService = {
   sendWelcomeEmail: async (userEmail, userName) => {
-    console.log('Sending welcome email to:', userEmail)
+    console.log('Sending welcome email')
     return { success: true }
   },
   
   sendCampaignApprovedEmail: async (userEmail, userName, campaignData) => {
-    console.log('Sending campaign approved email to:', userEmail)
+    console.log('Sending campaign approved email')
     return { success: true }
   }
 }

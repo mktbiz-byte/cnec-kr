@@ -53,12 +53,12 @@ const MyPageWithPointSystem = () => {
       setLoading(true)
       setError('')
       
-      console.log('Loading user data for user:', user.id)
+      console.log('Loading user data')
       
       // 사용자 프로필 로드
       try {
         const profile = await database.userProfiles.get(user.id)
-        console.log('User profile loaded:', profile)
+        console.log('User profile loaded')
         setUserProfile(profile)
       } catch (profileError) {
         console.error('Profile loading error:', profileError)
@@ -69,7 +69,7 @@ const MyPageWithPointSystem = () => {
       // 사용자의 신청서들 로드
       try {
         const userApplications = await database.applications.getByUser(user.id)
-        console.log('User applications loaded:', userApplications)
+        console.log('User applications loaded:', userApplications?.length || 0, '개')
         setApplications(userApplications || [])
         
         // 포인트 잔액 계산

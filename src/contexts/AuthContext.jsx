@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
           console.error("Error getting session:", error);
           setUser(null);
         } else {
-          console.log("Session loaded:", session?.user?.email);
+          console.log("Session loaded");
           setUser(session?.user ?? null);
           
           // 사용자 프로필 로드
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     getSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
+      console.log("Auth state changed:", event);
       
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user);

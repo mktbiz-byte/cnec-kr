@@ -268,7 +268,7 @@ const CreatorMyPage = () => {
       })
 
       const result = await response.json()
-      console.log('계좌 인증 결과:', result)
+      console.log('계좌 인증 결과:', result.success ? '성공' : '실패')
 
       if (result.success && result.accountName) {
         // 은행 API에서 반환한 예금주명으로 인증 완료

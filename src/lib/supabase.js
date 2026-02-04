@@ -300,7 +300,7 @@ export const database = {
 
     async getByUser(userId) {
       return safeQuery(async () => {
-        console.log('getByUser 호출 - 사용자 ID:', userId)
+        console.log('getByUser 호출')
         
         try {
           // 먼저 기존 applications 테이블 확인 (우선순위)
@@ -467,7 +467,7 @@ export const database = {
 
     async getByUserAndCampaign(userId, campaignId) {
       return safeQuery(async () => {
-        console.log('getByUserAndCampaign 호출 - applications 테이블 사용:', { userId, campaignId })
+        console.log('getByUserAndCampaign 호출')
         
         const { data, error } = await supabase
           .from('applications')
@@ -484,14 +484,14 @@ export const database = {
         
         // 배열의 첫 번째 요소 반환 (가장 최신 신청서)
         const result = data && data.length > 0 ? data[0] : null
-        console.log('기존 신청서 조회 결과:', result)
+        console.log('기존 신청서 조회 결과:', result ? '있음' : '없음')
         return result
       })
     },
 
     async create(applicationData) {
       return safeQuery(async () => {
-        console.log('Application 생성 시작 - applications 테이블 사용:', applicationData)
+        console.log('Application 생성 시작 - applications 테이블 사용')
         const { data, error } = await supabase
           .from('applications')
           .insert([applicationData])
@@ -503,7 +503,7 @@ export const database = {
           throw error
         }
         
-        console.log('Application 생성 성공:', data)
+        console.log('Application 생성 성공')
         return data
       })
     },
@@ -556,14 +556,14 @@ export const database = {
           throw error
         }
         
-        console.log('상태 업데이트 성공:', data)
+        console.log('상태 업데이트 성공')
         return data && data.length > 0 ? data[0] : null
       })
     },
 
     async update(id, updateData) {
       return safeQuery(async () => {
-        console.log('신청서 업데이트 시작:', id, updateData)
+        console.log('신청서 업데이트 시작:', id)
         
         // applications 테이블을 우선 사용 (실제 데이터가 있는 테이블)
         let { data, error } = await supabase
@@ -596,7 +596,7 @@ export const database = {
           throw error
         }
         
-        console.log('신청서 업데이트 성공:', data)
+        console.log('신청서 업데이트 성공')
         return data && data.length > 0 ? data[0] : null
       })
     },
@@ -708,7 +708,7 @@ export const database = {
 
     async upsert(profileData) {
       return safeQuery(async () => {
-        console.log('Upsert 시작:', profileData)
+        console.log('Upsert 시작')
 
         // id 필드가 반드시 있어야 함 (auth user id)
         if (!profileData.id) {
@@ -828,7 +828,7 @@ export const database = {
 
     async update(userId, updateData) {
       return safeQuery(async () => {
-        console.log('사용자 프로필 업데이트:', { userId, updateData })
+        console.log('사용자 프로필 업데이트 시작')
         
         // user_id로 먼저 시도
         let { data, error } = await supabase
@@ -862,7 +862,7 @@ export const database = {
           throw error
         }
         
-        console.log('프로필 업데이트 성공:', data)
+        console.log('프로필 업데이트 성공')
         return data && data.length > 0 ? data[0] : null
       })
     }
@@ -990,7 +990,7 @@ export const database = {
 
     async create(withdrawalData) {
       return safeQuery(async () => {
-        console.log('출금 신청 데이터:', withdrawalData)
+        console.log('출금 신청 시작')
         
         // withdrawal_requests 테이블에 맞는 데이터 구조
         const insertData = {
@@ -1003,7 +1003,7 @@ export const database = {
           status: 'pending'
         }
         
-        console.log('삽입할 데이터:', insertData)
+        console.log('출금 데이터 삽입 시작')
         
         const { data, error } = await supabase
           .from('withdrawal_requests')
@@ -1015,7 +1015,7 @@ export const database = {
           throw error
         }
         
-        console.log('출금 신청 성공:', data)
+        console.log('출금 신청 성공')
         return data && data.length > 0 ? data[0] : null
       })
     },
@@ -1049,7 +1049,7 @@ export const database = {
   userPoints: {
     async getUserTotalPoints(userId) {
       return safeQuery(async () => {
-        console.log('포인트 조회 시작 - 사용자 ID:', userId)
+        console.log('포인트 조회 시작')
         
         // point_transactions 테이블에서 포인트 합계 계산
         const { data, error } = await supabase
@@ -1062,7 +1062,7 @@ export const database = {
           throw error
         }
         
-        console.log('포인트 트랜잭션 데이터:', data)
+        console.log('포인트 트랜잭션 조회 완료:', data?.length || 0, '건')
         
         // 모든 트랜잭션의 합계 계산 (양수는 적립, 음수는 차감)
         const totalPoints = (data || []).reduce((sum, record) => sum + (record.amount || 0), 0)
@@ -1074,7 +1074,7 @@ export const database = {
 
     async getUserPoints(userId) {
       return safeQuery(async () => {
-        console.log('포인트 내역 조회 - 사용자 ID:', userId)
+        console.log('포인트 내역 조회 시작')
         
         // point_transactions 테이블에서 포인트 내역 조회
         const { data, error } = await supabase
@@ -1088,14 +1088,14 @@ export const database = {
           throw error
         }
         
-        console.log('포인트 내역:', data)
+        console.log('포인트 내역 조회 완료:', data?.length || 0, '건')
         return data || []
       })
     },
 
     async deductPoints(userId, amount, reason = '出金申請') {
       return safeQuery(async () => {
-        console.log('포인트 차감:', { userId, amount, reason })
+        console.log('포인트 차감 시작')
         
         // point_transactions 테이블에 차감 기록 추가 (음수로 저장)
         const { data, error } = await supabase
@@ -1114,7 +1114,7 @@ export const database = {
           throw error
         }
         
-        console.log('포인트 차감 완료:', data)
+        console.log('포인트 차감 완료')
         return data && data.length > 0 ? data[0] : null
       })
     },
@@ -1122,7 +1122,7 @@ export const database = {
     // 한국 출금 신청 (포인트 차감 + withdrawals 테이블 저장 + 거래 내역 생성)
     async requestWithdrawal({ user_id, amount, bank_name, bank_account_number, bank_account_holder, resident_number_encrypted }) {
       return safeQuery(async () => {
-        console.log('출금 신청:', { user_id, amount, bank_name })
+        console.log('출금 신청 시작')
 
         // 주민번호 필수 체크
         if (!resident_number_encrypted) {
@@ -1196,7 +1196,7 @@ export const database = {
           // 트랜잭션 기록 실패해도 출금 신청은 유지
         }
 
-        console.log('출금 신청 완료:', { withdrawal: withdrawalData, transaction: txData })
+        console.log('출금 신청 완료')
         return {
           success: true,
           withdrawal: withdrawalData && withdrawalData.length > 0 ? withdrawalData[0] : null,

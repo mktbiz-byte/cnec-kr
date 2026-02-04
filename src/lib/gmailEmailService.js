@@ -74,7 +74,7 @@ class GmailEmailService {
       const response = await this.sendViaGmailAPI(emailData)
       
       if (response.success) {
-        console.log('✅ Gmail 발송 성공:', response)
+        console.log('✅ Gmail 발송 성공')
         return {
           success: true,
           messageId: response.messageId || `gmail_${Date.now()}`,

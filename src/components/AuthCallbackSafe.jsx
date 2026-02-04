@@ -69,7 +69,7 @@ const AuthCallbackSafe = () => {
           }
 
           if (sessionData?.session) {
-            console.log('Session found:', sessionData.session.user.email)
+            console.log('Session found')
             setStatus('success')
             setMessage('로그인이 완료되었습니다.')
 
