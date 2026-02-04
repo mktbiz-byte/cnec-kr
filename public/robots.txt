@@ -1,25 +1,6 @@
-# Block all search engines
+# Allow crawling so search engines can read noindex meta tags
+# (Disallow prevents crawlers from seeing noindex, causing URLs to remain in search results)
 User-agent: *
-Disallow: /
+Allow: /
 
-# Block specific bots
-User-agent: Googlebot
-Disallow: /
-
-User-agent: Bingbot
-Disallow: /
-
-User-agent: Yeti
-Disallow: /
-
-User-agent: Naverbot
-Disallow: /
-
-User-agent: Daumoa
-Disallow: /
-
-User-agent: Baiduspider
-Disallow: /
-
-User-agent: YandexBot
-Disallow: /
+# No sitemap

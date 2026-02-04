@@ -12,10 +12,11 @@
   to = "/index.html"
   status = 200
 
-# 보안 헤더
+# 보안 헤더 + 검색엔진 인덱싱 차단
 [[headers]]
   for = "/*"
   [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
