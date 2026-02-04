@@ -324,6 +324,23 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
     return `${amount.toLocaleString()}P`
   }
 
+  const formatShortDate = (dateStr) => {
+    if (!dateStr) return null
+    const date = new Date(dateStr)
+    return `${date.getMonth() + 1}/${date.getDate()}`
+  }
+
+  // 캠페인 타입에 따른 최종 영상 마감일 계산
+  const getVideoDeadline = (campaign) => {
+    if (campaign.campaign_type === '4week_challenge') {
+      return campaign.week4_deadline || campaign.week3_deadline || campaign.week2_deadline || campaign.week1_deadline
+    }
+    if (campaign.campaign_type === 'oliveyoung') {
+      return campaign.step3_deadline || campaign.step2_deadline || campaign.step1_deadline
+    }
+    return campaign.content_submission_deadline
+  }
+
   const getCategoryColor = (type) => {
     switch (type) {
       case 'oliveyoung': return 'bg-green-100 text-green-700'
@@ -607,6 +624,26 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
                       {campaign.title}
                     </h4>
                   </div>
+                  {/* 마감일 정보 */}
+                  {(campaign.application_deadline || getVideoDeadline(campaign) || campaign.end_date) && (
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+                      {campaign.application_deadline && (
+                        <span className="text-[11px] text-gray-400">
+                          모집 ~{formatShortDate(campaign.application_deadline)}
+                        </span>
+                      )}
+                      {getVideoDeadline(campaign) && (
+                        <span className="text-[11px] text-gray-400">
+                          영상 ~{formatShortDate(getVideoDeadline(campaign))}
+                        </span>
+                      )}
+                      {campaign.end_date && (
+                        <span className="text-[11px] text-gray-400">
+                          업로드 ~{formatShortDate(campaign.end_date)}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <div className="flex justify-between items-center mt-2">
                     <span className="font-extrabold text-gray-900 text-lg">
                       {formatCurrency(campaign.creator_points_override || campaign.reward_points)}

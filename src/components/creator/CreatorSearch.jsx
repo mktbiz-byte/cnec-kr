@@ -305,6 +305,17 @@ const CreatorSearch = ({ onCampaignClick }) => {
     return `${date.getMonth() + 1}/${date.getDate()}`
   }
 
+  // 캠페인 타입에 따른 최종 영상 마감일 계산
+  const getVideoDeadline = (campaign) => {
+    if (campaign.campaign_type === '4week_challenge') {
+      return campaign.week4_deadline || campaign.week3_deadline || campaign.week2_deadline || campaign.week1_deadline
+    }
+    if (campaign.campaign_type === 'oliveyoung') {
+      return campaign.step3_deadline || campaign.step2_deadline || campaign.step1_deadline
+    }
+    return campaign.content_submission_deadline
+  }
+
   return (
     <div className="pb-20">
       {/* 카테고리 탭 - 고정형 (스크롤 없음) */}
@@ -447,11 +458,25 @@ const CreatorSearch = ({ onCampaignClick }) => {
                     </span>
                   </div>
 
-                  {/* 기간 */}
-                  {campaign.application_deadline && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      ~{formatDeadlineRange(campaign.application_deadline)}까지
-                    </p>
+                  {/* 마감일 */}
+                  {(campaign.application_deadline || getVideoDeadline(campaign) || campaign.end_date) && (
+                    <div className="flex flex-wrap gap-x-3 gap-y-0 mt-1">
+                      {campaign.application_deadline && (
+                        <span className="text-[11px] text-gray-400">
+                          모집 ~{formatDeadlineRange(campaign.application_deadline)}
+                        </span>
+                      )}
+                      {getVideoDeadline(campaign) && (
+                        <span className="text-[11px] text-gray-400">
+                          영상 ~{formatDeadlineRange(getVideoDeadline(campaign))}
+                        </span>
+                      )}
+                      {campaign.end_date && (
+                        <span className="text-[11px] text-gray-400">
+                          업로드 ~{formatDeadlineRange(campaign.end_date)}
+                        </span>
+                      )}
+                    </div>
                   )}
 
                   {/* 지원완료 표시 */}
