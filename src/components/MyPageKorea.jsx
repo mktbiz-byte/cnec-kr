@@ -301,7 +301,7 @@ const MyPageKorea = () => {
       setError('')
 
       // 입력 검증
-      if (!withdrawForm.amount || !withdrawForm.bankName || !withdrawForm.bankAccountNumber || 
+      if (!withdrawForm.amount || !withdrawForm.bankName || !withdrawForm.bankAccountNumber ||
           !withdrawForm.bankAccountHolder || !withdrawForm.residentNumber) {
         setError('모든 필수 항목을 입력해주세요.')
         setProcessing(false)
@@ -317,6 +317,28 @@ const MyPageKorea = () => {
 
       if (amount > profile.points) {
         setError('보유 포인트가 부족합니다.')
+        setProcessing(false)
+        return
+      }
+
+      // 제출 직전 최신 포인트 잔액 재확인
+      const { data: latestProfile, error: profileCheckError } = await supabase
+        .from('user_profiles')
+        .select('points')
+        .eq('id', user.id)
+        .single()
+
+      if (profileCheckError) {
+        setError('포인트 조회에 실패했습니다. 다시 시도해주세요.')
+        setProcessing(false)
+        return
+      }
+
+      const latestPoints = latestProfile?.points || 0
+      if (amount > latestPoints) {
+        setError(`보유 포인트가 부족합니다. 현재 보유: ${latestPoints.toLocaleString()}포인트`)
+        // 화면의 포인트 정보도 업데이트
+        setProfile(prev => ({ ...prev, points: latestPoints }))
         setProcessing(false)
         return
       }

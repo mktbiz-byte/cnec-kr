@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { database } from '../lib/supabase'
+import { database, supabase } from '../lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -50,8 +50,29 @@ const WithdrawalModal = ({ isOpen, onClose, userId, availablePoints, onSuccess }
     try {
       setLoading(true)
       setError('')
-      
-      // 출금 신청 데이터 생성
+
+      // 제출 직전 최신 포인트 잔액 재확인
+      const { data: latestProfile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('points')
+        .eq('id', userId)
+        .single()
+
+      if (profileError) {
+        setError(language === 'ko' ? '포인트 조회에 실패했습니다.' : 'ポイントの照会に失敗しました。')
+        return
+      }
+
+      const latestPoints = latestProfile?.points || 0
+      if (parseInt(amount) > latestPoints) {
+        setError(language === 'ko'
+          ? `보유 포인트가 부족합니다. 현재 보유: ${latestPoints.toLocaleString()}포인트`
+          : `保有ポイントが不足しています。現在の保有: ${latestPoints.toLocaleString()}ポイント`
+        )
+        return
+      }
+
+      // 출금 신청 데이터 생성 (서버에서도 잔액 재검증)
       await database.withdrawals.create({
         user_id: userId,
         amount: parseInt(amount),

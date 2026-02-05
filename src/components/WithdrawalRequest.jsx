@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLanguage } from '../contexts/LanguageContext'
-import { database } from '../lib/supabase'
+import { database, supabase } from '../lib/supabase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -120,7 +120,32 @@ const WithdrawalRequest = ({ availablePoints, onClose, onSuccess }) => {
     try {
       setLoading(true)
       setError('')
-      
+
+      // 제출 직전 최신 포인트 잔액 재확인
+      const { data: latestProfile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('points')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError) {
+        setError(language === 'ko' ? '포인트 조회에 실패했습니다.' : 'ポイントの照会に失敗しました。')
+        setLoading(false)
+        return
+      }
+
+      const latestPoints = latestProfile?.points || 0
+      const requestAmount = parseInt(formData.amount)
+
+      if (requestAmount > latestPoints) {
+        setError(language === 'ko'
+          ? `보유 포인트가 부족합니다. 현재 보유: ${latestPoints.toLocaleString()}포인트`
+          : `保有ポイントが不足しています。現在の保有: ${latestPoints.toLocaleString()}ポイント`
+        )
+        setLoading(false)
+        return
+      }
+
       const withdrawalData = {
         user_id: user.id,
         amount: parseInt(formData.amount),
