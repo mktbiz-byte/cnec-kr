@@ -175,6 +175,35 @@ const PointsPage = () => {
       return
     }
 
+    // 제출 직전 최신 포인트 잔액 재확인
+    try {
+      const { data: latestProfile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('points')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError) {
+        setError('포인트 조회에 실패했습니다. 다시 시도해주세요.')
+        return
+      }
+
+      const latestPoints = latestProfile?.points || 0
+      if (amount > latestPoints) {
+        setError(`보유 포인트가 부족합니다. 현재 보유: ${latestPoints.toLocaleString()}원`)
+        // 화면의 포인트 정보도 업데이트
+        setPointStats(prev => ({
+          ...prev,
+          totalPoints: latestPoints,
+          withdrawablePoints: latestPoints
+        }))
+        return
+      }
+    } catch (err) {
+      setError('포인트 확인 중 오류가 발생했습니다.')
+      return
+    }
+
     if (!profile?.bank_name || !profile?.account_number) {
       setError('계좌 정보를 먼저 등록해주세요')
       return

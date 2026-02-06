@@ -991,30 +991,92 @@ export const database = {
     async create(withdrawalData) {
       return safeQuery(async () => {
         console.log('출금 신청 데이터:', withdrawalData)
-        
-        // withdrawal_requests 테이블에 맞는 데이터 구조
+
+        // 1. 서버사이드 잔액 검증 - 실제 보유 포인트 확인
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('points')
+          .eq('id', withdrawalData.user_id)
+          .single()
+
+        if (profileError) {
+          console.error('포인트 조회 오류:', profileError)
+          throw new Error('포인트 조회에 실패했습니다')
+        }
+
+        const currentPoints = profileData?.points || 0
+        const requestAmount = parseInt(withdrawalData.amount)
+
+        if (isNaN(requestAmount) || requestAmount <= 0) {
+          throw new Error('유효하지 않은 출금 금액입니다')
+        }
+
+        if (currentPoints < requestAmount) {
+          throw new Error(`보유 포인트가 부족합니다. 보유: ${currentPoints.toLocaleString()}, 요청: ${requestAmount.toLocaleString()}`)
+        }
+
+        // 2. 포인트 차감 (atomic guard: gte로 DB 레벨에서 재검증)
+        const newPoints = currentPoints - requestAmount
+        const { data: updateData, error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ points: newPoints, updated_at: new Date().toISOString() })
+          .eq('id', withdrawalData.user_id)
+          .gte('points', requestAmount)
+          .select()
+
+        if (updateError) {
+          console.error('포인트 차감 오류:', updateError)
+          throw new Error('포인트 차감에 실패했습니다')
+        }
+
+        if (!updateData || updateData.length === 0) {
+          throw new Error('보유 포인트가 부족합니다. 다시 확인해주세요.')
+        }
+
+        // 3. withdrawal_requests 테이블에 출금 신청 저장
         const insertData = {
           user_id: withdrawalData.user_id,
-          amount: withdrawalData.amount,
+          amount: requestAmount,
           withdrawal_method: 'paypal',
           paypal_email: withdrawalData.paypal_email,
           paypal_name: withdrawalData.paypal_name,
           reason: withdrawalData.reason || 'ポイント出金申請',
           status: 'pending'
         }
-        
+
         console.log('삽입할 데이터:', insertData)
-        
+
         const { data, error } = await supabase
           .from('withdrawal_requests')
           .insert([insertData])
           .select()
-          
+
         if (error) {
           console.error('출금 신청 삽입 오류:', error)
+          // 출금 신청 실패 시 포인트 복구
+          await supabase
+            .from('user_profiles')
+            .update({ points: currentPoints })
+            .eq('id', withdrawalData.user_id)
           throw error
         }
-        
+
+        // 4. point_transactions에 출금 기록 추가
+        const { error: txError } = await supabase
+          .from('point_transactions')
+          .insert([{
+            user_id: withdrawalData.user_id,
+            amount: -requestAmount,
+            transaction_type: 'withdraw',
+            description: `[出金申請] ${requestAmount.toLocaleString()} | PayPal: ${withdrawalData.paypal_email}`,
+            related_withdrawal_id: data?.[0]?.id || null
+          }])
+
+        if (txError) {
+          console.error('point_transactions 저장 실패:', txError)
+          // 트랜잭션 기록 실패해도 출금 신청은 유지
+        }
+
         console.log('출금 신청 성공:', data)
         return data && data.length > 0 ? data[0] : null
       })
@@ -1124,6 +1186,12 @@ export const database = {
       return safeQuery(async () => {
         console.log('출금 신청:', { user_id, amount, bank_name })
 
+        // 금액 유효성 검증
+        const requestAmount = parseInt(amount)
+        if (isNaN(requestAmount) || requestAmount <= 0) {
+          throw new Error('유효하지 않은 출금 금액입니다')
+        }
+
         // 주민번호 필수 체크
         if (!resident_number_encrypted) {
           throw new Error('주민등록번호가 필요합니다')
@@ -1139,25 +1207,32 @@ export const database = {
         if (profileError) throw profileError
 
         const currentPoints = profileData?.points || 0
-        if (currentPoints < amount) {
-          throw new Error('보유 포인트가 부족합니다')
+        if (currentPoints < requestAmount) {
+          throw new Error(`보유 포인트가 부족합니다. 보유: ${currentPoints.toLocaleString()}원, 요청: ${requestAmount.toLocaleString()}원`)
         }
 
-        // 2. 포인트 차감
-        const newPoints = currentPoints - amount
-        const { error: updateError } = await supabase
+        // 2. 포인트 차감 (atomic guard: gte로 DB 레벨에서 동시 요청 방어)
+        const newPoints = currentPoints - requestAmount
+        const { data: updateData, error: updateError } = await supabase
           .from('user_profiles')
-          .update({ points: newPoints })
+          .update({ points: newPoints, updated_at: new Date().toISOString() })
           .eq('id', user_id)
+          .gte('points', requestAmount)
+          .select()
 
         if (updateError) throw updateError
+
+        // gte 조건에 의해 업데이트가 되지 않은 경우 (동시 요청으로 잔액 부족)
+        if (!updateData || updateData.length === 0) {
+          throw new Error('보유 포인트가 부족합니다. 다시 확인해주세요.')
+        }
 
         // 3. withdrawals 테이블에 출금 신청 저장
         const { data: withdrawalData, error: withdrawalError } = await supabase
           .from('withdrawals')
           .insert([{
             user_id: user_id,
-            amount: amount,
+            amount: requestAmount,
             bank_name: bank_name,
             bank_account_number: bank_account_number,
             bank_account_holder: bank_account_holder,
@@ -1178,13 +1253,13 @@ export const database = {
         }
 
         // 4. point_transactions에 출금 신청 기록
-        const description = `[출금신청] ${amount.toLocaleString()}원 | ${bank_name} ${bank_account_number} (${bank_account_holder})`
+        const description = `[출금신청] ${requestAmount.toLocaleString()}원 | ${bank_name} ${bank_account_number} (${bank_account_holder})`
 
         const { data: txData, error: txError } = await supabase
           .from('point_transactions')
           .insert([{
             user_id: user_id,
-            amount: -amount,
+            amount: -requestAmount,
             transaction_type: 'withdraw',
             description: description,
             related_withdrawal_id: withdrawalData?.[0]?.id || null

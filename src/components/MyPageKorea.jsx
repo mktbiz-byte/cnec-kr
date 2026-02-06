@@ -174,10 +174,30 @@ const MyPageKorea = () => {
             .select('id, title, image_url, reward_points, campaign_type, is_oliveyoung_sale')
             .in('id', campaignIds)
 
-          // 캠페인 데이터 병합
+          // main_channel 조회 (기업이 선정 시 저장한 업로드 플랫폼)
+          const userEmail = profileData?.email || user?.email
+          let mainChannelMap = {}
+          if (userEmail) {
+            const { data: channelData } = await supabase
+              .from('applications')
+              .select('campaign_id, main_channel')
+              .in('campaign_id', campaignIds)
+              .or(`applicant_email.eq.${userEmail},email.eq.${userEmail}`)
+
+            if (channelData) {
+              channelData.forEach(item => {
+                if (item.main_channel) {
+                  mainChannelMap[item.campaign_id] = item.main_channel
+                }
+              })
+            }
+          }
+
+          // 캠페인 데이터 + main_channel 병합
           applicationsData = applicationsData.map(app => ({
             ...app,
-            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
+            campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null,
+            main_channel: app.main_channel || mainChannelMap[app.campaign_id] || null
           }))
         }
       }
@@ -301,7 +321,7 @@ const MyPageKorea = () => {
       setError('')
 
       // 입력 검증
-      if (!withdrawForm.amount || !withdrawForm.bankName || !withdrawForm.bankAccountNumber || 
+      if (!withdrawForm.amount || !withdrawForm.bankName || !withdrawForm.bankAccountNumber ||
           !withdrawForm.bankAccountHolder || !withdrawForm.residentNumber) {
         setError('모든 필수 항목을 입력해주세요.')
         setProcessing(false)
@@ -317,6 +337,28 @@ const MyPageKorea = () => {
 
       if (amount > profile.points) {
         setError('보유 포인트가 부족합니다.')
+        setProcessing(false)
+        return
+      }
+
+      // 제출 직전 최신 포인트 잔액 재확인
+      const { data: latestProfile, error: profileCheckError } = await supabase
+        .from('user_profiles')
+        .select('points')
+        .eq('id', user.id)
+        .single()
+
+      if (profileCheckError) {
+        setError('포인트 조회에 실패했습니다. 다시 시도해주세요.')
+        setProcessing(false)
+        return
+      }
+
+      const latestPoints = latestProfile?.points || 0
+      if (amount > latestPoints) {
+        setError(`보유 포인트가 부족합니다. 현재 보유: ${latestPoints.toLocaleString()}포인트`)
+        // 화면의 포인트 정보도 업데이트
+        setProfile(prev => ({ ...prev, points: latestPoints }))
         setProcessing(false)
         return
       }
@@ -445,8 +487,8 @@ const MyPageKorea = () => {
       setProcessing(true)
       setError('')
 
-      // 폴더 경로 생성: creator-videos/{user_id}/{campaign_id}/{step}/
-      const folderPath = `${user.id}/${selectedApplication.campaign_id}/${step}`
+      // 폴더 경로 생성: campaign-videos/creator-uploads/{user_id}/{campaign_id}/{step}/
+      const folderPath = `creator-uploads/${user.id}/${selectedApplication.campaign_id}/${step}`
 
       // 각 파일 업로드
       const uploadPromises = files.map(async (file) => {
@@ -455,7 +497,7 @@ const MyPageKorea = () => {
         const filePath = `${folderPath}/${fileName}`
 
         const { error: uploadError } = await supabase.storage
-          .from('creator-videos')
+          .from('campaign-videos')
           .upload(filePath, file, {
             cacheControl: '3600',
             upsert: false
@@ -649,6 +691,29 @@ const MyPageKorea = () => {
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
         {config.label}
       </span>
+    )
+  }
+
+  // 업로드 플랫폼 배지 컴포넌트
+  const PlatformBadge = ({ platform }) => {
+    if (!platform) return null
+
+    const platformConfig = {
+      instagram: { label: 'Instagram', icon: '📸', color: 'bg-pink-100 text-pink-700' },
+      youtube: { label: 'YouTube', icon: '📺', color: 'bg-red-100 text-red-700' },
+      tiktok: { label: 'TikTok', icon: '🎵', color: 'bg-gray-100 text-gray-700' }
+    }
+
+    const config = platformConfig[platform.toLowerCase()]
+    if (!config) return null
+
+    return (
+      <div className="mt-2 flex items-center gap-1.5">
+        <span className="text-xs text-gray-500">업로드 플랫폼:</span>
+        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+          {config.icon} {config.label}
+        </span>
+      </div>
     )
   }
 
@@ -1072,7 +1137,12 @@ const MyPageKorea = () => {
                             <span>지원일: {new Date(app.created_at).toLocaleDateString('ko-KR')}</span>
                             <StatusBadge status={app.status} />
                           </div>
-                          
+
+                          {/* 선정된 캠페인에 업로드 플랫폼 표시 */}
+                          {(app.status === 'selected' || app.status === 'approved' || app.status === 'sns_uploaded' || app.status === 'completed') && (
+                            <PlatformBadge platform={app.main_channel} />
+                          )}
+
                           {app.status === 'selected' && !app.sns_upload_url && (
                             <button
                               onClick={() => {
