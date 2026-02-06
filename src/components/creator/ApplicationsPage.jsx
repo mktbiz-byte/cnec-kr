@@ -665,8 +665,8 @@ const ApplicationsPage = () => {
       setProcessing(true)
       setError('')
 
-      // 폴더 경로 생성: creator-videos/{user_id}/{campaign_id}/{step}/
-      const folderPath = `${user.id}/${selectedApplication.campaign_id}/${step}`
+      // 폴더 경로 생성: campaign-videos/creator-uploads/{user_id}/{campaign_id}/{step}/
+      const folderPath = `creator-uploads/${user.id}/${selectedApplication.campaign_id}/${step}`
 
       // 각 파일 업로드
       const uploadPromises = files.map(async (file) => {
@@ -675,7 +675,7 @@ const ApplicationsPage = () => {
         const filePath = `${folderPath}/${fileName}`
 
         const { error: uploadError } = await supabase.storage
-          .from('creator-videos')
+          .from('campaign-videos')
           .upload(filePath, file, {
             cacheControl: '3600',
             upsert: false
