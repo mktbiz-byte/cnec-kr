@@ -112,3 +112,4 @@ temp/
 # Deployment files
 *.zip
 *.backup
+create_admin_account.js
