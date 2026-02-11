@@ -403,7 +403,7 @@ const CreatorMyPage = () => {
       setWithdrawProcessing(true)
       setError('')
 
-      const amount = parseInt(withdrawAmount.replace(/,/g, ''))
+      const amount = parseInt(withdrawAmount.replace(/[^0-9]/g, ''))
 
       // 유효성 검사
       if (!amount || amount < 10000) {
@@ -1425,7 +1425,7 @@ const CreatorMyPage = () => {
                   onChange={(e) => {
                     const value = e.target.value.replace(/[^0-9]/g, '')
                     if (value) {
-                      setWithdrawAmount(parseInt(value).toLocaleString())
+                      setWithdrawAmount(parseInt(value).toLocaleString('ko-KR'))
                     } else {
                       setWithdrawAmount('')
                     }
