@@ -661,6 +661,13 @@ const ApplicationsPage = () => {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
 
+    // 파일 크기 체크 (2GB)
+    const oversizedFile = files.find(file => file.size > 2 * 1024 * 1024 * 1024)
+    if (oversizedFile) {
+      setError('파일 크기는 2GB 이하여야 합니다.')
+      return
+    }
+
     try {
       setProcessing(true)
       setError('')
@@ -750,9 +757,9 @@ const ApplicationsPage = () => {
   const handleCleanVideoSelect = (e, key = 'general') => {
     const file = e.target.files[0]
     if (file) {
-      // 파일 크기 체크 (500MB)
-      if (file.size > 500 * 1024 * 1024) {
-        setError('파일 크기는 500MB 이하여야 합니다.')
+      // 파일 크기 체크 (2GB)
+      if (file.size > 2 * 1024 * 1024 * 1024) {
+        setError('파일 크기는 2GB 이하여야 합니다.')
         return
       }
       const fieldName = key === 'general' ? 'clean_video_file' : `${key}_clean_video_file`
@@ -2908,7 +2915,7 @@ const ApplicationsPage = () => {
                       <div className="flex flex-col items-center justify-center pt-2 pb-2">
                         <Upload size={24} className="text-red-400 mb-1" />
                         <p className="text-xs text-red-600 font-medium">클린본 영상 선택</p>
-                        <p className="text-[10px] text-gray-400">MP4, MOV (최대 500MB)</p>
+                        <p className="text-[10px] text-gray-400">MP4, MOV (최대 2GB)</p>
                       </div>
                       <input
                         type="file"
