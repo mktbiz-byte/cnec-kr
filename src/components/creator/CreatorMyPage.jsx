@@ -8,7 +8,7 @@ import {
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
   ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift,
-  Crown, Sparkles
+  Crown, Sparkles, BookOpen
 } from 'lucide-react'
 
 // 등급 설정
@@ -138,7 +138,7 @@ const CreatorMyPage = () => {
         if (campaignIds.length > 0) {
           const { data: campaignsData } = await supabase
             .from('campaigns')
-            .select('id, title, brand, image_url, reward_points, creator_points_override, content_submission_deadline, campaign_type')
+            .select('*')
             .in('id', campaignIds)
 
           // 캠페인 데이터 병합
@@ -403,7 +403,7 @@ const CreatorMyPage = () => {
       setWithdrawProcessing(true)
       setError('')
 
-      const amount = parseInt(withdrawAmount.replace(/,/g, ''))
+      const amount = parseInt(withdrawAmount.replace(/[^0-9]/g, ''))
 
       // 유효성 검사
       if (!amount || amount < 10000) {
@@ -544,6 +544,65 @@ const CreatorMyPage = () => {
       inProgress: applications.filter(a => ['filming', 'video_submitted', 'sns_uploaded'].includes(a.status)).length,
       completed: applications.filter(a => ['completed', 'paid'].includes(a.status)).length
     }
+  }
+
+  // 가이드 데이터 해결 함수: guide_group이 있으면 guide_group_data[그룹] 우선, 없으면 기존 가이드 사용
+  const resolveGuideData = (app) => {
+    const campaign = app.campaigns
+    if (!campaign) return null
+
+    // guide_group이 설정된 경우, guide_group_data에서 그룹별 가이드를 우선 사용
+    if (app.guide_group && campaign.guide_group_data) {
+      let groupData = campaign.guide_group_data
+      if (typeof groupData === 'string') {
+        try { groupData = JSON.parse(groupData) } catch(e) { groupData = null }
+      }
+      if (groupData && groupData[app.guide_group]) {
+        return {
+          type: 'group',
+          groupName: app.guide_group,
+          guideData: groupData[app.guide_group]
+        }
+      }
+    }
+
+    // 기획형 캠페인
+    if (campaign.campaign_type === 'planned') {
+      if (campaign.guide_delivery_mode === 'external' && (campaign.external_guide_url || campaign.external_guide_file_url)) {
+        return { type: 'planned_external' }
+      }
+      if (app.personalized_guide) {
+        return { type: 'planned_personalized' }
+      }
+    }
+
+    // 올리브영 캠페인
+    if (campaign.campaign_type === 'oliveyoung') {
+      const hasExternalSteps = campaign.step1_guide_mode === 'external' || campaign.step2_guide_mode === 'external' || campaign.step3_guide_mode === 'external'
+      const hasAiSteps = campaign.oliveyoung_step1_guide_ai || campaign.oliveyoung_step1_guide ||
+                         campaign.oliveyoung_step2_guide_ai || campaign.oliveyoung_step2_guide ||
+                         campaign.oliveyoung_step3_guide_ai || campaign.oliveyoung_step3_guide
+      if (hasExternalSteps || hasAiSteps) {
+        return { type: 'oliveyoung' }
+      }
+    }
+
+    // 4주 챌린지 캠페인
+    if (campaign.campaign_type === '4week_challenge') {
+      const hasExternalWeeks = campaign.week1_guide_mode === 'external' || campaign.week2_guide_mode === 'external' ||
+                               campaign.week3_guide_mode === 'external' || campaign.week4_guide_mode === 'external'
+      const hasAiWeeks = campaign.challenge_weekly_guides_ai
+      if (hasExternalWeeks || hasAiWeeks) {
+        return { type: '4week_challenge' }
+      }
+    }
+
+    // 일반 캠페인 AI 가이드
+    if (campaign.ai_generated_guide) {
+      return { type: 'general' }
+    }
+
+    return null
   }
 
   const counts = getCampaignCounts()
@@ -1011,6 +1070,9 @@ const CreatorMyPage = () => {
                   paid: { color: 'bg-green-100 text-green-700', label: '정산완료' }
                 }
                 const status = statusMap[app.status] || { color: 'bg-gray-100 text-gray-600', label: app.status }
+                const guideInfo = ['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status)
+                  ? resolveGuideData(app)
+                  : null
 
                 return (
                   <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm">
@@ -1032,6 +1094,28 @@ const CreatorMyPage = () => {
                         <p className="font-bold text-gray-900">{formatCurrency(app.campaigns?.creator_points_override || app.campaigns?.reward_points)}</p>
                       </div>
                     </div>
+                    {/* 촬영 가이드 버튼 - 선정 이후 상태에서 가이드가 있는 경우 표시 */}
+                    {guideInfo && (
+                      <div className="mt-3">
+                        <button
+                          onClick={() => navigate('/my/applications')}
+                          className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                            guideInfo.type === 'group'
+                              ? 'bg-violet-600 text-white hover:bg-violet-700'
+                              : guideInfo.type === 'oliveyoung'
+                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              : guideInfo.type === '4week_challenge'
+                              ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                              : 'bg-purple-600 text-white hover:bg-purple-700'
+                          }`}
+                        >
+                          <BookOpen size={14} />
+                          {guideInfo.type === 'group'
+                            ? `촬영 가이드 보기 (${guideInfo.groupName})`
+                            : '촬영 가이드 보기'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )
               })
@@ -1341,7 +1425,7 @@ const CreatorMyPage = () => {
                   onChange={(e) => {
                     const value = e.target.value.replace(/[^0-9]/g, '')
                     if (value) {
-                      setWithdrawAmount(parseInt(value).toLocaleString())
+                      setWithdrawAmount(parseInt(value).toLocaleString('ko-KR'))
                     } else {
                       setWithdrawAmount('')
                     }

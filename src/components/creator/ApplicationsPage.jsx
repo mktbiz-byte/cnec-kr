@@ -1380,8 +1380,78 @@ const ApplicationsPage = () => {
                   {/* completed/paid 상태에서도 영상/SNS 수정 가능 */}
                   {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
-                      {/* 기획형 캠페인 가이드 */}
-                      {app.campaigns?.campaign_type === 'planned' && (
+                      {/* 그룹 가이드 우선 표시: guide_group이 설정된 경우 guide_group_data에서 해당 그룹의 가이드를 표시 */}
+                      {(() => {
+                        if (!app.guide_group || !app.campaigns?.guide_group_data) return null
+                        let groupData = app.campaigns.guide_group_data
+                        if (typeof groupData === 'string') {
+                          try { groupData = JSON.parse(groupData) } catch(e) { return null }
+                        }
+                        const groupGuide = groupData?.[app.guide_group]
+                        if (!groupGuide) return null
+
+                        return (
+                          <div className="bg-violet-50 border border-violet-200 rounded-xl p-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <BookOpen size={14} className="text-violet-600" />
+                              <span className="text-xs font-semibold text-violet-900">
+                                촬영 가이드 ({app.guide_group})
+                              </span>
+                            </div>
+                            {typeof groupGuide === 'string' && (groupGuide.startsWith('http://') || groupGuide.startsWith('https://')) ? (
+                              <a
+                                href={groupGuide}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full py-2 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 flex items-center justify-center gap-1"
+                              >
+                                <ExternalLink size={12} /> 가이드 열기
+                              </a>
+                            ) : typeof groupGuide === 'object' && groupGuide !== null ? (
+                              <button
+                                onClick={() => {
+                                  setSelectedGuide({
+                                    type: 'planned',
+                                    personalized_guide: groupGuide,
+                                    additional_message: app.additional_message,
+                                    campaigns: app.campaigns
+                                  })
+                                  setShowGuideModal(true)
+                                }}
+                                className="w-full py-2 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 flex items-center justify-center gap-1"
+                              >
+                                <Eye size={12} /> 그룹 가이드 보기
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setSelectedGuide({
+                                    type: 'planned',
+                                    personalized_guide: groupGuide,
+                                    additional_message: app.additional_message,
+                                    campaigns: app.campaigns
+                                  })
+                                  setShowGuideModal(true)
+                                }}
+                                className="w-full py-2 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 flex items-center justify-center gap-1"
+                              >
+                                <Eye size={12} /> 그룹 가이드 보기
+                              </button>
+                            )}
+                            {app.status === 'filming' && (
+                              <button
+                                onClick={() => handleVideoUpload(app)}
+                                className="w-full mt-2 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                              >
+                                <Video size={12} /> 영상 업로드
+                              </button>
+                            )}
+                          </div>
+                        )
+                      })()}
+
+                      {/* 기획형 캠페인 가이드 (그룹 가이드가 없는 경우에만 표시) */}
+                      {!app.guide_group && app.campaigns?.campaign_type === 'planned' && (
                         <>
                           {/* 외부 가이드 모드 */}
                           {app.campaigns?.guide_delivery_mode === 'external' && (app.campaigns?.external_guide_url || app.campaigns?.external_guide_file_url) && (
@@ -1447,8 +1517,8 @@ const ApplicationsPage = () => {
                         </>
                       )}
 
-                      {/* 올리브영 캠페인 가이드 */}
-                      {app.campaigns?.campaign_type === 'oliveyoung' && (
+                      {/* 올리브영 캠페인 가이드 (그룹 가이드가 없는 경우에만 표시) */}
+                      {!app.guide_group && app.campaigns?.campaign_type === 'oliveyoung' && (
                         <>
                           {/* 외부 가이드 모드 - step별로 표시 */}
                           {(app.campaigns?.step1_guide_mode === 'external' || app.campaigns?.step2_guide_mode === 'external' || app.campaigns?.step3_guide_mode === 'external') && (
@@ -1550,8 +1620,8 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* 4주 챌린지 캠페인 가이드 */}
-                      {app.campaigns?.campaign_type === '4week_challenge' && (
+                      {/* 4주 챌린지 캠페인 가이드 (그룹 가이드가 없는 경우에만 표시) */}
+                      {!app.guide_group && app.campaigns?.campaign_type === '4week_challenge' && (
                         <>
                           {/* 외부 가이드 모드 - week별로 표시 */}
                           {(app.campaigns?.week1_guide_mode === 'external' || app.campaigns?.week2_guide_mode === 'external' || app.campaigns?.week3_guide_mode === 'external' || app.campaigns?.week4_guide_mode === 'external') && (
@@ -1714,8 +1784,9 @@ const ApplicationsPage = () => {
                         </div>
                       )}
 
-                      {/* 일반 캠페인 - 가이드가 없는 경우 기본 버튼 */}
-                      {!app.personalized_guide &&
+                      {/* 일반 캠페인 - 가이드가 없는 경우 기본 버튼 (그룹 가이드가 없는 경우에만 표시) */}
+                      {!app.guide_group &&
+                       !app.personalized_guide &&
                        !app.campaigns?.oliveyoung_step1_guide_ai &&
                        !app.campaigns?.challenge_weekly_guides_ai &&
                        app.campaigns?.ai_generated_guide && (
@@ -1752,6 +1823,7 @@ const ApplicationsPage = () => {
 
                       {/* 가이드 없이 filming 상태인 경우 기본 업로드 버튼 */}
                       {app.status === 'filming' &&
+                       !app.guide_group &&
                        !app.personalized_guide &&
                        !app.campaigns?.oliveyoung_step1_guide_ai &&
                        !app.campaigns?.challenge_weekly_guides_ai &&
