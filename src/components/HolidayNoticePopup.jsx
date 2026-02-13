@@ -77,6 +77,13 @@ const HolidayNoticePopup = () => {
           </div>
         </div>
 
+        {/* 안내 메시지 */}
+        <div className="mx-5 mb-3 bg-purple-50 rounded-xl px-3.5 py-2.5">
+          <p className="text-xs text-purple-800 leading-relaxed">
+            캠페인 지원 및 캠페인 운영은 자동 진행되오니, 캠페인에 선정되신 크리에이터분들은 캠페인 스케줄에 맞춰 활동 부탁드립니다.
+          </p>
+        </div>
+
         {/* 닫기 버튼 */}
         <div className="px-5 pb-4">
           <button
