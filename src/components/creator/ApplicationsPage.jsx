@@ -661,6 +661,13 @@ const ApplicationsPage = () => {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
 
+    // 파일 크기 체크 (2GB)
+    const oversizedFile = files.find(file => file.size > 2 * 1024 * 1024 * 1024)
+    if (oversizedFile) {
+      setError('파일 크기는 2GB 이하여야 합니다.')
+      return
+    }
+
     try {
       setProcessing(true)
       setError('')
@@ -750,9 +757,9 @@ const ApplicationsPage = () => {
   const handleCleanVideoSelect = (e, key = 'general') => {
     const file = e.target.files[0]
     if (file) {
-      // 파일 크기 체크 (500MB)
-      if (file.size > 500 * 1024 * 1024) {
-        setError('파일 크기는 500MB 이하여야 합니다.')
+      // 파일 크기 체크 (2GB)
+      if (file.size > 2 * 1024 * 1024 * 1024) {
+        setError('파일 크기는 2GB 이하여야 합니다.')
         return
       }
       const fieldName = key === 'general' ? 'clean_video_file' : `${key}_clean_video_file`
@@ -1148,9 +1155,27 @@ const ApplicationsPage = () => {
                       </div>
 
                       <p className="text-xs text-gray-400 mb-0.5">{app.campaigns?.brand}</p>
-                      <p className="font-bold text-gray-900 text-sm line-clamp-2 mb-2">
+                      <p className="font-bold text-gray-900 text-sm line-clamp-2 mb-1">
                         {app.campaigns?.title}
                       </p>
+
+                      {/* 업로드 채널 표시 (선정된 캠페인) */}
+                      {!['pending', 'rejected', 'cancelled'].includes(app.status) && app.main_channel && (
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <span className="text-[10px] text-gray-400">업로드 채널:</span>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            app.main_channel.toLowerCase() === 'instagram' ? 'bg-pink-50 text-pink-600' :
+                            app.main_channel.toLowerCase() === 'youtube' ? 'bg-red-50 text-red-600' :
+                            app.main_channel.toLowerCase() === 'tiktok' ? 'bg-gray-100 text-gray-700' :
+                            'bg-blue-50 text-blue-600'
+                          }`}>
+                            {app.main_channel.toLowerCase() === 'instagram' && '📸 Instagram'}
+                            {app.main_channel.toLowerCase() === 'youtube' && '📺 YouTube'}
+                            {app.main_channel.toLowerCase() === 'tiktok' && '🎵 TikTok'}
+                            {!['instagram', 'youtube', 'tiktok'].includes(app.main_channel.toLowerCase()) && app.main_channel}
+                          </span>
+                        </div>
+                      )}
 
                       {/* 기본 정보 (포인트, 마감일) */}
                       {!['pending', 'rejected', 'cancelled'].includes(app.status) && (
@@ -1914,6 +1939,19 @@ const ApplicationsPage = () => {
                   <p className="text-sm font-bold text-white truncate">{selectedGuide.campaigns?.title}</p>
                 </div>
               </div>
+
+              {/* 업로드 채널 표시 */}
+              {selectedGuide.main_channel && (
+                <div className="mt-3 inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5">
+                  <span className="text-[10px] text-white/70 font-medium">업로드 채널</span>
+                  <span className="text-xs font-bold text-white">
+                    {selectedGuide.main_channel.toLowerCase() === 'instagram' && '📸 Instagram'}
+                    {selectedGuide.main_channel.toLowerCase() === 'youtube' && '📺 YouTube'}
+                    {selectedGuide.main_channel.toLowerCase() === 'tiktok' && '🎵 TikTok'}
+                    {!['instagram', 'youtube', 'tiktok'].includes(selectedGuide.main_channel.toLowerCase()) && selectedGuide.main_channel}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* 스크롤 콘텐츠 영역 */}
@@ -2533,6 +2571,22 @@ const ApplicationsPage = () => {
               <div className="bg-gray-50 rounded-xl p-3">
                 <p className="text-xs text-gray-500">{selectedApplication.campaigns?.brand}</p>
                 <p className="font-semibold text-gray-900 text-sm">{selectedApplication.campaigns?.title}</p>
+                {selectedApplication.main_channel && (
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <span className="text-[10px] text-gray-400">업로드 채널:</span>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      selectedApplication.main_channel.toLowerCase() === 'instagram' ? 'bg-pink-100 text-pink-700' :
+                      selectedApplication.main_channel.toLowerCase() === 'youtube' ? 'bg-red-100 text-red-700' :
+                      selectedApplication.main_channel.toLowerCase() === 'tiktok' ? 'bg-gray-200 text-gray-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {selectedApplication.main_channel.toLowerCase() === 'instagram' && '📸 Instagram'}
+                      {selectedApplication.main_channel.toLowerCase() === 'youtube' && '📺 YouTube'}
+                      {selectedApplication.main_channel.toLowerCase() === 'tiktok' && '🎵 TikTok'}
+                      {!['instagram', 'youtube', 'tiktok'].includes(selectedApplication.main_channel.toLowerCase()) && selectedApplication.main_channel}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* 4주 챌린지: 4개 URL + 4개 광고코드 + 4개 클린본 입력 */}
@@ -2861,7 +2915,7 @@ const ApplicationsPage = () => {
                       <div className="flex flex-col items-center justify-center pt-2 pb-2">
                         <Upload size={24} className="text-red-400 mb-1" />
                         <p className="text-xs text-red-600 font-medium">클린본 영상 선택</p>
-                        <p className="text-[10px] text-gray-400">MP4, MOV (최대 500MB)</p>
+                        <p className="text-[10px] text-gray-400">MP4, MOV (최대 2GB)</p>
                       </div>
                       <input
                         type="file"

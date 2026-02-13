@@ -150,8 +150,8 @@ export default function OliveyoungVideoSubmissionPage() {
     const file = e.target.files[0]
     if (!file) return
 
-    if (file.size > 500 * 1024 * 1024) {
-      setError('파일 크기는 500MB 이하여야 합니다.')
+    if (file.size > 2 * 1024 * 1024 * 1024) {
+      setError('파일 크기는 2GB 이하여야 합니다.')
       return
     }
 

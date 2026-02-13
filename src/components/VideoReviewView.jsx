@@ -230,6 +230,11 @@ export default function VideoReviewView() {
       return
     }
 
+    if (file.size > 2 * 1024 * 1024 * 1024) {
+      alert('파일 크기는 2GB 이하여야 합니다.')
+      return
+    }
+
     // 다음 버전 계산 (제한 없음)
     const currentVersion = submission?.version || 1
     const nextVersion = currentVersion + 1
