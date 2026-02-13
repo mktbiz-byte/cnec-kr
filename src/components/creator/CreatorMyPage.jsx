@@ -766,6 +766,19 @@ const CreatorMyPage = () => {
             <p className="text-xs text-gray-500 font-medium mb-2 px-1">캠페인 관리</p>
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <button
+                onClick={() => navigate('/guide')}
+                className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <BookOpen size={18} className="text-purple-600" />
+                  </div>
+                  <span className="text-[15px] text-gray-900">활동 가이드</span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </button>
+
+              <button
                 onClick={() => navigate('/my/applications')}
                 className="w-full px-4 py-4 flex items-center justify-between border-b border-gray-100"
               >
