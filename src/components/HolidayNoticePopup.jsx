@@ -10,10 +10,20 @@ const HolidayNoticePopup = () => {
     const kstNow = new Date(now.getTime() + (9 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000))
     const expiry = new Date(2026, 1, 18, 23, 59, 59) // 2026-02-18 23:59:59 KST
 
-    if (kstNow <= expiry) {
-      setVisible(true)
-    }
+    if (kstNow > expiry) return
+
+    // 24시간 보지 않기 체크
+    const dismissedUntil = localStorage.getItem('holiday_popup_dismissed_until')
+    if (dismissedUntil && now.getTime() < Number(dismissedUntil)) return
+
+    setVisible(true)
   }, [])
+
+  const handleDismiss24h = () => {
+    const until = Date.now() + 24 * 60 * 60 * 1000
+    localStorage.setItem('holiday_popup_dismissed_until', String(until))
+    setVisible(false)
+  }
 
   if (!visible) return null
 
@@ -85,12 +95,18 @@ const HolidayNoticePopup = () => {
         </div>
 
         {/* 닫기 버튼 */}
-        <div className="px-5 pb-4">
+        <div className="px-5 pb-4 space-y-2">
           <button
             onClick={() => setVisible(false)}
             className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-colors"
           >
             확인
+          </button>
+          <button
+            onClick={handleDismiss24h}
+            className="w-full py-2.5 text-gray-400 text-xs font-medium"
+          >
+            24시간 동안 보지 않기
           </button>
         </div>
       </div>
