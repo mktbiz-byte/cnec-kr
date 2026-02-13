@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import {
   ArrowLeft, Upload, CheckCircle, AlertCircle, FileVideo,
-  Video, Scissors, Hash, FileText, Copy, ExternalLink, Loader2,
+  Video, Scissors, Hash, FileText, Copy, Loader2,
   Check, ChevronDown, ChevronUp, History
 } from 'lucide-react'
 
@@ -47,14 +47,6 @@ export default function OliveyoungVideoSubmissionPage() {
       expanded: false
     }
   })
-
-  // SNS 업로드 정보
-  const [snsForm, setSnsForm] = useState({
-    video1Url: '',
-    video2Url: '',
-    partnershipCode: ''
-  })
-  const [showSnsSection, setShowSnsSection] = useState(false)
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -121,15 +113,10 @@ export default function OliveyoungVideoSubmissionPage() {
             allVersions: allVersionsData,
             expanded: !latestSubmission.video_file_url || latestSubmission.status === 'revision_requested'
           }
-          setSnsForm(prev => ({
-            ...prev,
-            [`video${videoNum}Url`]: latestSubmission.sns_upload_url || ''
-          }))
         }
       }
 
       setVideos(newVideos)
-      if (hasSubmission) setShowSnsSection(true)
 
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -315,89 +302,12 @@ export default function OliveyoungVideoSubmissionPage() {
       }
 
       setSuccess(`영상 ${videoNum} V${nextVersion}이 제출되었습니다!`)
-      setShowSnsSection(true)
       updateVideoData(videoNum, { expanded: false, cleanFile: null, editedFile: null })
       await fetchData()
 
     } catch (err) {
       console.error('Error submitting video:', err)
       setError(`영상 ${videoNum} 제출 실패: ` + err.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handleSnsSubmit = async (e) => {
-    e.preventDefault()
-
-    const hasAnyUrl = snsForm.video1Url.trim() || snsForm.video2Url.trim()
-    if (!hasAnyUrl) {
-      setError('최소 1개의 SNS URL을 입력해주세요.')
-      return
-    }
-
-    try {
-      setSubmitting(true)
-      setError('')
-
-      for (let videoNum = 1; videoNum <= 2; videoNum++) {
-        const video = videos[videoNum]
-        const url = snsForm[`video${videoNum}Url`]
-
-        if (video.submission && url && url.trim()) {
-          await supabase
-            .from('video_submissions')
-            .update({
-              sns_upload_url: url,
-              partnership_code: snsForm.partnershipCode,
-              sns_uploaded_at: new Date().toISOString()
-            })
-            .eq('id', video.submission.id)
-        }
-      }
-
-      // 기업에게 SNS 업로드 완료 알림톡 발송
-      try {
-        const companyName = campaign?.company_name || '기업'
-
-        let companyPhone = campaign?.company_phone
-
-        if (!companyPhone && campaign?.company_id) {
-          const { data: companyProfile } = await supabase
-            .from('user_profiles')
-            .select('phone')
-            .eq('id', campaign.company_id)
-            .single()
-          companyPhone = companyProfile?.phone
-        }
-
-        if (companyPhone) {
-          await fetch('/.netlify/functions/send-alimtalk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              receiverNum: companyPhone.replace(/-/g, ''),
-              receiverName: companyName,
-              templateCode: '025100001009',
-              variables: {
-                '회사명': companyName,
-                '캠페인명': campaign?.title || '캠페인'
-              }
-            })
-          })
-        } else {
-          console.log('기업 전화번호가 없어 알림톡을 발송하지 않습니다.')
-        }
-      } catch (notificationError) {
-        console.error('알림톡 발송 오류:', notificationError)
-      }
-
-      setSuccess('SNS 업로드 정보가 저장되었습니다!')
-      setTimeout(() => navigate('/my/applications'), 2000)
-
-    } catch (err) {
-      console.error('Error updating SNS info:', err)
-      setError('SNS 정보 저장에 실패했습니다.')
     } finally {
       setSubmitting(false)
     }
@@ -744,8 +654,6 @@ export default function OliveyoungVideoSubmissionPage() {
   const creatorCode = application?.partnership_code || campaign?.partnership_code ||
     `OLIVEYOUNG_${application?.id?.slice(0, 6)?.toUpperCase() || 'CODE'}`
 
-  const hasAnySubmission = videos[1].submission || videos[2].submission
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
@@ -806,49 +714,6 @@ export default function OliveyoungVideoSubmissionPage() {
         {/* 영상 1, 2 */}
         {renderVideoSection(1)}
         {renderVideoSection(2)}
-
-        {/* SNS 업로드 섹션 */}
-        {showSnsSection && hasAnySubmission && (
-          <div className="bg-white rounded-2xl shadow-sm p-4">
-            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <ExternalLink size={18} className="text-green-600" />
-              SNS 업로드 정보
-            </h3>
-            <form onSubmit={handleSnsSubmit} className="space-y-4">
-              {videos[1].submission && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">영상 1 SNS URL</label>
-                  <input
-                    type="url"
-                    value={snsForm.video1Url}
-                    onChange={(e) => setSnsForm(prev => ({ ...prev, video1Url: e.target.value }))}
-                    placeholder="https://www.instagram.com/..."
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-              )}
-              {videos[2].submission && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">영상 2 SNS URL</label>
-                  <input
-                    type="url"
-                    value={snsForm.video2Url}
-                    onChange={(e) => setSnsForm(prev => ({ ...prev, video2Url: e.target.value }))}
-                    placeholder="https://www.instagram.com/..."
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-              )}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-700 disabled:opacity-50"
-              >
-                {submitting ? '저장 중...' : 'SNS 정보 저장'}
-              </button>
-            </form>
-          </div>
-        )}
 
         {/* 안내 */}
         <div className="bg-green-50 rounded-2xl p-4">

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import {
   ArrowLeft, Upload, CheckCircle, AlertCircle, FileVideo,
-  Video, Scissors, Hash, FileText, Copy, ExternalLink, Loader2,
+  Video, Scissors, Hash, FileText, Copy, Loader2,
   X, Check, ChevronDown, History
 } from 'lucide-react'
 
@@ -33,13 +33,6 @@ export default function VideoSubmissionPage() {
     allVersions: [],  // 모든 버전 목록
     expanded: true
   })
-
-  // SNS 업로드 정보
-  const [snsForm, setSnsForm] = useState({
-    snsUrl: '',
-    partnershipCode: ''
-  })
-  const [showSnsSection, setShowSnsSection] = useState(false)
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -114,11 +107,6 @@ export default function VideoSubmissionPage() {
           allVersions: allVersionsData,
           expanded: !latestSubmission.video_file_url || latestSubmission.status === 'revision_requested'
         })
-        setSnsForm(prev => ({
-          ...prev,
-          snsUrl: latestSubmission.sns_upload_url || ''
-        }))
-        setShowSnsSection(true)
       }
 
     } catch (err) {
@@ -310,50 +298,12 @@ export default function VideoSubmissionPage() {
       }
 
       setSuccess(`영상 V${nextVersion}이 제출되었습니다!`)
-      setShowSnsSection(true)
       setVideoData(prev => ({ ...prev, expanded: false, cleanFile: null, editedFile: null }))
       await fetchData()
 
     } catch (err) {
       console.error('Error submitting video:', err)
       setError('영상 제출 실패: ' + err.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handleSnsSubmit = async (e) => {
-    e.preventDefault()
-
-    if (!snsForm.snsUrl.trim()) {
-      setError('SNS URL을 입력해주세요.')
-      return
-    }
-
-    try {
-      setSubmitting(true)
-      setError('')
-
-      if (videoData.submission) {
-        await supabase
-          .from('video_submissions')
-          .update({
-            sns_upload_url: snsForm.snsUrl,
-            partnership_code: snsForm.partnershipCode,
-            sns_uploaded_at: new Date().toISOString()
-          })
-          .eq('id', videoData.submission.id)
-      }
-
-      setSuccess('SNS 업로드 정보가 저장되었습니다!')
-
-      setTimeout(() => {
-        navigate('/my/applications')
-      }, 2000)
-
-    } catch (err) {
-      console.error('Error updating SNS info:', err)
-      setError('SNS 정보 저장에 실패했습니다.')
     } finally {
       setSubmitting(false)
     }
@@ -746,35 +696,6 @@ export default function VideoSubmissionPage() {
 
         {/* 영상 업로드 섹션 (1개) */}
         {renderVideoSection()}
-
-        {/* SNS 업로드 섹션 */}
-        {showSnsSection && videoData.submission?.video_file_url && (
-          <div className="bg-white rounded-2xl shadow-sm p-4">
-            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <ExternalLink size={18} className="text-purple-600" />
-              SNS 업로드 정보
-            </h3>
-            <form onSubmit={handleSnsSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">SNS URL *</label>
-                <input
-                  type="url"
-                  value={snsForm.snsUrl}
-                  onChange={(e) => setSnsForm(prev => ({ ...prev, snsUrl: e.target.value }))}
-                  placeholder="https://www.instagram.com/..."
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 disabled:opacity-50"
-              >
-                {submitting ? '저장 중...' : 'SNS 정보 저장'}
-              </button>
-            </form>
-          </div>
-        )}
 
         {/* 안내 사항 */}
         <div className="bg-purple-50 rounded-2xl p-4">
