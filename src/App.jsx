@@ -43,6 +43,7 @@ import VideoSubmissionPage from './components/VideoSubmissionPage';
 import VideoReviewView from './components/VideoReviewView';
 import OliveyoungVideoSubmissionPage from './components/OliveyoungVideoSubmissionPage';
 import FourWeekVideoSubmissionPage from './components/FourWeekVideoSubmissionPage';
+import HolidayNoticePopup from './components/HolidayNoticePopup';
 
 // 관리자 컴포넌트
 import AdminDashboardSimple from './components/admin/AdminDashboardSimple';
@@ -79,6 +80,7 @@ const AppContent = () => {
 
   return (
     <div className="App">
+      <HolidayNoticePopup />
       <Routes>
         {/* 메인 페이지 - 로그인 여부에 따라 분기 */}
         <Route path="/" element={user ? <HomePage /> : <LandingPage />} />
