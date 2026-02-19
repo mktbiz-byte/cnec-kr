@@ -2,95 +2,71 @@ import html2pdf from 'html2pdf.js'
 
 /**
  * oklab/oklch → sRGB 변환 공통 파이프라인
- * oklab(L, a, b) → LMS → linear sRGB → sRGB
  */
 function oklabToSrgb(L, a_, b_) {
-  // oklab → LMS (cube root domain)
   const l = L + 0.3963377774 * a_ + 0.2158037573 * b_
   const m = L - 0.1055613458 * a_ - 0.0638541728 * b_
   const s = L - 0.0894841775 * a_ - 1.2914855480 * b_
 
-  // LMS cube root → LMS linear
   const ll = l * l * l
   const mm = m * m * m
   const ss = s * s * s
 
-  // LMS → linear sRGB
   let r = +4.0767416621 * ll - 3.3077115913 * mm + 0.2309699292 * ss
   let g = -1.2684380046 * ll + 2.6097574011 * mm - 0.3413193965 * ss
   let b = -0.0041960863 * ll - 0.7034186147 * mm + 1.7076147010 * ss
 
-  // linear sRGB → sRGB (gamma correction) + clamp to [0, 255]
-  const toSrgb = (v) => {
+  const clamp = (v) => {
     v = Math.max(0, Math.min(1, v))
     return Math.round(
       (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055) * 255
     )
   }
 
-  return [toSrgb(r), toSrgb(g), toSrgb(b)]
+  return [clamp(r), clamp(g), clamp(b)]
 }
 
-function formatRgb(r, g, b, alpha) {
-  if (alpha < 1) {
-    return `rgba(${r}, ${g}, ${b}, ${Math.round(alpha * 1000) / 1000})`
-  }
-  return `rgb(${r}, ${g}, ${b})`
+function fmtRgb(r, g, b, a) {
+  return a < 1
+    ? `rgba(${r}, ${g}, ${b}, ${Math.round(a * 1000) / 1000})`
+    : `rgb(${r}, ${g}, ${b})`
 }
 
-function parseAlpha(alphaStr) {
-  if (!alphaStr || alphaStr === 'none') return 1
-  const val = parseFloat(alphaStr)
-  return alphaStr.endsWith('%') ? val / 100 : val
+function parseA(s) {
+  if (!s || s === 'none') return 1
+  const v = parseFloat(s)
+  return s.endsWith('%') ? v / 100 : v
 }
 
-/**
- * oklch(L C H / alpha) → rgb(r, g, b)
- */
 function oklchToRgb(str) {
-  const match = str.match(
-    /oklch\(\s*([\d.]+%?|none)\s+([\d.]+%?|none)\s+([\d.]+(?:deg)?|none)(?:\s*\/\s*([\d.]+%?|none))?\s*\)/
-  )
-  if (!match) return 'rgb(0, 0, 0)'
-
-  let L = match[1] === 'none' ? 0 : parseFloat(match[1])
-  if (match[1]?.endsWith('%')) L = L / 100
-
-  const C = match[2] === 'none' ? 0 : parseFloat(match[2])
-  const H = match[3] === 'none' ? 0 : parseFloat(match[3])
-  const alpha = parseAlpha(match[4])
-
-  // oklch → oklab (polar → cartesian)
+  const m = str.match(/oklch\(\s*([\d.]+%?|none)\s+([\d.]+%?|none)\s+([\d.]+(?:deg)?|none)(?:\s*\/\s*([\d.]+%?|none))?\s*\)/)
+  if (!m) return 'rgb(0,0,0)'
+  let L = m[1] === 'none' ? 0 : parseFloat(m[1])
+  if (m[1]?.endsWith('%')) L /= 100
+  const C = m[2] === 'none' ? 0 : parseFloat(m[2])
+  const H = m[3] === 'none' ? 0 : parseFloat(m[3])
   const hRad = H * Math.PI / 180
-  const a_ = C * Math.cos(hRad)
-  const b_ = C * Math.sin(hRad)
-
-  const [r, g, b] = oklabToSrgb(L, a_, b_)
-  return formatRgb(r, g, b, alpha)
+  const [r, g, b] = oklabToSrgb(L, C * Math.cos(hRad), C * Math.sin(hRad))
+  return fmtRgb(r, g, b, parseA(m[4]))
 }
 
-/**
- * oklab(L a b / alpha) → rgb(r, g, b)
- */
 function oklabToRgb(str) {
-  const match = str.match(
-    /oklab\(\s*([\d.]+%?|none)\s+([-\d.]+%?|none)\s+([-\d.]+%?|none)(?:\s*\/\s*([\d.]+%?|none))?\s*\)/
-  )
-  if (!match) return 'rgb(0, 0, 0)'
-
-  let L = match[1] === 'none' ? 0 : parseFloat(match[1])
-  if (match[1]?.endsWith('%')) L = L / 100
-
-  const a_ = match[2] === 'none' ? 0 : parseFloat(match[2])
-  const b_ = match[3] === 'none' ? 0 : parseFloat(match[3])
-  const alpha = parseAlpha(match[4])
-
-  const [r, g, b] = oklabToSrgb(L, a_, b_)
-  return formatRgb(r, g, b, alpha)
+  const m = str.match(/oklab\(\s*([\d.]+%?|none)\s+([-\d.]+%?|none)\s+([-\d.]+%?|none)(?:\s*\/\s*([\d.]+%?|none))?\s*\)/)
+  if (!m) return 'rgb(0,0,0)'
+  let L = m[1] === 'none' ? 0 : parseFloat(m[1])
+  if (m[1]?.endsWith('%')) L /= 100
+  const [r, g, b] = oklabToSrgb(L, m[2] === 'none' ? 0 : parseFloat(m[2]), m[3] === 'none' ? 0 : parseFloat(m[3]))
+  return fmtRgb(r, g, b, parseA(m[4]))
 }
 
-// oklch(...) 또는 oklab(...) 매칭 (중첩 괄호 없는 경우)
-const OK_COLOR_RE = /ok(?:lch|lab)\([^)]+\)/g
+// oklch(...) 또는 oklab(...) 함수 매칭
+const OK_FN_RE = /ok(?:lch|lab)\([^)]+\)/g
+
+// 그래디언트 내 "in oklab", "in oklch" 색공간 지정자 제거
+const OK_INTERP_RE = /\bin\s+ok(?:lch|lab)\b/g
+
+// color-mix(in oklab/oklch, ...) 매칭 - 중첩 괄호 포함
+const COLOR_MIX_RE = /color-mix\(in\s+ok(?:lch|lab)\s*,\s*([^,)]+)\s*(?:(\d+%)\s*)?,\s*([^,)]+)\s*(?:(\d+%)\s*)?\)/g
 
 function convertOkColor(match) {
   if (match.startsWith('oklch')) return oklchToRgb(match)
@@ -99,30 +75,107 @@ function convertOkColor(match) {
 }
 
 /**
+ * CSS 텍스트에서 모든 oklab/oklch 관련 값을 rgb로 치환
+ * 1. oklab(...), oklch(...) 함수 → rgb(...)
+ * 2. "in oklab", "in oklch" 그래디언트 색공간 지정자 제거
+ * 3. color-mix(in oklab/oklch, ...) → 첫 번째 색상으로 단순화
+ */
+function fixCssText(text, cache) {
+  let result = text
+  // 1. oklch/oklab 함수 → rgb
+  result = result.replace(OK_FN_RE, (m) => {
+    if (cache.has(m)) return cache.get(m)
+    const rgb = convertOkColor(m)
+    cache.set(m, rgb)
+    return rgb
+  })
+  // 2. "in oklab/oklch" 그래디언트 색공간 제거
+  result = result.replace(OK_INTERP_RE, '')
+  // 3. color-mix 단순화 (첫 번째 색상 사용)
+  result = result.replace(COLOR_MIX_RE, (_, c1) => c1.trim())
+  return result
+}
+
+/**
+ * 클론된 문서의 모든 요소에서 oklab/oklch computed style을 인라인 rgb로 교체
+ */
+function fixComputedStylesInClone(clonedDoc, cache) {
+  const win = clonedDoc.defaultView
+  if (!win) return
+
+  const colorProps = [
+    'color', 'backgroundColor',
+    'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor',
+    'outlineColor', 'textDecorationColor'
+  ]
+  const cssPropName = (js) => js.replace(/[A-Z]/g, c => '-' + c.toLowerCase())
+
+  clonedDoc.querySelectorAll('*').forEach(el => {
+    try {
+      const cs = win.getComputedStyle(el)
+
+      // 색상 속성 검사
+      colorProps.forEach(prop => {
+        const val = cs[prop]
+        if (val && (val.includes('oklab') || val.includes('oklch'))) {
+          const fixed = val.replace(OK_FN_RE, (m) => {
+            if (cache.has(m)) return cache.get(m)
+            const rgb = convertOkColor(m)
+            cache.set(m, rgb)
+            return rgb
+          })
+          el.style.setProperty(cssPropName(prop), fixed, 'important')
+        }
+      })
+
+      // background-image (그래디언트)
+      const bgImg = cs.backgroundImage
+      if (bgImg && bgImg !== 'none' && (bgImg.includes('oklab') || bgImg.includes('oklch'))) {
+        let fixed = bgImg.replace(OK_FN_RE, (m) => {
+          if (cache.has(m)) return cache.get(m)
+          const rgb = convertOkColor(m)
+          cache.set(m, rgb)
+          return rgb
+        })
+        fixed = fixed.replace(OK_INTERP_RE, '')
+        el.style.setProperty('background-image', fixed, 'important')
+      }
+
+      // box-shadow
+      const shadow = cs.boxShadow
+      if (shadow && shadow !== 'none' && (shadow.includes('oklab') || shadow.includes('oklch'))) {
+        const fixed = shadow.replace(OK_FN_RE, (m) => {
+          if (cache.has(m)) return cache.get(m)
+          const rgb = convertOkColor(m)
+          cache.set(m, rgb)
+          return rgb
+        })
+        el.style.setProperty('box-shadow', fixed, 'important')
+      }
+    } catch (e) {
+      // Skip elements that can't be processed
+    }
+  })
+}
+
+/**
  * 원본 문서의 모든 oklch/oklab를 rgb로 치환하고 복원 함수를 반환
  */
 async function patchModernColorsInDocument() {
   const cache = new Map()
-  const convert = (match) => {
-    if (cache.has(match)) return cache.get(match)
-    const rgb = convertOkColor(match)
-    cache.set(match, rgb)
-    return rgb
-  }
-
   const restoreFns = []
 
-  // 1. <style> 요소의 textContent에서 oklch/oklab 치환
+  // 1. <style> 요소의 textContent 치환
   document.querySelectorAll('style').forEach(el => {
     const text = el.textContent
     if (text && (text.includes('oklch') || text.includes('oklab'))) {
       const original = text
-      el.textContent = text.replace(OK_COLOR_RE, convert)
+      el.textContent = fixCssText(text, cache)
       restoreFns.push(() => { el.textContent = original })
     }
   })
 
-  // 2. <link rel="stylesheet"> → raw CSS fetch 후 인라인 <style>로 교체
+  // 2. <link rel="stylesheet"> → fetch raw CSS → 인라인 <style>로 교체
   const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
   for (const link of links) {
     try {
@@ -131,20 +184,18 @@ async function patchModernColorsInDocument() {
       const rawCss = await res.text()
       if (!rawCss.includes('oklch') && !rawCss.includes('oklab')) continue
 
-      const fixedCss = rawCss.replace(OK_COLOR_RE, convert)
-
+      const fixedCss = fixCssText(rawCss, cache)
       const inlineStyle = document.createElement('style')
       inlineStyle.dataset.pdfColorFix = 'true'
       inlineStyle.textContent = fixedCss
       link.replaceWith(inlineStyle)
-
       restoreFns.push(() => { inlineStyle.replaceWith(link) })
     } catch (e) {
-      // Cross-origin 또는 fetch 실패
+      // Cross-origin or fetch failed
     }
   }
 
-  // 3. :root CSS 변수를 rgb로 오버라이드
+  // 3. :root CSS 변수 오버라이드
   const root = document.documentElement
   const originalRootStyle = root.getAttribute('style') || ''
   const computed = getComputedStyle(root)
@@ -162,25 +213,32 @@ async function patchModernColorsInDocument() {
   varNames.forEach(v => {
     const raw = computed.getPropertyValue(v).trim()
     if (raw && (raw.includes('oklch') || raw.includes('oklab'))) {
-      root.style.setProperty(v, convert(raw))
+      const fixed = raw.replace(OK_FN_RE, (m) => {
+        if (cache.has(m)) return cache.get(m)
+        const rgb = convertOkColor(m)
+        cache.set(m, rgb)
+        return rgb
+      })
+      root.style.setProperty(v, fixed)
     }
   })
 
-  return function restore() {
+  return { cache, restore: () => {
     restoreFns.forEach(fn => fn())
-    if (originalRootStyle) {
-      root.setAttribute('style', originalRootStyle)
-    } else {
-      root.removeAttribute('style')
-    }
-  }
+    if (originalRootStyle) root.setAttribute('style', originalRootStyle)
+    else root.removeAttribute('style')
+  }}
 }
 
 /**
  * HTML 요소를 PDF로 변환하여 다운로드
  */
 export async function downloadElementAsPdf(element, filename = 'guide', options = {}) {
-  const restore = await patchModernColorsInDocument()
+  // 1. 원본 문서 CSS 패치
+  const { cache, restore } = await patchModernColorsInDocument()
+
+  // 2. 브라우저 스타일 재계산 대기
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 
   try {
     const pdfOptions = {
@@ -192,6 +250,18 @@ export async function downloadElementAsPdf(element, filename = 'guide', options 
         useCORS: true,
         logging: false,
         letterRendering: true,
+        // 3. 클론된 문서에서 남은 oklab/oklch computed style 인라인 rgb로 교체
+        onclone: (clonedDoc) => {
+          // 3a. 클론된 문서의 <style> 요소도 재치환
+          clonedDoc.querySelectorAll('style').forEach(el => {
+            const text = el.textContent
+            if (text && (text.includes('oklch') || text.includes('oklab'))) {
+              el.textContent = fixCssText(text, cache)
+            }
+          })
+          // 3b. 모든 요소의 computed style에서 oklab/oklch → 인라인 rgb
+          fixComputedStylesInClone(clonedDoc, cache)
+        },
         ...(options.html2canvas || {}),
       },
       jsPDF: {
