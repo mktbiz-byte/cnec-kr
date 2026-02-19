@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { usePCView } from '../contexts/PCViewContext'
 import { database, supabase } from '../lib/supabase'
 import {
   Loader2, User, Instagram, Youtube, Hash, Camera, ArrowLeft, Search,
@@ -332,6 +333,7 @@ const BottomNavigation = ({ isLastStep, onNext, canProceed, saving }) => (
 const ProfileSettingsTest = () => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const { isPCView } = usePCView()
 
   const [profile, setProfile] = useState({
     name: '', email: '', phone: '', age: '', bio: '', profile_image: '',
@@ -1818,7 +1820,7 @@ const ProfileSettingsTest = () => {
 
       {/* 회원 탈퇴 모달 */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className={`${isPCView ? 'absolute' : 'fixed'} inset-0 bg-black/50 flex items-center justify-center z-50 p-4`}>
           <div className="bg-white rounded-2xl max-w-sm w-full p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-red-600">회원 탈퇴</h3>
@@ -1875,7 +1877,7 @@ const ProfileSettingsTest = () => {
 
       {/* 우편번호 검색 레이어 */}
       {showPostcodeLayer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className={`${isPCView ? 'absolute' : 'fixed'} inset-0 z-50 flex items-center justify-center bg-black/50`}>
           <div className="bg-white w-full max-w-md mx-4 rounded-2xl overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b">
               <h3 className="font-bold text-lg text-gray-900">주소 검색</h3>

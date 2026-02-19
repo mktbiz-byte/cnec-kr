@@ -906,7 +906,10 @@ const CampaignDetailPage = () => {
         </div>
 
         {/* 하단 고정 버튼 */}
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 p-4 pb-6 z-40">
+        <div className={isPCView
+          ? "sticky bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40"
+          : "fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 p-4 pb-6 z-40"
+        }>
           {existingApplication ? (
             <div className="w-full py-3.5 bg-gray-100 text-gray-500 rounded-xl font-bold text-center">
               {existingApplication.status === 'pending' ? '검토중' :
@@ -936,7 +939,10 @@ const CampaignDetailPage = () => {
         {/* 상품 상세 이미지 모달 */}
         {showDetailImage && campaign.product_detail_file_url && (
           <div
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+            className={isPCView
+              ? "absolute inset-0 z-50 bg-black/90 flex items-center justify-center"
+              : "fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+            }
             onClick={() => setShowDetailImage(false)}
           >
             <button

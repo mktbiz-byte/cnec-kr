@@ -160,7 +160,7 @@
   position: absolute !important;
 }
 
-/* Tailwind fixed 클래스 오버라이드 */
+/* Tailwind fixed 클래스 → 기본 absolute */
 .pc-view-mobile-frame .fixed {
   position: absolute !important;
 }
@@ -174,15 +174,23 @@
   bottom: 0 !important;
 }
 
-/* 하단 네비게이션 바 및 하단 고정 버튼 폰 프레임 내 재배치 */
-.pc-view-mobile-frame nav.fixed,
-.pc-view-mobile-frame div.fixed[class*="bottom-0"] {
-  position: absolute !important;
-  left: 0 !important;
+/* ── 하단 고정 버튼/바: sticky로 변환하여 폰 프레임 스크롤 내부에 고정 ── */
+.pc-view-mobile-frame .fixed.bottom-0,
+.pc-view-mobile-frame div.fixed[class*="bottom-0"],
+.pc-view-mobile-frame nav.fixed[class*="bottom-0"],
+.pc-view-mobile-frame nav.fixed {
+  position: sticky !important;
+  bottom: 0 !important;
+  left: auto !important;
+  right: auto !important;
   transform: none !important;
   width: 100% !important;
   max-width: 100% !important;
-  bottom: 0 !important;
+}
+
+/* left-1/2, -translate-x-1/2 패턴의 centering 해제 (하단 바에 불필요) */
+.pc-view-mobile-frame .fixed.bottom-0.left-1\/2 {
+  left: auto !important;
 }
 
 /* sticky 요소가 폰 프레임 내에서 제대로 작동하도록 */
