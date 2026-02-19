@@ -119,24 +119,78 @@
   }
 }
 
-/* PC View: 모바일 폰 프레임 내 고정 요소 처리 */
+/* ============================================================
+   PC View: 모바일 폰 프레임 내 레이아웃 오버라이드
+   ============================================================ */
+
+/* 폰 프레임 기본 설정 */
 .pc-view-mobile-frame {
   position: relative;
 }
 
+/* min-h-screen을 폰 프레임 높이에 맞게 변환 (100vh -> 100%) */
+.pc-view-mobile-frame > * {
+  min-height: 100% !important;
+}
+
+/* Type A: flex justify-center bg-gray-100 래퍼 → display: contents로 평탄화 */
+.pc-view-mobile-frame > div[class*="flex"][class*="justify-center"][class*="bg-gray-1"] {
+  display: contents !important;
+}
+.pc-view-mobile-frame > div[class*="flex"][class*="justify-center"][class*="bg-gray-1"] > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100% !important;
+  box-shadow: none !important;
+}
+
+/* Type B: min-h-screen bg-gray-50 래퍼 (ApplicationsPage, GradeDetailPage 등) */
+.pc-view-mobile-frame > div[class*="min-h-screen"] {
+  min-height: 100% !important;
+}
+
+/* Type C: 로그인/회원가입 페이지의 flex centering 래퍼 */
+.pc-view-mobile-frame > div[class*="min-h-screen"][class*="flex"][class*="items-center"] {
+  min-height: 100% !important;
+}
+
+/* fixed 요소 → absolute로 변환 (모달, 네비 등) */
+.pc-view-mobile-frame [style*="position: fixed"],
+.pc-view-mobile-frame [style*="position:fixed"] {
+  position: absolute !important;
+}
+
+/* Tailwind fixed 클래스 오버라이드 */
 .pc-view-mobile-frame .fixed {
   position: absolute !important;
 }
 
+/* 모달 오버레이 (fixed inset-0) - 폰 프레임 내부에 맞게 */
 .pc-view-mobile-frame .fixed.inset-0 {
   position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
 }
 
-/* 하단 네비게이션 바 폰 프레임 내 재배치 */
-.pc-view-mobile-frame nav.fixed {
+/* 하단 네비게이션 바 및 하단 고정 버튼 폰 프레임 내 재배치 */
+.pc-view-mobile-frame nav.fixed,
+.pc-view-mobile-frame div.fixed[class*="bottom-0"] {
   position: absolute !important;
   left: 0 !important;
   transform: none !important;
   width: 100% !important;
+  max-width: 100% !important;
+  bottom: 0 !important;
+}
+
+/* sticky 요소가 폰 프레임 내에서 제대로 작동하도록 */
+.pc-view-mobile-frame .sticky {
+  position: sticky !important;
+}
+
+/* max-w-md 를 폰 프레임 너비에 맞게 - 프레임이 이미 448px이므로 제약 해제 */
+.pc-view-mobile-frame .max-w-md {
   max-width: 100% !important;
 }

@@ -119,10 +119,11 @@ const AppContent = () => {
 
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/profile" element={<ProfileSettingsTest />} />
         <Route path="/settings/notifications" element={<NotificationSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
-        <Route path="/profile-settings" element={<ProfileSettings />} />
+        <Route path="/profile-settings" element={<ProfileSettingsTest />} />
+        <Route path="/profile-simple" element={<ProfileSettings />} />
         <Route path="/profile-test-beta-2025" element={<ProfileSettingsTest />} />
         <Route path="/profile-view-beta-2025" element={<ProfileViewTest />} />
         <Route path="/submit-video/:campaignId" element={<VideoSubmissionPage />} />

@@ -55,12 +55,8 @@ import {
   CATEGORIES
 } from '../constants/beautyProfileOptions'
 
-// 테스트 모드 배너
-const TestModeBanner = () => (
-  <div className="bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white text-center py-1.5 px-4 text-xs font-medium">
-    Premium Profile v5
-  </div>
-)
+// 테스트 모드 배너 (프로덕션에서는 숨김)
+const TestModeBanner = () => null
 
 // 단일 선택 버튼 그룹
 const SingleSelectGroup = ({ options, value, onChange, size = 'normal' }) => (

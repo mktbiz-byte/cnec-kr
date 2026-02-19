@@ -46,7 +46,7 @@ function PCExpandedPanel() {
   return (
     <div className="h-full flex flex-col">
       {/* 패널 헤더 */}
-      <div className="border-b border-gray-100 px-8 py-5 bg-white">
+      <div className="border-b border-gray-100 px-8 py-5 bg-white flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="bg-purple-100 p-2 rounded-xl">
             <Layout size={20} className="text-purple-600" />
@@ -122,18 +122,21 @@ export default function PCViewLayout({ children }) {
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* 왼쪽: 모바일 폰 프레임 */}
-      <div className="flex-shrink-0 w-[480px] flex flex-col items-center py-6 px-4 overflow-y-auto">
+      <div className="flex-shrink-0 w-[480px] flex flex-col items-center py-6 px-4">
         <div className="text-xs font-medium text-gray-400 mb-3 flex items-center gap-2">
           <Smartphone size={14} />
           모바일 미리보기
         </div>
         <div
-          className="w-[448px] bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden relative pc-view-mobile-frame"
-          style={{ minHeight: '812px', maxHeight: 'calc(100vh - 80px)' }}
+          className="w-[448px] bg-white rounded-3xl shadow-2xl border border-gray-200 relative flex flex-col overflow-hidden"
+          style={{ height: 'calc(100vh - 100px)' }}
         >
           {/* 폰 노치 */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-black rounded-b-2xl z-50" />
-          <div className="pt-6 h-full overflow-y-auto">
+          <div className="flex-shrink-0 h-7 bg-white relative z-50">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-black rounded-b-2xl" />
+          </div>
+          {/* 콘텐츠 영역 - pc-view-mobile-frame 클래스로 CSS 오버라이드 적용 */}
+          <div className="flex-1 overflow-y-auto pc-view-mobile-frame relative">
             {children}
           </div>
         </div>
