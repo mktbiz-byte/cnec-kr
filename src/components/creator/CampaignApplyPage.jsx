@@ -393,7 +393,7 @@ const CampaignApplyPage = () => {
           <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
             <div className="flex items-center justify-between px-4 py-3">
           <button
-            onClick={() => navigate(`/campaign/${id}`)}
+            onClick={() => navigate(-1)}
             className="p-1 hover:bg-gray-100 rounded-full"
           >
             <ArrowLeft size={24} className="text-gray-700" />
