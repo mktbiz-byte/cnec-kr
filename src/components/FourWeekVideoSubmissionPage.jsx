@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import {
   ArrowLeft, Upload, CheckCircle, AlertCircle, FileVideo,
-  Video, Scissors, Hash, Copy, ExternalLink, Loader2,
+  Video, Scissors, Hash, Copy, Loader2,
   Check, ChevronDown, ChevronUp, Calendar, History
 } from 'lucide-react'
 
@@ -27,19 +27,6 @@ export default function FourWeekVideoSubmissionPage() {
     3: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, allVersions: [], expanded: false },
     4: { cleanFile: null, cleanUrl: '', editedFile: null, editedUrl: '', title: '', content: '', hashtags: '', submission: null, allVersions: [], expanded: false }
   })
-
-  // SNS 업로드 정보
-  const [snsForm, setSnsForm] = useState({
-    week1_url: '',
-    week2_url: '',
-    week3_url: '',
-    week4_url: '',
-    week1_code: '',
-    week2_code: '',
-    week3_code: '',
-    week4_code: ''
-  })
-  const [showSnsSection, setShowSnsSection] = useState(false)
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -108,15 +95,10 @@ export default function FourWeekVideoSubmissionPage() {
             expanded: !latestSubmission.video_file_url || latestSubmission.status === 'revision_requested'
           }
 
-          setSnsForm(prev => ({
-            ...prev,
-            [`week${week}_url`]: latestSubmission.sns_upload_url || ''
-          }))
         }
       }
 
       setWeekVideos(newWeekVideos)
-      if (hasSubmission) setShowSnsSection(true)
 
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -302,7 +284,6 @@ export default function FourWeekVideoSubmissionPage() {
       }
 
       setSuccess(`${week}주차 영상 V${nextVersion}이 제출되었습니다!`)
-      setShowSnsSection(true)
       updateWeekData(week, 'expanded', false)
       setWeekVideos(prev => ({
         ...prev,
@@ -313,83 +294,6 @@ export default function FourWeekVideoSubmissionPage() {
     } catch (err) {
       console.error('Error submitting video:', err)
       setError(`${week}주차 영상 제출 실패: ` + err.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handleSnsSubmit = async (e) => {
-    e.preventDefault()
-
-    const hasAnyUrl = Object.keys(snsForm).some(key => key.includes('url') && snsForm[key])
-    if (!hasAnyUrl) {
-      setError('최소 1개의 SNS URL을 입력해주세요.')
-      return
-    }
-
-    try {
-      setSubmitting(true)
-      setError('')
-
-      for (let week = 1; week <= 4; week++) {
-        const weekData = weekVideos[week]
-        const snsUrl = snsForm[`week${week}_url`]
-        const partnershipCode = snsForm[`week${week}_code`]
-
-        if (weekData.submission && snsUrl) {
-          await supabase
-            .from('video_submissions')
-            .update({
-              sns_upload_url: snsUrl,
-              partnership_code: partnershipCode || null,
-              sns_uploaded_at: new Date().toISOString()
-            })
-            .eq('id', weekData.submission.id)
-        }
-      }
-
-      // 기업에게 SNS 업로드 완료 알림톡 발송
-      try {
-        const companyName = campaign?.company_name || '기업'
-
-        let companyPhone = campaign?.company_phone
-
-        if (!companyPhone && campaign?.company_id) {
-          const { data: companyProfile } = await supabase
-            .from('user_profiles')
-            .select('phone')
-            .eq('id', campaign.company_id)
-            .single()
-          companyPhone = companyProfile?.phone
-        }
-
-        if (companyPhone) {
-          await fetch('/.netlify/functions/send-alimtalk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              receiverNum: companyPhone.replace(/-/g, ''),
-              receiverName: companyName,
-              templateCode: '025100001009',
-              variables: {
-                '회사명': companyName,
-                '캠페인명': campaign?.title || '캠페인'
-              }
-            })
-          })
-        } else {
-          console.log('기업 전화번호가 없어 알림톡을 발송하지 않습니다.')
-        }
-      } catch (notificationError) {
-        console.error('알림톡 발송 오류:', notificationError)
-      }
-
-      setSuccess('SNS 업로드 정보가 저장되었습니다!')
-      setTimeout(() => navigate('/my/applications'), 2000)
-
-    } catch (err) {
-      console.error('Error updating SNS info:', err)
-      setError('SNS 정보 저장에 실패했습니다.')
     } finally {
       setSubmitting(false)
     }
@@ -742,8 +646,6 @@ export default function FourWeekVideoSubmissionPage() {
   const creatorCode = application?.partnership_code || campaign?.partnership_code ||
     `CHALLENGE_${application?.id?.slice(0, 6)?.toUpperCase() || 'CODE'}`
 
-  const hasAnySubmission = Object.values(weekVideos).some(w => w.submission)
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
@@ -816,37 +718,6 @@ export default function FourWeekVideoSubmissionPage() {
 
         {/* 주차별 영상 */}
         {[1, 2, 3, 4].map(week => renderWeekSection(week))}
-
-        {/* SNS 업로드 섹션 */}
-        {showSnsSection && hasAnySubmission && (
-          <div className="bg-white rounded-2xl shadow-sm p-4">
-            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <ExternalLink size={18} className="text-indigo-600" />
-              SNS 업로드 정보
-            </h3>
-            <form onSubmit={handleSnsSubmit} className="space-y-4">
-              {[1, 2, 3, 4].map(week => weekVideos[week].submission && (
-                <div key={week}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{week}주차 SNS URL</label>
-                  <input
-                    type="url"
-                    value={snsForm[`week${week}_url`]}
-                    onChange={(e) => setSnsForm(prev => ({ ...prev, [`week${week}_url`]: e.target.value }))}
-                    placeholder="https://www.instagram.com/..."
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              ))}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 disabled:opacity-50"
-              >
-                {submitting ? '저장 중...' : 'SNS 정보 저장'}
-              </button>
-            </form>
-          </div>
-        )}
 
         {/* 안내 */}
         <div className="bg-indigo-50 rounded-2xl p-4">
