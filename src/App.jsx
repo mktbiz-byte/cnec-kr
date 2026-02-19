@@ -2,7 +2,10 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { PCViewProvider } from './contexts/PCViewContext';
 import emailScheduler from './lib/emailScheduler';
+import PCViewToggleButton from './components/common/PCViewToggleButton';
+import PCViewLayout from './components/common/PCViewLayout';
 import './App.css';
 
 // 크리에이터 앱 컴포넌트 (새 디자인)
@@ -82,6 +85,7 @@ const AppContent = () => {
   return (
     <div className="App">
       <HolidayNoticePopup />
+      <PCViewLayout>
       <Routes>
         {/* 메인 페이지 - 로그인 여부에 따라 분기 */}
         <Route path="/" element={user ? <HomePage /> : <LandingPage />} />
@@ -115,10 +119,11 @@ const AppContent = () => {
 
         {/* 사용자 페이지 */}
         <Route path="/campaign-application" element={<CampaignApplicationUpdated />} />
-        <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/profile" element={<ProfileSettingsTest />} />
         <Route path="/settings/notifications" element={<NotificationSettings />} />
         <Route path="/company-report/:campaignId" element={<CompanyReportNew />} />
-        <Route path="/profile-settings" element={<ProfileSettings />} />
+        <Route path="/profile-settings" element={<ProfileSettingsTest />} />
+        <Route path="/profile-simple" element={<ProfileSettings />} />
         <Route path="/profile-test-beta-2025" element={<ProfileSettingsTest />} />
         <Route path="/profile-view-beta-2025" element={<ProfileViewTest />} />
         <Route path="/submit-video/:campaignId" element={<VideoSubmissionPage />} />
@@ -145,6 +150,8 @@ const AppContent = () => {
         <Route path="/system-settings" element={<ProtectedRoute requireAdmin={true}><SystemSettings /></ProtectedRoute>} />
         <Route path="/email-settings" element={<ProtectedRoute requireAdmin={true}><EmailSettings /></ProtectedRoute>} />
       </Routes>
+      </PCViewLayout>
+      <PCViewToggleButton />
     </div>
   );
 };
@@ -154,7 +161,9 @@ function App() {
     <Router>
       <AuthProvider>
         <LanguageProvider>
-          <AppContent />
+          <PCViewProvider>
+            <AppContent />
+          </PCViewProvider>
         </LanguageProvider>
       </AuthProvider>
     </Router>

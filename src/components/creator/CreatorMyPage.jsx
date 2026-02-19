@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { database, supabase } from '../../lib/supabase'
 import {
   User, Settings, FileText, DollarSign, LogOut, ChevronRight,
@@ -24,6 +25,7 @@ const CreatorMyPage = () => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
@@ -79,6 +81,99 @@ const CreatorMyPage = () => {
       loadUserData()
     }
   }, [user])
+
+  // PC 확장 보기: 마이페이지 정보를 넓은 화면으로 표시
+  useEffect(() => {
+    if (!isPCView || !profile) {
+      setExpandedContent(null)
+      return
+    }
+    const gradeInfo = GRADE_CONFIG[profile.grade || 1]
+    const completedApps = applications.filter(a => a.status === 'completed' || a.status === 'sns_uploaded').length
+    const activeApps = applications.filter(a => ['approved', 'selected', 'filming', 'submitted'].includes(a.status)).length
+
+    setExpandedContent(
+      <div className="space-y-6">
+        {/* 등급 카드 확대 */}
+        <div className={`bg-gradient-to-br ${gradeInfo.bgGradient} rounded-2xl p-8 text-white shadow-xl`}>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+              <Crown size={32} className="text-white" />
+            </div>
+            <div>
+              <p className="text-white/70 text-sm">현재 등급</p>
+              <h3 className="text-3xl font-extrabold">{gradeInfo.name}</h3>
+              <p className="text-white/80 text-sm">{gradeInfo.label}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 활동 요약 */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 text-center">
+            <p className="text-3xl font-bold text-purple-600">{applications.length}</p>
+            <p className="text-sm text-gray-500 mt-1">총 지원</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 text-center">
+            <p className="text-3xl font-bold text-blue-600">{activeApps}</p>
+            <p className="text-sm text-gray-500 mt-1">진행중</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 text-center">
+            <p className="text-3xl font-bold text-green-600">{completedApps}</p>
+            <p className="text-sm text-gray-500 mt-1">완료</p>
+          </div>
+        </div>
+
+        {/* 포인트 요약 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Wallet size={20} className="text-violet-600" />
+            포인트 현황
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-violet-50 rounded-xl p-4">
+              <p className="text-xs text-violet-600 font-medium mb-1">보유 포인트</p>
+              <p className="text-2xl font-bold text-violet-700">{(profile.points || 0).toLocaleString()}P</p>
+            </div>
+            <div className="bg-green-50 rounded-xl p-4">
+              <p className="text-xs text-green-600 font-medium mb-1">누적 포인트</p>
+              <p className="text-2xl font-bold text-green-700">{(profile.total_earned_points || 0).toLocaleString()}P</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 프로필 정보 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">프로필 정보</h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Mail size={16} className="text-gray-400" />
+              <span className="text-sm text-gray-700">{user?.email}</span>
+            </div>
+            {profile.phone && (
+              <div className="flex items-center gap-3">
+                <Phone size={16} className="text-gray-400" />
+                <span className="text-sm text-gray-700">{profile.phone}</span>
+              </div>
+            )}
+            {profile.instagram_url && (
+              <div className="flex items-center gap-3">
+                <Instagram size={16} className="text-pink-500" />
+                <span className="text-sm text-gray-700">{profile.instagram_url}</span>
+              </div>
+            )}
+            {profile.youtube_url && (
+              <div className="flex items-center gap-3">
+                <Youtube size={16} className="text-red-500" />
+                <span className="text-sm text-gray-700">{profile.youtube_url}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+    return () => setExpandedContent(null)
+  }, [isPCView, profile, applications])
 
   // URL state에서 section 파라미터 처리 (포인트 페이지에서 계좌 등록으로 이동 시)
   useEffect(() => {
@@ -1392,8 +1487,8 @@ const CreatorMyPage = () => {
 
       {/* 출금 신청 모달 */}
       {showWithdrawModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
-          <div className="bg-white w-full max-w-md rounded-t-3xl p-6 animate-in slide-in-from-bottom">
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50">
+          <div className="bg-white w-full max-w-lg rounded-t-3xl p-6 animate-in slide-in-from-bottom">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-gray-900">출금 신청</h3>
               <button

@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, ArrowRight, Clock, CheckCircle, FileText,
   Upload, Target, Loader2, Calendar, Truck, Camera,
   Eye, X, BookOpen, Video, CheckCircle2, AlertCircle,
   Play, Copy, Gift, Zap, MessageSquare, Ban, Hash, Tag,
-  ShoppingBag, Store, ExternalLink
+  ShoppingBag, Store, ExternalLink, Download
 } from 'lucide-react'
+import { downloadElementAsPdf } from '../../lib/pdfDownload'
 import FourWeekGuideViewer from '../FourWeekGuideViewer'
 import ExternalGuideViewer from '../common/ExternalGuideViewer'
 import OliveYoungGuideViewer from '../OliveYoungGuideViewer'
+import AIGuideViewer from '../AIGuideViewer'
 
 // 안전하게 값을 문자열로 변환하는 헬퍼 함수
 const renderValue = (value) => {
@@ -325,9 +328,121 @@ const CreatorTipsCard = ({ tips }) => {
   )
 }
 
+// 가이드 일반 섹션 카드 (renderGuideSection을 컴포넌트로 추출)
+const GuideSection = ({ sectionKey, value, colorScheme }) => {
+  const colors = {
+    blue: { bg: 'bg-blue-50', border: 'border-blue-100', icon: 'bg-blue-500', title: 'text-blue-900', bullet: 'bg-blue-400' },
+    green: { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900', bullet: 'bg-green-400' },
+    purple: { bg: 'bg-purple-50', border: 'border-purple-100', icon: 'bg-purple-500', title: 'text-purple-900', bullet: 'bg-purple-400' },
+    orange: { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900', bullet: 'bg-orange-400' },
+  }
+  const c = colors[colorScheme] || colors.purple
+  const valueStr = renderValue(value)
+  const lines = valueStr.split('\n').filter(l => l.trim())
+
+  return (
+    <div className={`relative group overflow-hidden rounded-3xl ${c.bg} border ${c.border} p-5`}>
+      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+        <Video size={80} className="text-gray-900" />
+      </div>
+      <div className="relative z-10">
+        <div className="flex items-center gap-2 mb-3">
+          <div className={`${c.icon} text-white p-1.5 rounded-lg shadow-sm`}>
+            <CheckCircle2 size={16} strokeWidth={3} />
+          </div>
+          <span className={`font-bold ${c.title} text-base`}>{sectionKey}</span>
+        </div>
+        <ul className="space-y-2.5">
+          {lines.map((line, i) => (
+            <li key={i} className="flex items-start gap-3 text-sm text-gray-700 font-medium">
+              <span className={`mt-1.5 w-1.5 h-1.5 ${c.bullet} rounded-full flex-shrink-0`} />
+              <span className="whitespace-pre-wrap">{line.replace(/^[•\-]\s*/, '')}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+// 기획형 가이드 콘텐츠 (모달과 확장 패널에서 공유)
+const PlannedGuideContent = ({ guideData, additionalMessage, campaigns }) => {
+  if (!guideData) return null
+
+  const isObject = typeof guideData === 'object' && guideData !== null
+
+  // 외부 가이드 형식인지 확인
+  const isExternalGuide = isObject && (
+    guideData.type === 'external_url' ||
+    guideData.type === 'pdf' ||
+    guideData.type?.startsWith('google_') ||
+    ('url' in guideData && !guideData.hookingPoint && !guideData.coreMessage) ||
+    ('fileUrl' in guideData && !guideData.hookingPoint && !guideData.coreMessage)
+  )
+
+  if (isExternalGuide) {
+    return (
+      <ExternalGuideViewer
+        guideType={guideData.type}
+        guideUrl={guideData.url}
+        fileUrl={guideData.fileUrl}
+        title={guideData.title || campaigns?.external_guide_title}
+        fileName={guideData.fileName || campaigns?.external_guide_file_name}
+      />
+    )
+  }
+
+  if (isObject) {
+    const specialFields = ['content_philosophy', 'story_flow', 'authenticity_guidelines', 'creator_tips', 'shooting_scenes']
+    const entries = Object.entries(guideData)
+    const colorOrder = ['blue', 'green', 'purple', 'orange']
+    let colorIdx = 0
+
+    return (
+      <>
+        {guideData.content_philosophy && <ContentPhilosophyCard data={guideData.content_philosophy} />}
+        {guideData.story_flow && <StoryFlowCard data={guideData.story_flow} />}
+        {guideData.authenticity_guidelines && <AuthenticityGuidelinesCard data={guideData.authenticity_guidelines} />}
+        {guideData.creator_tips && Array.isArray(guideData.creator_tips) && <CreatorTipsCard tips={guideData.creator_tips} />}
+        {guideData.shooting_scenes && Array.isArray(guideData.shooting_scenes) && <ShootingScenesTable scenes={guideData.shooting_scenes} />}
+        {entries
+          .filter(([key]) => !specialFields.includes(key))
+          .map(([key, value]) => {
+            const color = colorOrder[colorIdx++ % colorOrder.length]
+            return <GuideSection key={key} sectionKey={key} value={value} colorScheme={color} />
+          })}
+        {additionalMessage && (
+          <div className="rounded-3xl bg-yellow-50 border border-yellow-200 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-yellow-500 text-white p-1.5 rounded-lg shadow-sm">
+                <AlertCircle size={16} strokeWidth={3} />
+              </div>
+              <span className="font-bold text-yellow-900 text-base">추가 메시지</span>
+            </div>
+            <p className="text-sm text-yellow-800/80 font-medium">{renderValue(additionalMessage)}</p>
+          </div>
+        )}
+      </>
+    )
+  }
+
+  return (
+    <div className="relative overflow-hidden rounded-3xl bg-purple-50 border border-purple-100 p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="bg-purple-500 text-white p-1.5 rounded-lg shadow-sm">
+          <CheckCircle2 size={16} strokeWidth={3} />
+        </div>
+        <span className="font-bold text-purple-900 text-base">촬영 가이드</span>
+      </div>
+      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(guideData)}</p>
+    </div>
+  )
+}
+
 const ApplicationsPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [loading, setLoading] = useState(true)
   const [applications, setApplications] = useState([])
@@ -341,6 +456,8 @@ const ApplicationsPage = () => {
   })
   const [showGuideModal, setShowGuideModal] = useState(false)
   const [selectedGuide, setSelectedGuide] = useState(null)
+  const guideContentRef = useRef(null)
+  const [pdfDownloading, setPdfDownloading] = useState(false)
 
   // SNS 업로드 관련 상태 (레거시 코드 기반)
   const [showSnsUploadModal, setShowSnsUploadModal] = useState(false)
@@ -394,6 +511,128 @@ const ApplicationsPage = () => {
       loadApplications()
     }
   }, [user])
+
+  // PC 확장 보기: 가이드 모달 열림 시 가이드 내용을 확장 패널에 표시
+  useEffect(() => {
+    if (!isPCView) {
+      setExpandedContent(null)
+      return
+    }
+    if (showGuideModal && selectedGuide) {
+      setExpandedContent(
+        <div className="space-y-6">
+          <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-6 text-white">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-white/20 px-2.5 py-0.5 rounded-md text-xs font-bold">
+                {selectedGuide.type === 'planned' && '기획형'}
+                {selectedGuide.type === 'oliveyoung' && '올리브영'}
+                {selectedGuide.type === '4week_challenge' && '4주 챌린지'}
+                {selectedGuide.type === 'general' && '일반'}
+              </span>
+            </div>
+            <h3 className="text-2xl font-extrabold mb-1">촬영 가이드</h3>
+            <p className="text-white/70">{selectedGuide.campaigns?.brand} - {selectedGuide.campaigns?.title}</p>
+          </div>
+
+          {/* 기획형 가이드 확장 렌더링 - 모바일 모달과 동일한 콘텐츠 */}
+          {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
+            <div className="space-y-4">
+              <PlannedGuideContent
+                guideData={selectedGuide.personalized_guide}
+                additionalMessage={selectedGuide.additional_message}
+                campaigns={selectedGuide.campaigns}
+              />
+            </div>
+          )}
+
+          {/* 올리브영 가이드 확장 렌더링 */}
+          {selectedGuide.type === 'oliveyoung' && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+              {selectedGuide.campaigns?.oliveyoung_step1_guide_ai && (
+                <div>
+                  <h4 className="text-lg font-bold text-green-900 mb-3">1차 촬영 가이드</h4>
+                  <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai} />
+                </div>
+              )}
+              {selectedGuide.campaigns?.oliveyoung_step2_guide_ai && (
+                <div>
+                  <h4 className="text-lg font-bold text-blue-900 mb-3">2차 촬영 가이드</h4>
+                  <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai} />
+                </div>
+              )}
+              {selectedGuide.campaigns?.oliveyoung_step3_guide_ai && (
+                <div>
+                  <h4 className="text-lg font-bold text-purple-900 mb-3">3차 촬영 가이드</h4>
+                  <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step3_guide_ai} />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 4주 챌린지 가이드 확장 렌더링 */}
+          {selectedGuide.type === '4week_challenge' && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <FourWeekGuideViewer
+                guides={selectedGuide.campaigns?.challenge_weekly_guides_ai}
+                commonMessage={selectedGuide.additional_message}
+              />
+            </div>
+          )}
+        </div>
+      )
+    } else {
+      // 가이드 모달 닫힘 - 지원 내역 요약 표시
+      if (applications.length > 0) {
+        const approved = applications.filter(a => ['approved', 'selected'].includes(a.status)).length
+        const completed = applications.filter(a => a.status === 'completed' || a.status === 'sns_uploaded').length
+        setExpandedContent(
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+                <p className="text-3xl font-bold text-purple-600">{applications.length}</p>
+                <p className="text-sm text-gray-500 mt-1">총 지원</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+                <p className="text-3xl font-bold text-green-600">{approved}</p>
+                <p className="text-sm text-gray-500 mt-1">선정됨</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+                <p className="text-3xl font-bold text-blue-600">{completed}</p>
+                <p className="text-sm text-gray-500 mt-1">완료</p>
+              </div>
+            </div>
+          </div>
+        )
+      } else {
+        setExpandedContent(null)
+      }
+    }
+    return () => setExpandedContent(null)
+  }, [isPCView, showGuideModal, selectedGuide, applications])
+
+  const handlePdfDownload = async () => {
+    if (!guideContentRef.current || pdfDownloading) return
+    setPdfDownloading(true)
+    try {
+      const el = guideContentRef.current
+      const originalOverflow = el.style.overflow
+      const originalMaxHeight = el.style.maxHeight
+      el.style.overflow = 'visible'
+      el.style.maxHeight = 'none'
+
+      const campaignTitle = selectedGuide.campaigns?.title || '촬영가이드'
+      const brandName = selectedGuide.campaigns?.brand || ''
+      const filename = `${brandName ? brandName + '_' : ''}${campaignTitle}_촬영가이드`
+      await downloadElementAsPdf(el, filename)
+
+      el.style.overflow = originalOverflow
+      el.style.maxHeight = originalMaxHeight
+    } catch (error) {
+      console.error('PDF 다운로드 실패:', error)
+    } finally {
+      setPdfDownloading(false)
+    }
+  }
 
   const loadApplications = async () => {
     try {
@@ -1900,8 +2139,8 @@ const ApplicationsPage = () => {
 
       {/* 가이드 모달 - 새로운 디자인 */}
       {showGuideModal && selectedGuide && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-md max-h-[90vh] overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col">
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col">
 
             {/* 히어로 헤더 */}
             <div className="relative bg-gradient-to-br from-purple-600 to-indigo-700 p-6 pb-8">
@@ -1955,157 +2194,15 @@ const ApplicationsPage = () => {
             </div>
 
             {/* 스크롤 콘텐츠 영역 */}
-            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 bg-gray-50">
+            <div ref={guideContentRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-6 bg-gray-50">
 
-              {/* 기획형 가이드 내용 */}
+              {/* 기획형 가이드 내용 - PlannedGuideContent 공유 컴포넌트 사용 */}
               {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
-                <>
-                  {(() => {
-                    const guideData = selectedGuide.personalized_guide
-                    const isObject = typeof guideData === 'object' && guideData !== null
-
-                    // 외부 가이드 형식인지 확인 (type이 external_url 또는 url/fileUrl 필드가 있는 경우)
-                    const isExternalGuide = isObject && (
-                      guideData.type === 'external_url' ||
-                      guideData.type === 'pdf' ||
-                      guideData.type?.startsWith('google_') ||
-                      ('url' in guideData && !guideData.hookingPoint && !guideData.coreMessage) ||
-                      ('fileUrl' in guideData && !guideData.hookingPoint && !guideData.coreMessage)
-                    )
-
-                    // 외부 가이드인 경우 ExternalGuideViewer로 렌더링
-                    if (isExternalGuide) {
-                      return (
-                        <ExternalGuideViewer
-                          guideType={guideData.type}
-                          guideUrl={guideData.url}
-                          fileUrl={guideData.fileUrl}
-                          title={guideData.title || selectedGuide.campaigns?.external_guide_title}
-                          fileName={guideData.fileName || selectedGuide.campaigns?.external_guide_file_name}
-                        />
-                      )
-                    }
-
-                    // 가이드 섹션들을 카드로 분리
-                    const renderGuideSection = (key, value, colorScheme) => {
-                      const colors = {
-                        blue: { bg: 'bg-blue-50', border: 'border-blue-100', icon: 'bg-blue-500', title: 'text-blue-900', bullet: 'bg-blue-400' },
-                        green: { bg: 'bg-green-50', border: 'border-green-100', icon: 'bg-green-500', title: 'text-green-900', bullet: 'bg-green-400' },
-                        purple: { bg: 'bg-purple-50', border: 'border-purple-100', icon: 'bg-purple-500', title: 'text-purple-900', bullet: 'bg-purple-400' },
-                        orange: { bg: 'bg-orange-50', border: 'border-orange-100', icon: 'bg-orange-500', title: 'text-orange-900', bullet: 'bg-orange-400' },
-                      }
-                      const c = colors[colorScheme] || colors.purple
-                      const valueStr = renderValue(value)
-                      const lines = valueStr.split('\n').filter(l => l.trim())
-
-                      return (
-                        <div key={key} className={`relative group overflow-hidden rounded-3xl ${c.bg} border ${c.border} p-5`}>
-                          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <Video size={80} className="text-gray-900" />
-                          </div>
-                          <div className="relative z-10">
-                            <div className="flex items-center gap-2 mb-3">
-                              <div className={`${c.icon} text-white p-1.5 rounded-lg shadow-sm`}>
-                                <CheckCircle2 size={16} strokeWidth={3} />
-                              </div>
-                              <span className={`font-bold ${c.title} text-base`}>{key}</span>
-                            </div>
-                            <ul className="space-y-2.5">
-                              {lines.map((line, i) => (
-                                <li key={i} className="flex items-start gap-3 text-sm text-gray-700 font-medium">
-                                  <span className={`mt-1.5 w-1.5 h-1.5 ${c.bullet} rounded-full flex-shrink-0`} />
-                                  <span className="whitespace-pre-wrap">{line.replace(/^[•\-]\s*/, '')}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      )
-                    }
-
-                    if (isObject) {
-                      // 새로운 AI 가이드 필드들을 위한 전용 컴포넌트 렌더링
-                      const specialFields = ['content_philosophy', 'story_flow', 'authenticity_guidelines', 'creator_tips', 'shooting_scenes']
-                      const entries = Object.entries(guideData)
-                      const colorOrder = ['blue', 'green', 'purple', 'orange']
-                      let colorIdx = 0
-
-                      // 전용 컴포넌트들 먼저 렌더링
-                      const specialComponents = []
-
-                      // 콘텐츠 철학 카드
-                      if (guideData.content_philosophy) {
-                        specialComponents.push(
-                          <ContentPhilosophyCard key="content_philosophy" data={guideData.content_philosophy} />
-                        )
-                      }
-
-                      // 스토리 흐름 카드
-                      if (guideData.story_flow) {
-                        specialComponents.push(
-                          <StoryFlowCard key="story_flow" data={guideData.story_flow} />
-                        )
-                      }
-
-                      // 진정성 가이드라인 카드
-                      if (guideData.authenticity_guidelines) {
-                        specialComponents.push(
-                          <AuthenticityGuidelinesCard key="authenticity_guidelines" data={guideData.authenticity_guidelines} />
-                        )
-                      }
-
-                      // 크리에이터 팁 카드
-                      if (guideData.creator_tips && Array.isArray(guideData.creator_tips)) {
-                        specialComponents.push(
-                          <CreatorTipsCard key="creator_tips" tips={guideData.creator_tips} />
-                        )
-                      }
-
-                      // 촬영 장면 테이블
-                      if (guideData.shooting_scenes && Array.isArray(guideData.shooting_scenes)) {
-                        specialComponents.push(
-                          <ShootingScenesTable key="shooting_scenes" scenes={guideData.shooting_scenes} />
-                        )
-                      }
-
-                      // 나머지 필드들은 기존 방식으로 렌더링
-                      const regularSections = entries
-                        .filter(([key]) => !specialFields.includes(key))
-                        .map(([key, value]) => {
-                          const color = colorOrder[colorIdx % colorOrder.length]
-                          colorIdx++
-                          return renderGuideSection(key, value, color)
-                        })
-
-                      return [...specialComponents, ...regularSections]
-                    }
-
-                    return (
-                      <div className="relative overflow-hidden rounded-3xl bg-purple-50 border border-purple-100 p-5">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="bg-purple-500 text-white p-1.5 rounded-lg shadow-sm">
-                            <CheckCircle2 size={16} strokeWidth={3} />
-                          </div>
-                          <span className="font-bold text-purple-900 text-base">촬영 가이드</span>
-                        </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{renderValue(guideData)}</p>
-                      </div>
-                    )
-                  })()}
-
-                  {/* 추가 메시지 */}
-                  {selectedGuide.additional_message && (
-                    <div className="rounded-3xl bg-yellow-50 border border-yellow-200 p-5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="bg-yellow-500 text-white p-1.5 rounded-lg shadow-sm">
-                          <AlertCircle size={16} strokeWidth={3} />
-                        </div>
-                        <span className="font-bold text-yellow-900 text-base">추가 메시지</span>
-                      </div>
-                      <p className="text-sm text-yellow-800/80 font-medium">{renderValue(selectedGuide.additional_message)}</p>
-                    </div>
-                  )}
-                </>
+                <PlannedGuideContent
+                  guideData={selectedGuide.personalized_guide}
+                  additionalMessage={selectedGuide.additional_message}
+                  campaigns={selectedGuide.campaigns}
+                />
               )}
 
               {/* 올리브영 가이드 내용 */}
@@ -2534,16 +2631,30 @@ const ApplicationsPage = () => {
 
             {/* 하단 고정 버튼 */}
             <div className="bg-white border-t border-gray-100 p-4 safe-area-bottom">
-              <button
-                onClick={() => {
-                  setShowGuideModal(false)
-                  setSelectedGuide(null)
-                }}
-                className="w-full bg-gray-900 text-white font-bold text-base py-4 rounded-2xl shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-              >
-                확인했어요
-                <ArrowRight size={18} />
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handlePdfDownload}
+                  disabled={pdfDownloading}
+                  className="flex-shrink-0 bg-purple-600 text-white font-bold text-sm py-4 px-5 rounded-2xl shadow-lg hover:bg-purple-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {pdfDownloading ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <Download size={18} />
+                  )}
+                  PDF
+                </button>
+                <button
+                  onClick={() => {
+                    setShowGuideModal(false)
+                    setSelectedGuide(null)
+                  }}
+                  className="flex-1 bg-gray-900 text-white font-bold text-base py-4 rounded-2xl shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  확인했어요
+                  <ArrowRight size={18} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2551,8 +2662,8 @@ const ApplicationsPage = () => {
 
       {/* SNS 업로드 모달 (레거시 코드 기반) */}
       {showSnsUploadModal && selectedApplication && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-100 p-4 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">SNS 업로드</h3>
               <button

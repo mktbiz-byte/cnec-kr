@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { database, supabase } from '../../lib/supabase'
 import {
   Search, Filter, Target, Gift, Calendar,
@@ -13,6 +14,7 @@ const ITEMS_PER_PAGE = 10
 const CreatorSearch = ({ onCampaignClick }) => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -304,6 +306,54 @@ const CreatorSearch = ({ onCampaignClick }) => {
     const date = new Date(deadline)
     return `${date.getMonth() + 1}/${date.getDate()}`
   }
+
+  // PC 확장 보기: 캠페인 목록을 넓은 그리드로 표시
+  useEffect(() => {
+    if (!isPCView) {
+      setExpandedContent(null)
+      return
+    }
+    if (visibleCampaigns.length > 0) {
+      setExpandedContent(
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">캠페인 목록 ({filteredCampaigns.length}개)</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            {visibleCampaigns.map((campaign) => {
+              const reward = campaign.creator_points_override || campaign.reward_points || 0
+              return (
+                <div
+                  key={campaign.id}
+                  className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer bg-white"
+                  onClick={() => navigate(`/campaign/${campaign.id}`)}
+                >
+                  {campaign.image_url ? (
+                    <img src={campaign.image_url} alt={campaign.title} className="w-full h-48 object-cover" />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                      <Gift size={40} className="text-gray-300" />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    {campaign.brand && (
+                      <p className="text-xs text-blue-600 font-medium mb-1">{campaign.brand}</p>
+                    )}
+                    <h4 className="text-sm font-bold text-gray-900 line-clamp-2 mb-2">{campaign.title}</h4>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-violet-600">{formatPrice(reward)}</span>
+                      {campaign.application_deadline && (
+                        <span className="text-xs text-gray-400">~{formatDeadlineRange(campaign.application_deadline)}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )
+    }
+    return () => setExpandedContent(null)
+  }, [isPCView, visibleCampaigns, filteredCampaigns.length])
 
   return (
     <div className="pb-20">

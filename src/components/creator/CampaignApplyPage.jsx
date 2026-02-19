@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { database, supabase } from '../../lib/supabase'
 import {
   ArrowLeft, Instagram, Youtube, Hash,
@@ -12,6 +13,7 @@ const CampaignApplyPage = () => {
   const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [campaign, setCampaign] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -200,6 +202,73 @@ const CampaignApplyPage = () => {
     return `${date.getMonth() + 1}월 ${date.getDate()}일`
   }
 
+  // PC 확장 보기: 캠페인 정보 및 지원 요건 확대
+  useEffect(() => {
+    if (!isPCView || !campaign) {
+      setExpandedContent(null)
+      return
+    }
+    const reward = campaign.creator_points_override || campaign.reward_points || 0
+    setExpandedContent(
+      <div className="space-y-6">
+        {/* 캠페인 이미지 및 정보 */}
+        {campaign.image_url && (
+          <div className="rounded-2xl overflow-hidden shadow-lg">
+            <img src={campaign.image_url} alt={campaign.title} className="w-full max-h-[400px] object-cover" />
+          </div>
+        )}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          {campaign.brand && (
+            <p className="text-sm text-blue-600 font-medium mb-2">{campaign.brand}</p>
+          )}
+          <h3 className="text-xl font-bold text-gray-900 mb-3">{campaign.title}</h3>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <Gift size={18} className="text-violet-500" />
+              <span className="text-xl font-bold text-violet-600">{reward.toLocaleString()}P</span>
+            </div>
+          </div>
+          {campaign.description && (
+            <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">{campaign.description}</p>
+          )}
+        </div>
+
+        {/* 일정 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Calendar size={20} className="text-purple-600" />
+            캠페인 일정
+          </h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">모집 마감</p>
+              <p className="text-sm font-bold text-gray-900">{formatDate(campaign.application_deadline)}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">선정 발표</p>
+              <p className="text-sm font-bold text-gray-900">{formatDate(campaign.announcement_date)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 지원 질문 미리보기 */}
+        {campaign.questions && campaign.questions.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h4 className="text-lg font-bold text-gray-900 mb-4">지원 질문</h4>
+            <div className="space-y-3">
+              {campaign.questions.map((q, idx) => (
+                <div key={idx} className="bg-gray-50 rounded-xl p-4">
+                  <p className="text-sm font-medium text-gray-900">Q{idx + 1}. {q.question || q}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+    return () => setExpandedContent(null)
+  }, [isPCView, campaign])
+
   if (loading) {
     return (
       <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
@@ -324,7 +393,7 @@ const CampaignApplyPage = () => {
           <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
             <div className="flex items-center justify-between px-4 py-3">
           <button
-            onClick={() => navigate(`/campaign/${id}`)}
+            onClick={() => navigate(-1)}
             className="p-1 hover:bg-gray-100 rounded-full"
           >
             <ArrowLeft size={24} className="text-gray-700" />
@@ -583,7 +652,10 @@ const CampaignApplyPage = () => {
         </div>
 
         {/* 하단 버튼 */}
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 p-4 pb-6 z-40">
+        <div className={isPCView
+          ? "sticky bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40"
+          : "fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100 p-4 pb-6 z-40"
+        }>
           <button
             onClick={handleSubmit}
             disabled={submitting}

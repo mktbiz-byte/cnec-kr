@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { database, supabase } from '../../lib/supabase'
 import {
   DollarSign, FileText, ChevronRight,
@@ -153,6 +154,7 @@ export const getNextGradeInfo = (currentGrade, totalScore, completedCampaigns) =
 
 const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
   const { user } = useAuth()
+  const { isPCView, setExpandedContent } = usePCView()
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState(true)
@@ -318,6 +320,57 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
       setLoading(false)
     }
   }
+
+  // PC 확장 보기: 대시보드 요약 정보
+  useEffect(() => {
+    if (!isPCView || loading) {
+      setExpandedContent(null)
+      return
+    }
+    setExpandedContent(
+      <div className="space-y-6">
+        <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-6 text-white">
+          <h3 className="text-2xl font-extrabold mb-1">대시보드</h3>
+          <p className="text-white/70">{profile?.name || '크리에이터'}님의 활동 현황</p>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+            <p className="text-3xl font-bold text-purple-600">{stats.activeCampaigns}</p>
+            <p className="text-sm text-gray-500 mt-1">진행중 캠페인</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+            <p className="text-3xl font-bold text-green-600">{stats.completedCampaigns}</p>
+            <p className="text-sm text-gray-500 mt-1">완료 캠페인</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+            <p className="text-3xl font-bold text-blue-600">{stats.totalPoints.toLocaleString()}P</p>
+            <p className="text-sm text-gray-500 mt-1">총 포인트</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+            <p className="text-3xl font-bold text-orange-600">{gradeInfo?.name || 'FRESH'}</p>
+            <p className="text-sm text-gray-500 mt-1">현재 등급</p>
+          </div>
+        </div>
+        {recommendedCampaigns.length > 0 && (
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-3">추천 캠페인</h4>
+            <div className="grid grid-cols-1 gap-3">
+              {recommendedCampaigns.slice(0, 4).map((camp) => (
+                <div key={camp.id}
+                  className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => navigate(`/campaign/${camp.id}`)}
+                >
+                  <p className="font-bold text-gray-900">{camp.title}</p>
+                  <p className="text-sm text-gray-500 mt-1">{camp.brand}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+    return () => setExpandedContent(null)
+  }, [isPCView, loading, stats, gradeInfo, profile, recommendedCampaigns])
 
   const formatCurrency = (amount) => {
     if (!amount) return '0P'
