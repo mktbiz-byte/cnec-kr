@@ -1487,8 +1487,8 @@ const CreatorMyPage = () => {
 
       {/* 출금 신청 모달 */}
       {showWithdrawModal && (
-        <div className={`${isPCView ? 'absolute' : 'fixed'} inset-0 z-50 flex items-end justify-center bg-black/50`}>
-          <div className={`bg-white w-full ${isPCView ? '' : 'max-w-md'} rounded-t-3xl p-6 animate-in slide-in-from-bottom`}>
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50">
+          <div className="bg-white w-full max-w-lg rounded-t-3xl p-6 animate-in slide-in-from-bottom">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-gray-900">출금 신청</h3>
               <button

@@ -622,8 +622,8 @@ const PointsPage = () => {
 
       {/* 출금 신청 모달 */}
       {showWithdrawModal && (
-        <div className={`${isPCView ? 'absolute' : 'fixed'} inset-0 bg-black/50 z-50 flex items-end justify-center`}>
-          <div className={`w-full ${isPCView ? '' : 'max-w-md'} bg-white rounded-t-2xl p-6`}>
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-end justify-center">
+          <div className="w-full max-w-lg bg-white rounded-t-2xl p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">출금 신청</h3>
 
             <div className="mb-4">

@@ -1,25 +1,75 @@
 import html2pdf from 'html2pdf.js'
 
 /**
- * oklch 색상 값을 브라우저가 지원하는 rgb로 변환
+ * oklch 색상을 수학적으로 rgb로 변환 (브라우저 의존 없음)
+ * 최신 Chrome이 getComputedStyle에서 oklch를 그대로 반환하는 문제 해결
  */
-function oklchToRgb(oklchValue) {
-  const temp = document.createElement('div')
-  temp.style.color = oklchValue
-  temp.style.display = 'none'
-  document.body.appendChild(temp)
-  const rgbValue = getComputedStyle(temp).color
-  document.body.removeChild(temp)
-  return rgbValue || 'rgb(0, 0, 0)'
+function oklchToRgb(oklchStr) {
+  const match = oklchStr.match(
+    /oklch\(\s*([\d.]+%?|none)\s+([\d.]+%?|none)\s+([\d.]+(?:deg)?|none)(?:\s*\/\s*([\d.]+%?|none))?\s*\)/
+  )
+  if (!match) return 'rgb(0, 0, 0)'
+
+  let L = match[1] === 'none' ? 0 : parseFloat(match[1])
+  if (match[1]?.endsWith('%')) L = L / 100
+
+  let C = match[2] === 'none' ? 0 : parseFloat(match[2])
+
+  let H = match[3] === 'none' ? 0 : parseFloat(match[3])
+
+  let alpha = 1
+  if (match[4] && match[4] !== 'none') {
+    alpha = parseFloat(match[4])
+    if (match[4].endsWith('%')) alpha = alpha / 100
+  }
+
+  // oklch → oklab
+  const hRad = H * Math.PI / 180
+  const a_ = C * Math.cos(hRad)
+  const b_ = C * Math.sin(hRad)
+
+  // oklab → LMS (cube root domain)
+  const l = L + 0.3963377774 * a_ + 0.2158037573 * b_
+  const m = L - 0.1055613458 * a_ - 0.0638541728 * b_
+  const s = L - 0.0894841775 * a_ - 1.2914855480 * b_
+
+  // LMS cube root → LMS linear
+  const ll = l * l * l
+  const mm = m * m * m
+  const ss = s * s * s
+
+  // LMS → linear sRGB
+  let r = +4.0767416621 * ll - 3.3077115913 * mm + 0.2309699292 * ss
+  let g = -1.2684380046 * ll + 2.6097574011 * mm - 0.3413193965 * ss
+  let b = -0.0041960863 * ll - 0.7034186147 * mm + 1.7076147010 * ss
+
+  // linear sRGB → sRGB (gamma correction) + clamp
+  const toSrgb = (v) => {
+    v = Math.max(0, Math.min(1, v))
+    return Math.round(
+      (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055) * 255
+    )
+  }
+
+  r = toSrgb(r)
+  g = toSrgb(g)
+  b = toSrgb(b)
+
+  if (alpha < 1) {
+    return `rgba(${r}, ${g}, ${b}, ${Math.round(alpha * 1000) / 1000})`
+  }
+  return `rgb(${r}, ${g}, ${b})`
 }
 
+const OKLCH_RE = /oklch\([^)]+\)/g
+
 /**
- * 원본 문서의 스타일시트에서 oklch를 rgb로 치환하고 복원 함수를 반환
- *
- * 전략: html2canvas가 문서를 클론할 때 oklch가 없는 상태로 복사되도록,
- * 클론 전에 원본 문서의 스타일을 직접 수정한 뒤 PDF 생성 후 복원
+ * 원본 문서의 모든 oklch를 rgb로 치환하고 복원 함수를 반환
+ * - <style> textContent 직접 치환
+ * - <link> CSS 파일을 fetch하여 인라인 <style>로 교체
+ * - :root CSS 변수 오버라이드
  */
-function patchOklchInDocument() {
+async function patchOklchInDocument() {
   const cache = new Map()
   const convert = (match) => {
     if (cache.has(match)) return cache.get(match)
@@ -35,41 +85,38 @@ function patchOklchInDocument() {
     const text = el.textContent
     if (text && text.includes('oklch')) {
       const original = text
-      el.textContent = text.replace(/oklch\([^)]+\)/g, convert)
+      el.textContent = text.replace(OKLCH_RE, convert)
       restoreFns.push(() => { el.textContent = original })
     }
   })
 
-  // 2. <link rel="stylesheet"> 로 로드된 외부 CSS 파일 처리
-  //    CSSOM에서 읽어서 inline <style>로 교체
-  const processedLinks = []
-  for (const sheet of document.styleSheets) {
-    if (!sheet.href) continue // <style> 요소는 위에서 처리
+  // 2. <link rel="stylesheet"> → raw CSS fetch 후 인라인 <style>로 교체
+  const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+  for (const link of links) {
     try {
-      const rules = Array.from(sheet.cssRules)
-      const text = rules.map(r => r.cssText).join('\n')
-      if (!text.includes('oklch')) continue
+      if (!link.href) continue
+      const res = await fetch(link.href)
+      const rawCss = await res.text()
+      if (!rawCss.includes('oklch')) continue
 
-      const fixedText = text.replace(/oklch\([^)]+\)/g, convert)
-      const linkEl = sheet.ownerNode
+      const fixedCss = rawCss.replace(OKLCH_RE, convert)
 
-      // <link>를 비활성화하고 인라인 <style>로 교체
-      linkEl.disabled = true
+      // <link> 제거 후 같은 위치에 <style> 삽입
       const inlineStyle = document.createElement('style')
       inlineStyle.dataset.pdfOklchFix = 'true'
-      inlineStyle.textContent = fixedText
-      document.head.appendChild(inlineStyle)
+      inlineStyle.textContent = fixedCss
+      link.replaceWith(inlineStyle)
 
-      processedLinks.push({ linkEl, inlineStyle })
+      restoreFns.push(() => { inlineStyle.replaceWith(link) })
     } catch (e) {
-      // Cross-origin 스타일시트 접근 불가
+      // Cross-origin 또는 fetch 실패 - 무시
     }
   }
 
-  // 3. :root CSS 변수도 인라인으로 오버라이드
+  // 3. :root CSS 변수를 rgb로 오버라이드
   const root = document.documentElement
   const originalRootStyle = root.getAttribute('style') || ''
-  const computedStyle = getComputedStyle(root)
+  const computed = getComputedStyle(root)
   const varNames = [
     '--background', '--foreground', '--card', '--card-foreground',
     '--popover', '--popover-foreground', '--primary', '--primary-foreground',
@@ -81,23 +128,15 @@ function patchOklchInDocument() {
     '--sidebar-primary-foreground', '--sidebar-accent',
     '--sidebar-accent-foreground', '--sidebar-border', '--sidebar-ring',
   ]
-  varNames.forEach(varName => {
-    const raw = computedStyle.getPropertyValue(varName).trim()
-    if (raw) {
-      root.style.setProperty(varName, raw.includes('oklch') ? oklchToRgb(raw) : raw)
+  varNames.forEach(v => {
+    const raw = computed.getPropertyValue(v).trim()
+    if (raw && raw.includes('oklch')) {
+      root.style.setProperty(v, convert(raw))
     }
   })
 
-  // 복원 함수 반환
   return function restore() {
-    // <style> 요소 복원
     restoreFns.forEach(fn => fn())
-    // <link> 복원
-    processedLinks.forEach(({ linkEl, inlineStyle }) => {
-      linkEl.disabled = false
-      inlineStyle.remove()
-    })
-    // :root 인라인 스타일 복원
     if (originalRootStyle) {
       root.setAttribute('style', originalRootStyle)
     } else {
@@ -108,13 +147,10 @@ function patchOklchInDocument() {
 
 /**
  * HTML 요소를 PDF로 변환하여 다운로드
- * @param {HTMLElement} element - PDF로 변환할 DOM 요소
- * @param {string} filename - 출력 파일명 (.pdf 확장자 제외)
- * @param {object} options - html2pdf 추가 옵션
  */
 export async function downloadElementAsPdf(element, filename = 'guide', options = {}) {
-  // PDF 생성 전에 oklch → rgb 치환 (원본 문서 직접 수정)
-  const restoreOklch = patchOklchInDocument()
+  // PDF 생성 전에 oklch → rgb 치환 (원본 문서 직접 수정, async)
+  const restoreOklch = await patchOklchInDocument()
 
   try {
     const pdfOptions = {
@@ -146,7 +182,6 @@ export async function downloadElementAsPdf(element, filename = 'guide', options 
 
     await html2pdf().set(pdfOptions).from(element).save()
   } finally {
-    // 항상 원본 스타일 복원
     restoreOklch()
   }
 }

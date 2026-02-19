@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CreatorLayout from './CreatorLayout'
+import { usePCView } from '../../contexts/PCViewContext'
 import {
   ArrowLeft, Search, UserCheck, Package, Video, Upload, Coins,
   ChevronRight, CheckCircle, Star, Award, Crown, Sparkles,
@@ -136,6 +137,144 @@ const typeBgMap = {
 export default function CreatorGuidePage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('flow')
+  const { isPCView, setExpandedContent } = usePCView()
+
+  // PC 확장 보기: 현재 탭의 확대 콘텐츠 표시
+  useEffect(() => {
+    if (!isPCView) {
+      setExpandedContent(null)
+      return
+    }
+
+    setExpandedContent(
+      <div className="space-y-6">
+        {/* 가이드 요약 카드 */}
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
+          <h3 className="text-lg font-bold text-purple-900 mb-2">크리에이터 활동 가이드</h3>
+          <p className="text-sm text-purple-700">캠페인 지원부터 포인트 지급까지의 전체 프로세스를 안내합니다.</p>
+        </div>
+
+        {activeTab === 'flow' && (
+          <div className="space-y-4">
+            <h4 className="text-lg font-bold text-gray-900">활동 플로우 상세</h4>
+            {FLOW_STEPS.map((step, idx) => {
+              const c = colorMap[step.color]
+              return (
+                <div key={idx} className="bg-white rounded-2xl border border-gray-100 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-8 h-8 rounded-full ${c.bg} flex items-center justify-center text-sm font-bold ${c.text}`}>
+                      {idx + 1}
+                    </div>
+                    <h5 className="font-bold text-gray-900">{step.title}</h5>
+                  </div>
+                  <p className="text-sm text-gray-700 mb-2">{step.desc}</p>
+                  <div className="bg-amber-50 rounded-lg px-3 py-2">
+                    <p className="text-xs text-amber-800"><span className="font-bold">TIP</span> {step.tip}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {activeTab === 'types' && (
+          <div className="space-y-4">
+            <h4 className="text-lg font-bold text-gray-900">캠페인 유형 비교</h4>
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50">
+                    <th className="text-left py-3 px-4 text-gray-500 font-medium"></th>
+                    <th className="text-center py-3 px-4 text-blue-600 font-bold">기획형</th>
+                    <th className="text-center py-3 px-4 text-emerald-600 font-bold">올리브영</th>
+                    <th className="text-center py-3 px-4 text-violet-600 font-bold">4주 챌린지</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARE_ROWS.map((row, i) => (
+                    <tr key={i} className={i < COMPARE_ROWS.length - 1 ? 'border-b border-gray-50' : ''}>
+                      <td className="py-3 px-4 text-gray-600 font-medium">{row.label}</td>
+                      <td className="py-3 px-4 text-center text-gray-800">{row.planned}</td>
+                      <td className="py-3 px-4 text-center text-gray-800">{row.oliveyoung}</td>
+                      <td className="py-3 px-4 text-center text-gray-800">{row.challenge}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {CAMPAIGN_TYPES.map((ct, idx) => {
+              const tb = typeBgMap[ct.color]
+              return (
+                <div key={idx} className={`rounded-2xl border p-5 ${tb.card}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <h5 className="font-bold text-gray-900 text-base">{ct.type}</h5>
+                    <span className={`text-xs text-white px-2 py-0.5 rounded-full ${tb.badge}`}>{ct.badge}</span>
+                  </div>
+                  <p className="text-sm text-gray-700 mb-3">{ct.desc}</p>
+                  <div className="space-y-2">
+                    {ct.details.map((d, i) => (
+                      <div key={i} className="flex gap-3">
+                        <span className="text-sm text-gray-500 w-24 flex-shrink-0 font-medium">{d.label}</span>
+                        <span className="text-sm text-gray-800">{d.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {activeTab === 'points' && (
+          <div className="space-y-4">
+            <h4 className="text-lg font-bold text-gray-900">포인트 & 등급 상세</h4>
+
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h5 className="font-bold text-gray-900 mb-4">크리에이터 등급 시스템</h5>
+              <div className="space-y-3">
+                {GRADES.map((g, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div className={`w-12 h-12 rounded-full bg-${g.color}-100 flex items-center justify-center`}>
+                      <span className={`text-lg font-bold text-${g.color}-600`}>{g.name[0]}</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base font-bold text-gray-900">{g.name}</span>
+                        <span className="text-sm text-gray-500">{g.label}</span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-0.5">{g.condition}</p>
+                    </div>
+                    <p className="text-sm text-gray-700 font-medium">{g.benefit}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-violet-50 rounded-2xl border border-violet-100 p-5">
+              <h5 className="font-bold text-violet-900 mb-3">포인트 출금 안내</h5>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="bg-white rounded-xl p-4 text-center">
+                  <p className="text-xs text-gray-500 mb-1">최소 출금</p>
+                  <p className="text-lg font-bold text-gray-900">10,000원</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 text-center">
+                  <p className="text-xs text-gray-500 mb-1">원천징수</p>
+                  <p className="text-lg font-bold text-gray-900">3.3%</p>
+                </div>
+              </div>
+              <div className="space-y-2 text-sm text-violet-800">
+                <p>1. 마이페이지 &gt; 계좌 정보에서 출금 계좌 등록</p>
+                <p>2. 출금 신청 시 주민등록번호 입력 (원천징수용)</p>
+                <p>3. 관리자 확인 후 3~5 영업일 내 입금</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+
+    return () => setExpandedContent(null)
+  }, [isPCView, activeTab])
 
   return (
     <CreatorLayout>

@@ -2139,8 +2139,8 @@ const ApplicationsPage = () => {
 
       {/* 가이드 모달 - 새로운 디자인 */}
       {showGuideModal && selectedGuide && (
-        <div className={`${isPCView ? 'absolute' : 'fixed'} inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center`}>
-          <div className={`bg-white w-full ${isPCView ? '' : 'max-w-md'} max-h-[90vh] overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col`}>
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col">
 
             {/* 히어로 헤더 */}
             <div className="relative bg-gradient-to-br from-purple-600 to-indigo-700 p-6 pb-8">
@@ -2662,8 +2662,8 @@ const ApplicationsPage = () => {
 
       {/* SNS 업로드 모달 (레거시 코드 기반) */}
       {showSnsUploadModal && selectedApplication && (
-        <div className={`${isPCView ? 'absolute' : 'fixed'} inset-0 bg-black/60 z-50 flex items-center justify-center p-4`}>
-          <div className={`bg-white rounded-2xl ${isPCView ? '' : 'max-w-md'} w-full max-h-[90vh] overflow-y-auto`}>
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-100 p-4 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">SNS 업로드</h3>
               <button
