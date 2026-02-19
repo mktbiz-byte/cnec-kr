@@ -2,7 +2,6 @@ import html2pdf from 'html2pdf.js'
 
 /**
  * oklch 색상 값을 브라우저가 지원하는 rgb로 변환
- * 브라우저의 CSS 엔진을 이용해 oklch → rgb 변환
  */
 function oklchToRgb(oklchValue) {
   const temp = document.createElement('div')
@@ -15,52 +14,63 @@ function oklchToRgb(oklchValue) {
 }
 
 /**
- * 클론된 문서에서 모든 oklch 색상을 rgb로 치환
- * html2canvas는 oklch() 색상 함수를 지원하지 않으므로,
- * 스타일시트 텍스트의 모든 oklch(...)를 rgb(...)로 치환
+ * 원본 문서의 스타일시트에서 oklch를 rgb로 치환하고 복원 함수를 반환
+ *
+ * 전략: html2canvas가 문서를 클론할 때 oklch가 없는 상태로 복사되도록,
+ * 클론 전에 원본 문서의 스타일을 직접 수정한 뒤 PDF 생성 후 복원
  */
-function fixOklchInClonedDoc(clonedDoc) {
-  // oklch(...)를 rgb로 변환하는 캐시 (동일 값 반복 변환 방지)
+function patchOklchInDocument() {
   const cache = new Map()
-  function convertOklch(match) {
+  const convert = (match) => {
     if (cache.has(match)) return cache.get(match)
     const rgb = oklchToRgb(match)
     cache.set(match, rgb)
     return rgb
   }
 
-  // 1. 모든 스타일시트의 oklch를 rgb로 치환
-  const sheets = Array.from(clonedDoc.styleSheets)
-  sheets.forEach(sheet => {
-    try {
-      const rules = sheet.cssRules
-      if (!rules) return
+  const restoreFns = []
 
-      // 모든 규칙의 CSS 텍스트를 합침 (@layer, @media 포함)
-      const fullCssText = Array.from(rules).map(r => r.cssText).join('\n')
-
-      if (!fullCssText.includes('oklch')) return
-
-      // oklch(...) 패턴을 rgb로 변환 (알파값 포함: oklch(0.5 0.2 30 / 50%))
-      const fixedCss = fullCssText.replace(/oklch\([^)]+\)/g, convertOklch)
-
-      // 기존 스타일시트를 새 스타일로 교체
-      const ownerNode = sheet.ownerNode
-      if (ownerNode && ownerNode.parentNode) {
-        const newStyle = clonedDoc.createElement('style')
-        newStyle.textContent = fixedCss
-        ownerNode.parentNode.insertBefore(newStyle, ownerNode)
-        ownerNode.parentNode.removeChild(ownerNode)
-      }
-    } catch (e) {
-      // Cross-origin 스타일시트는 접근 불가 - 무시
+  // 1. <style> 요소의 textContent에서 oklch 치환
+  document.querySelectorAll('style').forEach(el => {
+    const text = el.textContent
+    if (text && text.includes('oklch')) {
+      const original = text
+      el.textContent = text.replace(/oklch\([^)]+\)/g, convert)
+      restoreFns.push(() => { el.textContent = original })
     }
   })
 
-  // 2. :root 인라인 스타일에도 CSS 변수를 rgb로 오버라이드 (안전장치)
-  const root = clonedDoc.documentElement
-  const originalStyle = getComputedStyle(document.documentElement)
-  const allVarNames = [
+  // 2. <link rel="stylesheet"> 로 로드된 외부 CSS 파일 처리
+  //    CSSOM에서 읽어서 inline <style>로 교체
+  const processedLinks = []
+  for (const sheet of document.styleSheets) {
+    if (!sheet.href) continue // <style> 요소는 위에서 처리
+    try {
+      const rules = Array.from(sheet.cssRules)
+      const text = rules.map(r => r.cssText).join('\n')
+      if (!text.includes('oklch')) continue
+
+      const fixedText = text.replace(/oklch\([^)]+\)/g, convert)
+      const linkEl = sheet.ownerNode
+
+      // <link>를 비활성화하고 인라인 <style>로 교체
+      linkEl.disabled = true
+      const inlineStyle = document.createElement('style')
+      inlineStyle.dataset.pdfOklchFix = 'true'
+      inlineStyle.textContent = fixedText
+      document.head.appendChild(inlineStyle)
+
+      processedLinks.push({ linkEl, inlineStyle })
+    } catch (e) {
+      // Cross-origin 스타일시트 접근 불가
+    }
+  }
+
+  // 3. :root CSS 변수도 인라인으로 오버라이드
+  const root = document.documentElement
+  const originalRootStyle = root.getAttribute('style') || ''
+  const computedStyle = getComputedStyle(root)
+  const varNames = [
     '--background', '--foreground', '--card', '--card-foreground',
     '--popover', '--popover-foreground', '--primary', '--primary-foreground',
     '--secondary', '--secondary-foreground', '--muted', '--muted-foreground',
@@ -71,13 +81,29 @@ function fixOklchInClonedDoc(clonedDoc) {
     '--sidebar-primary-foreground', '--sidebar-accent',
     '--sidebar-accent-foreground', '--sidebar-border', '--sidebar-ring',
   ]
-  allVarNames.forEach(varName => {
-    const raw = originalStyle.getPropertyValue(varName).trim()
+  varNames.forEach(varName => {
+    const raw = computedStyle.getPropertyValue(varName).trim()
     if (raw) {
-      const rgbValue = raw.includes('oklch') ? oklchToRgb(raw) : raw
-      root.style.setProperty(varName, rgbValue)
+      root.style.setProperty(varName, raw.includes('oklch') ? oklchToRgb(raw) : raw)
     }
   })
+
+  // 복원 함수 반환
+  return function restore() {
+    // <style> 요소 복원
+    restoreFns.forEach(fn => fn())
+    // <link> 복원
+    processedLinks.forEach(({ linkEl, inlineStyle }) => {
+      linkEl.disabled = false
+      inlineStyle.remove()
+    })
+    // :root 인라인 스타일 복원
+    if (originalRootStyle) {
+      root.setAttribute('style', originalRootStyle)
+    } else {
+      root.removeAttribute('style')
+    }
+  }
 }
 
 /**
@@ -87,41 +113,40 @@ function fixOklchInClonedDoc(clonedDoc) {
  * @param {object} options - html2pdf 추가 옵션
  */
 export async function downloadElementAsPdf(element, filename = 'guide', options = {}) {
-  const defaultOptions = {
-    margin: [10, 10, 10, 10],
-    filename: `${filename}.pdf`,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      letterRendering: true,
-      onclone: (clonedDoc) => {
-        fixOklchInClonedDoc(clonedDoc)
-      },
-    },
-    jsPDF: {
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait',
-    },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-  }
+  // PDF 생성 전에 oklch → rgb 치환 (원본 문서 직접 수정)
+  const restoreOklch = patchOklchInDocument()
 
-  const mergedOptions = {
-    ...defaultOptions,
-    ...options,
-    html2canvas: {
-      ...defaultOptions.html2canvas,
-      ...(options.html2canvas || {}),
-      onclone: (clonedDoc) => {
-        fixOklchInClonedDoc(clonedDoc)
-        if (options.html2canvas?.onclone) {
-          options.html2canvas.onclone(clonedDoc)
-        }
+  try {
+    const pdfOptions = {
+      margin: [10, 10, 10, 10],
+      filename: `${filename}.pdf`,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        ...(options.html2canvas || {}),
       },
-    },
-  }
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      ...options,
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        ...(options.html2canvas || {}),
+      },
+    }
 
-  await html2pdf().set(mergedOptions).from(element).save()
+    await html2pdf().set(pdfOptions).from(element).save()
+  } finally {
+    // 항상 원본 스타일 복원
+    restoreOklch()
+  }
 }
