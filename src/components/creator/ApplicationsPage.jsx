@@ -457,7 +457,6 @@ const ApplicationsPage = () => {
   const [showGuideModal, setShowGuideModal] = useState(false)
   const [selectedGuide, setSelectedGuide] = useState(null)
   const guideContentRef = useRef(null)
-  const [pdfDownloading, setPdfDownloading] = useState(false)
 
   // SNS 업로드 관련 상태 (레거시 코드 기반)
   const [showSnsUploadModal, setShowSnsUploadModal] = useState(false)
@@ -610,27 +609,21 @@ const ApplicationsPage = () => {
     return () => setExpandedContent(null)
   }, [isPCView, showGuideModal, selectedGuide, applications])
 
-  const handlePdfDownload = async () => {
-    if (!guideContentRef.current || pdfDownloading) return
-    setPdfDownloading(true)
+  const handlePdfDownload = () => {
+    if (!guideContentRef.current) return
     try {
       const el = guideContentRef.current
-      const originalOverflow = el.style.overflow
-      const originalMaxHeight = el.style.maxHeight
-      el.style.overflow = 'visible'
-      el.style.maxHeight = 'none'
-
       const campaignTitle = selectedGuide.campaigns?.title || '촬영가이드'
       const brandName = selectedGuide.campaigns?.brand || ''
       const filename = `${brandName ? brandName + '_' : ''}${campaignTitle}_촬영가이드`
-      await downloadElementAsPdf(el, filename)
-
-      el.style.overflow = originalOverflow
-      el.style.maxHeight = originalMaxHeight
+      downloadElementAsPdf(el, filename, {
+        brand: brandName,
+        campaignTitle,
+        type: selectedGuide.type,
+        channel: selectedGuide.main_channel,
+      })
     } catch (error) {
-      console.error('PDF 다운로드 실패:', error)
-    } finally {
-      setPdfDownloading(false)
+      console.error('PDF 저장 실패:', error)
     }
   }
 
@@ -2608,14 +2601,9 @@ const ApplicationsPage = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handlePdfDownload}
-                  disabled={pdfDownloading}
-                  className="flex-shrink-0 bg-purple-600 text-white font-bold text-sm py-4 px-5 rounded-2xl shadow-lg hover:bg-purple-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-shrink-0 bg-purple-600 text-white font-bold text-sm py-4 px-5 rounded-2xl shadow-lg hover:bg-purple-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  {pdfDownloading ? (
-                    <Loader2 size={18} className="animate-spin" />
-                  ) : (
-                    <Download size={18} />
-                  )}
+                  <Download size={18} />
                   PDF
                 </button>
                 <button
