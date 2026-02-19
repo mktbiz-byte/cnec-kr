@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, Sparkles, Star, Clock, CheckCircle,
@@ -16,6 +17,7 @@ import {
 const GradeDetailPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
@@ -153,6 +155,71 @@ const GradeDetailPage = () => {
     { icon: '💬', tip: '빠른 응답으로 브랜드 신뢰도 UP' },
     { icon: '🔄', tip: '재협업 요청을 받으면 특별 보너스 점수!' }
   ]
+
+  // PC 확장 보기: 등급 비교 및 점수 상세
+  useEffect(() => {
+    if (!isPCView || !gradeInfo) {
+      setExpandedContent(null)
+      return
+    }
+    setExpandedContent(
+      <div className="space-y-6">
+        <h3 className="text-xl font-bold text-gray-900">등급 시스템 상세</h3>
+
+        {/* 현재 점수 상세 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h4 className="text-lg font-bold text-gray-900 mb-4">내 점수 상세</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-purple-50 rounded-xl p-4">
+              <p className="text-xs text-purple-600 mb-1">브랜드 신뢰</p>
+              <p className="text-2xl font-bold text-purple-700">{scores.brandTrustScore}</p>
+            </div>
+            <div className="bg-blue-50 rounded-xl p-4">
+              <p className="text-xs text-blue-600 mb-1">콘텐츠 품질</p>
+              <p className="text-2xl font-bold text-blue-700">{scores.contentQualityScore}</p>
+            </div>
+            <div className="bg-green-50 rounded-xl p-4">
+              <p className="text-xs text-green-600 mb-1">프로페셔널</p>
+              <p className="text-2xl font-bold text-green-700">{scores.professionalismScore}</p>
+            </div>
+            <div className="bg-amber-50 rounded-xl p-4">
+              <p className="text-xs text-amber-600 mb-1">총합 점수</p>
+              <p className="text-2xl font-bold text-amber-700">{scores.totalScore}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 전체 등급 비교 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h4 className="text-lg font-bold text-gray-900 mb-4">전체 등급 비교</h4>
+          <div className="space-y-3">
+            {Object.entries(GRADE_CONFIG).map(([level, config]) => (
+              <div
+                key={level}
+                className={`flex items-center gap-4 p-4 rounded-xl border ${
+                  Number(level) === (profile?.grade || 1)
+                    ? 'border-purple-300 bg-purple-50'
+                    : 'border-gray-100 bg-gray-50'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${config.bgGradient} flex items-center justify-center`}>
+                  <Star size={16} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-gray-900">{config.name}</p>
+                  <p className="text-xs text-gray-500">{config.label}</p>
+                </div>
+                {Number(level) === (profile?.grade || 1) && (
+                  <span className="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded-full">현재</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+    return () => setExpandedContent(null)
+  }, [isPCView, gradeInfo, scores, profile])
 
   if (loading) {
     return (

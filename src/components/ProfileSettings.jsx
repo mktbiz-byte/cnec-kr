@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { usePCView } from '../contexts/PCViewContext'
 import { database, supabase } from '../lib/supabase'
 import {
   Loader2, User, Instagram, Youtube, Hash, Camera, ArrowLeft, Search,
@@ -10,6 +11,7 @@ import {
 const ProfileSettings = () => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   // 프로필 필드 (Master DB 스키마 기준 - 브랜드 사이트 연동)
   const [profile, setProfile] = useState({
@@ -408,6 +410,109 @@ const ProfileSettings = () => {
       setUploadingPhoto(false)
     }
   }
+
+  // PC 확장 보기: 프로필 정보 확대
+  useEffect(() => {
+    if (!isPCView) {
+      setExpandedContent(null)
+      return
+    }
+    setExpandedContent(
+      <div className="space-y-6">
+        {/* 프로필 카드 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-20 h-20 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden">
+              {profile.profile_image ? (
+                <img src={profile.profile_image} alt="프로필" className="w-full h-full object-cover" />
+              ) : (
+                <User size={32} className="text-violet-600" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">{profile.name || '이름 미설정'}</h3>
+              <p className="text-sm text-gray-500">{user?.email}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 기본 정보 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h4 className="text-lg font-bold text-gray-900 mb-4">기본 정보</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">전화번호</p>
+              <p className="text-sm font-medium text-gray-900">{profile.phone || '-'}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">나이</p>
+              <p className="text-sm font-medium text-gray-900">{profile.age || '-'}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">피부 타입</p>
+              <p className="text-sm font-medium text-gray-900">{profile.skin_type || '-'}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">카테고리</p>
+              <p className="text-sm font-medium text-gray-900">{profile.category || '-'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* SNS 정보 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h4 className="text-lg font-bold text-gray-900 mb-4">SNS 채널</h4>
+          <div className="space-y-3">
+            {profile.instagram_url && (
+              <div className="flex items-center gap-3 bg-pink-50 rounded-xl p-4">
+                <Instagram size={20} className="text-pink-500" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Instagram</p>
+                  <p className="text-xs text-gray-500 truncate">{profile.instagram_url}</p>
+                </div>
+                {profile.instagram_followers && (
+                  <span className="text-sm font-bold text-pink-600">{profile.instagram_followers}</span>
+                )}
+              </div>
+            )}
+            {profile.youtube_url && (
+              <div className="flex items-center gap-3 bg-red-50 rounded-xl p-4">
+                <Youtube size={20} className="text-red-500" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">YouTube</p>
+                  <p className="text-xs text-gray-500 truncate">{profile.youtube_url}</p>
+                </div>
+                {profile.youtube_subscribers && (
+                  <span className="text-sm font-bold text-red-600">{profile.youtube_subscribers}</span>
+                )}
+              </div>
+            )}
+            {profile.tiktok_url && (
+              <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+                <Hash size={20} className="text-gray-700" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">TikTok</p>
+                  <p className="text-xs text-gray-500 truncate">{profile.tiktok_url}</p>
+                </div>
+                {profile.tiktok_followers && (
+                  <span className="text-sm font-bold text-gray-700">{profile.tiktok_followers}</span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 소개 */}
+        {profile.bio && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h4 className="text-lg font-bold text-gray-900 mb-3">자기소개</h4>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{profile.bio}</p>
+          </div>
+        )}
+      </div>
+    )
+    return () => setExpandedContent(null)
+  }, [isPCView, profile])
 
   if (loading) {
     return (

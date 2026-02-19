@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, ArrowRight, Clock, CheckCircle, FileText,
   Upload, Target, Loader2, Calendar, Truck, Camera,
   Eye, X, BookOpen, Video, CheckCircle2, AlertCircle,
   Play, Copy, Gift, Zap, MessageSquare, Ban, Hash, Tag,
-  ShoppingBag, Store, ExternalLink
+  ShoppingBag, Store, ExternalLink, Download
 } from 'lucide-react'
+import { downloadElementAsPdf } from '../../lib/pdfDownload'
 import FourWeekGuideViewer from '../FourWeekGuideViewer'
 import ExternalGuideViewer from '../common/ExternalGuideViewer'
 import OliveYoungGuideViewer from '../OliveYoungGuideViewer'
+import AIGuideViewer from '../AIGuideViewer'
 
 // 안전하게 값을 문자열로 변환하는 헬퍼 함수
 const renderValue = (value) => {
@@ -328,6 +331,7 @@ const CreatorTipsCard = ({ tips }) => {
 const ApplicationsPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [loading, setLoading] = useState(true)
   const [applications, setApplications] = useState([])
@@ -341,6 +345,8 @@ const ApplicationsPage = () => {
   })
   const [showGuideModal, setShowGuideModal] = useState(false)
   const [selectedGuide, setSelectedGuide] = useState(null)
+  const guideContentRef = useRef(null)
+  const [pdfDownloading, setPdfDownloading] = useState(false)
 
   // SNS 업로드 관련 상태 (레거시 코드 기반)
   const [showSnsUploadModal, setShowSnsUploadModal] = useState(false)
@@ -394,6 +400,124 @@ const ApplicationsPage = () => {
       loadApplications()
     }
   }, [user])
+
+  // PC 확장 보기: 가이드 모달 열림 시 가이드 내용을 확장 패널에 표시
+  useEffect(() => {
+    if (!isPCView) {
+      setExpandedContent(null)
+      return
+    }
+    if (showGuideModal && selectedGuide) {
+      setExpandedContent(
+        <div className="space-y-6">
+          <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-6 text-white">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-white/20 px-2.5 py-0.5 rounded-md text-xs font-bold">
+                {selectedGuide.type === 'planned' && '기획형'}
+                {selectedGuide.type === 'oliveyoung' && '올리브영'}
+                {selectedGuide.type === '4week_challenge' && '4주 챌린지'}
+                {selectedGuide.type === 'general' && '일반'}
+              </span>
+            </div>
+            <h3 className="text-2xl font-extrabold mb-1">촬영 가이드</h3>
+            <p className="text-white/70">{selectedGuide.campaigns?.brand} - {selectedGuide.campaigns?.title}</p>
+          </div>
+
+          {/* 기획형 가이드 확장 렌더링 */}
+          {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <AIGuideViewer guide={selectedGuide.personalized_guide} campaign={selectedGuide.campaigns} />
+            </div>
+          )}
+
+          {/* 올리브영 가이드 확장 렌더링 */}
+          {selectedGuide.type === 'oliveyoung' && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+              {selectedGuide.campaigns?.oliveyoung_step1_guide_ai && (
+                <div>
+                  <h4 className="text-lg font-bold text-green-900 mb-3">1차 촬영 가이드</h4>
+                  <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step1_guide_ai} />
+                </div>
+              )}
+              {selectedGuide.campaigns?.oliveyoung_step2_guide_ai && (
+                <div>
+                  <h4 className="text-lg font-bold text-blue-900 mb-3">2차 촬영 가이드</h4>
+                  <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step2_guide_ai} />
+                </div>
+              )}
+              {selectedGuide.campaigns?.oliveyoung_step3_guide_ai && (
+                <div>
+                  <h4 className="text-lg font-bold text-purple-900 mb-3">3차 촬영 가이드</h4>
+                  <OliveYoungGuideViewer guide={selectedGuide.campaigns.oliveyoung_step3_guide_ai} />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 4주 챌린지 가이드 확장 렌더링 */}
+          {selectedGuide.type === '4week_challenge' && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <FourWeekGuideViewer
+                guides={selectedGuide.campaigns?.challenge_weekly_guides_ai}
+                commonMessage={selectedGuide.additional_message}
+              />
+            </div>
+          )}
+        </div>
+      )
+    } else {
+      // 가이드 모달 닫힘 - 지원 내역 요약 표시
+      if (applications.length > 0) {
+        const approved = applications.filter(a => ['approved', 'selected'].includes(a.status)).length
+        const completed = applications.filter(a => a.status === 'completed' || a.status === 'sns_uploaded').length
+        setExpandedContent(
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+                <p className="text-3xl font-bold text-purple-600">{applications.length}</p>
+                <p className="text-sm text-gray-500 mt-1">총 지원</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+                <p className="text-3xl font-bold text-green-600">{approved}</p>
+                <p className="text-sm text-gray-500 mt-1">선정됨</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+                <p className="text-3xl font-bold text-blue-600">{completed}</p>
+                <p className="text-sm text-gray-500 mt-1">완료</p>
+              </div>
+            </div>
+          </div>
+        )
+      } else {
+        setExpandedContent(null)
+      }
+    }
+    return () => setExpandedContent(null)
+  }, [isPCView, showGuideModal, selectedGuide, applications])
+
+  const handlePdfDownload = async () => {
+    if (!guideContentRef.current || pdfDownloading) return
+    setPdfDownloading(true)
+    try {
+      const el = guideContentRef.current
+      const originalOverflow = el.style.overflow
+      const originalMaxHeight = el.style.maxHeight
+      el.style.overflow = 'visible'
+      el.style.maxHeight = 'none'
+
+      const campaignTitle = selectedGuide.campaigns?.title || '촬영가이드'
+      const brandName = selectedGuide.campaigns?.brand || ''
+      const filename = `${brandName ? brandName + '_' : ''}${campaignTitle}_촬영가이드`
+      await downloadElementAsPdf(el, filename)
+
+      el.style.overflow = originalOverflow
+      el.style.maxHeight = originalMaxHeight
+    } catch (error) {
+      console.error('PDF 다운로드 실패:', error)
+    } finally {
+      setPdfDownloading(false)
+    }
+  }
 
   const loadApplications = async () => {
     try {
@@ -1955,7 +2079,7 @@ const ApplicationsPage = () => {
             </div>
 
             {/* 스크롤 콘텐츠 영역 */}
-            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 bg-gray-50">
+            <div ref={guideContentRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-6 bg-gray-50">
 
               {/* 기획형 가이드 내용 */}
               {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
@@ -2534,16 +2658,30 @@ const ApplicationsPage = () => {
 
             {/* 하단 고정 버튼 */}
             <div className="bg-white border-t border-gray-100 p-4 safe-area-bottom">
-              <button
-                onClick={() => {
-                  setShowGuideModal(false)
-                  setSelectedGuide(null)
-                }}
-                className="w-full bg-gray-900 text-white font-bold text-base py-4 rounded-2xl shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-              >
-                확인했어요
-                <ArrowRight size={18} />
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handlePdfDownload}
+                  disabled={pdfDownloading}
+                  className="flex-shrink-0 bg-purple-600 text-white font-bold text-sm py-4 px-5 rounded-2xl shadow-lg hover:bg-purple-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {pdfDownloading ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <Download size={18} />
+                  )}
+                  PDF
+                </button>
+                <button
+                  onClick={() => {
+                    setShowGuideModal(false)
+                    setSelectedGuide(null)
+                  }}
+                  className="flex-1 bg-gray-900 text-white font-bold text-base py-4 rounded-2xl shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  확인했어요
+                  <ArrowRight size={18} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

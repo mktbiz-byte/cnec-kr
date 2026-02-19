@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { database, supabase } from '../../lib/supabase'
 import {
   ArrowLeft, Calendar, Gift, Instagram, Youtube, Hash,
@@ -15,6 +16,7 @@ const CampaignDetailPage = () => {
   const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [campaign, setCampaign] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -148,6 +150,83 @@ const CampaignDetailPage = () => {
     }
     navigate(`/campaign/${id}/apply`)
   }
+
+  // PC 확장 보기: 캠페인 상세 정보를 넓은 화면으로 표시
+  useEffect(() => {
+    if (!isPCView || !campaign) {
+      setExpandedContent(null)
+      return
+    }
+    const reward = campaign.creator_points_override || campaign.reward_points || 0
+    setExpandedContent(
+      <div className="space-y-6">
+        {/* 캠페인 이미지 크게 */}
+        {campaign.image_url && (
+          <div className="rounded-2xl overflow-hidden shadow-lg">
+            <img src={campaign.image_url} alt={campaign.title} className="w-full max-h-[500px] object-cover" />
+          </div>
+        )}
+
+        {/* 캠페인 기본 정보 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          {campaign.brand && (
+            <p className="text-sm text-blue-600 font-medium mb-2">{campaign.brand}</p>
+          )}
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">{campaign.title}</h2>
+          {campaign.product_name && (
+            <p className="text-base text-gray-600 mb-4">{campaign.product_name}</p>
+          )}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <Gift size={20} className="text-violet-500" />
+              <span className="text-2xl font-bold text-violet-600">{formatPoints(reward)}</span>
+            </div>
+            {campaign.total_slots && (
+              <div className="flex items-center gap-2 text-gray-500">
+                <Users size={18} />
+                <span>{campaign.total_slots}명 모집</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 일정 정보 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Calendar size={20} className="text-purple-600" />
+            캠페인 일정
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">모집 마감</p>
+              <p className="text-sm font-bold text-gray-900">{formatDate(campaign.application_deadline)}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">선정 발표</p>
+              <p className="text-sm font-bold text-gray-900">{formatDate(campaign.announcement_date)}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">촬영 기간</p>
+              <p className="text-sm font-bold text-gray-900">{formatDate(campaign.shooting_start)} ~ {formatDate(campaign.shooting_end)}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 mb-1">업로드 마감</p>
+              <p className="text-sm font-bold text-gray-900">{formatDate(campaign.upload_deadline)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 캠페인 설명 */}
+        {campaign.description && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-3">캠페인 소개</h3>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{campaign.description}</p>
+          </div>
+        )}
+      </div>
+    )
+    return () => setExpandedContent(null)
+  }, [isPCView, campaign])
 
   if (loading) {
     return (

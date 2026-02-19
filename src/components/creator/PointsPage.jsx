@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePCView } from '../../contexts/PCViewContext'
 import { supabase, database } from '../../lib/supabase'
 import {
   ArrowLeft, Wallet, DollarSign, CreditCard, Clock,
@@ -11,6 +12,7 @@ import {
 const PointsPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isPCView, setExpandedContent } = usePCView()
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
@@ -348,6 +350,74 @@ const PointsPage = () => {
         return { label: status, color: 'bg-gray-100 text-gray-700' }
     }
   }
+
+  // PC 확장 보기: 포인트 현황 및 내역 확대
+  useEffect(() => {
+    if (!isPCView || !profile) {
+      setExpandedContent(null)
+      return
+    }
+    setExpandedContent(
+      <div className="space-y-6">
+        {/* 포인트 요약 */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-violet-50 rounded-2xl p-6 border border-violet-100">
+            <p className="text-sm text-violet-600 mb-2">보유 포인트</p>
+            <p className="text-3xl font-bold text-violet-700">{(pointStats.totalPoints || 0).toLocaleString()}P</p>
+          </div>
+          <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100">
+            <p className="text-sm text-amber-600 mb-2">정산 예정</p>
+            <p className="text-3xl font-bold text-amber-700">{(pointStats.pendingPoints || 0).toLocaleString()}P</p>
+          </div>
+          <div className="bg-green-50 rounded-2xl p-6 border border-green-100">
+            <p className="text-sm text-green-600 mb-2">출금 가능</p>
+            <p className="text-3xl font-bold text-green-700">{(pointStats.withdrawablePoints || 0).toLocaleString()}P</p>
+          </div>
+        </div>
+
+        {/* 포인트 내역 */}
+        {pointHistory.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h4 className="text-lg font-bold text-gray-900 mb-4">포인트 내역</h4>
+            <div className="space-y-3">
+              {pointHistory.slice(0, 20).map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{item.description || item.campaign_title || '포인트'}</p>
+                    <p className="text-xs text-gray-500">{new Date(item.created_at).toLocaleDateString('ko-KR')}</p>
+                  </div>
+                  <span className={`text-sm font-bold ${item.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {item.amount > 0 ? '+' : ''}{(item.amount || 0).toLocaleString()}P
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 출금 내역 */}
+        {withdrawalHistory.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h4 className="text-lg font-bold text-gray-900 mb-4">출금 내역</h4>
+            <div className="space-y-3">
+              {withdrawalHistory.slice(0, 10).map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{(item.amount || 0).toLocaleString()}P 출금</p>
+                    <p className="text-xs text-gray-500">{new Date(item.created_at).toLocaleDateString('ko-KR')}</p>
+                  </div>
+                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${getStatusBadge(item.status).color}`}>
+                    {getStatusBadge(item.status).label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+    return () => setExpandedContent(null)
+  }, [isPCView, profile, pointStats, pointHistory, withdrawalHistory])
 
   if (loading) {
     return (
