@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  html2canvas@1.4.1:
+    hash: 90dc25d0bc39e91de9737134343c1a6069051e4298ea63ec44104f8e18a62180
+    path: patches/html2canvas@1.4.1.patch
+
 importers:
 
   .:
@@ -5744,6 +5749,7 @@ snapshots:
       has-proto: 1.2.0
       has-symbols: 1.1.0
       hasown: 2.0.2
+      html2pdf.js: 0.14.0
       input-otp: 1.4.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       lucide-react: 0.510.0(react@19.2.3)
       mime-db: 1.54.0
@@ -6446,7 +6452,7 @@ snapshots:
 
   html-url-attributes@3.0.1: {}
 
-  html2canvas@1.4.1:
+  html2canvas@1.4.1(patch_hash=90dc25d0bc39e91de9737134343c1a6069051e4298ea63ec44104f8e18a62180):
     dependencies:
       css-line-break: 2.1.0
       text-segmentation: 1.0.3
@@ -6454,7 +6460,7 @@ snapshots:
   html2pdf.js@0.14.0:
     dependencies:
       dompurify: 3.3.1
-      html2canvas: 1.4.1
+      html2canvas: 1.4.1(patch_hash=90dc25d0bc39e91de9737134343c1a6069051e4298ea63ec44104f8e18a62180)
       jspdf: 4.1.0
 
   http-parser-js@0.5.10: {}
@@ -6593,7 +6599,7 @@ snapshots:
       canvg: 3.0.11
       core-js: 3.48.0
       dompurify: 3.3.1
-      html2canvas: 1.4.1
+      html2canvas: 1.4.1(patch_hash=90dc25d0bc39e91de9737134343c1a6069051e4298ea63ec44104f8e18a62180)
 
   jwa@2.0.1:
     dependencies:
