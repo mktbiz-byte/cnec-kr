@@ -393,6 +393,71 @@ const PlannedGuideContent = ({ guideData, additionalMessage, campaigns }) => {
   }
 
   if (isObject) {
+    // 올리브영 스텝 가이드 형식 감지 (step1_ai, step2_ai, step3_ai 등)
+    const oliveYoungStepDefs = [
+      { ai: 'step1_ai', fallback: 'step1', label: '1차 촬영 가이드',
+        card: 'bg-green-50 border-green-100', icon: 'bg-green-500', title: 'text-green-900', bgIcon: 'text-green-900' },
+      { ai: 'step2_ai', fallback: 'step2', label: '2차 촬영 가이드',
+        card: 'bg-blue-50 border-blue-100', icon: 'bg-blue-500', title: 'text-blue-900', bgIcon: 'text-blue-900' },
+      { ai: 'step3_ai', fallback: 'step3', label: '3차 촬영 가이드',
+        card: 'bg-purple-50 border-purple-100', icon: 'bg-purple-500', title: 'text-purple-900', bgIcon: 'text-purple-900' },
+    ]
+    const hasOliveYoungSteps = oliveYoungStepDefs.some(s => guideData[s.ai] || guideData[s.fallback])
+
+    if (hasOliveYoungSteps) {
+      const allScenes = []
+      const stepAllKeys = oliveYoungStepDefs.flatMap(s => [s.ai, s.fallback])
+      return (
+        <>
+          <div className="space-y-4">
+            {oliveYoungStepDefs.map((step) => {
+              const stepData = guideData[step.ai] || guideData[step.fallback]
+              if (!stepData) return null
+              try {
+                const parsed = typeof stepData === 'string' ? JSON.parse(stepData) : stepData
+                if (parsed?.shooting_scenes && Array.isArray(parsed.shooting_scenes)) {
+                  allScenes.push(...parsed.shooting_scenes)
+                }
+              } catch (e) {}
+              return (
+                <div key={step.ai} className={`relative overflow-hidden rounded-3xl ${step.card} border p-5`}>
+                  <div className="absolute top-0 right-0 p-4 opacity-5">
+                    <Video size={80} className={step.bgIcon} />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className={`${step.icon} text-white p-1.5 rounded-lg shadow-sm`}>
+                        <Play size={16} fill="white" />
+                      </div>
+                      <span className={`font-bold ${step.title} text-base`}>{step.label}</span>
+                    </div>
+                    <OliveYoungGuideViewer guide={stepData} />
+                  </div>
+                </div>
+              )
+            })}
+            {allScenes.length > 0 && <ShootingScenesTable scenes={allScenes} />}
+          </div>
+          {Object.entries(guideData)
+            .filter(([key]) => !stepAllKeys.includes(key))
+            .map(([key, value]) => (
+              <GuideSection key={key} sectionKey={key} value={value} colorScheme="blue" />
+            ))}
+          {additionalMessage && (
+            <div className="rounded-3xl bg-yellow-50 border border-yellow-200 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="bg-yellow-500 text-white p-1.5 rounded-lg shadow-sm">
+                  <AlertCircle size={16} strokeWidth={3} />
+                </div>
+                <span className="font-bold text-yellow-900 text-base">추가 메시지</span>
+              </div>
+              <p className="text-sm text-yellow-800/80 font-medium">{renderValue(additionalMessage)}</p>
+            </div>
+          )}
+        </>
+      )
+    }
+
     const specialFields = ['content_philosophy', 'story_flow', 'authenticity_guidelines', 'creator_tips', 'shooting_scenes']
     const entries = Object.entries(guideData)
     const colorOrder = ['blue', 'green', 'purple', 'orange']
