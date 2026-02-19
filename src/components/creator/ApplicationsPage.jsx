@@ -677,51 +677,25 @@ const ApplicationsPage = () => {
             console.error('Video submissions 로드 오류:', videoError)
           }
 
-          // video_review_comments 조회 - submission_id와 application_id 모두로 조회
+          // video_review_comments 조회 - submission_id로 조회
           let videoReviewComments = []
           const submissionIds = (videoSubmissionsData || []).map(vs => vs.id).filter(Boolean)
 
-          // 1. submission_id로 조회
           if (submissionIds.length > 0) {
-            const { data: commentsBySubmission, error: err1 } = await supabase
+            const { data: commentsData, error: commentsErr } = await supabase
               .from('video_review_comments')
               .select('*')
               .in('submission_id', submissionIds)
 
-            if (!err1 && commentsBySubmission) {
-              videoReviewComments = [...commentsBySubmission]
+            if (!commentsErr && commentsData) {
+              videoReviewComments = commentsData
             }
           }
 
-          // 2. application_id로도 조회 (4주/올영 등 week_number, video_number로 매칭 필요)
-          const { data: commentsByApplication, error: err2 } = await supabase
-            .from('video_review_comments')
-            .select('*')
-            .in('application_id', applicationIds)
-
-          if (!err2 && commentsByApplication) {
-            // 중복 제거하면서 추가
-            const existingIds = new Set(videoReviewComments.map(c => c.id))
-            commentsByApplication.forEach(c => {
-              if (!existingIds.has(c.id)) {
-                videoReviewComments.push(c)
-              }
-            })
-          }
-
-          // video_submissions에 video_review_comments 병합
-          // submission_id 또는 (application_id + week_number/video_number) 매칭
+          // video_submissions에 video_review_comments 병합 (submission_id 매칭)
           const videoSubmissionsWithComments = (videoSubmissionsData || []).map(vs => ({
             ...vs,
-            video_review_comments: videoReviewComments.filter(c => {
-              // submission_id로 매칭
-              if (c.submission_id === vs.id) return true
-              // application_id + week_number 매칭 (4주 챌린지)
-              if (c.application_id === vs.application_id && c.week_number && c.week_number === vs.week_number) return true
-              // application_id + video_number 매칭 (올리브영)
-              if (c.application_id === vs.application_id && c.video_number && c.video_number === vs.video_number) return true
-              return false
-            })
+            video_review_comments: videoReviewComments.filter(c => c.submission_id === vs.id)
           }))
 
           // 캠페인 및 비디오 데이터 병합
