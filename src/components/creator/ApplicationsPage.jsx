@@ -1550,6 +1550,9 @@ const ApplicationsPage = () => {
                               >
                                 <ExternalLink size={12} />
                                 <span>V{vs.version || 1} 영상 보기</span>
+                                {vs.uploaded_by === 'admin' && (
+                                  <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">관리자</span>
+                                )}
                               </a>
                             ))}
                           </div>
