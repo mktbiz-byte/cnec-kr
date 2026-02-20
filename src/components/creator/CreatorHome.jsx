@@ -7,7 +7,6 @@ import {
   DollarSign, FileText, ChevronRight,
   Gift, Target, Loader2, Sparkles, Camera, X
 } from 'lucide-react'
-import CampaignPolicyModal, { shouldShowPolicyPopup } from './CampaignPolicyModal'
 
 // 등급 설정 (PRD 기준)
 export const GRADE_CONFIG = {
@@ -161,7 +160,6 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
   const [showProfilePhotoBanner, setShowProfilePhotoBanner] = useState(true)
-  const [showPolicyPopup, setShowPolicyPopup] = useState(false)
   const [stats, setStats] = useState({
     pendingEarnings: 0,
     activeCampaigns: 0,
@@ -179,14 +177,6 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
       loadDashboardData()
     }
   }, [user])
-
-  // 메인 페이지 진입 시 캠페인 정책 팝업 자동 표시 (24시간 보지 않기 체크)
-  useEffect(() => {
-    if (shouldShowPolicyPopup()) {
-      const timer = setTimeout(() => setShowPolicyPopup(true), 500)
-      return () => clearTimeout(timer)
-    }
-  }, [])
 
   const loadDashboardData = async () => {
     try {
@@ -685,12 +675,6 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
         )}
       </div>
 
-      {/* 캠페인 정책 자동 팝업 (메인 진입 시) */}
-      <CampaignPolicyModal
-        isOpen={showPolicyPopup}
-        onClose={() => setShowPolicyPopup(false)}
-        autoMode={true}
-      />
     </div>
   )
 }
