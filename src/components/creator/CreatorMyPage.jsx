@@ -9,8 +9,9 @@ import {
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
   ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift,
-  Crown, Sparkles, BookOpen
+  Crown, Sparkles, BookOpen, ShieldAlert, AlertTriangle
 } from 'lucide-react'
+import CampaignPolicyModal from './CampaignPolicyModal'
 
 // 등급 설정
 const GRADE_CONFIG = {
@@ -53,6 +54,9 @@ const CreatorMyPage = () => {
   // 찜한 캠페인 관련
   const [wishlistCampaigns, setWishlistCampaigns] = useState([])
   const [wishlistLoading, setWishlistLoading] = useState(false)
+
+  // 캠페인 정책 팝업
+  const [showPolicyModal, setShowPolicyModal] = useState(false)
 
   // 한국 주요 은행 목록 (레거시 18개 은행)
   const koreanBanks = [
@@ -856,8 +860,27 @@ const CreatorMyPage = () => {
             </div>
           </div>
 
+          {/* 캠페인 정책 안내 배너 */}
+          <div className="mx-5 mt-5">
+            <button
+              onClick={() => setShowPolicyModal(true)}
+              className="w-full bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-2xl p-4 text-left hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <ShieldAlert size={20} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-red-900 text-sm">캠페인 활동 정책 안내</p>
+                  <p className="text-xs text-red-600 mt-0.5">마감일 미준수 시 패널티가 부과됩니다. 반드시 확인하세요.</p>
+                </div>
+                <ChevronRight size={18} className="text-red-400" />
+              </div>
+            </button>
+          </div>
+
           {/* 캠페인 관리 섹션 */}
-          <div className="mx-5 mt-6">
+          <div className="mx-5 mt-5">
             <p className="text-xs text-gray-500 font-medium mb-2 px-1">캠페인 관리</p>
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <button
@@ -1612,6 +1635,12 @@ const CreatorMyPage = () => {
           </div>
         </div>
       )}
+
+      {/* 캠페인 정책 팝업 */}
+      <CampaignPolicyModal
+        isOpen={showPolicyModal}
+        onClose={() => setShowPolicyModal(false)}
+      />
     </div>
   )
 }
