@@ -87,7 +87,7 @@ ${baseInfo}
 // AI 가이드 생성
 async function generateGuide(campaign) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
     const prompt = generatePrompt(campaign)
     
     const result = await model.generateContent(prompt)

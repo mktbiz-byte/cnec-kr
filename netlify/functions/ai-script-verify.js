@@ -48,7 +48,7 @@ exports.handler = async (event, context) => {
 
     // Gemini 클라이언트 초기화
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
     const verifyPrompt = `
 당신은 인플루언서 마케팅 콘텐츠 품질 관리 전문가입니다. 다음 대본을 검토하고 상세한 피드백을 제공해주세요.
