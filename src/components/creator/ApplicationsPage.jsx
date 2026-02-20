@@ -393,6 +393,71 @@ const PlannedGuideContent = ({ guideData, additionalMessage, campaigns }) => {
   }
 
   if (isObject) {
+    // 올리브영 스텝 가이드 형식 감지 (step1_ai, step2_ai, step3_ai 등)
+    const oliveYoungStepDefs = [
+      { ai: 'step1_ai', fallback: 'step1', label: '1차 촬영 가이드',
+        card: 'bg-green-50 border-green-100', icon: 'bg-green-500', title: 'text-green-900', bgIcon: 'text-green-900' },
+      { ai: 'step2_ai', fallback: 'step2', label: '2차 촬영 가이드',
+        card: 'bg-blue-50 border-blue-100', icon: 'bg-blue-500', title: 'text-blue-900', bgIcon: 'text-blue-900' },
+      { ai: 'step3_ai', fallback: 'step3', label: '3차 촬영 가이드',
+        card: 'bg-purple-50 border-purple-100', icon: 'bg-purple-500', title: 'text-purple-900', bgIcon: 'text-purple-900' },
+    ]
+    const hasOliveYoungSteps = oliveYoungStepDefs.some(s => guideData[s.ai] || guideData[s.fallback])
+
+    if (hasOliveYoungSteps) {
+      const allScenes = []
+      const stepAllKeys = oliveYoungStepDefs.flatMap(s => [s.ai, s.fallback])
+      return (
+        <>
+          <div className="space-y-4">
+            {oliveYoungStepDefs.map((step) => {
+              const stepData = guideData[step.ai] || guideData[step.fallback]
+              if (!stepData) return null
+              try {
+                const parsed = typeof stepData === 'string' ? JSON.parse(stepData) : stepData
+                if (parsed?.shooting_scenes && Array.isArray(parsed.shooting_scenes)) {
+                  allScenes.push(...parsed.shooting_scenes)
+                }
+              } catch (e) {}
+              return (
+                <div key={step.ai} className={`relative overflow-hidden rounded-3xl ${step.card} border p-5`}>
+                  <div className="absolute top-0 right-0 p-4 opacity-5">
+                    <Video size={80} className={step.bgIcon} />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className={`${step.icon} text-white p-1.5 rounded-lg shadow-sm`}>
+                        <Play size={16} fill="white" />
+                      </div>
+                      <span className={`font-bold ${step.title} text-base`}>{step.label}</span>
+                    </div>
+                    <OliveYoungGuideViewer guide={stepData} />
+                  </div>
+                </div>
+              )
+            })}
+            {allScenes.length > 0 && <ShootingScenesTable scenes={allScenes} />}
+          </div>
+          {Object.entries(guideData)
+            .filter(([key]) => !stepAllKeys.includes(key))
+            .map(([key, value]) => (
+              <GuideSection key={key} sectionKey={key} value={value} colorScheme="blue" />
+            ))}
+          {additionalMessage && (
+            <div className="rounded-3xl bg-yellow-50 border border-yellow-200 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="bg-yellow-500 text-white p-1.5 rounded-lg shadow-sm">
+                  <AlertCircle size={16} strokeWidth={3} />
+                </div>
+                <span className="font-bold text-yellow-900 text-base">추가 메시지</span>
+              </div>
+              <p className="text-sm text-yellow-800/80 font-medium">{renderValue(additionalMessage)}</p>
+            </div>
+          )}
+        </>
+      )
+    }
+
     const specialFields = ['content_philosophy', 'story_flow', 'authenticity_guidelines', 'creator_tips', 'shooting_scenes']
     const entries = Object.entries(guideData)
     const colorOrder = ['blue', 'green', 'purple', 'orange']
@@ -457,7 +522,6 @@ const ApplicationsPage = () => {
   const [showGuideModal, setShowGuideModal] = useState(false)
   const [selectedGuide, setSelectedGuide] = useState(null)
   const guideContentRef = useRef(null)
-  const [pdfDownloading, setPdfDownloading] = useState(false)
 
   // SNS 업로드 관련 상태 (레거시 코드 기반)
   const [showSnsUploadModal, setShowSnsUploadModal] = useState(false)
@@ -610,27 +674,21 @@ const ApplicationsPage = () => {
     return () => setExpandedContent(null)
   }, [isPCView, showGuideModal, selectedGuide, applications])
 
-  const handlePdfDownload = async () => {
-    if (!guideContentRef.current || pdfDownloading) return
-    setPdfDownloading(true)
+  const handlePdfDownload = () => {
+    if (!guideContentRef.current) return
     try {
       const el = guideContentRef.current
-      const originalOverflow = el.style.overflow
-      const originalMaxHeight = el.style.maxHeight
-      el.style.overflow = 'visible'
-      el.style.maxHeight = 'none'
-
       const campaignTitle = selectedGuide.campaigns?.title || '촬영가이드'
       const brandName = selectedGuide.campaigns?.brand || ''
       const filename = `${brandName ? brandName + '_' : ''}${campaignTitle}_촬영가이드`
-      await downloadElementAsPdf(el, filename)
-
-      el.style.overflow = originalOverflow
-      el.style.maxHeight = originalMaxHeight
+      downloadElementAsPdf(el, filename, {
+        brand: brandName,
+        campaignTitle,
+        type: selectedGuide.type,
+        channel: selectedGuide.main_channel,
+      })
     } catch (error) {
-      console.error('PDF 다운로드 실패:', error)
-    } finally {
-      setPdfDownloading(false)
+      console.error('PDF 저장 실패:', error)
     }
   }
 
@@ -677,51 +735,25 @@ const ApplicationsPage = () => {
             console.error('Video submissions 로드 오류:', videoError)
           }
 
-          // video_review_comments 조회 - submission_id와 application_id 모두로 조회
+          // video_review_comments 조회 - submission_id로 조회
           let videoReviewComments = []
           const submissionIds = (videoSubmissionsData || []).map(vs => vs.id).filter(Boolean)
 
-          // 1. submission_id로 조회
           if (submissionIds.length > 0) {
-            const { data: commentsBySubmission, error: err1 } = await supabase
+            const { data: commentsData, error: commentsErr } = await supabase
               .from('video_review_comments')
               .select('*')
               .in('submission_id', submissionIds)
 
-            if (!err1 && commentsBySubmission) {
-              videoReviewComments = [...commentsBySubmission]
+            if (!commentsErr && commentsData) {
+              videoReviewComments = commentsData
             }
           }
 
-          // 2. application_id로도 조회 (4주/올영 등 week_number, video_number로 매칭 필요)
-          const { data: commentsByApplication, error: err2 } = await supabase
-            .from('video_review_comments')
-            .select('*')
-            .in('application_id', applicationIds)
-
-          if (!err2 && commentsByApplication) {
-            // 중복 제거하면서 추가
-            const existingIds = new Set(videoReviewComments.map(c => c.id))
-            commentsByApplication.forEach(c => {
-              if (!existingIds.has(c.id)) {
-                videoReviewComments.push(c)
-              }
-            })
-          }
-
-          // video_submissions에 video_review_comments 병합
-          // submission_id 또는 (application_id + week_number/video_number) 매칭
+          // video_submissions에 video_review_comments 병합 (submission_id 매칭)
           const videoSubmissionsWithComments = (videoSubmissionsData || []).map(vs => ({
             ...vs,
-            video_review_comments: videoReviewComments.filter(c => {
-              // submission_id로 매칭
-              if (c.submission_id === vs.id) return true
-              // application_id + week_number 매칭 (4주 챌린지)
-              if (c.application_id === vs.application_id && c.week_number && c.week_number === vs.week_number) return true
-              // application_id + video_number 매칭 (올리브영)
-              if (c.application_id === vs.application_id && c.video_number && c.video_number === vs.video_number) return true
-              return false
-            })
+            video_review_comments: videoReviewComments.filter(c => c.submission_id === vs.id)
           }))
 
           // 캠페인 및 비디오 데이터 병합
@@ -2634,14 +2666,9 @@ const ApplicationsPage = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handlePdfDownload}
-                  disabled={pdfDownloading}
-                  className="flex-shrink-0 bg-purple-600 text-white font-bold text-sm py-4 px-5 rounded-2xl shadow-lg hover:bg-purple-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-shrink-0 bg-purple-600 text-white font-bold text-sm py-4 px-5 rounded-2xl shadow-lg hover:bg-purple-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  {pdfDownloading ? (
-                    <Loader2 size={18} className="animate-spin" />
-                  ) : (
-                    <Download size={18} />
-                  )}
+                  <Download size={18} />
                   PDF
                 </button>
                 <button
