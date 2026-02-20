@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, ArrowRight, Clock, CheckCircle, FileText,
   Upload, Target, Loader2, Calendar, Truck, Camera,
-  Eye, X, BookOpen, Video, CheckCircle2, AlertCircle,
+  Eye, X, BookOpen, Video, CheckCircle2, AlertCircle, AlertTriangle,
   Play, Copy, Gift, Zap, MessageSquare, Ban, Hash, Tag,
   ShoppingBag, Store, ExternalLink, Download
 } from 'lucide-react'
@@ -1669,6 +1669,21 @@ const ApplicationsPage = () => {
                           </button>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* SNS 업로드 전 확인 경고 배너 - 선정~진행중 상태 */}
+                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
+                    <div className="mt-3 bg-amber-50 border border-amber-300 rounded-xl p-3">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-amber-800">SNS 업로드 전 반드시 확인하세요!</p>
+                          <p className="text-[11px] text-amber-700 mt-1 leading-relaxed">
+                            촬영 완료 후 <span className="font-bold text-red-600">SNS에 바로 업로드하지 마세요.</span> 반드시 영상을 먼저 제출하고, <span className="font-bold text-amber-900">기업의 검수 완료</span> 후 SNS에 업로드해 주세요. 미확인 업로드 시 수정 요청이 발생할 수 있습니다.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
 
