@@ -4,17 +4,33 @@ import {
   ArrowDown, CheckCircle, Info, ChevronDown, ChevronUp
 } from 'lucide-react'
 
+const STORAGE_KEY = 'campaign_policy_dismissed_until'
+
 /**
  * 캠페인 정책 및 패널티 안내 팝업
- * 마감일 미준수, 가이드 미준수, 등급 관련 정책
+ * - autoMode=true: 메인 페이지에서 자동으로 뜸 (24시간 보지 않기 가능)
+ * - autoMode=false: 마이페이지 배너 클릭 등으로 수동으로 열 때
  */
-export default function CampaignPolicyModal({ isOpen, onClose }) {
+export default function CampaignPolicyModal({ isOpen, onClose, autoMode = false }) {
   const [expandedSection, setExpandedSection] = useState(null)
 
   if (!isOpen) return null
 
   const toggleSection = (section) => {
     setExpandedSection(expandedSection === section ? null : section)
+  }
+
+  const handleDismiss24h = () => {
+    const until = Date.now() + 24 * 60 * 60 * 1000
+    localStorage.setItem(STORAGE_KEY, String(until))
+    onClose()
+  }
+
+  /** 24시간 보지 않기 체크 유틸 (외부에서 호출) */
+  CampaignPolicyModal.shouldShow = () => {
+    const dismissedUntil = localStorage.getItem(STORAGE_KEY)
+    if (dismissedUntil && Date.now() < Number(dismissedUntil)) return false
+    return true
   }
 
   return (
@@ -321,13 +337,21 @@ export default function CampaignPolicyModal({ isOpen, onClose }) {
           </div>
 
           {/* 하단 버튼 */}
-          <div className="sticky bottom-0 bg-white border-t px-6 py-4 rounded-b-3xl">
+          <div className="sticky bottom-0 bg-white border-t px-6 py-4 rounded-b-3xl space-y-2">
             <button
               onClick={onClose}
               className="w-full py-3.5 bg-gray-900 text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-colors"
             >
               확인했습니다
             </button>
+            {autoMode && (
+              <button
+                onClick={handleDismiss24h}
+                className="w-full py-2.5 text-gray-400 text-xs font-medium hover:text-gray-600 transition-colors"
+              >
+                24시간 동안 보지 않기
+              </button>
+            )}
           </div>
         </div>
       </div>

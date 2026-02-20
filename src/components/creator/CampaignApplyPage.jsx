@@ -8,6 +8,7 @@ import {
   CheckCircle, AlertCircle, Loader2, AlertTriangle,
   Gift, DollarSign, Calendar
 } from 'lucide-react'
+import CampaignPolicyModal from './CampaignPolicyModal'
 
 const CampaignApplyPage = () => {
   const { id } = useParams()
@@ -22,6 +23,15 @@ const CampaignApplyPage = () => {
   const [success, setSuccess] = useState(false)
   const [userProfile, setUserProfile] = useState(null)
   const [existingApplication, setExistingApplication] = useState(null)
+  const [showPolicyPopup, setShowPolicyPopup] = useState(false)
+
+  // 캠페인 지원 페이지 진입 시 정책 팝업 자동 표시 (24시간 보지 않기 체크)
+  useEffect(() => {
+    if (CampaignPolicyModal.shouldShow && CampaignPolicyModal.shouldShow()) {
+      const timer = setTimeout(() => setShowPolicyPopup(true), 300)
+      return () => clearTimeout(timer)
+    }
+  }, [])
 
   // 지원서 폼
   const [applicationData, setApplicationData] = useState({
@@ -672,6 +682,13 @@ const CampaignApplyPage = () => {
           </button>
         </div>
       </div>
+
+      {/* 캠페인 정책 자동 팝업 */}
+      <CampaignPolicyModal
+        isOpen={showPolicyPopup}
+        onClose={() => setShowPolicyPopup(false)}
+        autoMode={true}
+      />
     </div>
   )
 }
