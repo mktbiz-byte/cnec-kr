@@ -7,7 +7,7 @@ import {
   DollarSign, FileText, ChevronRight,
   Gift, Target, Loader2, Sparkles, Camera, X
 } from 'lucide-react'
-import CampaignPolicyModal from './CampaignPolicyModal'
+import CampaignPolicyModal, { shouldShowPolicyPopup } from './CampaignPolicyModal'
 
 // 등급 설정 (PRD 기준)
 export const GRADE_CONFIG = {
@@ -182,7 +182,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
 
   // 메인 페이지 진입 시 캠페인 정책 팝업 자동 표시 (24시간 보지 않기 체크)
   useEffect(() => {
-    if (CampaignPolicyModal.shouldShow && CampaignPolicyModal.shouldShow()) {
+    if (shouldShowPolicyPopup()) {
       const timer = setTimeout(() => setShowPolicyPopup(true), 500)
       return () => clearTimeout(timer)
     }

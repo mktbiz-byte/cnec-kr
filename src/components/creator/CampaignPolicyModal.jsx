@@ -6,6 +6,13 @@ import {
 
 const STORAGE_KEY = 'campaign_policy_dismissed_until'
 
+/** 24시간 보지 않기 체크 유틸 (컴포넌트 외부에서도 호출 가능) */
+export function shouldShowPolicyPopup() {
+  const dismissedUntil = localStorage.getItem(STORAGE_KEY)
+  if (dismissedUntil && Date.now() < Number(dismissedUntil)) return false
+  return true
+}
+
 /**
  * 캠페인 정책 및 패널티 안내 팝업
  * - autoMode=true: 메인 페이지에서 자동으로 뜸 (24시간 보지 않기 가능)
@@ -24,13 +31,6 @@ export default function CampaignPolicyModal({ isOpen, onClose, autoMode = false 
     const until = Date.now() + 24 * 60 * 60 * 1000
     localStorage.setItem(STORAGE_KEY, String(until))
     onClose()
-  }
-
-  /** 24시간 보지 않기 체크 유틸 (외부에서 호출) */
-  CampaignPolicyModal.shouldShow = () => {
-    const dismissedUntil = localStorage.getItem(STORAGE_KEY)
-    if (dismissedUntil && Date.now() < Number(dismissedUntil)) return false
-    return true
   }
 
   return (

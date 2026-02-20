@@ -8,7 +8,7 @@ import {
   CheckCircle, AlertCircle, Loader2, AlertTriangle,
   Gift, DollarSign, Calendar
 } from 'lucide-react'
-import CampaignPolicyModal from './CampaignPolicyModal'
+import CampaignPolicyModal, { shouldShowPolicyPopup } from './CampaignPolicyModal'
 
 const CampaignApplyPage = () => {
   const { id } = useParams()
@@ -27,7 +27,7 @@ const CampaignApplyPage = () => {
 
   // 캠페인 지원 페이지 진입 시 정책 팝업 자동 표시 (24시간 보지 않기 체크)
   useEffect(() => {
-    if (CampaignPolicyModal.shouldShow && CampaignPolicyModal.shouldShow()) {
+    if (shouldShowPolicyPopup()) {
       const timer = setTimeout(() => setShowPolicyPopup(true), 300)
       return () => clearTimeout(timer)
     }
