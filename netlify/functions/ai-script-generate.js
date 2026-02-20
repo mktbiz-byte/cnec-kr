@@ -48,7 +48,7 @@ exports.handler = async (event, context) => {
 
     // Gemini 클라이언트 초기화
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
     // 숏폼 길이에 따른 장면 수 결정 (더 많은 장면)
     const duration = videoLength || '30초'

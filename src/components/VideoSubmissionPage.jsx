@@ -387,6 +387,9 @@ export default function VideoSubmissionPage() {
                       <div key={v.id} className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-purple-600">V{v.version}</span>
+                          {v.uploaded_by === 'admin' && (
+                            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">관리자</span>
+                          )}
                           <span className="text-gray-500">
                             {new Date(v.submitted_at).toLocaleDateString('ko-KR')}
                           </span>

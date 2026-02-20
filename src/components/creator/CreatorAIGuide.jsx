@@ -6,7 +6,7 @@ import {
   Sparkles, Youtube, FileText, CheckCircle, Copy, Check,
   Loader2, ArrowLeft, Video, Crown, Play,
   ChevronRight, AlertCircle, Zap, Clock, Film, RefreshCw,
-  FolderOpen, Trash2, Eye
+  FolderOpen, Trash2, Eye, Search, TrendingUp, Hash, Image, Tag
 } from 'lucide-react'
 
 // MUSE 등급 전용 AI 숏폼 가이드 플랫폼
@@ -17,7 +17,7 @@ const CreatorAIGuide = () => {
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
   const [isMuse, setIsMuse] = useState(false)
-  const [activeTab, setActiveTab] = useState('analyze') // analyze, script, saved
+  const [activeTab, setActiveTab] = useState('analyze') // analyze, script, saved, seo
 
   // 저장된 대본 관련
   const [savedScripts, setSavedScripts] = useState([])
@@ -49,6 +49,16 @@ const CreatorAIGuide = () => {
   // 재생성 관련
   const [regenerating, setRegenerating] = useState(false)
   const [scriptVersion, setScriptVersion] = useState(1)
+
+  // SEO 관련
+  const [seoForm, setSeoForm] = useState({
+    keyword: '',
+    category: '',
+    platform: 'YouTube Shorts',
+    contentType: '숏폼'
+  })
+  const [analyzingSeo, setAnalyzingSeo] = useState(false)
+  const [seoResult, setSeoResult] = useState(null)
 
   // 복사 상태
   const [copiedId, setCopiedId] = useState(null)
@@ -371,6 +381,51 @@ const CreatorAIGuide = () => {
     }
   }
 
+  // YouTube SEO 분석
+  const handleSeoAnalysis = async () => {
+    if (!seoForm.keyword.trim()) {
+      setError('키워드 또는 주제를 입력해주세요.')
+      return
+    }
+
+    try {
+      setAnalyzingSeo(true)
+      setError('')
+      setSeoResult(null)
+
+      const response = await fetch('/.netlify/functions/ai-youtube-seo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(seoForm)
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'SEO 분석에 실패했습니다.')
+      }
+
+      setSeoResult(data.seo)
+
+      // DB에 저장
+      await supabase.from('ai_guides').insert({
+        user_id: user.id,
+        guide_type: 'youtube_seo',
+        input_data: seoForm,
+        result: data.seo
+      })
+
+      setSuccess('YouTube SEO 분석이 완료되었습니다!')
+      setTimeout(() => setSuccess(''), 3000)
+
+    } catch (error) {
+      console.error('SEO 분석 오류:', error)
+      setError(error.message || 'SEO 분석 중 오류가 발생했습니다.')
+    } finally {
+      setAnalyzingSeo(false)
+    }
+  }
+
   // 복사 기능
   const copyToClipboard = async (text, id) => {
     try {
@@ -468,6 +523,10 @@ const CreatorAIGuide = () => {
               <CheckCircle size={16} className="text-amber-500" />
               콘텐츠 사전 검증
             </li>
+            <li className="flex items-center gap-2">
+              <Search size={16} className="text-amber-500" />
+              YouTube SEO 최적화
+            </li>
           </ul>
           <button
             onClick={() => navigate('/my/grade')}
@@ -521,7 +580,7 @@ const CreatorAIGuide = () => {
       )}
 
       {/* 탭 버튼 */}
-      <div className="grid grid-cols-3 gap-2 mb-6">
+      <div className="grid grid-cols-4 gap-2 mb-6">
         <button
           onClick={() => setActiveTab('analyze')}
           className={`p-3 rounded-2xl text-left transition-all ${
@@ -543,7 +602,19 @@ const CreatorAIGuide = () => {
           }`}
         >
           <FileText size={20} className={activeTab === 'script' ? 'text-white' : 'text-amber-500'} />
-          <p className="font-bold mt-1.5 text-sm">대본 생성</p>
+          <p className="font-bold mt-1.5 text-sm">대본</p>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('seo')}
+          className={`p-3 rounded-2xl text-left transition-all ${
+            activeTab === 'seo'
+              ? 'bg-emerald-500 text-white shadow-lg'
+              : 'bg-white text-gray-700 border border-gray-100 shadow-sm'
+          }`}
+        >
+          <Search size={20} className={activeTab === 'seo' ? 'text-white' : 'text-emerald-500'} />
+          <p className="font-bold mt-1.5 text-sm">SEO</p>
         </button>
 
         <button
@@ -1015,6 +1086,462 @@ const CreatorAIGuide = () => {
                 <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 text-center">
                   <p className="text-emerald-700 font-bold text-sm">🎉 훌륭한 대본입니다!</p>
                   <p className="text-emerald-600 text-xs mt-1">이대로 촬영하시면 됩니다</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* SEO 탭 */}
+      {activeTab === 'seo' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp size={20} className="text-emerald-500" />
+              <h2 className="font-bold text-gray-900">YouTube SEO 추천</h2>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              키워드를 입력하면 AI가 검색 노출 최적화 전략을 추천합니다.
+            </p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">키워드/주제 *</label>
+                <input
+                  type="text"
+                  value={seoForm.keyword}
+                  onChange={(e) => setSeoForm({...seoForm, keyword: e.target.value})}
+                  placeholder="예: 올리브영 추천템, 다이어트 식단"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">카테고리</label>
+                  <select
+                    value={seoForm.category}
+                    onChange={(e) => setSeoForm({...seoForm, category: e.target.value})}
+                    className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="">선택</option>
+                    <option value="뷰티">뷰티</option>
+                    <option value="패션">패션</option>
+                    <option value="먹방/요리">먹방/요리</option>
+                    <option value="브이로그">브이로그</option>
+                    <option value="리뷰">리뷰</option>
+                    <option value="정보/꿀팁">정보/꿀팁</option>
+                    <option value="운동/건강">운동/건강</option>
+                    <option value="일상">일상</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">플랫폼</label>
+                  <select
+                    value={seoForm.platform}
+                    onChange={(e) => setSeoForm({...seoForm, platform: e.target.value})}
+                    className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="YouTube Shorts">YouTube Shorts</option>
+                    <option value="YouTube 일반">YouTube 일반</option>
+                    <option value="Instagram Reels">Instagram Reels</option>
+                    <option value="TikTok">TikTok</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                onClick={handleSeoAnalysis}
+                disabled={analyzingSeo}
+                className="w-full py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 disabled:opacity-50 flex items-center justify-center gap-2 mt-1"
+              >
+                {analyzingSeo ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    SEO 분석 중...
+                  </>
+                ) : (
+                  <>
+                    <Search size={18} />
+                    SEO 분석하기
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* SEO 분석 결과 */}
+          {seoResult && (
+            <div className="space-y-4">
+              {/* 경쟁 분석 요약 */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-gray-900">SEO 분석 결과</h3>
+                  <button
+                    onClick={() => copyToClipboard(JSON.stringify(seoResult, null, 2), 'seo-all')}
+                    className="text-sm text-emerald-500 flex items-center gap-1"
+                  >
+                    {copiedId === 'seo-all' ? <Check size={16} /> : <Copy size={16} />}
+                    {copiedId === 'seo-all' ? '복사됨' : '전체 복사'}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <div className="bg-emerald-50 rounded-xl p-3 text-center">
+                    <p className="text-xs text-emerald-600 font-medium mb-1">경쟁 강도</p>
+                    <p className={`text-lg font-bold ${
+                      seoResult.competitionLevel === '높음' ? 'text-red-600' :
+                      seoResult.competitionLevel === '보통' ? 'text-amber-600' : 'text-emerald-600'
+                    }`}>
+                      {seoResult.competitionLevel || '-'}
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 rounded-xl p-3 text-center">
+                    <p className="text-xs text-blue-600 font-medium mb-1">검색량 추세</p>
+                    <p className={`text-lg font-bold ${
+                      seoResult.searchVolumeTrend === '상승' ? 'text-emerald-600' :
+                      seoResult.searchVolumeTrend === '하락' ? 'text-red-600' : 'text-amber-600'
+                    }`}>
+                      {seoResult.searchVolumeTrend === '상승' ? '↑ ' : seoResult.searchVolumeTrend === '하락' ? '↓ ' : '→ '}
+                      {seoResult.searchVolumeTrend || '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 제목 추천 */}
+              {seoResult.titles && seoResult.titles.length > 0 && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileText size={18} className="text-red-500" />
+                    <h3 className="font-bold text-gray-900">제목 추천</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {seoResult.titles.map((item, idx) => (
+                      <div key={idx} className="bg-gray-50 rounded-xl p-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-bold text-gray-900 flex-1">{item.title}</p>
+                          <button
+                            onClick={() => copyToClipboard(item.title, `title-${idx}`)}
+                            className="text-gray-400 hover:text-emerald-500 shrink-0"
+                          >
+                            {copiedId === `title-${idx}` ? <Check size={14} /> : <Copy size={14} />}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">{item.pattern}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            item.estimatedCTR === '상' ? 'bg-emerald-100 text-emerald-700' :
+                            item.estimatedCTR === '중' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            CTR {item.estimatedCTR}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1.5">{item.reason}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 설명문 템플릿 */}
+              {seoResult.description && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <FileText size={18} className="text-amber-500" />
+                      <h3 className="font-bold text-gray-900">설명문 템플릿</h3>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(seoResult.description.template, 'desc')}
+                      className="text-sm text-emerald-500 flex items-center gap-1"
+                    >
+                      {copiedId === 'desc' ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedId === 'desc' ? '복사됨' : '복사'}
+                    </button>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-3 mb-3">
+                    <p className="text-sm text-gray-800 whitespace-pre-line">{seoResult.description.template}</p>
+                  </div>
+                  {seoResult.description.mustInclude && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 mb-1">필수 포함 요소:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {seoResult.description.mustInclude.map((item, idx) => (
+                          <span key={idx} className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full">{item}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 태그/키워드 */}
+              {seoResult.tags && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Tag size={18} className="text-blue-500" />
+                      <h3 className="font-bold text-gray-900">태그/키워드</h3>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const allTags = [
+                          ...(seoResult.tags.primary || []),
+                          ...(seoResult.tags.longTail || []),
+                          ...(seoResult.tags.related || []),
+                          ...(seoResult.tags.trending || [])
+                        ].join(', ')
+                        copyToClipboard(allTags, 'tags-all')
+                      }}
+                      className="text-sm text-emerald-500 flex items-center gap-1"
+                    >
+                      {copiedId === 'tags-all' ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedId === 'tags-all' ? '복사됨' : '전체 복사'}
+                    </button>
+                  </div>
+
+                  {seoResult.tags.primary && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-red-600 mb-1.5">메인 키워드</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {seoResult.tags.primary.map((tag, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => copyToClipboard(tag, `ptag-${idx}`)}
+                            className="text-xs px-2.5 py-1 bg-red-50 text-red-700 rounded-full hover:bg-red-100"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {seoResult.tags.longTail && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-blue-600 mb-1.5">롱테일 키워드</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {seoResult.tags.longTail.map((tag, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => copyToClipboard(tag, `ltag-${idx}`)}
+                            className="text-xs px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {seoResult.tags.trending && (
+                    <div>
+                      <p className="text-xs font-semibold text-purple-600 mb-1.5">트렌딩 키워드</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {seoResult.tags.trending.map((tag, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => copyToClipboard(tag, `ttag-${idx}`)}
+                            className="text-xs px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full hover:bg-purple-100"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 해시태그 */}
+              {seoResult.hashtags && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Hash size={18} className="text-violet-500" />
+                      <h3 className="font-bold text-gray-900">해시태그</h3>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const allHashtags = [
+                          ...(seoResult.hashtags.must || []),
+                          ...(seoResult.hashtags.recommended || []),
+                          ...(seoResult.hashtags.niche || [])
+                        ].join(' ')
+                        copyToClipboard(allHashtags, 'hashtags-all')
+                      }}
+                      className="text-sm text-emerald-500 flex items-center gap-1"
+                    >
+                      {copiedId === 'hashtags-all' ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedId === 'hashtags-all' ? '복사됨' : '전체 복사'}
+                    </button>
+                  </div>
+
+                  {seoResult.hashtags.must && (
+                    <div className="mb-2">
+                      <p className="text-xs font-semibold text-red-600 mb-1.5">필수</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {seoResult.hashtags.must.map((tag, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => copyToClipboard(tag, `mhash-${idx}`)}
+                            className="text-xs px-2.5 py-1 bg-red-50 text-red-700 rounded-full hover:bg-red-100 font-medium"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {seoResult.hashtags.recommended && (
+                    <div className="mb-2">
+                      <p className="text-xs font-semibold text-emerald-600 mb-1.5">추천</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {seoResult.hashtags.recommended.map((tag, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => copyToClipboard(tag, `rhash-${idx}`)}
+                            className="text-xs px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full hover:bg-emerald-100"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {seoResult.hashtags.niche && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 mb-1.5">틈새</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {seoResult.hashtags.niche.map((tag, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => copyToClipboard(tag, `nhash-${idx}`)}
+                            className="text-xs px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 썸네일 전략 */}
+              {seoResult.thumbnail && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Image size={18} className="text-pink-500" />
+                    <h3 className="font-bold text-gray-900">썸네일 전략</h3>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="bg-pink-50 rounded-xl p-3">
+                      <p className="text-xs text-pink-600 font-medium mb-1">스타일</p>
+                      <p className="text-sm text-gray-800">{seoResult.thumbnail.style}</p>
+                    </div>
+                    {seoResult.thumbnail.mainText && (
+                      <div className="bg-gray-50 rounded-xl p-3">
+                        <p className="text-xs text-gray-500 font-medium mb-1">텍스트</p>
+                        <p className="text-sm font-bold text-gray-900">{seoResult.thumbnail.mainText}</p>
+                      </div>
+                    )}
+                    {seoResult.thumbnail.colorScheme && (
+                      <div className="bg-gray-50 rounded-xl p-3">
+                        <p className="text-xs text-gray-500 font-medium mb-1">색상</p>
+                        <p className="text-sm text-gray-800">{seoResult.thumbnail.colorScheme}</p>
+                      </div>
+                    )}
+                    {seoResult.thumbnail.tips && (
+                      <ul className="space-y-1 mt-2">
+                        {seoResult.thumbnail.tips.map((tip, idx) => (
+                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                            <span className="text-pink-500">•</span>
+                            {tip}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 업로드 전략 */}
+              {seoResult.uploadStrategy && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock size={18} className="text-orange-500" />
+                    <h3 className="font-bold text-gray-900">업로드 전략</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="bg-orange-50 rounded-xl p-3 text-center">
+                      <p className="text-xs text-orange-600 font-medium mb-1">최적 시간</p>
+                      <p className="text-sm font-bold text-gray-900">
+                        {(seoResult.uploadStrategy.bestTimes || []).join(', ')}
+                      </p>
+                    </div>
+                    <div className="bg-orange-50 rounded-xl p-3 text-center">
+                      <p className="text-xs text-orange-600 font-medium mb-1">최적 요일</p>
+                      <p className="text-sm font-bold text-gray-900">
+                        {(seoResult.uploadStrategy.bestDays || []).join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                  {seoResult.uploadStrategy.frequency && (
+                    <div className="bg-gray-50 rounded-xl p-3">
+                      <p className="text-xs text-gray-500 font-medium mb-1">추천 빈도</p>
+                      <p className="text-sm text-gray-800">{seoResult.uploadStrategy.frequency}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 경쟁 인사이트 */}
+              {seoResult.competitorInsight && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp size={18} className="text-indigo-500" />
+                    <h3 className="font-bold text-gray-900">경쟁 분석</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {seoResult.competitorInsight.topStrategy && (
+                      <div className="bg-indigo-50 rounded-xl p-3">
+                        <p className="text-xs text-indigo-600 font-medium mb-1">상위 영상 전략</p>
+                        <p className="text-sm text-gray-800">{seoResult.competitorInsight.topStrategy}</p>
+                      </div>
+                    )}
+                    {seoResult.competitorInsight.gap && (
+                      <div className="bg-emerald-50 rounded-xl p-3">
+                        <p className="text-xs text-emerald-600 font-medium mb-1">공략 가능한 틈새</p>
+                        <p className="text-sm text-gray-800">{seoResult.competitorInsight.gap}</p>
+                      </div>
+                    )}
+                    {seoResult.competitorInsight.differentiation && (
+                      <div className="bg-amber-50 rounded-xl p-3">
+                        <p className="text-xs text-amber-600 font-medium mb-1">차별화 포인트</p>
+                        <p className="text-sm text-gray-800">{seoResult.competitorInsight.differentiation}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 프로 팁 */}
+              {seoResult.proTips && seoResult.proTips.length > 0 && (
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
+                  <p className="text-xs text-emerald-700 font-bold mb-2">Pro Tips</p>
+                  <ul className="space-y-1.5">
+                    {seoResult.proTips.map((tip, idx) => (
+                      <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                        <Zap size={14} className="text-emerald-500 mt-0.5 shrink-0" />
+                        {tip}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>

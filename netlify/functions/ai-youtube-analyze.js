@@ -58,7 +58,7 @@ exports.handler = async (event, context) => {
 
     // Gemini 클라이언트 초기화
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
     const analysisPrompt = `
 당신은 숏폼 콘텐츠(YouTube Shorts, Instagram Reels, TikTok) 분석 전문가입니다.

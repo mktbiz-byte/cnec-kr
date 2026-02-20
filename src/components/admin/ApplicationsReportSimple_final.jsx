@@ -4,14 +4,15 @@ import { useLanguage } from '../../contexts/LanguageContext'
 import { database } from '../../lib/supabase'
 import { emailTriggersKorean } from '../../lib/emailService'
 import AdminNavigation from './AdminNavigation'
-import { 
+import {
   Loader2, Eye, CheckCircle, XCircle, Clock, Search, Filter,
   Users, FileText, AlertCircle, Download, ExternalLink,
   Calendar, Mail, Instagram, Youtube, Video, RefreshCw,
   Link as LinkIcon, FolderOpen, Presentation, Wand2, X, Save,
-  ArrowLeft, DollarSign, FileText as FileTextIcon, Edit
+  ArrowLeft, DollarSign, FileText as FileTextIcon, Edit, Upload
 } from 'lucide-react'
 import DriveModal from './DriveModal'
+import AdminVideoUploadModal from './AdminVideoUploadModal'
 
 const ApplicationsReportSimple = () => {
   const navigate = useNavigate()
@@ -38,6 +39,9 @@ const ApplicationsReportSimple = () => {
     notes: '',
     campaign: null
   })
+  const [videoUploadModal, setVideoUploadModal] = useState(false)
+  const [videoUploadApp, setVideoUploadApp] = useState(null)
+  const [videoUploadCampaign, setVideoUploadCampaign] = useState(null)
 
   // 다국어 텍스트
   const texts = {
@@ -364,6 +368,13 @@ const ApplicationsReportSimple = () => {
     } finally {
       setProcessing(false)
     }
+  }
+
+  const openVideoUploadModal = (application) => {
+    const campaign = campaigns.find(c => c.id === application.campaign_id)
+    setVideoUploadApp(application)
+    setVideoUploadCampaign(campaign)
+    setVideoUploadModal(true)
   }
 
   const openDetailModal = (application) => {
@@ -733,6 +744,14 @@ const ApplicationsReportSimple = () => {
                               <FolderOpen className="h-4 w-4 mr-1" />
                               {t.provideDriveAccess}
                             </button>
+                            <button
+                              onClick={() => openVideoUploadModal(application)}
+                              disabled={processing}
+                              className="inline-flex items-center px-3 py-1 border border-indigo-300 shadow-sm text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-50 hover:bg-indigo-100"
+                            >
+                              <Upload className="h-4 w-4 mr-1" />
+                              영상 업로드
+                            </button>
                           </>
                         )}
                         
@@ -1018,6 +1037,17 @@ const ApplicationsReportSimple = () => {
           error={error}
           success={success}
           texts={t}
+        />
+
+        {/* 관리자 영상 업로드 모달 */}
+        <AdminVideoUploadModal
+          isOpen={videoUploadModal}
+          onClose={() => {
+            setVideoUploadModal(false)
+            loadData() // 닫을 때 데이터 새로고침
+          }}
+          application={videoUploadApp}
+          campaign={videoUploadCampaign}
         />
       </div>
     </div>
