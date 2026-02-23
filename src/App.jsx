@@ -25,6 +25,7 @@ import {
 import LandingPage from './components/creator/LandingPage';
 import CampaignDetailPage from './components/creator/CampaignDetailPage';
 import CampaignApplyPage from './components/creator/CampaignApplyPage';
+import CreatorApplicationPage from './components/creator/CreatorApplicationPage';
 
 // 인증 관련
 import LoginPageExactReplica from './components/LoginPageExactReplica';
@@ -101,6 +102,9 @@ const AppContent = () => {
         <Route path="/my/ai-guide" element={<CreatorAIGuide />} />
         <Route path="/guide" element={<CreatorGuidePage />} />
         <Route path="/welcome" element={<WelcomeScreen />} />
+
+        {/* 크리에이터 지원서 (URL 직접 접근 전용) */}
+        <Route path="/creator-application" element={<ProtectedRoute><CreatorApplicationPage /></ProtectedRoute>} />
 
         {/* 레거시 - 호환성 */}
         <Route path="/creator" element={<HomePage />} />
