@@ -75,8 +75,8 @@ cnec-kr/
     │   └── supabase_new.js      # 신규 구현
     ├── components/
     │   ├── ui/                  # 46개 Radix UI 프리미티브
-    │   ├── creator/             # 크리에이터 페이지 (20개)
-    │   ├── admin/               # 관리자 페이지 (54개, 백업 포함)
+    │   ├── creator/             # 크리에이터 페이지 (20개 .jsx + index.js)
+    │   ├── admin/               # 관리자 페이지 (53개, 백업 포함)
     │   ├── common/              # 공통 컴포넌트 (3개)
     │   ├── FourWeekGuideViewer.jsx
     │   ├── VideoSubmissionPage.jsx
@@ -100,8 +100,12 @@ emailjs-dummy.js 로드 (EmailJS 목 객체)
 
 ### 3.2 App.jsx - Context Provider 순서
 ```
-AuthProvider → LanguageProvider → PCViewProvider → Router
+Router → AuthProvider → LanguageProvider → PCViewProvider → AppContent
 ```
+- `AppContent`에서 `emailScheduler.start()` 실행 (useEffect)
+- `HolidayNoticePopup` 전역 렌더링 (모든 페이지에서 표시)
+- `PCViewLayout`으로 전체 라우트 감싸기
+- `PCViewToggleButton` 플로팅 버튼 표시
 
 ### 3.3 라우트 구조
 
@@ -642,6 +646,7 @@ created_at       TIMESTAMPTZ
 - **HomePage.jsx** - 로그인 후 메인 홈
 - **MyPageWrapper.jsx** - 마이페이지 래퍼 컴포넌트
 - **CreatorApp.jsx** - 크리에이터 앱 루트
+- **index.js** - 배럴 익스포트 (App.jsx에서 `import { CreatorApp, CreatorMyPage, ... } from './components/creator'` 형태로 사용)
 
 ---
 
@@ -724,7 +729,16 @@ created_at       TIMESTAMPTZ
 - **DriveModal.jsx** - Google Drive/Slides URL 입력 모달
 - **CampaignCreationWithTranslator.jsx** - 번역 기능 캠페인 생성
 
-**관리자 백업/레거시 파일 (54개 중 약 30개):** `_backup`, `_fixed`, `_fixed_final`, `_with_drive` 등 접미사 파일 다수 존재. 반복적 개선 과정에서 생성된 히스토리 파일.
+**추가 활성 파일:**
+- **AdminCampaigns.jsx** - 캠페인 관리 (기본 버전)
+- **AdminCampaignsEnhanced.jsx** - 향상된 캠페인 관리
+- **AdminWithdrawals_helper.js** - 출금 헬퍼 유틸리티 (.js)
+- **ConfirmedCreatorsReport_multilingual.jsx** - 다국어 확정 리포트
+- **SNSUploadFinalReport_multilingual.jsx** - 다국어 SNS 리포트
+
+**중요:** `/applications-manage` 및 `/applications-report` 라우트의 `ApplicationsReportSimple` 컴포넌트는 실제로 `ApplicationsReportSimple_final.jsx` 파일에서 임포트됨 (App.jsx line 57: `import ... from './components/admin/ApplicationsReportSimple_final'`)
+
+**관리자 백업/레거시 파일 (53개 중 약 28개):** `_backup`, `_fixed`, `_fixed_final`, `_with_drive` 등 접미사 파일 다수 존재. 반복적 개선 과정에서 생성된 히스토리 파일.
 
 ---
 
@@ -762,7 +776,7 @@ created_at       TIMESTAMPTZ
 - 언어 전환 드롭다운
 - `languageChanged` 커스텀 이벤트 발행
 
-### 9.7 주요 공유 컴포넌트 (src/components/ 루트, 81개 파일)
+### 9.7 주요 공유 컴포넌트 (src/components/ 루트, 72개 파일)
 **인증 관련:**
 - `LoginPageExactReplica.jsx` - 로그인 (이메일/구글)
 - `ForgotPasswordPage.jsx` - 비밀번호 찾기
@@ -924,23 +938,23 @@ emailScheduler → 매일 오전 9시 체크
 
 ## 15. 파일별 빠른 참조 (Quick Reference)
 
-| 파일 | 줄 수(약) | 핵심 역할 |
-|------|-----------|-----------|
-| `src/App.jsx` | ~500 | 라우팅 + Provider 설정 |
-| `src/lib/supabase.js` | ~1,355 | 모든 DB CRUD 작업 |
-| `src/lib/i18n.js` | ~559 | 번역 시스템 |
-| `src/contexts/AuthContext.jsx` | ~300 | 인증 상태 |
-| `src/components/creator/CreatorMyPage.jsx` | ~1,500+ | 마이페이지 종합 |
-| `src/components/creator/CreatorHome.jsx` | ~500 | 크리에이터 홈 |
-| `src/components/creator/CampaignDetailPage.jsx` | ~800 | 캠페인 상세 |
-| `src/components/creator/CampaignApplyPage.jsx` | ~600 | 지원 폼 |
-| `src/components/creator/CreatorAIGuide.jsx` | ~800 | AI 도구 (MUSE) |
-| `src/components/admin/AdminDashboard.jsx` | ~400 | 관리자 대시보드 |
-| `src/components/admin/AdminApplications.jsx` | ~800 | 지원 관리 |
-| `src/components/admin/AdminWithdrawals.jsx` | ~700 | 출금 관리 |
-| `src/components/admin/CampaignCreationKorea.jsx` | ~600 | 캠페인 생성 |
-| `src/components/VideoSubmissionPage.jsx` | ~700 | 영상 제출 |
-| `src/components/VideoReviewView.jsx` | ~900 | 영상 검수 |
+| 파일 | 줄 수 | 핵심 역할 |
+|------|-------|-----------|
+| `src/App.jsx` | 178 | 라우팅 + Provider 설정 |
+| `src/lib/supabase.js` | 1,355 | 모든 DB CRUD 작업 |
+| `src/lib/i18n.js` | 558 | 번역 시스템 |
+| `src/contexts/AuthContext.jsx` | 303 | 인증 상태 |
+| `src/components/creator/CreatorMyPage.jsx` | 1,648 | 마이페이지 종합 |
+| `src/components/creator/CreatorHome.jsx` | 698 | 크리에이터 홈 |
+| `src/components/creator/CampaignDetailPage.jsx` | 968 | 캠페인 상세 |
+| `src/components/creator/CampaignApplyPage.jsx` | 696 | 지원 폼 |
+| `src/components/creator/CreatorAIGuide.jsx` | 1,655 | AI 도구 (MUSE) |
+| `src/components/admin/AdminDashboard.jsx` | 476 | 관리자 대시보드 |
+| `src/components/admin/AdminApplications.jsx` | 908 | 지원 관리 |
+| `src/components/admin/AdminWithdrawals.jsx` | 1,003 | 출금 관리 |
+| `src/components/admin/CampaignCreationKorea.jsx` | 588 | 캠페인 생성 |
+| `src/components/VideoSubmissionPage.jsx` | 716 | 영상 제출 |
+| `src/components/VideoReviewView.jsx` | 791 | 영상 검수 |
 
 ---
 
@@ -1023,19 +1037,20 @@ emailScheduler → 매일 오전 9시 체크
 
 ---
 
-## 20. SQL 스크립트 (루트 디렉토리, 41개)
+## 20. SQL 스크립트 (루트 42개 + sql/ 1개 = 총 43개)
 
 주요 DB 설정/수정용 SQL 스크립트:
 - **스키마:** `KOREA_DATABASE_SCHEMA.sql`, `MUSE_AI_GUIDE_SCHEMA.sql`, `SUPABASE_COMPLETE_SETUP.sql`
 - **칼럼 추가:** `ADD_BEAUTY_PROFILE_COLUMNS.sql`, `ADD_CAMPAIGNS_COLUMNS.sql`, `ADD_MISSING_COLUMNS.sql`, `ADD_PROFILE_PHOTO_COLUMN.sql`
-- **수정:** `FIX_KOREA_USER_PROFILES.sql`, `FIX_STORAGE_RLS_POLICY.sql`, `fix_database_schema.sql`, `fix_foreign_key_relations.sql`, `fix_point_transactions_constraint.sql`
+- **수정:** `FIX_KOREA_USER_PROFILES.sql`, `FIX_STORAGE_RLS_POLICY.sql`, `SUPABASE_FIX_SCRIPT.sql`, `fix_database_schema.sql`, `database_schema_fix.sql`, `fix_foreign_key_relations.sql`, `fix_point_transactions_constraint.sql`
 - **테이블 생성:** `add_campaign_category.sql`, `add_cnecplus_table.sql`, `add_faq_table.sql`, `add_video_references_table.sql`, `create_withdrawals_table.sql`, `database_creator_materials.sql`
 - **스토리지:** `CREATE_STORAGE_BUCKETS_KR.sql`, `SETUP_PROFILE_PHOTOS_STORAGE.sql`
-- **출금 시스템:** `withdrawal_system_check.sql`, `withdrawal_system_fix.sql`, `check_withdrawal_data.sql`, `check_withdrawal_tables.sql`
+- **출금 시스템:** `withdrawal_system_check.sql`, `withdrawal_system_fix.sql`, `check_withdrawal_data.sql`, `check_withdrawal_system.sql`, `check_withdrawal_tables.sql`
 - **점검:** `check_schema.sql`, `check_applications_columns.sql`, `check_applications_structure.sql`, `check_user_profiles_structure.sql`, `supabase_structure_check.sql`
 - **관리자:** `admin_role_fix.sql`, `create_test_admin.sql`, `ADD_ADMIN_USER.sql`, `CHECK_PROFILE_COLUMNS.sql`
 - **트랜잭션:** `update_transaction_types.sql`, `fix_existing_transaction_types.sql`
 - **기타:** `database_schema_with_email.sql`, `cleanup_temp_users.sql`, `check_users_and_admins.sql`, `check_sns_uploads.sql`
+- **sql/ 디렉토리:** `sql/check_profile_fields.sql`
 
 ---
 
