@@ -13,7 +13,7 @@
 - **프론트엔드:** React 19 + Vite 6 + Tailwind CSS 4
 - **백엔드/DB:** Supabase (PostgreSQL + Auth + Storage + Realtime)
 - **서버리스:** Netlify Functions (이메일 발송, 관리자 기능)
-- **UI 라이브러리:** Radix UI + shadcn/ui 스타일 (46개 프리미티브 컴포넌트)
+- **UI 라이브러리:** Radix UI + shadcn/ui 스타일 (46개+ 프리미티브 컴포넌트)
 - **상태관리:** React Context API (AuthContext, LanguageContext, PCViewContext)
 - **라우팅:** React Router DOM v7
 - **차트:** Recharts
@@ -65,11 +65,19 @@ cnec-kr/
     │   ├── emailScheduler.js    # 자동 데드라인 리마인더
     │   ├── simpleEmailService.js# 간단 SMTP 이메일
     │   ├── gmailEmailService.js # Gmail SMTP (EmailJS)
-    │   └── googleDriveService.js# Google Drive/Slides API
+    │   ├── googleDriveService.js# Google Drive/Slides API
+    │   ├── emailjs-dummy.js     # EmailJS 더미 객체 (에러 방지)
+    │   ├── supabase_backup.js   # Supabase 백업본
+    │   ├── supabase_backup_original.js # 원본 백업
+    │   ├── supabase_enhanced.js # 향상 버전
+    │   ├── supabase_fixed.js    # 수정 버전
+    │   ├── supabase_fixed_campaign_applications.js # 지원서 특화
+    │   └── supabase_new.js      # 신규 구현
     ├── components/
     │   ├── ui/                  # 46개 Radix UI 프리미티브
-    │   ├── creator/             # 크리에이터 페이지 (21개)
-    │   ├── admin/               # 관리자 페이지 (22개+)
+    │   ├── creator/             # 크리에이터 페이지 (20개)
+    │   ├── admin/               # 관리자 페이지 (54개, 백업 포함)
+    │   ├── common/              # 공통 컴포넌트 (3개)
     │   ├── FourWeekGuideViewer.jsx
     │   ├── VideoSubmissionPage.jsx
     │   ├── VideoReviewView.jsx
@@ -101,46 +109,67 @@ AuthProvider → LanguageProvider → PCViewProvider → Router
 | 경로 | 컴포넌트 | 설명 |
 |------|----------|------|
 | `/` | LandingPage (비로그인) / HomePage (로그인) | 메인 페이지 |
-| `/login` | 로그인 | 이메일/구글 로그인 |
+| `/login` | LoginPageExactReplica | 이메일/구글 로그인 |
 | `/signup` | SignupPageExactReplica | 회원가입 |
-| `/forgot-password` | 비밀번호 찾기 | 이메일 발송 |
-| `/reset-password` | 비밀번호 재설정 | 새 비밀번호 입력 |
-| `/auth/callback` | OAuth 콜백 | 구글 로그인 콜백 |
+| `/forgot-password` | ForgotPasswordPage | 비밀번호 찾기 이메일 발송 |
+| `/reset-password` | ResetPasswordPage | 새 비밀번호 입력 |
+| `/auth/callback` | AuthCallbackSafe | 구글 OAuth 콜백 |
 | `/guide` | CreatorGuidePage | 크리에이터 활동 가이드 |
 | `/welcome` | WelcomeScreen | 신규 크리에이터 환영 |
 
 **크리에이터 라우트 (로그인 필요):**
 | 경로 | 컴포넌트 | 설명 |
 |------|----------|------|
-| `/campaigns` | CampaignsPage → CreatorSearch | 캠페인 탐색/검색 |
+| `/campaigns` | CampaignsPage | 캠페인 탐색/검색 |
 | `/campaign/:id` | CampaignDetailPage | 캠페인 상세 |
 | `/campaign/:id/apply` | CampaignApplyPage | 캠페인 지원 신청 |
-| `/mypage` | MyPageWrapper → CreatorMyPage | 마이페이지 (프로필, 지원, 포인트) |
+| `/mypage` | MyPageWrapper | 마이페이지 (프로필, 지원, 포인트) |
 | `/my/grade` | GradeDetailPage | 등급 상세 |
 | `/my/points` | PointsPage | 포인트/출금 관리 |
 | `/my/applications` | ApplicationsPage | 지원 내역 |
 | `/my/ai-guide` | CreatorAIGuide | AI 콘텐츠 도구 (MUSE 전용) |
-| `/creator-application` | CreatorApplicationPage | 크리에이터 소속사 지원서 |
-| `/submit-video/:campaignId` | VideoSubmissionPage | 영상 제출 |
+| `/creator-application` | CreatorApplicationPage | 크리에이터 소속사 지원서 (ProtectedRoute) |
+| `/submit-video/:campaignId` | VideoSubmissionPage | 영상 제출 (범용) |
+| `/submit-oliveyoung-video/:campaignId` | OliveyoungVideoSubmissionPage | 올리브영 영상 제출 |
+| `/submit-4week-video/:campaignId` | FourWeekVideoSubmissionPage | 4주 챌린지 영상 제출 |
 | `/video-review/:submissionId` | VideoReviewView | 영상 검수/피드백 |
+| `/profile` | ProfileSettingsTest | 프로필 설정 |
+| `/settings/notifications` | NotificationSettings | 알림 설정 |
+| `/campaign-application` | CampaignApplicationUpdated | 캠페인 지원서 (구버전) |
+| `/company-report/:campaignId` | CompanyReportNew | 기업 리포트 (공개) |
+| `/cnecplus` | CNECPlusPageEnhanced | CNEC Plus 페이지 |
+
+**레거시/테스트 라우트:**
+| 경로 | 컴포넌트 | 설명 |
+|------|----------|------|
+| `/creator` | HomePage | 레거시 리다이렉트 |
+| `/home-legacy` | HomePageExactReplica | 구버전 홈 |
+| `/cnec-plus` | CNECPlusPageEnhanced | CNEC Plus 별칭 |
+| `/profile-settings` | ProfileSettingsTest | 프로필 설정 별칭 |
+| `/profile-simple` | ProfileSettings | 간소화 프로필 |
+| `/profile-test-beta-2025` | ProfileSettingsTest | 프로필 베타 테스트 |
+| `/profile-view-beta-2025` | ProfileViewTest | 프로필 뷰 베타 |
+| `/secret-admin-login` | SecretAdminLogin | 관리자 비밀 로그인 |
+| `/test-admin-login` | TestAdminLogin | 관리자 테스트 로그인 |
 
 **관리자 라우트 (어드민 권한 필요):**
 | 경로 | 컴포넌트 | 설명 |
 |------|----------|------|
-| `/dashboard` | AdminDashboard | 관리자 대시보드 |
+| `/dashboard` | AdminDashboardSimple | 관리자 대시보드 |
 | `/campaigns-manage` | AdminCampaignsWithQuestions | 캠페인 관리 |
 | `/campaign-create` | CampaignCreationKorea | 캠페인 생성 |
-| `/applications-manage` | AdminApplications | 지원서 관리 |
+| `/applications-manage` | ApplicationsReportSimple | 지원서 관리 |
 | `/applications-report` | ApplicationsReportSimple | 지원서 리포트 |
 | `/confirmed-creators` | AdminConfirmedCreators | 확정 크리에이터 |
-| `/confirmed-creators/:campaignId` | ConfirmedCreatorsReport | 확정 리포트 |
-| `/sns-uploads` | SNSUploadFinalReport | SNS 업로드 관리 |
-| `/campaign-report/:campaignId` | CampaignReport | 캠페인 리포트 |
+| `/confirmed-creators/:campaignId` | ConfirmedCreatorsNew | 확정 리포트 |
+| `/sns-uploads` | SNSUploadNew | SNS 업로드 관리 |
+| `/sns-uploads/:campaignId` | SNSUploadNew | SNS 업로드 (캠페인별) |
+| `/campaign-report/:campaignId` | CampaignReportEnhanced | 캠페인 리포트 |
 | `/email-templates` | EmailTemplateManager | 이메일 템플릿 |
-| `/user-approval` | UserApprovalManager | 사용자 승인 |
+| `/user-approval` | UserApprovalManagerEnhanced | 사용자 승인 |
 | `/withdrawals-manage` | AdminWithdrawals | 출금 관리 |
 | `/system-settings` | SystemSettings | 시스템 설정 |
-| `/email-settings` | AdminEmailManagement | 이메일 설정 |
+| `/email-settings` | EmailSettings | 이메일 설정 |
 
 ---
 
@@ -457,6 +486,12 @@ created_at       TIMESTAMPTZ
 - 권한 거부 시 빈 배열 반환
 - 출금은 원자적 연산 (gte 가드로 경쟁 조건 방지)
 
+**백업/레거시 파일 (6개, 총 3,303줄):**
+- `supabase_backup.js` (636줄), `supabase_backup_original.js` (711줄)
+- `supabase_enhanced.js` (482줄), `supabase_fixed.js` (620줄)
+- `supabase_fixed_campaign_applications.js` (272줄), `supabase_new.js` (582줄)
+- 현재 활성 파일은 `supabase.js` (1,355줄)만 사용. 나머지는 히스토리용
+
 ### 6.2 i18n.js (559줄) - 번역 시스템
 - `t(key, params)` → 번역 텍스트 조회 (파라미터 치환 지원)
 - `setLanguage(lang)` → 언어 변경 (localStorage 저장)
@@ -481,14 +516,17 @@ created_at       TIMESTAMPTZ
 - `userPointsAPI.getUserTotalPoints(userId)` → 총 포인트 계산
 - 원자적 차감 (실패 시 롤백)
 
-### 6.6 이메일 시스템 (4개 파일)
-- `emailHelper.js` → 고수준 API (Netlify Functions 호출)
+### 6.6 이메일 시스템 (7개 파일)
+- `emailHelper.js` (172줄) → 고수준 API (Netlify Functions 호출)
   - `sendWelcomeEmail()`, `sendApplicationConfirmationEmail()`, `sendApplicationApprovedEmail()`, `sendApplicationRejectedEmail()`, `sendCustomEmail()`
-- `emailTemplates.js` → HTML 템플릿 (환영, 승인 등)
-- `emailService.js` → 한국어 이메일 템플릿 + {{변수}} 치환
-- `emailScheduler.js` → 데드라인 자동 리마인더
+- `emailTemplates.js` (128줄) → HTML 템플릿 (환영, 승인 등)
+- `emailService.js` (1,177줄) → 한국어 이메일 템플릿 + {{변수}} 치환
+- `emailScheduler.js` (331줄) → 데드라인 자동 리마인더
   - 매일 오전 9시 실행, D-3/D-2/D-1/D-Day 리마인더
   - 영상 미제출자만 대상, 중복 발송 방지
+- `simpleEmailService.js` (127줄) → 브라우저 기반 SMTP (localStorage 설정)
+- `gmailEmailService.js` (220줄) → Gmail SMTP (EmailJS 연동)
+- `emailjs-dummy.js` (25줄) → EmailJS 더미 객체 (EM.init 에러 방지)
 
 ### 6.7 googleDriveService.js - Google Drive 연동
 - `createFolderStructureForUser(brandName, userName, userEmail)` → 폴더 구조 자동 생성
@@ -600,6 +638,10 @@ created_at       TIMESTAMPTZ
 - **WelcomeScreen.jsx** - 신규 환영 + 보너스 안내
 - **CreatorApplicationPage.jsx** - 소속사 지원서 (SNS 정보, 카테고리, 경력)
 - **CampaignDetailModal.jsx** - 캠페인 상세 모달 버전
+- **CampaignsPage.jsx** - 캠페인 목록 래퍼 (CreatorSearch 포함)
+- **HomePage.jsx** - 로그인 후 메인 홈
+- **MyPageWrapper.jsx** - 마이페이지 래퍼 컴포넌트
+- **CreatorApp.jsx** - 크리에이터 앱 루트
 
 ---
 
@@ -658,19 +700,31 @@ created_at       TIMESTAMPTZ
 - 상세 모달 + 승인/거절
 - 관리자 권한 부여/해제
 
-### 8.9 기타 관리자 컴포넌트
+### 8.9 기타 관리자 컴포넌트 (활성 사용)
+- **AdminDashboardSimple.jsx** - 대시보드 간소화 버전 (현재 라우트 사용)
 - **AdminNavigation.jsx** - 관리 메뉴 (반응형)
 - **AdminHeader.jsx** - 헤더 + 언어 전환 + 사용자 메뉴
 - **AdminEmailManagement.jsx** - 이메일 로그, 예약 이메일, 테스트 발송
 - **AdminCompanyAccess.jsx** - 기업 계정 + API 토큰 관리
 - **EmailTemplateManager.jsx** - 이메일 템플릿 편집
+- **EmailSettings.jsx** - 이메일 설정 (현재 라우트 사용)
 - **SystemSettings.jsx** - SMTP, SEO, 애널리틱스 설정
+- **SNSUploadNew.jsx** - SNS 업로드 관리 (현재 라우트 사용)
 - **SNSUploadFinalReport.jsx** - SNS 업로드 현황 리포트
+- **ConfirmedCreatorsNew.jsx** - 확정 크리에이터 (현재 라우트 사용)
 - **ConfirmedCreatorsReport.jsx** - 확정 크리에이터 리포트 + Excel
-- **ApplicationsReportSimple.jsx** - 지원서 종합 리포트
+- **ApplicationsReportSimple.jsx** - 지원서 종합 리포트 (현재 라우트 사용)
 - **CampaignReport.jsx** - 캠페인별 리포트
+- **CampaignReportEnhanced.jsx** - 향상된 캠페인 리포트 (현재 라우트 사용)
+- **CampaignFinalReport.jsx** - 캠페인 최종 리포트
+- **CampaignApplicationsReport.jsx** - 캠페인 지원서 리포트
+- **CompanyReport_multilingual.jsx** - 다국어 기업 리포트
+- **UserApprovalManagerEnhanced.jsx** - 향상된 사용자 승인 (현재 라우트 사용)
 - **CreatorMaterialsManager.jsx** - 크리에이터 자료 배포 (Drive URL)
 - **DriveModal.jsx** - Google Drive/Slides URL 입력 모달
+- **CampaignCreationWithTranslator.jsx** - 번역 기능 캠페인 생성
+
+**관리자 백업/레거시 파일 (54개 중 약 30개):** `_backup`, `_fixed`, `_fixed_final`, `_with_drive` 등 접미사 파일 다수 존재. 반복적 개선 과정에서 생성된 히스토리 파일.
 
 ---
 
@@ -708,11 +762,40 @@ created_at       TIMESTAMPTZ
 - 언어 전환 드롭다운
 - `languageChanged` 커스텀 이벤트 발행
 
+### 9.7 주요 공유 컴포넌트 (src/components/ 루트, 81개 파일)
+**인증 관련:**
+- `LoginPageExactReplica.jsx` - 로그인 (이메일/구글)
+- `ForgotPasswordPage.jsx` - 비밀번호 찾기
+- `ResetPasswordPage.jsx` - 비밀번호 재설정
+- `AuthCallbackSafe.jsx` - OAuth 콜백 처리
+- `ProtectedRoute.jsx` - 인증 필요 라우트 가드
+- `SecretAdminLogin.jsx`, `TestAdminLogin.jsx` - 관리자 로그인
+
+**프로필 관련:**
+- `ProfileSettingsTest.jsx` - 현재 활성 프로필 설정 (라우트: `/profile`)
+- `ProfileSettings.jsx` - 간소화 프로필 (라우트: `/profile-simple`)
+- `ProfileViewTest.jsx` - 프로필 뷰 베타
+- `NotificationSettings.jsx` - 알림 설정
+
+**캠페인 관련:**
+- `CampaignApplicationUpdated.jsx` - 캠페인 지원서 (구버전 라우트)
+- `CompanyReportNew.jsx` - 기업 리포트 (크리에이터 공개)
+- `CNECPlusPageEnhanced.jsx` - CNEC Plus 페이지
+- `OliveYoungGuideViewer.jsx` - 올리브영 가이드 뷰어
+- `AIGuideViewer.jsx` - AI 가이드 뷰어
+- `OliveyoungVideoSubmissionPage.jsx` - 올리브영 영상 제출
+- `FourWeekVideoSubmissionPage.jsx` - 4주 챌린지 영상 제출
+- `HolidayNoticePopup.jsx` - 휴일 공지 팝업
+- `VideoReferencesSection.jsx` - 참고 영상 섹션
+- `EmailScheduler.jsx` - 이메일 스케줄러 UI
+
+**레거시/백업 (미사용):** 다수의 `_backup`, `_fixed`, `_old`, `_enhanced` 접미사 파일 존재
+
 ---
 
 ## 10. UI 컴포넌트 라이브러리 (src/components/ui/)
 
-Radix UI + CVA(Class Variance Authority) 기반 **46개 프리미티브 컴포넌트**:
+Radix UI + CVA(Class Variance Authority) 기반 **46개+ 프리미티브 컴포넌트**:
 
 **기본:** button, card, input, label, select, textarea, checkbox, alert, separator, badge
 **레이아웃:** accordion, collapsible, resizable, scroll-area, sheet, sidebar, aspect-ratio, tabs
@@ -863,7 +946,7 @@ emailScheduler → 매일 오전 9시 체크
 
 ## 16. Netlify Serverless Functions (netlify/functions/)
 
-17개의 서버리스 함수로 백엔드 로직을 처리합니다.
+17개의 서버리스 함수로 백엔드 로직을 처리합니다 (자체 package.json 포함).
 
 ### AI/콘텐츠 생성
 | 함수 | 용도 |
@@ -931,14 +1014,73 @@ emailScheduler → 매일 오전 9시 체크
 | `05_create_storage_policies.sql` | 파일 업로드 보안 |
 | `06_add_video_submission_fields.sql` | 영상 필드 확장 |
 | `07_add_partnership_code_to_applications.sql` | 파트너십 코드 |
+| `07_fix_video_submissions_version_check.sql` | 영상 버전 체크 수정 |
 | `08_add_company_phone_to_campaigns.sql` | 기업 연락처 |
 | `09_add_korean_campaign_columns.sql` | 한국 캠페인 칼럼 |
 | `10_add_clean_video_url_to_applications.sql` | 클린 영상 URL |
 | `11_add_uploaded_by_to_video_submissions.sql` | 업로더 추적 |
+| `create_video_submissions_table.sql` | 영상 제출 테이블 (초기 버전) |
 
 ---
 
-## 20. 핵심 의존성 요약
+## 20. SQL 스크립트 (루트 디렉토리, 41개)
+
+주요 DB 설정/수정용 SQL 스크립트:
+- **스키마:** `KOREA_DATABASE_SCHEMA.sql`, `MUSE_AI_GUIDE_SCHEMA.sql`, `SUPABASE_COMPLETE_SETUP.sql`
+- **칼럼 추가:** `ADD_BEAUTY_PROFILE_COLUMNS.sql`, `ADD_CAMPAIGNS_COLUMNS.sql`, `ADD_MISSING_COLUMNS.sql`, `ADD_PROFILE_PHOTO_COLUMN.sql`
+- **수정:** `FIX_KOREA_USER_PROFILES.sql`, `FIX_STORAGE_RLS_POLICY.sql`, `fix_database_schema.sql`, `fix_foreign_key_relations.sql`, `fix_point_transactions_constraint.sql`
+- **테이블 생성:** `add_campaign_category.sql`, `add_cnecplus_table.sql`, `add_faq_table.sql`, `add_video_references_table.sql`, `create_withdrawals_table.sql`, `database_creator_materials.sql`
+- **스토리지:** `CREATE_STORAGE_BUCKETS_KR.sql`, `SETUP_PROFILE_PHOTOS_STORAGE.sql`
+- **출금 시스템:** `withdrawal_system_check.sql`, `withdrawal_system_fix.sql`, `check_withdrawal_data.sql`, `check_withdrawal_tables.sql`
+- **점검:** `check_schema.sql`, `check_applications_columns.sql`, `check_applications_structure.sql`, `check_user_profiles_structure.sql`, `supabase_structure_check.sql`
+- **관리자:** `admin_role_fix.sql`, `create_test_admin.sql`, `ADD_ADMIN_USER.sql`, `CHECK_PROFILE_COLUMNS.sql`
+- **트랜잭션:** `update_transaction_types.sql`, `fix_existing_transaction_types.sql`
+- **기타:** `database_schema_with_email.sql`, `cleanup_temp_users.sql`, `check_users_and_admins.sql`, `check_sns_uploads.sql`
+
+---
+
+## 21. Assets (src/assets/)
+
+| 파일 | 용도 |
+|------|------|
+| `cnec-logo.png` | 기본 로고 |
+| `cnec-logo-clean.png` | 클린 로고 |
+| `cnec-logo-final.png` | 최종 로고 |
+| `cnec-logo-horizontal.png` | 가로형 로고 |
+| `cnec-logo-transparent.png` | 투명 배경 로고 |
+| `react.svg` | React 기본 아이콘 |
+| `supabase-client-complete.js` | Supabase 클라이언트 (정적 번들용) |
+| `supabase-client-netlify.js` | Netlify용 Supabase 클라이언트 |
+
+---
+
+## 22. 환경변수 상세 (.env.example)
+
+```bash
+# Supabase Configuration (필수)
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Platform Configuration
+VITE_PLATFORM_REGION=kr
+VITE_PLATFORM_COUNTRY=KR
+
+# Encryption Key (필수 - 주민번호 암호화)
+# 생성: openssl rand -hex 32
+VITE_ENCRYPTION_KEY=your_very_secure_encryption_key_here_minimum_32_characters
+
+# Stats Multipliers (선택 - 홈페이지 통계 배수)
+# VITE_STATS_MULTIPLIER_CREATORS=1
+# VITE_STATS_MULTIPLIER_CAMPAIGNS=1
+# VITE_STATS_MULTIPLIER_BRANDS=1
+# VITE_STATS_MULTIPLIER_REVENUE=1
+
+NODE_ENV=production
+```
+
+---
+
+## 23. 핵심 의존성 요약
 
 ### 코어
 - React 19.1.0, React DOM 19.1.0, React Router DOM 7.6.1
