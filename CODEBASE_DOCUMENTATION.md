@@ -388,14 +388,25 @@ id               UUID PRIMARY KEY
 application_id   UUID REFERENCES applications
 user_id          UUID REFERENCES auth.users
 campaign_id      UUID REFERENCES campaigns
-version          INTEGER
-edited_video_url TEXT
-clean_video_url  TEXT
-title            TEXT
-memo             TEXT
-status           TEXT (submitted/revision_requested/approved)
+video_file_url   TEXT NOT NULL           -- 편집본 영상 URL
+clean_video_url  TEXT                    -- 클린본 영상 URL
+sns_title        TEXT                    -- SNS 영상 제목
+sns_content      TEXT                    -- SNS 피드 내용
+sns_upload_url   TEXT                    -- SNS 업로드 URL
+partnership_code TEXT                    -- 파트너십 코드
+hashtags         TEXT                    -- 해시태그
+video_number     INTEGER                 -- 올리브영 캠페인용 (1 or 2)
+week_number      INTEGER                 -- 4주 챌린지용 (1-4)
+version          INTEGER DEFAULT 1       -- 버전 (V1~V10)
+uploaded_by      TEXT DEFAULT 'creator'  -- 업로드 주체 (creator/admin)
+status           TEXT (submitted/revision_requested/approved/rejected)
 feedback         TEXT
+feedback_data    JSONB
+submitted_at     TIMESTAMPTZ
+reviewed_at      TIMESTAMPTZ
+approved_at      TIMESTAMPTZ
 created_at       TIMESTAMPTZ
+updated_at       TIMESTAMPTZ
 ```
 
 #### ai_guides (AI 분석 결과 - MUSE 전용)

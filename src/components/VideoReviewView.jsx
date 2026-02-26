@@ -307,7 +307,18 @@ export default function VideoReviewView() {
       navigate(`/video-review/${newSubmission.id}`)
     } catch (error) {
       console.error('Error uploading video:', error)
-      alert('영상 업로드에 실패했습니다: ' + error.message)
+      const msg = error.message || ''
+      let userMsg = '영상 업로드에 실패했습니다: '
+      if (msg.includes('http_request') || msg.includes('supabase_functions')) {
+        userMsg += '서버 설정 오류입니다. 관리자에게 문의해주세요.'
+      } else if (msg.includes('row-level security')) {
+        userMsg += '권한이 없습니다. 다시 로그인해주세요.'
+      } else if (msg.includes('network') || msg.includes('Failed to fetch')) {
+        userMsg += '네트워크 오류입니다. 인터넷 연결을 확인해주세요.'
+      } else {
+        userMsg += msg || '알 수 없는 오류가 발생했습니다.'
+      }
+      alert(userMsg)
     } finally {
       setUploading(false)
     }
