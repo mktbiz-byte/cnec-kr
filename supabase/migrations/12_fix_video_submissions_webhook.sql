@@ -6,11 +6,15 @@
 -- pg_net 확장이 비활성화되어 함수가 존재하지 않아 INSERT가 실패함:
 --   "function supabase_functions.http_request(unknown, unknown, unknown, text, unknown) does not exist"
 --
+-- 영향 범위: 크리에이터(anon key) + 통합 관리자(service_role key) 모두 영향받음.
+-- service_role key는 RLS를 우회하지만 트리거는 우회하지 않으므로,
+-- 관리자가 롤키로 video_submissions에 INSERT해도 동일한 에러 발생.
+--
 -- 알림 발송은 이미 클라이언트 측 Netlify Function(send-alimtalk)으로 처리되므로
 -- 이 트리거와 함수는 불필요함.
 --
 -- 진단 결과:
---   video_submission_notification → public.notify_video_submission (문제 원인)
+--   video_submission_notification → public.notify_video_submission (문제 원인, 삭제 대상)
 --   update_video_submissions_updated_at_trigger → public.update_video_submissions_updated_at (정상, 보존)
 
 -- Step 1: 문제 트리거 삭제
