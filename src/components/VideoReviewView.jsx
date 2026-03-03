@@ -10,12 +10,11 @@ export default function VideoReviewView() {
   const videoContainerRef = useRef(null)
   const fileInputRef = useRef(null)
 
-  const [submission, setSubmission] = useState(null)
-  const [allVersions, setAllVersions] = useState([]) // 모든 버전 목록
-  const [comments, setComments] = useState([])
-  const [replies, setReplies] = useState({})
+  const [submission, setSubmission] = useState(null) // URL param 기준 submission (메타 정보용)
+  const [allVersions, setAllVersions] = useState([]) // 모든 버전 목록 (최신순 정렬)
+  const [allVersionsData, setAllVersionsData] = useState({}) // { versionId: { submission, comments, replies } }
+  const [activeVersionId, setActiveVersionId] = useState(null) // 현재 선택된 버전 ID
   const [loading, setLoading] = useState(true)
-  const [signedVideoUrl, setSignedVideoUrl] = useState(null)
   const [replyingTo, setReplyingTo] = useState(null)
   const [replyText, setReplyText] = useState('')
   const [authorName, setAuthorName] = useState('')
@@ -26,9 +25,15 @@ export default function VideoReviewView() {
   const [sending, setSending] = useState(false)
   const [expandedComments, setExpandedComments] = useState({})
 
+  // 현재 활성 버전의 데이터 파생
+  const activeData = activeVersionId ? allVersionsData[activeVersionId] : null
+  const activeSubmission = activeData?.submission || null
+  const comments = activeData?.comments || []
+  const replies = activeData?.replies || {}
+  const signedVideoUrl = activeSubmission?.video_file_url || null
+
   useEffect(() => {
-    loadSubmission()
-    loadComments()
+    loadAllData()
   }, [submissionId])
 
   useEffect(() => {
@@ -53,8 +58,9 @@ export default function VideoReviewView() {
     }
   }, [signedVideoUrl])
 
-  const loadSubmission = async () => {
+  const loadAllData = async () => {
     try {
+      // 1. URL param의 submission 로드 (메타데이터용)
       const { data: submissionData, error: submissionError } = await supabase
         .from('video_submissions')
         .select('*')
@@ -63,91 +69,157 @@ export default function VideoReviewView() {
 
       if (submissionError) throw submissionError
 
+      let applicationData = null
+      let campaignData = null
+
       if (submissionData.application_id) {
-        const { data: applicationData, error: applicationError } = await supabase
+        const { data: appData, error: appError } = await supabase
           .from('applications')
           .select('applicant_name, campaign_id')
           .eq('id', submissionData.application_id)
           .single()
 
-        if (!applicationError && applicationData) {
-          submissionData.applications = applicationData
+        if (!appError && appData) {
+          applicationData = appData
+          submissionData.applications = appData
 
-          if (applicationData.campaign_id) {
-            const { data: campaignData, error: campaignError } = await supabase
+          if (appData.campaign_id) {
+            const { data: campData, error: campError } = await supabase
               .from('campaigns')
               .select('title, company_name, company_id, company_phone, campaign_type')
-              .eq('id', applicationData.campaign_id)
+              .eq('id', appData.campaign_id)
               .single()
 
-            if (!campaignError && campaignData) {
-              submissionData.applications.campaigns = campaignData
+            if (!campError && campData) {
+              campaignData = campData
+              submissionData.applications.campaigns = campData
             }
           }
         }
 
-        // 동일 application의 모든 버전 조회
+        // 2. 동일 application의 모든 버전 조회 (video_file_url 포함)
         let versionsQuery = supabase
           .from('video_submissions')
-          .select('id, version, status, created_at')
+          .select('*')
           .eq('application_id', submissionData.application_id)
 
-        // week_number 또는 video_number가 있으면 해당 조건 추가
         if (submissionData.week_number) {
           versionsQuery = versionsQuery.eq('week_number', submissionData.week_number)
         } else if (submissionData.video_number) {
           versionsQuery = versionsQuery.eq('video_number', submissionData.video_number)
         }
 
-        const { data: versions } = await versionsQuery.order('version', { ascending: true })
+        const { data: versions } = await versionsQuery.order('version', { ascending: false }) // 최신순
 
         if (versions && versions.length > 0) {
-          setAllVersions(versions)
+          // 각 버전에 application/campaign 메타 정보 추가
+          const versionsWithMeta = versions.map(v => ({
+            ...v,
+            applications: {
+              ...applicationData,
+              campaigns: campaignData
+            }
+          }))
+
+          setAllVersions(versionsWithMeta)
+
+          // 3. 모든 버전의 comments를 한 번에 로드
+          const versionIds = versions.map(v => v.id)
+          const { data: allComments, error: commentsError } = await supabase
+            .from('video_review_comments')
+            .select('*')
+            .in('submission_id', versionIds)
+            .order('timestamp', { ascending: true })
+
+          let allRepliesData = []
+          if (!commentsError && allComments && allComments.length > 0) {
+            const commentIds = allComments.map(c => c.id)
+            const { data: rData } = await supabase
+              .from('video_review_comment_replies')
+              .select('*')
+              .in('comment_id', commentIds)
+              .order('created_at', { ascending: true })
+            allRepliesData = rData || []
+          }
+
+          // 4. 버전별 데이터 구조화
+          const versionDataMap = {}
+          versionsWithMeta.forEach(v => {
+            const versionComments = (allComments || []).filter(c => c.submission_id === v.id)
+            const versionCommentIds = new Set(versionComments.map(c => c.id))
+            const repliesByComment = {}
+            allRepliesData.forEach(reply => {
+              if (versionCommentIds.has(reply.comment_id)) {
+                if (!repliesByComment[reply.comment_id]) {
+                  repliesByComment[reply.comment_id] = []
+                }
+                repliesByComment[reply.comment_id].push(reply)
+              }
+            })
+
+            versionDataMap[v.id] = {
+              submission: v,
+              comments: versionComments,
+              replies: repliesByComment
+            }
+          })
+
+          setAllVersionsData(versionDataMap)
+
+          // 5. 최신 버전을 기본 활성 탭으로 설정
+          setActiveVersionId(versionsWithMeta[0].id) // 이미 최신순 정렬이므로 첫 번째가 최신
+        } else {
+          // 버전이 없으면 현재 submission만 사용
+          setAllVersions([submissionData])
+          setAllVersionsData({
+            [submissionData.id]: {
+              submission: submissionData,
+              comments: [],
+              replies: {}
+            }
+          })
+          setActiveVersionId(submissionData.id)
+
+          // 단일 submission의 comments 로드
+          const { data: singleComments } = await supabase
+            .from('video_review_comments')
+            .select('*')
+            .eq('submission_id', submissionData.id)
+            .order('timestamp', { ascending: true })
+
+          if (singleComments && singleComments.length > 0) {
+            const commentIds = singleComments.map(c => c.id)
+            const { data: rData } = await supabase
+              .from('video_review_comment_replies')
+              .select('*')
+              .in('comment_id', commentIds)
+              .order('created_at', { ascending: true })
+
+            const repliesByComment = {}
+            ;(rData || []).forEach(reply => {
+              if (!repliesByComment[reply.comment_id]) {
+                repliesByComment[reply.comment_id] = []
+              }
+              repliesByComment[reply.comment_id].push(reply)
+            })
+
+            setAllVersionsData({
+              [submissionData.id]: {
+                submission: submissionData,
+                comments: singleComments,
+                replies: repliesByComment
+              }
+            })
+          }
         }
       }
 
       setSubmission(submissionData)
-      setSignedVideoUrl(submissionData.video_file_url)
     } catch (error) {
       console.error('Error loading submission:', error)
       alert('영상을 불러올 수 없습니다.')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadComments = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('video_review_comments')
-        .select('*')
-        .eq('submission_id', submissionId)
-        .order('timestamp', { ascending: true })
-
-      if (error) throw error
-      setComments(data || [])
-
-      if (data && data.length > 0) {
-        const commentIds = data.map(c => c.id)
-        const { data: repliesData, error: repliesError } = await supabase
-          .from('video_review_comment_replies')
-          .select('*')
-          .in('comment_id', commentIds)
-          .order('created_at', { ascending: true })
-
-        if (!repliesError && repliesData) {
-          const repliesByComment = {}
-          repliesData.forEach(reply => {
-            if (!repliesByComment[reply.comment_id]) {
-              repliesByComment[reply.comment_id] = []
-            }
-            repliesByComment[reply.comment_id].push(reply)
-          })
-          setReplies(repliesByComment)
-        }
-      }
-    } catch (error) {
-      console.error('Error loading comments:', error)
     }
   }
 
@@ -171,10 +243,15 @@ export default function VideoReviewView() {
 
       if (error) throw error
 
-      setReplies(prev => ({
-        ...prev,
-        [commentId]: [...(prev[commentId] || []), data]
-      }))
+      // 활성 버전의 replies 업데이트
+      setAllVersionsData(prev => {
+        const activeDataCopy = { ...prev[activeVersionId] }
+        activeDataCopy.replies = {
+          ...activeDataCopy.replies,
+          [commentId]: [...(activeDataCopy.replies[commentId] || []), data]
+        }
+        return { ...prev, [activeVersionId]: activeDataCopy }
+      })
 
       setReplyText('')
       setReplyingTo(null)
@@ -195,10 +272,15 @@ export default function VideoReviewView() {
 
       if (error) throw error
 
-      setReplies(prev => ({
-        ...prev,
-        [commentId]: prev[commentId].filter(r => r.id !== replyId)
-      }))
+      // 활성 버전의 replies 업데이트
+      setAllVersionsData(prev => {
+        const activeDataCopy = { ...prev[activeVersionId] }
+        activeDataCopy.replies = {
+          ...activeDataCopy.replies,
+          [commentId]: activeDataCopy.replies[commentId].filter(r => r.id !== replyId)
+        }
+        return { ...prev, [activeVersionId]: activeDataCopy }
+      })
     } catch (error) {
       console.error('Error deleting reply:', error)
       alert('댓글 삭제에 실패했습니다.')
@@ -221,6 +303,17 @@ export default function VideoReviewView() {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const handleVersionChange = (versionId) => {
+    if (versionId === activeVersionId) return
+    setActiveVersionId(versionId)
+    setSelectedComment(null)
+    setReplyingTo(null)
+    setReplyText('')
+    setCurrentTime(0)
+    setIsPaused(true)
+    setExpandedComments({})
+  }
+
   const handleFileUpload = async (event) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -235,8 +328,9 @@ export default function VideoReviewView() {
       return
     }
 
-    // 다음 버전 계산 (제한 없음)
-    const currentVersion = submission?.version || 1
+    // 최신 버전 기준으로 다음 버전 계산
+    const latestVersion = allVersions.length > 0 ? allVersions[0] : submission
+    const currentVersion = latestVersion?.version || 1
     const nextVersion = currentVersion + 1
 
     setUploading(true)
@@ -284,11 +378,11 @@ export default function VideoReviewView() {
 
       if (insertError) throw insertError
 
-      // 기존 submission 상태 업데이트
+      // 기존 최신 submission 상태 업데이트
       await supabase
         .from('video_submissions')
         .update({ status: 'superseded' })
-        .eq('id', submissionId)
+        .eq('id', latestVersion.id)
 
       // 자동으로 알림톡 발송
       try {
@@ -303,7 +397,7 @@ export default function VideoReviewView() {
 
       alert(`영상 V${nextVersion}이 제출되었습니다! 기업에게 알림이 전송되었습니다.`)
 
-      // 새 submission 페이지로 이동
+      // 새 submission 페이지로 이동 (전체 데이터 리로드)
       navigate(`/video-review/${newSubmission.id}`)
     } catch (error) {
       console.error('Error uploading video:', error)
@@ -360,7 +454,7 @@ export default function VideoReviewView() {
   const getVideoLabel = () => {
     if (!submission) return ''
     const campaignType = submission.applications?.campaigns?.campaign_type
-    const version = submission.version ? `V${submission.version}` : ''
+    const version = activeSubmission?.version ? `V${activeSubmission.version}` : ''
 
     if (campaignType === '4week_challenge' && submission.week_number) {
       return `Week ${submission.week_number} ${version}`.trim()
@@ -370,9 +464,31 @@ export default function VideoReviewView() {
     return version
   }
 
-  // 다음 버전 번호
+  // 다음 버전 번호 (최신 버전 기준)
   const getNextVersion = () => {
-    return (submission?.version || 1) + 1
+    const latestVersion = allVersions.length > 0 ? allVersions[0] : submission
+    return (latestVersion?.version || 1) + 1
+  }
+
+  // 버전별 수정 요청 수 계산
+  const getVersionCommentCount = (versionId) => {
+    return allVersionsData[versionId]?.comments?.length || 0
+  }
+
+  // 버전 상태 라벨
+  const getVersionStatusInfo = (version) => {
+    switch (version.status) {
+      case 'revision_requested':
+        return { label: '수정요청', color: 'bg-red-500' }
+      case 'approved':
+        return { label: '승인', color: 'bg-green-500' }
+      case 'submitted':
+        return { label: '검토중', color: 'bg-blue-500' }
+      case 'superseded':
+        return { label: '이전버전', color: 'bg-gray-400' }
+      default:
+        return null
+    }
   }
 
   if (loading) {
@@ -409,6 +525,9 @@ export default function VideoReviewView() {
   const companyName = submission.applications?.campaigns?.company_name || '기업'
   const videoLabel = getVideoLabel()
 
+  // 전체 수정 요청 총 수
+  const totalCommentCount = allVersions.reduce((sum, v) => sum + getVersionCommentCount(v.id), 0)
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 모바일 헤더 */}
@@ -435,30 +554,45 @@ export default function VideoReviewView() {
       </div>
 
       <div className="max-w-lg mx-auto">
-        {/* 버전 탭 네비게이션 */}
+        {/* 버전 탭 네비게이션 - 최신순으로 표시 */}
         {allVersions.length > 1 && (
           <div className="px-4 pt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-semibold text-gray-500">버전별 수정 요청</span>
+              <span className="text-xs text-gray-400">({totalCommentCount}개)</span>
+            </div>
             <div className="flex gap-2 overflow-x-auto pb-2">
-              {allVersions.map((v) => (
-                <button
-                  key={v.id}
-                  onClick={() => {
-                    if (v.id !== submissionId) {
-                      navigate(`/video-review/${v.id}`)
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                    v.id === submissionId
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  V{v.version || 1}
-                  {v.status === 'revision_requested' && (
-                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                  )}
-                </button>
-              ))}
+              {allVersions.map((v) => {
+                const commentCount = getVersionCommentCount(v.id)
+                const statusInfo = getVersionStatusInfo(v)
+                const isActive = v.id === activeVersionId
+
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => handleVersionChange(v.id)}
+                    className={`px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all flex flex-col items-center gap-1 min-w-[72px] ${
+                      isActive
+                        ? 'bg-purple-600 text-white shadow-md shadow-purple-200'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>V{v.version || 1}</span>
+                      {v.status === 'revision_requested' && (
+                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                      )}
+                    </div>
+                    {commentCount > 0 && (
+                      <span className={`text-[10px] font-medium ${
+                        isActive ? 'text-purple-200' : 'text-gray-400'
+                      }`}>
+                        수정 {commentCount}건
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
@@ -492,6 +626,29 @@ export default function VideoReviewView() {
           </div>
         </div>
 
+        {/* 현재 선택된 버전 표시 */}
+        {activeSubmission && allVersions.length > 1 && (
+          <div className="px-4 pt-3">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 bg-purple-600 text-white text-xs font-bold rounded-lg">
+                V{activeSubmission.version || 1}
+              </span>
+              {(() => {
+                const statusInfo = getVersionStatusInfo(activeSubmission)
+                if (!statusInfo) return null
+                return (
+                  <span className={`px-2 py-0.5 ${statusInfo.color} text-white text-[10px] font-bold rounded-full`}>
+                    {statusInfo.label}
+                  </span>
+                )
+              })()}
+              <span className="text-xs text-gray-400">
+                {new Date(activeSubmission.created_at || activeSubmission.submitted_at).toLocaleDateString('ko-KR')}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* 영상 플레이어 */}
         <div className="px-4 pt-4">
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -505,7 +662,8 @@ export default function VideoReviewView() {
                 playsInline
                 crossOrigin="anonymous"
                 className="w-full h-full object-contain"
-                src={signedVideoUrl || submission.video_file_url}
+                key={signedVideoUrl} // key를 변경하여 버전 전환 시 영상 리로드
+                src={signedVideoUrl || activeSubmission?.video_file_url}
               >
                 브라우저가 비디오를 지원하지 않습니다.
               </video>
@@ -590,6 +748,9 @@ export default function VideoReviewView() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-bold text-gray-900">
               수정 요청 사항
+              {activeSubmission && allVersions.length > 1 && (
+                <span className="ml-1 text-purple-600 text-sm font-bold">(V{activeSubmission.version || 1})</span>
+              )}
               <span className="ml-2 text-red-500">{comments.length}개</span>
             </h2>
           </div>
@@ -599,7 +760,12 @@ export default function VideoReviewView() {
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
-              <p className="text-gray-600 text-sm">수정 요청 사항이 없습니다.</p>
+              <p className="text-gray-600 text-sm">
+                {allVersions.length > 1
+                  ? `V${activeSubmission?.version || 1}에 대한 수정 요청 사항이 없습니다.`
+                  : '수정 요청 사항이 없습니다.'
+                }
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -764,9 +930,9 @@ export default function VideoReviewView() {
           <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900">수정 완료 후</h3>
-              {submission?.version && (
+              {allVersions.length > 0 && (
                 <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
-                  현재 V{submission.version}
+                  최신 V{allVersions[0]?.version || 1}
                 </span>
               )}
             </div>
