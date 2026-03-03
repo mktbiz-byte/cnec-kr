@@ -537,15 +537,9 @@ const MyPageKorea = () => {
       const isOliveYoungSale = selectedApplication?.campaigns?.is_oliveyoung_sale
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올영세일: 3개 URL 모두 필수
-        if (!snsUploadForm.step1_url || !snsUploadForm.step2_url || !snsUploadForm.step3_url) {
-          setError('STEP 1, 2, 3 URL을 모두 입력해주세요.')
-          setProcessing(false)
-          return
-        }
-        // 올영세일: 2개 영상 폴더 필수
-        if (!snsUploadForm.step1_2_video_folder || !snsUploadForm.step3_video_folder) {
-          setError('STEP 1&2 영상 폴더와 STEP 3 영상 폴더를 모두 업로드해주세요.')
+        // 올영세일: 최소 1개 URL 필수 (부분 제출 허용)
+        if (!snsUploadForm.step1_url && !snsUploadForm.step2_url && !snsUploadForm.step3_url) {
+          setError('최소 1개의 STEP URL을 입력해주세요.')
           setProcessing(false)
           return
         }
@@ -575,11 +569,11 @@ const MyPageKorea = () => {
       
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
         updateData = {
-          step1_url: snsUploadForm.step1_url,
-          step2_url: snsUploadForm.step2_url,
-          step3_url: snsUploadForm.step3_url,
-          step1_2_video_folder: snsUploadForm.step1_2_video_folder,
-          step3_video_folder: snsUploadForm.step3_video_folder,
+          step1_url: snsUploadForm.step1_url || selectedApplication.step1_url || null,
+          step2_url: snsUploadForm.step2_url || selectedApplication.step2_url || null,
+          step3_url: snsUploadForm.step3_url || selectedApplication.step3_url || null,
+          step1_2_video_folder: snsUploadForm.step1_2_video_folder || selectedApplication.step1_2_video_folder || null,
+          step3_video_folder: snsUploadForm.step3_video_folder || selectedApplication.step3_video_folder || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes,
           status: 'sns_uploaded'
@@ -1143,25 +1137,65 @@ const MyPageKorea = () => {
                             <PlatformBadge platform={app.main_channel} />
                           )}
 
-                          {app.status === 'selected' && !app.sns_upload_url && (
+                          {['selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                             <button
                               onClick={() => {
                                 setSelectedApplication(app)
+                                setSnsUploadForm({
+                                  sns_upload_url: app.sns_upload_url || '',
+                                  notes: app.notes || '',
+                                  step1_url: app.step1_url || '',
+                                  step2_url: app.step2_url || '',
+                                  step3_url: app.step3_url || '',
+                                  step1_2_video_folder: app.step1_2_video_folder || '',
+                                  step3_video_folder: app.step3_video_folder || '',
+                                  week1_url: app.week1_url || '',
+                                  week2_url: app.week2_url || '',
+                                  week3_url: app.week3_url || '',
+                                  week4_url: app.week4_url || '',
+                                  week1_video: app.week1_video || '',
+                                  week2_video: app.week2_video || '',
+                                  week3_video: app.week3_video || '',
+                                  week4_video: app.week4_video || ''
+                                })
                                 setShowSnsUploadModal(true)
                               }}
                               className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
                             >
-                              SNS 업로드 하기
+                              {(app.sns_upload_url || app.step1_url || app.step2_url || app.step3_url) ? 'SNS 정보 수정' : 'SNS 업로드 하기'}
                             </button>
                           )}
-                          
-                          {app.sns_upload_url && (
-                            <div className="mt-3 text-sm">
-                              <p className="text-gray-600">업로드 URL: 
-                                <a href={app.sns_upload_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
-                                  {app.sns_upload_url}
-                                </a>
-                              </p>
+
+                          {(app.sns_upload_url || app.step1_url || app.step2_url || app.step3_url) && (
+                            <div className="mt-3 text-sm space-y-1">
+                              {app.sns_upload_url && (
+                                <p className="text-gray-600">업로드 URL:
+                                  <a href={app.sns_upload_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
+                                    {app.sns_upload_url}
+                                  </a>
+                                </p>
+                              )}
+                              {app.step1_url && (
+                                <p className="text-gray-600">STEP 1:
+                                  <a href={app.step1_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
+                                    {app.step1_url}
+                                  </a>
+                                </p>
+                              )}
+                              {app.step2_url && (
+                                <p className="text-gray-600">STEP 2:
+                                  <a href={app.step2_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
+                                    {app.step2_url}
+                                  </a>
+                                </p>
+                              )}
+                              {app.step3_url && (
+                                <p className="text-gray-600">STEP 3:
+                                  <a href={app.step3_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
+                                    {app.step3_url}
+                                  </a>
+                                </p>
+                              )}
                             </div>
                           )}
                           
@@ -1491,12 +1525,15 @@ const MyPageKorea = () => {
                     </div>
                     {/* TODO: 4주 챌린지 영상 파일 업로드 UI 추가 */}
                   </>
-                ) : selectedApplication?.campaigns?.is_oliveyoung_sale ? (
-                  // 올영세일 캐페인: 3개 URL 입력
+                ) : selectedApplication?.campaigns?.is_oliveyoung_sale || selectedApplication?.campaigns?.campaign_type === 'oliveyoung' ? (
+                  // 올영세일 캐페인: 3개 URL 입력 (부분 제출 허용)
                   <>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
+                      일부 STEP만 완료된 경우 해당 STEP만 먼저 제출할 수 있습니다.
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 1 릴스 URL (세일 7일 전) *
+                        STEP 1 릴스 URL (세일 7일 전)
                       </label>
                       <input
                         type="url"
@@ -1508,7 +1545,7 @@ const MyPageKorea = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 2 릴스 URL (세일 1일 전) *
+                        STEP 2 릴스 URL (세일 1일 전)
                       </label>
                       <input
                         type="url"
@@ -1520,7 +1557,7 @@ const MyPageKorea = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 3 스토리 URL (세일 당일) *
+                        STEP 3 스토리 URL (세일 당일)
                       </label>
                       <input
                         type="url"
