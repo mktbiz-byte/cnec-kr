@@ -1050,24 +1050,30 @@ const ApplicationsPage = () => {
       const isOliveYoungSale = selectedApplication?.campaigns?.is_oliveyoung_sale
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올영세일: 3개 URL + 2개 광고코드 + 2개 클린본 필수 (step1, step2)
-        if (!snsUploadForm.step1_url || !snsUploadForm.step2_url || !snsUploadForm.step3_url) {
-          setError('STEP 1, 2, 3 URL을 모두 입력해주세요.')
+        // 올영세일: 최소 1개 URL 필수 (부분 제출 허용)
+        if (!snsUploadForm.step1_url && !snsUploadForm.step2_url && !snsUploadForm.step3_url) {
+          setError('최소 1개의 STEP URL을 입력해주세요.')
           setProcessing(false)
           return
         }
-        if (!snsUploadForm.step1_partnership_code || !snsUploadForm.step2_partnership_code) {
-          setError('광고코드를 모두 입력해주세요. (STEP 1용, STEP 2용)')
+        // 입력된 URL에 해당하는 광고코드 검증 (step1, step2만 - step3는 스토리라 코드 불필요)
+        if (snsUploadForm.step1_url && !snsUploadForm.step1_partnership_code) {
+          setError('STEP 1 URL을 입력했다면 광고코드도 입력해주세요.')
           setProcessing(false)
           return
         }
-        // 클린본 필수 검증 (step1, step2)
-        if (!snsUploadForm.step1_clean_video_file) {
+        if (snsUploadForm.step2_url && !snsUploadForm.step2_partnership_code) {
+          setError('STEP 2 URL을 입력했다면 광고코드도 입력해주세요.')
+          setProcessing(false)
+          return
+        }
+        // 입력된 URL에 해당하는 클린본 검증 (step1, step2만)
+        if (snsUploadForm.step1_url && !snsUploadForm.step1_clean_video_file && !selectedApplication.step1_clean_video_url) {
           setError('STEP 1 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
           setProcessing(false)
           return
         }
-        if (!snsUploadForm.step2_clean_video_file) {
+        if (snsUploadForm.step2_url && !snsUploadForm.step2_clean_video_file && !selectedApplication.step2_clean_video_url) {
           setError('STEP 2 클린본을 업로드해주세요. 클린본 미첨부 시 포인트 지급이 불가합니다.')
           setProcessing(false)
           return
@@ -1167,15 +1173,15 @@ const ApplicationsPage = () => {
       let updateData
 
       if (campaignType === 'oliveyoung' || isOliveYoungSale) {
-        // 올리브영: step1 URL+코드+클린본, step2 URL+코드+클린본, step3 URL만
+        // 올리브영: 부분 제출 허용 - 입력된 필드만 업데이트
         updateData = {
-          step1_url: snsUploadForm.step1_url,
-          step2_url: snsUploadForm.step2_url,
-          step3_url: snsUploadForm.step3_url,
-          step1_partnership_code: snsUploadForm.step1_partnership_code || null,
-          step2_partnership_code: snsUploadForm.step2_partnership_code || null,
-          step1_clean_video_url: uploadedCleanUrls.step1 || null,
-          step2_clean_video_url: uploadedCleanUrls.step2 || null,
+          step1_url: snsUploadForm.step1_url || selectedApplication.step1_url || null,
+          step2_url: snsUploadForm.step2_url || selectedApplication.step2_url || null,
+          step3_url: snsUploadForm.step3_url || selectedApplication.step3_url || null,
+          step1_partnership_code: snsUploadForm.step1_partnership_code || selectedApplication.step1_partnership_code || null,
+          step2_partnership_code: snsUploadForm.step2_partnership_code || selectedApplication.step2_partnership_code || null,
+          step1_clean_video_url: uploadedCleanUrls.step1 || selectedApplication.step1_clean_video_url || null,
+          step2_clean_video_url: uploadedCleanUrls.step2 || selectedApplication.step2_clean_video_url || null,
           sns_upload_date: new Date().toISOString(),
           notes: snsUploadForm.notes || null,
           status: 'sns_uploaded'
@@ -2823,6 +2829,9 @@ const ApplicationsPage = () => {
               {/* 올리브영 캠페인: 3개 URL + 2개 광고코드 입력 */}
               {(selectedApplication.campaigns?.campaign_type === 'oliveyoung' || selectedApplication.campaigns?.is_oliveyoung_sale) && (
                 <>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
+                    일부 STEP만 완료된 경우 해당 STEP만 먼저 제출할 수 있습니다. 나중에 나머지 STEP을 추가로 수정/제출할 수 있습니다.
+                  </div>
                   {/* STEP 1 릴스 섹션 */}
                   <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-3">
                     <div className="flex items-center gap-2">
@@ -2831,7 +2840,7 @@ const ApplicationsPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 1 릴스 URL *
+                        STEP 1 릴스 URL <span className="text-xs text-gray-400">(해당 시 입력)</span>
                       </label>
                       <input
                         type="url"
@@ -2901,7 +2910,7 @@ const ApplicationsPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 2 릴스 URL *
+                        STEP 2 릴스 URL <span className="text-xs text-gray-400">(해당 시 입력)</span>
                       </label>
                       <input
                         type="url"
@@ -2971,7 +2980,7 @@ const ApplicationsPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        STEP 3 스토리 URL *
+                        STEP 3 스토리 URL <span className="text-xs text-gray-400">(해당 시 입력)</span>
                       </label>
                       <input
                         type="url"

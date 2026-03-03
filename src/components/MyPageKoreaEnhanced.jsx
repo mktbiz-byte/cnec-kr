@@ -52,7 +52,14 @@ const MyPageKoreaEnhanced = () => {
   const [selectedApplication, setSelectedApplication] = useState(null)
   const [snsUploadForm, setSnsUploadForm] = useState({
     sns_upload_url: '',
-    notes: ''
+    notes: '',
+    step1_url: '',
+    step2_url: '',
+    step3_url: '',
+    week1_url: '',
+    week2_url: '',
+    week3_url: '',
+    week4_url: ''
   })
 
   // 가이드 보기 모달 관련 상태
@@ -185,6 +192,116 @@ const MyPageKoreaEnhanced = () => {
     window.location.href = `/campaign-application?campaign_id=${campaignId}&edit=${applicationId}`
   }
 
+  // SNS 업로드 모달 열기 (기존 데이터 로드)
+  const openSnsUploadModal = (app) => {
+    setSelectedApplication(app)
+    setSnsUploadForm({
+      sns_upload_url: app.sns_upload_url || '',
+      notes: app.notes || '',
+      step1_url: app.step1_url || '',
+      step2_url: app.step2_url || '',
+      step3_url: app.step3_url || '',
+      week1_url: app.week1_url || '',
+      week2_url: app.week2_url || '',
+      week3_url: app.week3_url || '',
+      week4_url: app.week4_url || ''
+    })
+    setError('')
+    setShowSnsUploadModal(true)
+  }
+
+  // SNS 업로드 제출
+  const handleSnsUploadSubmit = async () => {
+    try {
+      setProcessing(true)
+      setError('')
+
+      const campaignType = selectedApplication?.campaigns?.campaign_type || 'regular'
+      const isOliveYoungSale = selectedApplication?.campaigns?.is_oliveyoung_sale
+
+      if (campaignType === 'oliveyoung' || isOliveYoungSale) {
+        // 올영세일: 최소 1개 URL 필수 (부분 제출 허용)
+        if (!snsUploadForm.step1_url && !snsUploadForm.step2_url && !snsUploadForm.step3_url) {
+          setError('최소 1개의 STEP URL을 입력해주세요.')
+          setProcessing(false)
+          return
+        }
+      } else if (campaignType === '4week_challenge') {
+        if (!snsUploadForm.week1_url && !snsUploadForm.week2_url && !snsUploadForm.week3_url && !snsUploadForm.week4_url) {
+          setError('최소 1개의 Week URL을 입력해주세요.')
+          setProcessing(false)
+          return
+        }
+      } else {
+        if (!snsUploadForm.sns_upload_url) {
+          setError('SNS 업로드 URL을 입력해주세요.')
+          setProcessing(false)
+          return
+        }
+      }
+
+      let updateData
+
+      if (campaignType === 'oliveyoung' || isOliveYoungSale) {
+        updateData = {
+          step1_url: snsUploadForm.step1_url || selectedApplication.step1_url || null,
+          step2_url: snsUploadForm.step2_url || selectedApplication.step2_url || null,
+          step3_url: snsUploadForm.step3_url || selectedApplication.step3_url || null,
+          sns_upload_date: new Date().toISOString(),
+          notes: snsUploadForm.notes || null,
+          status: 'sns_uploaded'
+        }
+      } else if (campaignType === '4week_challenge') {
+        updateData = {
+          week1_url: snsUploadForm.week1_url || selectedApplication.week1_url || null,
+          week2_url: snsUploadForm.week2_url || selectedApplication.week2_url || null,
+          week3_url: snsUploadForm.week3_url || selectedApplication.week3_url || null,
+          week4_url: snsUploadForm.week4_url || selectedApplication.week4_url || null,
+          sns_upload_date: new Date().toISOString(),
+          notes: snsUploadForm.notes || null,
+          status: 'sns_uploaded'
+        }
+      } else {
+        updateData = {
+          sns_upload_url: snsUploadForm.sns_upload_url,
+          sns_upload_date: new Date().toISOString(),
+          notes: snsUploadForm.notes || null,
+          status: 'sns_uploaded'
+        }
+      }
+
+      const { error: updateError } = await supabase
+        .from('applications')
+        .update(updateData)
+        .eq('id', selectedApplication.id)
+
+      if (updateError) throw updateError
+
+      setSuccess('SNS 업로드가 완료되었습니다.')
+      setShowSnsUploadModal(false)
+      setSnsUploadForm({
+        sns_upload_url: '',
+        notes: '',
+        step1_url: '',
+        step2_url: '',
+        step3_url: '',
+        week1_url: '',
+        week2_url: '',
+        week3_url: '',
+        week4_url: ''
+      })
+      setSelectedApplication(null)
+
+      await fetchUserData()
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('SNS 업로드 오류:', err)
+      setError('SNS 업로드 중 오류가 발생했습니다.')
+    } finally {
+      setProcessing(false)
+    }
+  }
+
   const fetchUserData = async () => {
     try {
       setLoading(true)
@@ -253,7 +370,7 @@ const MyPageKoreaEnhanced = () => {
         if (campaignIds.length > 0) {
           const { data: campaignsData } = await supabase
             .from('campaigns')
-            .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, oliveyoung_step1_guide, oliveyoung_step2_guide, oliveyoung_step3_guide, step1_guide_mode, step2_guide_mode, step3_guide_mode, challenge_weekly_guides, challenge_weekly_guides_ai')
+            .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, is_oliveyoung_sale, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, oliveyoung_step1_guide, oliveyoung_step2_guide, oliveyoung_step3_guide, step1_guide_mode, step2_guide_mode, step3_guide_mode, challenge_weekly_guides, challenge_weekly_guides_ai')
             .in('id', campaignIds)
 
           // 비디오 제출 내역 조회
@@ -1403,17 +1520,60 @@ const MyPageKoreaEnhanced = () => {
                                 </div>
                               )}
                               
+                              {/* SNS URL 제출 상태 표시 */}
+                              {(app.sns_upload_url || app.step1_url || app.step2_url || app.step3_url) && (
+                                <div className="mt-2 text-sm space-y-1 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                  <p className="font-medium text-blue-800 mb-1">제출된 SNS URL:</p>
+                                  {app.sns_upload_url && (
+                                    <p className="text-gray-600">URL:
+                                      <a href={app.sns_upload_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1 break-all">{app.sns_upload_url}</a>
+                                    </p>
+                                  )}
+                                  {app.step1_url && (
+                                    <p className="text-gray-600">STEP 1:
+                                      <a href={app.step1_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1 break-all">{app.step1_url}</a>
+                                    </p>
+                                  )}
+                                  {app.step2_url && (
+                                    <p className="text-gray-600">STEP 2:
+                                      <a href={app.step2_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1 break-all">{app.step2_url}</a>
+                                    </p>
+                                  )}
+                                  {app.step3_url && (
+                                    <p className="text-gray-600">STEP 3:
+                                      <a href={app.step3_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1 break-all">{app.step3_url}</a>
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* SNS 업로드 / 수정 버튼 */}
+                              {['selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
+                                <div className="mt-2">
+                                  <button
+                                    onClick={() => openSnsUploadModal(app)}
+                                    className="w-full px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors font-medium text-sm"
+                                  >
+                                    {(app.sns_upload_url || app.step1_url || app.step2_url || app.step3_url) ? 'SNS 정보 수정' : 'SNS 업로드 정보 입력'}
+                                  </button>
+                                </div>
+                              )}
+
                               {/* 영상 제출 및 마감일 연장 버튼 */}
                               {app.guide_shared_to_company && (
                                 <div className="flex gap-2 mt-3">
                                   <button
                                     onClick={() => {
-                                      setSelectedApplication(app)
-                                      setShowSnsUploadModal(true)
+                                      const campaignType = app.campaigns?.campaign_type
+                                      if (campaignType === 'oliveyoung') {
+                                        window.location.href = `/submit-oliveyoung-video/${app.campaign_id}?step=1`
+                                      } else {
+                                        window.location.href = `/submit-video/${app.campaign_id}`
+                                      }
                                     }}
                                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                                   >
-                                    🎥 영상 제출하기
+                                    영상 제출하기
                                   </button>
                                   <button
                                     onClick={async () => {
@@ -1881,6 +2041,136 @@ const MyPageKoreaEnhanced = () => {
               >
                 닫기
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SNS 업로드 모달 */}
+      {showSnsUploadModal && selectedApplication && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">
+                {(selectedApplication.sns_upload_url || selectedApplication.step1_url || selectedApplication.step2_url || selectedApplication.step3_url) ? 'SNS 정보 수정' : 'SNS 업로드'}
+              </h3>
+              <button onClick={() => setShowSnsUploadModal(false)}>
+                <X className="w-6 h-6 text-gray-400 hover:text-gray-600" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {(selectedApplication?.campaigns?.campaign_type === 'oliveyoung' || selectedApplication?.campaigns?.is_oliveyoung_sale) ? (
+                // 올영세일: 3개 URL 입력 (부분 제출 허용)
+                <>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
+                    일부 STEP만 완료된 경우 해당 STEP만 먼저 제출할 수 있습니다. 나중에 나머지를 추가할 수 있습니다.
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      STEP 1 릴스 URL (세일 7일 전)
+                    </label>
+                    <input
+                      type="url"
+                      value={snsUploadForm.step1_url}
+                      onChange={(e) => setSnsUploadForm({...snsUploadForm, step1_url: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="https://instagram.com/reel/..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      STEP 2 릴스 URL (세일 1일 전)
+                    </label>
+                    <input
+                      type="url"
+                      value={snsUploadForm.step2_url}
+                      onChange={(e) => setSnsUploadForm({...snsUploadForm, step2_url: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="https://instagram.com/reel/..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      STEP 3 스토리 URL (세일 당일)
+                    </label>
+                    <input
+                      type="url"
+                      value={snsUploadForm.step3_url}
+                      onChange={(e) => setSnsUploadForm({...snsUploadForm, step3_url: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="https://instagram.com/stories/..."
+                    />
+                  </div>
+                </>
+              ) : selectedApplication?.campaigns?.campaign_type === '4week_challenge' ? (
+                // 4주 챌린지: 4개 URL 입력
+                <>
+                  {[1, 2, 3, 4].map((week) => (
+                    <div key={week}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Week {week} URL
+                      </label>
+                      <input
+                        type="url"
+                        value={snsUploadForm[`week${week}_url`]}
+                        onChange={(e) => setSnsUploadForm({...snsUploadForm, [`week${week}_url`]: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="https://instagram.com/p/..."
+                      />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                // 일반 캠페인: 1개 URL
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    SNS 업로드 URL *
+                  </label>
+                  <input
+                    type="url"
+                    value={snsUploadForm.sns_upload_url}
+                    onChange={(e) => setSnsUploadForm({...snsUploadForm, sns_upload_url: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="https://instagram.com/p/..."
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  메모 <span className="text-xs text-gray-500">(선택사항)</span>
+                </label>
+                <textarea
+                  value={snsUploadForm.notes}
+                  onChange={(e) => setSnsUploadForm({...snsUploadForm, notes: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  rows="3"
+                  placeholder="추가 메모를 입력하세요"
+                />
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-800">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowSnsUploadModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleSnsUploadSubmit}
+                  disabled={processing}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+                >
+                  {processing ? '처리중...' : '제출'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
