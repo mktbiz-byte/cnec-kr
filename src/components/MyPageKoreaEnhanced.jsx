@@ -373,18 +373,40 @@ const MyPageKoreaEnhanced = () => {
             .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, is_oliveyoung_sale, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, oliveyoung_step1_guide, oliveyoung_step2_guide, oliveyoung_step3_guide, step1_guide_mode, step2_guide_mode, step3_guide_mode, challenge_weekly_guides, challenge_weekly_guides_ai')
             .in('id', campaignIds)
 
-          // 비디오 제출 내역 조회
+          // 비디오 제출 내역 조회 (모든 필드 포함)
           const applicationIds = applicationsData.map(a => a.id)
           const { data: videoSubmissionsData } = await supabase
             .from('video_submissions')
-            .select('id, status, video_file_url, created_at, application_id')
+            .select('*')
             .in('application_id', applicationIds)
+            .order('created_at', { ascending: false })
+
+          // video_review_comments 조회 - submission_id로 조회
+          let videoReviewComments = []
+          const submissionIds = (videoSubmissionsData || []).map(vs => vs.id).filter(Boolean)
+
+          if (submissionIds.length > 0) {
+            const { data: commentsData, error: commentsErr } = await supabase
+              .from('video_review_comments')
+              .select('*')
+              .in('submission_id', submissionIds)
+
+            if (!commentsErr && commentsData) {
+              videoReviewComments = commentsData
+            }
+          }
+
+          // video_submissions에 video_review_comments 병합 (submission_id 매칭)
+          const videoSubmissionsWithComments = (videoSubmissionsData || []).map(vs => ({
+            ...vs,
+            video_review_comments: videoReviewComments.filter(c => c.submission_id === vs.id)
+          }))
 
           // 캠페인 및 비디오 데이터 병합
           applicationsData = applicationsData.map(app => ({
             ...app,
             campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null,
-            video_submissions: videoSubmissionsData?.filter(v => v.application_id === app.id) || []
+            video_submissions: videoSubmissionsWithComments.filter(v => v.application_id === app.id)
           }))
         }
       }
@@ -1447,24 +1469,82 @@ const MyPageKoreaEnhanced = () => {
                                 </div>
                               )}
                               
+                              {/* 제출한 영상 정보 */}
+                              {app.video_submissions && app.video_submissions.length > 0 && (
+                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                  <p className="text-xs font-semibold text-gray-700 mb-2">제출한 영상</p>
+                                  <div className="space-y-1">
+                                    {app.video_submissions.slice(0, 3).map((vs, idx) => (
+                                      <a
+                                        key={idx}
+                                        href={vs.video_file_url || vs.clean_video_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800"
+                                      >
+                                        <span>V{vs.version || 1} 영상 보기</span>
+                                        {vs.video_number && <span className="text-gray-400">(Video {vs.video_number})</span>}
+                                        {vs.week_number && <span className="text-gray-400">(Week {vs.week_number})</span>}
+                                        {vs.uploaded_by === 'admin' && (
+                                          <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">관리자</span>
+                                        )}
+                                      </a>
+                                    ))}
+                                    {app.video_submissions.length > 3 && (
+                                      <p className="text-xs text-gray-500">...외 {app.video_submissions.length - 3}개</p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
                               {/* 수정 요청 알림 배너 */}
-                              {app.video_submissions?.[0]?.video_review_comments?.length > 0 && (
+                              {app.video_submissions?.filter(vs => vs.video_review_comments?.length > 0).length > 0 && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                                    <h4 className="font-semibold text-red-900">🎬 영상 수정 요청이 있습니다!</h4>
+                                    <h4 className="font-semibold text-red-900">영상 수정 요청이 있습니다!</h4>
                                   </div>
                                   <p className="text-sm text-red-700 mb-3">
                                     기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.
                                   </p>
-                                  <button
-                                    onClick={() => {
-                                      window.location.href = `/video-review/${app.video_submissions[0].id}`
-                                    }}
-                                    className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold"
-                                  >
-                                    수정 요청 확인하기 ({app.video_submissions[0].video_review_comments.length}개)
-                                  </button>
+                                  <div className="space-y-2">
+                                    {(() => {
+                                      // week_number 또는 video_number로 그룹화하여 최신 버전만 표시
+                                      const submissionsWithComments = app.video_submissions.filter(vs => vs.video_review_comments?.length > 0)
+                                      const groupedByKey = {}
+
+                                      submissionsWithComments.forEach(vs => {
+                                        const key = vs.week_number ? `week_${vs.week_number}` :
+                                                    vs.video_number ? `video_${vs.video_number}` : 'default'
+                                        if (!groupedByKey[key] || (vs.version || 1) > (groupedByKey[key].version || 1)) {
+                                          groupedByKey[key] = vs
+                                        }
+                                      })
+
+                                      return Object.values(groupedByKey).map((vs, idx) => {
+                                        let label = '영상'
+                                        if (app.campaigns?.campaign_type === '4week_challenge' && vs.week_number) {
+                                          label = `Week ${vs.week_number}`
+                                        } else if ((app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && vs.video_number) {
+                                          label = `STEP ${vs.video_number}`
+                                        } else if (Object.keys(groupedByKey).length > 1) {
+                                          label = `영상 ${idx + 1}`
+                                        }
+                                        const versionLabel = vs.version ? ` V${vs.version}` : ''
+                                        return (
+                                          <button
+                                            key={vs.id}
+                                            onClick={() => {
+                                              window.location.href = `/video-review/${vs.id}`
+                                            }}
+                                            className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold"
+                                          >
+                                            {label}{versionLabel} 수정 요청 확인하기 ({vs.video_review_comments.length}개)
+                                          </button>
+                                        )
+                                      })
+                                    })()}
+                                  </div>
                                 </div>
                               )}
                               
