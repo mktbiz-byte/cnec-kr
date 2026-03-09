@@ -101,6 +101,22 @@ export default function OliveyoungVideoSubmissionPage() {
         if (allVersionsData && allVersionsData.length > 0) {
           hasSubmission = true
           const latestSubmission = allVersionsData[0]
+
+          // video_review_comments 조회
+          const submissionIds = allVersionsData.map(vs => vs.id).filter(Boolean)
+          let reviewCommentCount = 0
+          let latestReviewSubmissionId = null
+          if (submissionIds.length > 0) {
+            const { data: commentsData } = await supabase
+              .from('video_review_comments')
+              .select('id, submission_id')
+              .in('submission_id', submissionIds)
+            if (commentsData && commentsData.length > 0) {
+              reviewCommentCount = commentsData.length
+              latestReviewSubmissionId = commentsData[0].submission_id
+            }
+          }
+
           newVideos[videoNum] = {
             cleanFile: null,
             cleanUrl: latestSubmission.clean_video_url || '',
@@ -111,7 +127,9 @@ export default function OliveyoungVideoSubmissionPage() {
             hashtags: latestSubmission.hashtags || '',
             submission: latestSubmission,
             allVersions: allVersionsData,
-            expanded: !latestSubmission.video_file_url || latestSubmission.status === 'revision_requested'
+            expanded: !latestSubmission.video_file_url || latestSubmission.status === 'revision_requested',
+            reviewCommentCount,
+            latestReviewSubmissionId
           }
         }
       }
@@ -417,6 +435,22 @@ export default function OliveyoungVideoSubmissionPage() {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* video_review_comments 수정 요청 배너 */}
+            {videoData.reviewCommentCount > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                  <p className="text-xs font-bold text-red-900">영상 수정 요청이 있습니다!</p>
+                </div>
+                <button
+                  onClick={() => navigate(`/video-review/${videoData.latestReviewSubmissionId}`)}
+                  className="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors"
+                >
+                  수정 요청 확인하기 ({videoData.reviewCommentCount}개)
+                </button>
               </div>
             )}
 
