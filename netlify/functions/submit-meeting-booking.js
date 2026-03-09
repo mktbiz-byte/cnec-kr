@@ -22,13 +22,16 @@ exports.handler = async (event) => {
 
   try {
     const supabaseUrl = process.env.SUPABASE_BIZ_URL
+      || process.env.VITE_SUPABASE_BIZ_URL
+      || 'https://hbymozdhjseqebpomjsp.supabase.co'
     const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_KEY
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseKey) {
+      console.error('Missing SUPABASE_BIZ_SERVICE_KEY environment variable')
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ success: false, error: 'Server configuration error' })
+        body: JSON.stringify({ success: false, error: 'Server configuration error: missing service key' })
       }
     }
 
