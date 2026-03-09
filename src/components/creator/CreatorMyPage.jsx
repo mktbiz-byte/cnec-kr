@@ -246,6 +246,36 @@ const CreatorMyPage = () => {
             campaigns: campaignsData?.find(c => c.id === app.campaign_id) || null
           }))
         }
+
+        // video_submissions 및 video_review_comments 조회
+        const applicationIds = apps.map(a => a.id).filter(Boolean)
+        if (applicationIds.length > 0) {
+          const { data: videoSubmissionsData } = await supabase
+            .from('video_submissions')
+            .select('*')
+            .in('application_id', applicationIds)
+            .order('created_at', { ascending: false })
+
+          let videoReviewComments = []
+          const submissionIds = (videoSubmissionsData || []).map(vs => vs.id).filter(Boolean)
+          if (submissionIds.length > 0) {
+            const { data: commentsData } = await supabase
+              .from('video_review_comments')
+              .select('*')
+              .in('submission_id', submissionIds)
+            if (commentsData) videoReviewComments = commentsData
+          }
+
+          const videoSubmissionsWithComments = (videoSubmissionsData || []).map(vs => ({
+            ...vs,
+            video_review_comments: videoReviewComments.filter(c => c.submission_id === vs.id)
+          }))
+
+          apps = apps.map(app => ({
+            ...app,
+            video_submissions: videoSubmissionsWithComments.filter(vs => vs.application_id === app.id)
+          }))
+        }
       }
 
       setApplications(apps)
@@ -1225,6 +1255,21 @@ const CreatorMyPage = () => {
                         <p className="font-bold text-gray-900">{formatCurrency(app.campaigns?.creator_points_override || app.campaigns?.reward_points)}</p>
                       </div>
                     </div>
+                    {/* 수정 요청 알림 배너 */}
+                    {app.video_submissions?.filter(vs => vs.video_review_comments?.length > 0).length > 0 && (
+                      <div className="mt-3 bg-red-50 border border-red-200 rounded-xl p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                          <p className="font-semibold text-red-900 text-xs">영상 수정 요청이 있습니다!</p>
+                        </div>
+                        <button
+                          onClick={() => navigate('/my/applications')}
+                          className="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors"
+                        >
+                          수정 요청 확인하기 ({app.video_submissions.reduce((sum, vs) => sum + (vs.video_review_comments?.length || 0), 0)}개)
+                        </button>
+                      </div>
+                    )}
                     {/* 촬영 가이드 버튼 - 선정 이후 상태에서 가이드가 있는 경우 표시 */}
                     {guideInfo && (
                       <div className="mt-3">

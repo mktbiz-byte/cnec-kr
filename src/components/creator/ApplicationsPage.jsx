@@ -2052,9 +2052,8 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* 수정 요청 알림 배너 - filming 상태에서도 표시 */}
-                      {['filming', 'video_submitted'].includes(app.status) &&
-                       app.video_submissions?.filter(vs => vs.video_review_comments?.length > 0).length > 0 && (
+                      {/* 수정 요청 알림 배너 - 수정요청 코멘트가 있으면 상태 무관하게 표시 */}
+                      {app.video_submissions?.filter(vs => vs.video_review_comments?.length > 0).length > 0 && (
                         <div className="bg-red-50 border border-red-200 rounded-xl p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
