@@ -22,15 +22,11 @@ exports.handler = async (event) => {
 
   try {
     const supabaseUrl = process.env.SUPABASE_BIZ_URL
+      || process.env.VITE_SUPABASE_BIZ_URL
+      || 'https://hbymozdhjseqebpomjsp.supabase.co'
     const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_KEY
-
-    if (!supabaseUrl || !supabaseKey) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ success: false, error: 'Server configuration error' })
-      }
-    }
+      || process.env.SUPABASE_BIZ_ANON_KEY
+      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhieW1vemRoanNlcWVicG9tanNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NzA5NTgsImV4cCI6MjA3NjI0Njk1OH0.7th9Tz7oyHKqp03M68k1G0WqLwCSYTnoY9ECgy3pSzE'
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -85,113 +81,50 @@ exports.handler = async (event) => {
       }
     }
 
-    // 2. 각 slot_id가 유효한지 확인 (auto_ 접두사가 아닌 실제 슬롯만)
-    const realSlotIds = preferred_slots
-      .filter(s => s.slot_id && !String(s.slot_id).startsWith('auto_'))
-      .map(s => s.slot_id)
+    // 2. 각 slot_id가 유효한지 확인
+    const slotIds = preferred_slots.map(s => s.slot_id)
 
-    if (realSlotIds.length > 0) {
-      const { data: validSlots, error: slotCheckError } = await supabase
-        .from('meeting_slots')
-        .select('id, slot_date, slot_time, current_bookings, max_bookings, is_blocked')
-        .in('id', realSlotIds)
+    const { data: validSlots, error: slotCheckError } = await supabase
+      .from('meeting_slots')
+      .select('id, slot_date, slot_time, current_bookings, max_bookings, is_blocked')
+      .in('id', slotIds)
 
-      if (slotCheckError) throw slotCheckError
+    if (slotCheckError) throw slotCheckError
 
-      for (const slot of validSlots || []) {
-        if (slot.is_blocked) {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({
-              success: false,
-              error: `${slot.slot_date} ${slot.slot_time} 슬롯은 더 이상 예약할 수 없습니다.`
-            })
-          }
+    for (const slot of validSlots || []) {
+      if (slot.is_blocked) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            error: `${slot.slot_date} ${slot.slot_time} 슬롯은 더 이상 예약할 수 없습니다.`
+          })
         }
-        if (slot.current_bookings >= slot.max_bookings) {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({
-              success: false,
-              error: `${slot.slot_date} ${slot.slot_time} 슬롯은 이미 마감되었습니다.`
-            })
-          }
+      }
+      if (slot.current_bookings >= slot.max_bookings) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            error: `${slot.slot_date} ${slot.slot_time} 슬롯은 이미 마감되었습니다.`
+          })
         }
       }
     }
 
-    // 3. 자동 생성 슬롯이 있으면 DB에 실제 슬롯으로 생성
-    const autoSlots = preferred_slots.filter(s => String(s.slot_id).startsWith('auto_'))
-    const slotIdMap = {} // auto_id -> real_id mapping
+    // 3. meeting_bookings에 INSERT
+    const primarySlotId = preferred_slots[0]?.slot_id
 
-    for (const autoSlot of autoSlots) {
-      const { data: newSlot, error: createError } = await supabase
-        .from('meeting_slots')
-        .insert({
-          slot_date: autoSlot.date,
-          slot_time: autoSlot.time,
-          duration_minutes: 30,
-          max_bookings: 1,
-          current_bookings: 0,
-          is_blocked: false
-        })
-        .select('id')
-        .single()
-
-      if (createError) {
-        // 이미 존재할 수 있음 - 기존 슬롯 조회
-        const { data: existingSlot } = await supabase
-          .from('meeting_slots')
-          .select('id, current_bookings, max_bookings')
-          .eq('slot_date', autoSlot.date)
-          .eq('slot_time', autoSlot.time)
-          .single()
-
-        if (existingSlot) {
-          if (existingSlot.current_bookings >= existingSlot.max_bookings) {
-            return {
-              statusCode: 400,
-              headers,
-              body: JSON.stringify({
-                success: false,
-                error: `${autoSlot.date} ${autoSlot.time} 슬롯은 이미 마감되었습니다.`
-              })
-            }
-          }
-          slotIdMap[autoSlot.slot_id] = existingSlot.id
-        }
-      } else {
-        slotIdMap[autoSlot.slot_id] = newSlot.id
-      }
-    }
-
-    // preferred_slots에서 slot_id를 실제 ID로 교체
-    const resolvedSlots = preferred_slots.map(s => {
-      const resolvedId = String(s.slot_id).startsWith('auto_')
-        ? (slotIdMap[s.slot_id] || s.slot_id)
-        : s.slot_id
-      return {
-        slot_id: resolvedId,
-        date: s.date,
-        time: s.time
-      }
-    })
-
-    // 1순위 slot_id
-    const primarySlotId = resolvedSlots[0]?.slot_id
-    const isValidUUID = primarySlotId && !String(primarySlotId).startsWith('auto_')
-
-    // 4. meeting_bookings에 INSERT
     const bookingData = {
       creator_name,
-      creator_phone: creator_phone,
+      creator_phone,
       creator_email: creator_email || null,
       youtube_url: youtube_url || null,
       instagram_url: instagram_url || null,
-      slot_id: isValidUUID ? primarySlotId : null,
-      preferred_slots: resolvedSlots,
+      slot_id: primarySlotId || null,
+      preferred_slots: preferred_slots,
       status: 'pending',
       source: 'kakao_alimtalk'
     }
@@ -204,17 +137,8 @@ exports.handler = async (event) => {
 
     if (insertError) throw insertError
 
-    // 5. 1순위 슬롯의 current_bookings 증가
-    if (isValidUUID) {
-      await supabase.rpc('increment_booking_count', { slot_uuid: primarySlotId }).catch(() => {
-        // RPC가 없으면 직접 업데이트
-        return supabase
-          .from('meeting_slots')
-          .update({ current_bookings: supabase.rpc ? undefined : 1 })
-          .eq('id', primarySlotId)
-      })
-
-      // fallback: 직접 SQL로 증가
+    // 4. 1순위 슬롯의 current_bookings 증가
+    if (primarySlotId) {
       const { data: currentSlot } = await supabase
         .from('meeting_slots')
         .select('current_bookings')
