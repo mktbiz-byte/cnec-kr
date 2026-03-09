@@ -1509,28 +1509,24 @@ const MyPageKoreaEnhanced = () => {
                                   </p>
                                   <div className="space-y-2">
                                     {(() => {
-                                      // week_number 또는 video_number로 그룹화하여 최신 버전만 표시
-                                      const submissionsWithComments = app.video_submissions.filter(vs => vs.video_review_comments?.length > 0)
-                                      const groupedByKey = {}
+                                      // 수정요청이 있는 모든 버전을 표시 (V1, V2, V3...)
+                                      const submissionsWithComments = app.video_submissions
+                                        .filter(vs => vs.video_review_comments?.length > 0)
+                                        .sort((a, b) => {
+                                          const keyA = a.week_number || a.video_number || 0
+                                          const keyB = b.week_number || b.video_number || 0
+                                          if (keyA !== keyB) return keyA - keyB
+                                          return (a.version || 1) - (b.version || 1)
+                                        })
 
-                                      submissionsWithComments.forEach(vs => {
-                                        const key = vs.week_number ? `week_${vs.week_number}` :
-                                                    vs.video_number ? `video_${vs.video_number}` : 'default'
-                                        if (!groupedByKey[key] || (vs.version || 1) > (groupedByKey[key].version || 1)) {
-                                          groupedByKey[key] = vs
-                                        }
-                                      })
-
-                                      return Object.values(groupedByKey).map((vs, idx) => {
+                                      return submissionsWithComments.map((vs) => {
                                         let label = '영상'
                                         if (app.campaigns?.campaign_type === '4week_challenge' && vs.week_number) {
                                           label = `Week ${vs.week_number}`
                                         } else if ((app.campaigns?.campaign_type === 'oliveyoung' || app.campaigns?.is_oliveyoung_sale) && vs.video_number) {
                                           label = `STEP ${vs.video_number}`
-                                        } else if (Object.keys(groupedByKey).length > 1) {
-                                          label = `영상 ${idx + 1}`
                                         }
-                                        const versionLabel = vs.version ? ` V${vs.version}` : ''
+                                        const versionLabel = ` V${vs.version || 1}`
                                         return (
                                           <button
                                             key={vs.id}
