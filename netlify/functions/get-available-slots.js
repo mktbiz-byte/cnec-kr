@@ -25,15 +25,8 @@ exports.handler = async (event) => {
       || process.env.VITE_SUPABASE_BIZ_URL
       || 'https://hbymozdhjseqebpomjsp.supabase.co'
     const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_KEY
-
-    if (!supabaseKey) {
-      console.error('Missing SUPABASE_BIZ_SERVICE_KEY environment variable')
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ success: false, error: 'Server configuration error: missing service key' })
-      }
-    }
+      || process.env.SUPABASE_BIZ_ANON_KEY
+      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhieW1vemRoanNlcWVicG9tanNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NzA5NTgsImV4cCI6MjA3NjI0Njk1OH0.7th9Tz7oyHKqp03M68k1G0WqLwCSYTnoY9ECgy3pSzE'
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
