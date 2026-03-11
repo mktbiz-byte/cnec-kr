@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import {
   ShoppingBag, Video, Coins, Star,
   Loader2, CheckCircle, AlertCircle,
-  Calendar, Send
+  Calendar, Send, MapPin
 } from 'lucide-react'
 import MeetingCalendar from './MeetingCalendar'
 import cnecLogo from '../assets/cnec-logo-horizontal.png'
@@ -234,6 +234,22 @@ const CreatorApplication = () => {
         {/* 섹션 3: 지원 폼 + 미팅 스케줄 */}
         <div className="space-y-5">
           <h2 className="text-lg font-bold text-gray-900">미팅 신청</h2>
+
+          {/* 미팅 장소 안내 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 mb-1">미팅 장소</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  서울 중구 퇴계로36길 2<br />
+                  동국대학교 충무로 영상센터 1009호
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* 에러 메시지 */}
           {error && (
