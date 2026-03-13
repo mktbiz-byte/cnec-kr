@@ -1419,6 +1419,11 @@ const ApplicationsPage = () => {
                     {/* 캠페인 정보 */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
+                        {app.campaigns?.is_private && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-800 text-white flex items-center gap-0.5">
+                            🔒 비공개
+                          </span>
+                        )}
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${statusInfo.color}`}>
                           {statusInfo.label}
                         </span>

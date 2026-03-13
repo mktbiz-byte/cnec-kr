@@ -9,7 +9,7 @@ import {
   Award, Star, Clock, CheckCircle, AlertCircle, Loader2, X,
   CreditCard, Building2, Shield, Eye, EyeOff, Trash2, ExternalLink,
   ArrowRight, Bell, HelpCircle, Wallet, TrendingUp, Heart, Gift,
-  Crown, Sparkles, BookOpen, ShieldAlert, AlertTriangle
+  Crown, Sparkles, BookOpen, ShieldAlert, AlertTriangle, Lock
 } from 'lucide-react'
 import CampaignPolicyModal from './CampaignPolicyModal'
 
@@ -1217,6 +1217,12 @@ const CreatorMyPage = () => {
                         <p className="font-bold text-gray-900 text-sm truncate">{app.campaigns?.title}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{app.campaigns?.brand}</p>
                         <div className="flex items-center gap-2 mt-2">
+                          {app.campaigns?.is_private && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-800 text-white flex items-center gap-0.5">
+                              <Lock size={10} />
+                              비공개
+                            </span>
+                          )}
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${status.color}`}>{status.label}</span>
                           <span className="text-[10px] text-gray-400">{new Date(app.created_at).toLocaleDateString('ko-KR')}</span>
                         </div>

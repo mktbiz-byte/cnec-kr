@@ -161,13 +161,14 @@ export const database = {
         const { data, error } = await supabase
           .from('campaigns')
           .select('*')
+          .or('is_private.is.null,is_private.eq.false')
           .order('created_at', { ascending: false })
-        
+
         if (error) {
           console.error('Campaigns getAll error:', error)
           throw error
         }
-        
+
         console.log('Campaigns 데이터 로드 성공:', data?.length || 0, '개')
         return data || []
       })
@@ -179,6 +180,7 @@ export const database = {
           .from('campaigns')
           .select('*')
           .eq('status', 'active')
+          .or('is_private.is.null,is_private.eq.false')
           .order('created_at', { ascending: false })
         if (error) throw error
         return data
