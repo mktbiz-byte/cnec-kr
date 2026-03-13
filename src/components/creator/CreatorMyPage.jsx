@@ -1197,6 +1197,7 @@ const CreatorMyPage = () => {
                   rejected: { color: 'bg-red-100 text-red-700', label: '미선정' },
                   filming: { color: 'bg-orange-100 text-orange-700', label: '촬영중' },
                   video_submitted: { color: 'bg-purple-100 text-purple-700', label: '영상제출' },
+                  sns_uploaded: { color: 'bg-pink-100 text-pink-700', label: 'SNS업로드' },
                   completed: { color: 'bg-gray-100 text-gray-700', label: '완료' },
                   paid: { color: 'bg-green-100 text-green-700', label: '정산완료' }
                 }

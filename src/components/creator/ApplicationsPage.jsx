@@ -1539,19 +1539,20 @@ const ApplicationsPage = () => {
                     </div>
                   </div>
 
-                  {/* 완료 상태일 때 제출 정보 확인 (수정 불가) */}
+                  {/* 완료 상태일 때 제출 정보 확인 */}
                   {['completed', 'paid', 'sns_uploaded'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
-                      {/* 영상 제출 정보 */}
+                      {/* 영상 제출 정보 - 모든 버전 표시 */}
                       {app.video_submissions && app.video_submissions.length > 0 && (
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <Video size={14} className="text-gray-600" />
                             <span className="text-xs font-semibold text-gray-700">제출한 영상</span>
                             <span className="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">완료됨</span>
+                            <span className="text-[10px] text-gray-400 ml-auto">{app.video_submissions.length}개</span>
                           </div>
                           <div className="space-y-1">
-                            {app.video_submissions.slice(0, 1).map((vs, idx) => (
+                            {app.video_submissions.map((vs, idx) => (
                               <a
                                 key={idx}
                                 href={vs.video_file_url || vs.clean_video_url}
@@ -2057,16 +2058,22 @@ const ApplicationsPage = () => {
                         </button>
                       )}
 
-                      {/* 수정 요청 알림 배너 - filming 상태에서도 표시 */}
-                      {['filming', 'video_submitted'].includes(app.status) &&
+                      {/* 수정 요청 알림 배너 - 완료 상태에서도 기록 확인 가능 */}
+                      {['filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) &&
                        app.video_submissions?.filter(vs => vs.video_review_comments?.length > 0).length > 0 && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                        <div className={`${['completed', 'paid'].includes(app.status) ? 'bg-gray-50 border border-gray-200' : 'bg-red-50 border border-red-200'} rounded-xl p-3`}>
                           <div className="flex items-center gap-2 mb-2">
-                            <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                            <h4 className="font-semibold text-red-900 text-sm">🎬 영상 수정 요청이 있습니다!</h4>
+                            {!['completed', 'paid'].includes(app.status) && (
+                              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                            )}
+                            <h4 className={`font-semibold text-sm ${['completed', 'paid'].includes(app.status) ? 'text-gray-700' : 'text-red-900'}`}>
+                              {['completed', 'paid'].includes(app.status) ? '📋 수정 요청 기록' : '🎬 영상 수정 요청이 있습니다!'}
+                            </h4>
                           </div>
-                          <p className="text-xs text-red-700 mb-3">
-                            기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.
+                          <p className={`text-xs mb-3 ${['completed', 'paid'].includes(app.status) ? 'text-gray-500' : 'text-red-700'}`}>
+                            {['completed', 'paid'].includes(app.status)
+                              ? '캠페인 진행 중 기업에서 요청했던 수정 사항 기록입니다.'
+                              : '기업에서 영상 수정 요청을 전달했습니다. 수정 사항을 확인하고 영상을 재업로드해 주세요.'}
                           </p>
                           <div className="space-y-2">
                             {(() => {
