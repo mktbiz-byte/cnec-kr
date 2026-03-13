@@ -77,6 +77,22 @@ const CampaignApplyPage = () => {
       if (campaignError) throw campaignError
       setCampaign(campaignData)
 
+      // 비공개 캠페인 접근 제어
+      if (campaignData.is_private) {
+        const { data: invitationApp } = await supabase
+          .from('applications')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('campaign_id', id)
+          .single()
+
+        if (!invitationApp) {
+          setError('비공개 캠페인입니다. 초대된 크리에이터만 참여할 수 있습니다.')
+          setLoading(false)
+          return
+        }
+      }
+
       // 프로필 조회
       const profile = await database.userProfiles.get(user.id)
       setUserProfile(profile)

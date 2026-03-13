@@ -9,7 +9,7 @@ import {
   Share2, Heart, Truck, Camera, ExternalLink, Users,
   Clock, Package, DollarSign, ChevronDown, ChevronUp,
   AlertTriangle, Info, Play, Ban, Tag, Video, Zap,
-  MessageSquare, ShoppingBag, Store, Sparkles, X
+  MessageSquare, ShoppingBag, Store, Sparkles, X, Lock
 } from 'lucide-react'
 
 const CampaignDetailPage = () => {
@@ -26,6 +26,7 @@ const CampaignDetailPage = () => {
   const [liked, setLiked] = useState(false)
   const [showGuide, setShowGuide] = useState(true)
   const [showDetailImage, setShowDetailImage] = useState(false)
+  const [isPrivateBlocked, setIsPrivateBlocked] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -47,6 +48,25 @@ const CampaignDetailPage = () => {
 
       if (campaignError) throw campaignError
       setCampaign(campaignData)
+
+      // 비공개 캠페인 접근 제어
+      if (campaignData.is_private) {
+        if (user) {
+          // 초대받은 크리에이터인지 확인 (applications 테이블에 source='invitation'으로 존재)
+          const { data: invitationApp } = await supabase
+            .from('applications')
+            .select('id, status, source')
+            .eq('user_id', user.id)
+            .eq('campaign_id', id)
+            .single()
+
+          if (!invitationApp) {
+            setIsPrivateBlocked(true)
+          }
+        } else {
+          setIsPrivateBlocked(true)
+        }
+      }
 
       // 로그인한 경우 추가 데이터 조회
       if (user) {
@@ -255,6 +275,29 @@ const CampaignDetailPage = () => {
     )
   }
 
+  // 비공개 캠페인 - 초대받지 않은 경우
+  if (isPrivateBlocked) {
+    return (
+      <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col items-center justify-center p-4">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <Lock size={40} className="text-gray-400" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">비공개 캠페인입니다</h2>
+          <p className="text-gray-500 text-center mb-6">
+            이 캠페인은 초대된 크리에이터만 참여할 수 있습니다.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+          >
+            홈으로 돌아가기
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   const reward = campaign.creator_points_override || campaign.reward_points || 0
   const dDay = getDDay(campaign.application_deadline)
   const isDeadlinePassed = dDay === '마감'
@@ -311,6 +354,12 @@ const CampaignDetailPage = () => {
 
           {/* 뱃지 오버레이 */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+            {campaign.is_private && (
+              <span className="text-xs font-bold px-2.5 py-1 rounded bg-gray-800 text-white flex items-center gap-1">
+                <Lock size={12} />
+                비공개
+              </span>
+            )}
             <span className={`text-xs font-bold px-2.5 py-1 rounded ${getCategoryStyle(campaign.campaign_type)}`}>
               {getCategoryLabel(campaign.campaign_type)}
             </span>

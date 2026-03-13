@@ -5,7 +5,7 @@ import { usePCView } from '../../contexts/PCViewContext'
 import { database, supabase } from '../../lib/supabase'
 import {
   DollarSign, FileText, ChevronRight,
-  Gift, Target, Loader2, Sparkles, Camera, X
+  Gift, Target, Loader2, Sparkles, Camera, X, Lock
 } from 'lucide-react'
 import CampaignPolicyModal from './CampaignPolicyModal'
 
@@ -219,7 +219,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
         if (campaignIds.length > 0) {
           const { data: campaignsData } = await supabase
             .from('campaigns')
-            .select('id, title, brand, brand_id, image_url, reward_points, creator_points_override, application_deadline, content_submission_deadline, campaign_type, category')
+            .select('id, title, brand, brand_id, image_url, reward_points, creator_points_override, application_deadline, content_submission_deadline, campaign_type, category, is_private')
             .in('id', campaignIds)
 
           // 캠페인 데이터 병합
@@ -305,7 +305,7 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
         totalScore: scores.totalScore
       })
 
-      // 추천 캠페인 로드
+      // 추천 캠페인 로드 (database.campaigns.getAll()은 이미 is_private 캠페인을 제외함)
       const campaignsData = await database.campaigns.getAll()
       const activeCampaigns = campaignsData?.filter(campaign => {
         if (campaign.status !== 'active') return false
@@ -599,6 +599,12 @@ const CreatorHome = ({ onCampaignClick, onViewAllCampaigns }) => {
                       {app.campaigns?.title}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
+                      {app.campaigns?.is_private && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-800 text-white flex items-center gap-0.5">
+                          <Lock size={10} />
+                          비공개
+                        </span>
+                      )}
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                         app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
                       }`}>
