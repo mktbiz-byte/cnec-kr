@@ -61,6 +61,12 @@ export default function VideoSubmissionPage() {
 
       if (campaignError) throw campaignError
 
+      // 스토리 숏폼인 경우 리다이렉트
+      if (campaignData.campaign_type === 'story_short') {
+        navigate(`/campaign/${campaignId}/submit-story`)
+        return
+      }
+
       // 4주 챌린지인 경우 리다이렉트
       if (campaignData.campaign_type === '4week_challenge') {
         navigate(`/submit-4week-video/${campaignId}`)

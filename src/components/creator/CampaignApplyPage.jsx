@@ -75,6 +75,13 @@ const CampaignApplyPage = () => {
         .single()
 
       if (campaignError) throw campaignError
+
+      // 스토리 숏폼 캠페인이면 전용 페이지로 리다이렉트
+      if (campaignData.campaign_type === 'story_short') {
+        navigate(`/campaign/${id}/apply-story`, { replace: true })
+        return
+      }
+
       setCampaign(campaignData)
 
       // 비공개 캠페인 접근 제어

@@ -25,6 +25,8 @@ import {
 import LandingPage from './components/creator/LandingPage';
 import CampaignDetailPage from './components/creator/CampaignDetailPage';
 import CampaignApplyPage from './components/creator/CampaignApplyPage';
+import StoryApplyPage from './components/creator/StoryApplyPage';
+import StorySubmissionPage from './components/creator/StorySubmissionPage';
 import CreatorApplicationPage from './components/creator/CreatorApplicationPage';
 import CreatorApplication from './pages/CreatorApplication';
 
@@ -97,6 +99,8 @@ const AppContent = () => {
         <Route path="/mypage" element={<MyPageWrapper />} />
         <Route path="/campaign/:id" element={<CampaignDetailPage />} />
         <Route path="/campaign/:id/apply" element={<CampaignApplyPage />} />
+        <Route path="/campaign/:id/apply-story" element={<StoryApplyPage />} />
+        <Route path="/campaign/:id/submit-story" element={<StorySubmissionPage />} />
         <Route path="/my/grade" element={<GradeDetailPage />} />
         <Route path="/my/points" element={<PointsPage />} />
         <Route path="/my/applications" element={<ApplicationsPage />} />
