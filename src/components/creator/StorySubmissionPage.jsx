@@ -5,7 +5,7 @@ import { usePCView } from '../../contexts/PCViewContext'
 import { supabase } from '../../lib/supabase'
 import {
   ArrowLeft, CheckCircle, AlertCircle, Loader2, AlertTriangle,
-  Upload, Image, Video, Info, X
+  Upload, Image, Video, Info, X, Calendar
 } from 'lucide-react'
 
 const StorySubmissionPage = () => {
@@ -396,6 +396,16 @@ const StorySubmissionPage = () => {
               )}
             </div>
           </div>
+
+          {/* 업로드 마감일 */}
+          {campaign?.end_date && (
+            <div className="mx-4 mt-4 bg-amber-50 border border-amber-100 rounded-xl p-4">
+              <div className="flex items-center gap-2">
+                <Calendar size={14} className="text-amber-600" />
+                <span className="text-sm font-bold text-amber-900">업로드 마감일: {new Date(campaign.end_date).toLocaleDateString('ko-KR')}</span>
+              </div>
+            </div>
+          )}
 
           {/* 업로드 폼 */}
           <div className="p-4 space-y-5">

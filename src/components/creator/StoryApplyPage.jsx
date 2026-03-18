@@ -298,6 +298,12 @@ const StoryApplyPage = () => {
                     <Gift size={14} className="text-violet-500" />
                     <span className="text-sm font-bold text-violet-600">{formatPoints(reward)}</span>
                   </div>
+                  {campaign.end_date && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <Calendar size={14} className="text-rose-500" />
+                      <span className="text-sm text-rose-600 font-medium">업로드 마감: {new Date(campaign.end_date).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
