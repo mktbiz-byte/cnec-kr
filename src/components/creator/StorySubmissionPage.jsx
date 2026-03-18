@@ -388,11 +388,26 @@ const StorySubmissionPage = () => {
               스토리에 반드시 포함
             </h4>
             <div className="space-y-1.5 text-sm text-blue-800">
-              {campaign?.story_swipe_link && (
-                <p>링크: <span className="font-medium">{campaign.story_swipe_link}</span></p>
+              {campaign?.story_required_keyword && (
+                <p>필수 키워드: <span className="font-semibold">"{campaign.story_required_keyword}"</span></p>
               )}
-              {campaign?.story_hashtags && (
-                <p>해시태그: <span className="font-medium">{campaign.story_hashtags}</span></p>
+              {campaign?.story_swipe_link && (
+                <p>구매 링크: <span className="font-medium">{campaign.story_swipe_link}</span></p>
+              )}
+              {campaign?.story_exposure_type && (
+                <p>노출 방식: <span className="font-medium">
+                  {campaign.story_exposure_type === 'unboxing' ? '언박싱' :
+                   campaign.story_exposure_type === 'usage_scene' ? '사용 장면' :
+                   campaign.story_exposure_type === 'before_after' ? '비포애프터' :
+                   campaign.story_exposure_type}
+                </span></p>
+              )}
+              {campaign?.story_slide_count && (
+                <p>스토리 장수: <span className="font-medium">
+                  {campaign.story_slide_count === '1' ? '1장 (15초)' :
+                   campaign.story_slide_count === '2_3' ? '2~3장 연속' :
+                   campaign.story_slide_count}
+                </span></p>
               )}
             </div>
           </div>

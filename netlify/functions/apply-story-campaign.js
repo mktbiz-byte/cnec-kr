@@ -51,15 +51,6 @@ exports.handler = async (event) => {
       }
     }
 
-    // 수정 불가 정책 동의 필수 검증
-    if (!no_edit_policy_agreed) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ success: false, error: '수정 불가 정책 동의가 필요합니다.' })
-      }
-    }
-
     // BIZ DB 접속
     const supabaseUrl = process.env.SUPABASE_BIZ_URL
       || process.env.VITE_SUPABASE_BIZ_URL
@@ -75,7 +66,7 @@ exports.handler = async (event) => {
       .from('story_proposals')
       .select('id, status')
       .eq('campaign_id', campaign_id)
-      .eq('user_id', user_id)
+      .eq('creator_id', user_id)
       .single()
 
     if (existing) {
@@ -95,13 +86,11 @@ exports.handler = async (event) => {
       .from('story_proposals')
       .insert([{
         campaign_id,
-        user_id,
-        creator_name: creator_name || null,
+        creator_id: user_id,
         video_concept,
         tone_mood: tone_mood || null,
         description,
         secondary_use_agreed: true,
-        no_edit_policy_agreed: true,
         status: 'pending',
         created_at: new Date().toISOString()
       }])

@@ -410,19 +410,47 @@ const CampaignDetailPage = () => {
               필수사항
             </h4>
             <div className="space-y-2">
+              {campaign.story_required_keyword && (
+                <div className="flex items-start gap-2">
+                  <span className="text-xs text-blue-600 font-bold mt-0.5">필수 키워드</span>
+                  <span className="text-sm text-blue-800 font-semibold">"{campaign.story_required_keyword}"</span>
+                </div>
+              )}
               {campaign.story_swipe_link && (
                 <div className="flex items-start gap-2">
-                  <span className="text-xs text-blue-600 font-bold mt-0.5">링크</span>
+                  <span className="text-xs text-blue-600 font-bold mt-0.5">구매 링크</span>
                   <a href={campaign.story_swipe_link} target="_blank" rel="noopener noreferrer"
                      className="text-sm text-blue-700 underline break-all">
                     {campaign.story_swipe_link}
                   </a>
                 </div>
               )}
-              {campaign.story_hashtags && (
+              {campaign.story_exposure_type && (
                 <div className="flex items-start gap-2">
-                  <span className="text-xs text-blue-600 font-bold mt-0.5">해시태그</span>
-                  <span className="text-sm text-blue-800">{campaign.story_hashtags}</span>
+                  <span className="text-xs text-blue-600 font-bold mt-0.5">노출 방식</span>
+                  <span className="text-sm text-blue-800">
+                    {campaign.story_exposure_type === 'unboxing' ? '언박싱' :
+                     campaign.story_exposure_type === 'usage_scene' ? '사용 장면' :
+                     campaign.story_exposure_type === 'before_after' ? '비포애프터' :
+                     campaign.story_exposure_type}
+                  </span>
+                </div>
+              )}
+              {campaign.story_slide_count && (
+                <div className="flex items-start gap-2">
+                  <span className="text-xs text-blue-600 font-bold mt-0.5">스토리 장수</span>
+                  <span className="text-sm text-blue-800">
+                    {campaign.story_slide_count === '1' ? '1장 (15초)' :
+                     campaign.story_slide_count === '2_3' ? '2~3장 연속' :
+                     campaign.story_slide_count}
+                  </span>
+                </div>
+              )}
+              {campaign.story_reference_image_url && (
+                <div className="mt-2">
+                  <span className="text-xs text-blue-600 font-bold">레퍼런스 이미지</span>
+                  <img src={campaign.story_reference_image_url} alt="레퍼런스"
+                       className="mt-1 rounded-xl max-h-48 object-cover" />
                 </div>
               )}
             </div>
@@ -434,6 +462,19 @@ const CampaignDetailPage = () => {
               <h4 className="font-bold text-purple-900 mb-2 text-sm">영상 톤/분위기</h4>
               <p className="text-sm text-purple-800 leading-relaxed whitespace-pre-line">
                 {campaign.story_tone_guide}
+              </p>
+            </div>
+          )}
+
+          {/* 금지사항 */}
+          {campaign.story_restrictions && (
+            <div className="bg-red-50 rounded-2xl p-4 border border-red-100">
+              <h4 className="font-bold text-red-900 mb-2 text-sm flex items-center gap-1.5">
+                <Ban size={14} className="text-red-600" />
+                금지사항
+              </h4>
+              <p className="text-sm text-red-800 leading-relaxed whitespace-pre-line">
+                {campaign.story_restrictions}
               </p>
             </div>
           )}

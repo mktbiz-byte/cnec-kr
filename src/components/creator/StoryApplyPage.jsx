@@ -316,14 +316,51 @@ const StoryApplyPage = () => {
               스토리에 반드시 포함
             </h4>
             <div className="space-y-1.5 text-sm text-blue-800">
-              {campaign?.story_swipe_link && (
-                <p>링크: <span className="font-medium">{campaign.story_swipe_link}</span></p>
+              {campaign?.story_required_keyword && (
+                <p>필수 키워드: <span className="font-semibold">"{campaign.story_required_keyword}"</span></p>
               )}
-              {campaign?.story_hashtags && (
-                <p>해시태그: <span className="font-medium">{campaign.story_hashtags}</span></p>
+              {campaign?.story_swipe_link && (
+                <p>구매 링크: <span className="font-medium">{campaign.story_swipe_link}</span></p>
+              )}
+              {campaign?.story_exposure_type && (
+                <p>노출 방식: <span className="font-medium">
+                  {campaign.story_exposure_type === 'unboxing' ? '언박싱' :
+                   campaign.story_exposure_type === 'usage_scene' ? '사용 장면' :
+                   campaign.story_exposure_type === 'before_after' ? '비포애프터' :
+                   campaign.story_exposure_type}
+                </span></p>
+              )}
+              {campaign?.story_slide_count && (
+                <p>스토리 장수: <span className="font-medium">
+                  {campaign.story_slide_count === '1' ? '1장 (15초)' :
+                   campaign.story_slide_count === '2_3' ? '2~3장 연속' :
+                   campaign.story_slide_count}
+                </span></p>
               )}
             </div>
           </div>
+
+          {/* 레퍼런스 이미지 */}
+          {campaign?.story_reference_image_url && (
+            <div className="mx-4 mt-3 bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <h4 className="font-bold text-blue-900 mb-2 text-sm">레퍼런스 이미지</h4>
+              <img src={campaign.story_reference_image_url} alt="레퍼런스"
+                   className="rounded-xl max-h-48 object-cover" />
+            </div>
+          )}
+
+          {/* 금지사항 */}
+          {campaign?.story_restrictions && (
+            <div className="mx-4 mt-3 bg-red-50 border border-red-100 rounded-xl p-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <span className="text-xs font-bold text-red-900">금지사항</span>
+                  <p className="text-sm text-red-800 whitespace-pre-line mt-1">{campaign.story_restrictions}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 기획안 작성 폼 */}
           <div className="p-4 space-y-5">
