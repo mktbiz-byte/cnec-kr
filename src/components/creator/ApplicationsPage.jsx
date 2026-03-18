@@ -592,11 +592,74 @@ const ApplicationsPage = () => {
                 {selectedGuide.type === 'oliveyoung' && '올리브영'}
                 {selectedGuide.type === '4week_challenge' && '4주 챌린지'}
                 {selectedGuide.type === 'general' && '일반'}
+                {selectedGuide.type === 'story_short' && '스토리 숏폼'}
               </span>
             </div>
             <h3 className="text-2xl font-extrabold mb-1">촬영 가이드</h3>
             <p className="text-white/70">{selectedGuide.campaigns?.brand} - {selectedGuide.campaigns?.title}</p>
           </div>
+
+          {/* 스토리 숏폼 가이드 확장 렌더링 */}
+          {selectedGuide.type === 'story_short' && selectedGuide.personalized_guide && (
+            <div className="space-y-4">
+              {typeof selectedGuide.personalized_guide === 'object' && selectedGuide.personalized_guide !== null ? (
+                <>
+                  {selectedGuide.personalized_guide.overview && (
+                    <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                      <h4 className="font-bold text-gray-900 mb-2 text-sm">캠페인 개요</h4>
+                      <p className="text-sm text-gray-700 whitespace-pre-line">{selectedGuide.personalized_guide.overview}</p>
+                    </div>
+                  )}
+                  {selectedGuide.personalized_guide.required_keyword && (
+                    <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
+                      <h4 className="font-bold text-blue-900 mb-2 text-sm">필수 키워드</h4>
+                      <p className="text-sm text-blue-800 font-semibold">"{selectedGuide.personalized_guide.required_keyword}"</p>
+                    </div>
+                  )}
+                  {selectedGuide.personalized_guide.exposure_type && (
+                    <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                      <h4 className="font-bold text-gray-900 mb-2 text-sm">노출 방식</h4>
+                      <p className="text-sm text-gray-700">
+                        {selectedGuide.personalized_guide.exposure_type === 'unboxing' ? '언박싱' :
+                         selectedGuide.personalized_guide.exposure_type === 'usage_scene' ? '사용 장면' :
+                         selectedGuide.personalized_guide.exposure_type === 'before_after' ? '비포애프터' :
+                         selectedGuide.personalized_guide.exposure_type}
+                      </p>
+                    </div>
+                  )}
+                  {selectedGuide.personalized_guide.tone && (
+                    <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
+                      <h4 className="font-bold text-purple-900 mb-2 text-sm">톤/분위기</h4>
+                      <p className="text-sm text-purple-800 whitespace-pre-line">{selectedGuide.personalized_guide.tone}</p>
+                    </div>
+                  )}
+                  {selectedGuide.personalized_guide.swipe_link && (
+                    <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                      <h4 className="font-bold text-gray-900 mb-2 text-sm">구매 링크</h4>
+                      <a href={selectedGuide.personalized_guide.swipe_link} target="_blank" rel="noopener noreferrer"
+                         className="text-sm text-blue-600 underline break-all">{selectedGuide.personalized_guide.swipe_link}</a>
+                    </div>
+                  )}
+                  {selectedGuide.personalized_guide.restrictions && (
+                    <div className="bg-red-50 rounded-2xl p-4 border border-red-100">
+                      <h4 className="font-bold text-red-900 mb-2 text-sm">금지사항</h4>
+                      <p className="text-sm text-red-800 whitespace-pre-line">{selectedGuide.personalized_guide.restrictions}</p>
+                    </div>
+                  )}
+                  {selectedGuide.personalized_guide.additional_notes && (
+                    <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+                      <h4 className="font-bold text-amber-900 mb-2 text-sm">추가 안내</h4>
+                      <p className="text-sm text-amber-800 whitespace-pre-line">{selectedGuide.personalized_guide.additional_notes}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                  <p className="text-sm text-gray-700 whitespace-pre-line">{String(selectedGuide.personalized_guide)}</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* 기획형 가이드 확장 렌더링 - 모바일 모달과 동일한 콘텐츠 */}
           {selectedGuide.type === 'planned' && selectedGuide.personalized_guide && (
@@ -1752,6 +1815,33 @@ const ApplicationsPage = () => {
                         )}
                       </div>
 
+                      {/* 스토리 가이드 보기 버튼 */}
+                      {app.personalized_guide && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-purple-600" />
+                            <span className="text-xs font-semibold text-purple-900">촬영 가이드가 전달되었습니다</span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              let guideData = app.personalized_guide
+                              if (typeof guideData === 'string') {
+                                try { guideData = JSON.parse(guideData) } catch(e) {}
+                              }
+                              setSelectedGuide({
+                                type: 'story_short',
+                                personalized_guide: guideData,
+                                campaigns: app.campaigns
+                              })
+                              setShowGuideModal(true)
+                            }}
+                            className="w-full py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 flex items-center justify-center gap-1"
+                          >
+                            <Eye size={12} /> 촬영 가이드 보기
+                          </button>
+                        </div>
+                      )}
+
                       {/* 스토리 업로드 버튼 (승인됨 또는 수정 요청 시) */}
                       {(app.story_proposal.status === 'approved' || app.story_proposal.status === 'revision_requested') && (
                         <button
@@ -2315,6 +2405,7 @@ const ApplicationsPage = () => {
                   {selectedGuide.type === 'oliveyoung' && '올리브영'}
                   {selectedGuide.type === '4week_challenge' && '4주 챌린지'}
                   {selectedGuide.type === 'general' && '일반'}
+                  {selectedGuide.type === 'story_short' && '스토리 숏폼'}
                 </span>
               </div>
 
@@ -2358,6 +2449,73 @@ const ApplicationsPage = () => {
                   additionalMessage={selectedGuide.additional_message}
                   campaigns={selectedGuide.campaigns}
                 />
+              )}
+
+              {/* 스토리 숏폼 가이드 내용 */}
+              {selectedGuide.type === 'story_short' && selectedGuide.personalized_guide && (
+                <div className="space-y-4">
+                  {typeof selectedGuide.personalized_guide === 'object' && selectedGuide.personalized_guide !== null ? (
+                    <>
+                      {selectedGuide.personalized_guide.overview && (
+                        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                          <h4 className="font-bold text-gray-900 mb-2 text-sm flex items-center gap-1.5">
+                            <FileText size={14} className="text-purple-600" />
+                            캠페인 개요
+                          </h4>
+                          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{selectedGuide.personalized_guide.overview}</p>
+                        </div>
+                      )}
+                      {selectedGuide.personalized_guide.required_keyword && (
+                        <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
+                          <h4 className="font-bold text-blue-900 mb-2 text-sm">필수 키워드</h4>
+                          <p className="text-sm text-blue-800 font-semibold">"{selectedGuide.personalized_guide.required_keyword}"</p>
+                        </div>
+                      )}
+                      {selectedGuide.personalized_guide.exposure_type && (
+                        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                          <h4 className="font-bold text-gray-900 mb-2 text-sm">노출 방식</h4>
+                          <p className="text-sm text-gray-700">
+                            {selectedGuide.personalized_guide.exposure_type === 'unboxing' ? '언박싱' :
+                             selectedGuide.personalized_guide.exposure_type === 'usage_scene' ? '사용 장면' :
+                             selectedGuide.personalized_guide.exposure_type === 'before_after' ? '비포애프터' :
+                             selectedGuide.personalized_guide.exposure_type}
+                          </p>
+                        </div>
+                      )}
+                      {selectedGuide.personalized_guide.tone && (
+                        <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
+                          <h4 className="font-bold text-purple-900 mb-2 text-sm">톤/분위기</h4>
+                          <p className="text-sm text-purple-800 whitespace-pre-line">{selectedGuide.personalized_guide.tone}</p>
+                        </div>
+                      )}
+                      {selectedGuide.personalized_guide.swipe_link && (
+                        <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                          <h4 className="font-bold text-gray-900 mb-2 text-sm">구매 링크</h4>
+                          <a href={selectedGuide.personalized_guide.swipe_link} target="_blank" rel="noopener noreferrer"
+                             className="text-sm text-blue-600 underline break-all">{selectedGuide.personalized_guide.swipe_link}</a>
+                        </div>
+                      )}
+                      {selectedGuide.personalized_guide.restrictions && (
+                        <div className="bg-red-50 rounded-2xl p-4 border border-red-100">
+                          <h4 className="font-bold text-red-900 mb-2 text-sm">금지사항</h4>
+                          <p className="text-sm text-red-800 whitespace-pre-line">{selectedGuide.personalized_guide.restrictions}</p>
+                        </div>
+                      )}
+                      {selectedGuide.personalized_guide.additional_notes && (
+                        <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+                          <h4 className="font-bold text-amber-900 mb-2 text-sm">추가 안내</h4>
+                          <p className="text-sm text-amber-800 whitespace-pre-line">{selectedGuide.personalized_guide.additional_notes}</p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                        {String(selectedGuide.personalized_guide)}
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* 올리브영 가이드 내용 */}

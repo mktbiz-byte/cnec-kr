@@ -65,7 +65,7 @@ exports.handler = async (event) => {
       .from('story_proposals')
       .select('id, status')
       .eq('id', proposal_id)
-      .eq('user_id', user_id)
+      .eq('creator_id', user_id)
       .single()
 
     if (proposalError || !proposal) {
@@ -102,14 +102,10 @@ exports.handler = async (event) => {
       .insert([{
         proposal_id,
         campaign_id,
-        user_id,
+        creator_id: user_id,
         screenshot_url,
         clean_video_url,
-        version: nextVersion,
-        is_revision: is_revision || false,
-        revision_agreed: revision_agreed || false,
         status: 'submitted',
-        submitted_at: new Date().toISOString(),
         created_at: new Date().toISOString()
       }])
       .select()

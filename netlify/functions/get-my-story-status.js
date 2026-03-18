@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     let proposalsQuery = supabaseBiz
       .from('story_proposals')
       .select('*')
-      .eq('user_id', user_id)
+      .eq('creator_id', user_id)
       .order('created_at', { ascending: false })
 
     if (campaign_id) {
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     let submissionsQuery = supabaseBiz
       .from('story_submissions')
       .select('*')
-      .eq('user_id', user_id)
+      .eq('creator_id', user_id)
       .order('created_at', { ascending: false })
 
     if (campaign_id) {
