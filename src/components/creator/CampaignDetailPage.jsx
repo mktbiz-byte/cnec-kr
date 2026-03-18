@@ -113,6 +113,7 @@ const CampaignDetailPage = () => {
       case 'oliveyoung': return '올리브영'
       case '4week_challenge': return '4주챌린지'
       case 'planned': return '기획형'
+      case 'story_short': return '스토리 숏폼'
       default: return '기획형'
     }
   }
@@ -122,6 +123,7 @@ const CampaignDetailPage = () => {
       case 'oliveyoung': return 'bg-emerald-500 text-white'
       case '4week_challenge': return 'bg-violet-500 text-white'
       case 'planned': return 'bg-blue-500 text-white'
+      case 'story_short': return 'bg-rose-500 text-white'
       default: return 'bg-blue-500 text-white'
     }
   }
@@ -168,7 +170,11 @@ const CampaignDetailPage = () => {
       navigate('/login', { state: { from: `/campaign/${id}` } })
       return
     }
-    navigate(`/campaign/${id}/apply`)
+    if (campaign?.campaign_type === 'story_short') {
+      navigate(`/campaign/${id}/apply-story`)
+    } else {
+      navigate(`/campaign/${id}/apply`)
+    }
   }
 
   // PC 확장 보기: 캠페인 상세 정보를 넓은 화면으로 표시
@@ -336,7 +342,169 @@ const CampaignDetailPage = () => {
         </div>
       </div>
 
-      {/* 메인 콘텐츠 */}
+      {/* 스토리 숏폼 전용 콘텐츠 */}
+      {campaign.campaign_type === 'story_short' ? (
+      <div className="bg-white">
+        {/* 상품 이미지 */}
+        <div className="relative">
+          {campaign.image_url ? (
+            <img
+              src={campaign.image_url}
+              alt={campaign.title}
+              className="w-full aspect-video object-cover"
+            />
+          ) : (
+            <div className="w-full aspect-video bg-gray-100 flex items-center justify-center">
+              <Gift size={64} className="text-gray-300" />
+            </div>
+          )}
+          <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+            <span className="text-xs font-bold px-2.5 py-1 rounded bg-rose-500 text-white">
+              스토리 숏폼
+            </span>
+          </div>
+        </div>
+
+        {/* 기본 정보 */}
+        <div className="p-4">
+          {campaign.brand && (
+            <p className="text-sm text-blue-600 font-medium mb-1">{campaign.brand}</p>
+          )}
+          <h2 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
+            {campaign.title}
+          </h2>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <Gift size={18} className="text-violet-500" />
+              <span className="text-2xl font-bold text-violet-600">{formatPoints(reward)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-2 bg-gray-100" />
+
+        {/* 스토리 숏폼 상세 정보 */}
+        <div className="p-4 space-y-4">
+          <div className="bg-rose-50 rounded-2xl p-4 border border-rose-100">
+            <h3 className="font-bold text-rose-900 mb-3 text-base">스토리 숏폼 캠페인</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">영상 길이</span>
+                <span className="text-sm font-bold text-gray-900">최소 10초 이상</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">업로드 채널</span>
+                <span className="text-sm font-bold text-gray-900">인스타그램 스토리</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">보상</span>
+                <span className="text-sm font-bold text-violet-600">{formatPoints(reward)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 필수사항 */}
+          <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
+            <h4 className="font-bold text-blue-900 mb-3 text-sm flex items-center gap-1.5">
+              <Info size={14} className="text-blue-600" />
+              필수사항
+            </h4>
+            <div className="space-y-2">
+              {campaign.story_swipe_link && (
+                <div className="flex items-start gap-2">
+                  <span className="text-xs text-blue-600 font-bold mt-0.5">링크</span>
+                  <a href={campaign.story_swipe_link} target="_blank" rel="noopener noreferrer"
+                     className="text-sm text-blue-700 underline break-all">
+                    {campaign.story_swipe_link}
+                  </a>
+                </div>
+              )}
+              {campaign.story_hashtags && (
+                <div className="flex items-start gap-2">
+                  <span className="text-xs text-blue-600 font-bold mt-0.5">해시태그</span>
+                  <span className="text-sm text-blue-800">{campaign.story_hashtags}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 영상 톤/분위기 */}
+          {campaign.story_tone_guide && (
+            <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
+              <h4 className="font-bold text-purple-900 mb-2 text-sm">영상 톤/분위기</h4>
+              <p className="text-sm text-purple-800 leading-relaxed whitespace-pre-line">
+                {campaign.story_tone_guide}
+              </p>
+            </div>
+          )}
+
+          {/* 캠페인 설명 */}
+          {campaign.description && (
+            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+              <h4 className="font-bold text-gray-900 mb-2 text-sm">캠페인 소개</h4>
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                {campaign.description}
+              </p>
+            </div>
+          )}
+
+          {/* 주의사항 */}
+          <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200">
+            <h4 className="font-bold text-amber-900 mb-3 text-sm flex items-center gap-1.5">
+              <AlertTriangle size={14} className="text-amber-600" />
+              주의사항
+            </h4>
+            <ul className="space-y-2 text-sm text-amber-800">
+              <li className="flex items-start gap-2">
+                <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>
+                <span>수정 불가 — 수정 시 20,000원 추가 과금</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>
+                <span>2차 활용 동의 필수 (지원 시 동의)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>
+                <span>광고코드 제출 불필요</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* 일정 정보 */}
+          {campaign.application_deadline && (
+            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+              <h4 className="font-bold text-gray-900 mb-3 text-sm flex items-center gap-1.5">
+                <Calendar size={14} className="text-gray-600" />
+                일정
+              </h4>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">지원 마감</span>
+                  <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                    {formatDate(campaign.application_deadline)}
+                    {dDay && !isDeadlinePassed && (
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                        dDay === 'D-Day' || parseInt(dDay?.replace('D-', '')) <= 3
+                          ? 'bg-red-100 text-red-600'
+                          : 'bg-blue-100 text-blue-600'
+                      }`}>
+                        {dDay}
+                      </span>
+                    )}
+                  </span>
+                </div>
+                {campaign.content_submission_deadline && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">업로드 마감</span>
+                    <span className="text-sm font-medium text-gray-900">{formatDate(campaign.content_submission_deadline)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      ) : (
       <div className="bg-white">
         {/* 상품 이미지 */}
         <div className="relative">
@@ -952,6 +1120,7 @@ const CampaignDetailPage = () => {
           </div>
         </div>
       </div>
+        )}
         </div>
 
         {/* 하단 고정 버튼 */}

@@ -765,6 +765,36 @@ const ApplicationsPage = () => {
         }
       }
 
+      // 스토리 숏폼 기획안/제출 상태 로드 (BIZ DB)
+      try {
+        const storyRes = await fetch(`/.netlify/functions/get-my-story-status?user_id=${user.id}`)
+        const storyData = await storyRes.json()
+        if (storyData.success) {
+          // 캠페인별 기획안/제출 데이터 매핑
+          const proposalMap = {}
+          const submissionMap = {}
+          ;(storyData.proposals || []).forEach(p => {
+            proposalMap[p.campaign_id] = p
+          })
+          ;(storyData.submissions || []).forEach(s => {
+            if (!submissionMap[s.campaign_id]) submissionMap[s.campaign_id] = s
+          })
+
+          applicationsData = applicationsData.map(app => {
+            if (app.campaigns?.campaign_type === 'story_short') {
+              return {
+                ...app,
+                story_proposal: proposalMap[app.campaign_id] || null,
+                story_submission: submissionMap[app.campaign_id] || null
+              }
+            }
+            return app
+          })
+        }
+      } catch (storyErr) {
+        console.error('스토리 상태 로드 오류:', storyErr)
+      }
+
       setApplications(applicationsData)
 
       // 카운트 계산
@@ -1687,8 +1717,69 @@ const ApplicationsPage = () => {
                     </div>
                   )}
 
-                  {/* SNS 업로드 전 확인 경고 배너 - 선정~진행중 상태 */}
-                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
+                  {/* 스토리 숏폼 기획안/제출 상태 */}
+                  {app.campaigns?.campaign_type === 'story_short' && app.story_proposal && (
+                    <div className="mt-3 space-y-2">
+                      {/* 기획안 상태 */}
+                      <div className={`rounded-xl p-3 border ${
+                        app.story_proposal.status === 'approved' ? 'bg-green-50 border-green-200' :
+                        app.story_proposal.status === 'rejected' ? 'bg-red-50 border-red-200' :
+                        app.story_proposal.status === 'revision_requested' ? 'bg-amber-50 border-amber-200' :
+                        app.story_proposal.status === 'submitted' ? 'bg-blue-50 border-blue-200' :
+                        'bg-gray-50 border-gray-200'
+                      }`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-bold text-rose-600">기획안</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                            app.story_proposal.status === 'approved' ? 'bg-green-100 text-green-700' :
+                            app.story_proposal.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                            app.story_proposal.status === 'revision_requested' ? 'bg-amber-100 text-amber-700' :
+                            app.story_proposal.status === 'submitted' ? 'bg-blue-100 text-blue-700' :
+                            'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {app.story_proposal.status === 'pending' && '검토 중'}
+                            {app.story_proposal.status === 'approved' && '승인됨'}
+                            {app.story_proposal.status === 'rejected' && '반려됨'}
+                            {app.story_proposal.status === 'revision_requested' && '수정 요청'}
+                            {app.story_proposal.status === 'submitted' && '제출 완료'}
+                          </span>
+                        </div>
+                        {app.story_proposal.status === 'rejected' && app.story_proposal.reject_reason && (
+                          <p className="text-xs text-red-700 mt-1">반려 사유: {app.story_proposal.reject_reason}</p>
+                        )}
+                        {app.story_proposal.status === 'revision_requested' && app.story_proposal.admin_note && (
+                          <p className="text-xs text-amber-700 mt-1">관리자 메모: {app.story_proposal.admin_note}</p>
+                        )}
+                      </div>
+
+                      {/* 스토리 업로드 버튼 (승인됨 또는 수정 요청 시) */}
+                      {(app.story_proposal.status === 'approved' || app.story_proposal.status === 'revision_requested') && (
+                        <button
+                          onClick={() => navigate(`/campaign/${app.campaign_id}/submit-story`)}
+                          className="w-full py-2.5 bg-rose-600 text-white rounded-lg text-xs font-bold hover:bg-rose-700 flex items-center justify-center gap-1"
+                        >
+                          <Upload size={12} />
+                          {app.story_proposal.status === 'revision_requested' ? '수정 재제출하기' : '스토리 업로드 제출'}
+                        </button>
+                      )}
+
+                      {/* 제출 완료 표시 */}
+                      {app.story_submission && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle size={14} className="text-blue-600" />
+                            <span className="text-xs font-semibold text-blue-700">스토리 업로드 제출됨</span>
+                            <span className="text-[10px] text-blue-500 ml-auto">
+                              V{app.story_submission.version || 1}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SNS 업로드 전 확인 경고 배너 - 선정~진행중 상태 (스토리 숏폼 제외) */}
+                  {app.campaigns?.campaign_type !== 'story_short' && ['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
                     <div className="mt-3 bg-amber-50 border border-amber-300 rounded-xl p-3">
                       <div className="flex items-start gap-2">
                         <AlertTriangle size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
@@ -1702,9 +1793,9 @@ const ApplicationsPage = () => {
                     </div>
                   )}
 
-                  {/* 선정됨/진행중/완료 상태일 때 가이드 및 액션 버튼 */}
+                  {/* 선정됨/진행중/완료 상태일 때 가이드 및 액션 버튼 (스토리 숏폼 제외) */}
                   {/* completed/paid 상태에서도 영상/SNS 수정 가능 */}
-                  {['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
+                  {app.campaigns?.campaign_type !== 'story_short' && ['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted', 'sns_uploaded', 'completed', 'paid'].includes(app.status) && (
                     <div className="mt-3 space-y-2">
                       {/* 그룹 가이드 우선 표시: guide_group이 설정된 경우 guide_group_data에서 해당 그룹의 가이드를 표시 */}
                       {(() => {

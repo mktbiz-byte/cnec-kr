@@ -38,7 +38,8 @@ const CreatorSearch = ({ onCampaignClick }) => {
     { id: 'all', label: '전체' },
     { id: 'planned', label: '기획형' },
     { id: 'oliveyoung', label: '올영세일' },
-    { id: '4week_challenge', label: '4주챌린지' }
+    { id: '4week_challenge', label: '4주챌린지' },
+    { id: 'story_short', label: '스토리숏폼' }
   ]
 
   // 찜목록 로드
@@ -274,6 +275,7 @@ const CreatorSearch = ({ onCampaignClick }) => {
       case '4week_challenge': return '4주챌린지'
       case 'planned': return '기획형'
       case 'jasaMall': return '자사몰'
+      case 'story_short': return '스토리 숏폼'
       default: return '기획형'
     }
   }
@@ -284,6 +286,7 @@ const CreatorSearch = ({ onCampaignClick }) => {
       case '4week_challenge': return 'bg-violet-500 text-white'
       case 'planned': return 'bg-blue-500 text-white'
       case 'jasaMall': return 'bg-cyan-500 text-white'
+      case 'story_short': return 'bg-rose-500 text-white'
       default: return 'bg-blue-500 text-white'
     }
   }
@@ -489,6 +492,13 @@ const CreatorSearch = ({ onCampaignClick }) => {
                   <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2 leading-snug">
                     {campaign.title}
                   </h4>
+
+                  {/* 스토리 숏폼 간단 설명 */}
+                  {campaign.campaign_type === 'story_short' && (
+                    <p className="text-xs text-rose-500 font-medium mb-1">
+                      인스타그램 스토리에 10초+ 영상 업로드
+                    </p>
+                  )}
 
                   {/* 포인트 */}
                   <div className="flex items-baseline gap-2">
