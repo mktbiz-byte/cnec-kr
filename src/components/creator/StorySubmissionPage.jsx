@@ -206,11 +206,30 @@ const StorySubmissionPage = () => {
     }
   }
 
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1)
+    } else {
+      navigate('/')
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
-        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-rose-600" />
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl relative">
+          <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
+            <div className="flex items-center justify-between px-4 py-3">
+              <button onClick={goBack} className="p-1 hover:bg-gray-100 rounded-full">
+                <ArrowLeft size={24} className="text-gray-700" />
+              </button>
+              <h1 className="text-base font-medium text-gray-900">스토리 업로드 제출</h1>
+              <div className="w-8" />
+            </div>
+          </div>
+          <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 56px)' }}>
+            <Loader2 className="w-8 h-8 animate-spin text-rose-600" />
+          </div>
         </div>
       </div>
     )
@@ -276,12 +295,20 @@ const StorySubmissionPage = () => {
               </p>
             </div>
           )}
-          <button
-            onClick={() => navigate('/my/applications')}
-            className="px-6 py-3 bg-rose-600 text-white rounded-xl font-medium"
-          >
-            지원 내역으로 돌아가기
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate('/my/applications')}
+              className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium"
+            >
+              지원 내역 보기
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-rose-600 text-white rounded-xl font-medium"
+            >
+              홈으로
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -295,7 +322,7 @@ const StorySubmissionPage = () => {
           <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
             <div className="flex items-center justify-between px-4 py-3">
               <button
-                onClick={() => navigate(-1)}
+                onClick={goBack}
                 className="p-1 hover:bg-gray-100 rounded-full"
               >
                 <ArrowLeft size={24} className="text-gray-700" />
