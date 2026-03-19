@@ -42,6 +42,15 @@ exports.handler = async (event) => {
       }
     }
 
+    // 2차 활용 동의 필수 검증
+    if (!secondary_use_agreed) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, error: '2차 활용 동의가 필요합니다.' })
+      }
+    }
+
     // BIZ DB 접속
     const supabaseUrl = process.env.SUPABASE_BIZ_URL
       || process.env.VITE_SUPABASE_BIZ_URL
