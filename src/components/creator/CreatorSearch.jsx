@@ -496,7 +496,9 @@ const CreatorSearch = ({ onCampaignClick }) => {
                   {/* 스토리 숏폼 간단 설명 */}
                   {campaign.campaign_type === 'story_short' && (
                     <p className="text-xs text-rose-500 font-medium mb-1">
-                      인스타그램 스토리에 10초+ 영상 업로드
+                      {campaign.story_type === 'multi_story'
+                        ? '인스타그램 스토리에 사진 카드 2~3장 업로드'
+                        : '인스타그램 스토리에 10초+ 영상 업로드'}
                     </p>
                   )}
 

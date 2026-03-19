@@ -85,7 +85,7 @@ const StoryApplyPage = () => {
 
   const validateForm = () => {
     const errors = []
-    if (!formData.video_concept.trim()) errors.push('영상 컨셉을 입력해주세요')
+    if (!formData.video_concept.trim()) errors.push(campaign?.story_type === 'multi_story' ? '스토리 컨셉을 입력해주세요' : '영상 컨셉을 입력해주세요')
     if (!formData.description.trim()) errors.push('구성 설명을 입력해주세요')
     if (!formData.secondary_use_agreed) errors.push('2차 활용 동의가 필요합니다')
     if (!formData.no_edit_policy_agreed) errors.push('수정 불가 정책 동의가 필요합니다')
@@ -366,15 +366,15 @@ const StoryApplyPage = () => {
           <div className="p-4 space-y-5">
             <h3 className="text-lg font-bold text-gray-900">기획안 작성</h3>
 
-            {/* 영상 컨셉 */}
+            {/* 컨셉 */}
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5">
-                영상 컨셉 <span className="text-red-500">*</span>
+                {campaign?.story_type === 'multi_story' ? '스토리 컨셉' : '영상 컨셉'} <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={formData.video_concept}
                 onChange={(e) => setFormData(prev => ({ ...prev, video_concept: e.target.value }))}
-                placeholder="영상에서 보여줄 핵심 아이디어를 입력해주세요"
+                placeholder={campaign?.story_type === 'multi_story' ? '스토리 카드에서 보여줄 핵심 아이디어를 입력해주세요' : '영상에서 보여줄 핵심 아이디어를 입력해주세요'}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 rows={3}
               />
@@ -421,7 +421,7 @@ const StoryApplyPage = () => {
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="영상 흐름을 간단히 설명해주세요"
+                placeholder={campaign?.story_type === 'multi_story' ? '스토리 카드 구성을 간단히 설명해주세요' : '영상 흐름을 간단히 설명해주세요'}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 rows={4}
               />
@@ -438,7 +438,7 @@ const StoryApplyPage = () => {
                 />
                 <div>
                   <span className="text-sm font-medium text-gray-900">
-                    본 영상의 2차 활용(광고 소재 등)에 동의합니다.
+                    본 {campaign?.story_type === 'multi_story' ? '콘텐츠' : '영상'}의 2차 활용(광고 소재 등)에 동의합니다.
                   </span>
                   <span className="text-xs text-red-500 font-bold ml-1">(필수)</span>
                   <p className="text-xs text-gray-500 mt-0.5">미동의 시 지원이 불가합니다.</p>
