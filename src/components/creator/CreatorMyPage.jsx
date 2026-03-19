@@ -696,6 +696,11 @@ const CreatorMyPage = () => {
       }
     }
 
+    // 일반 캠페인 외부 가이드 (planned가 아닌 경우에도 외부 가이드 지원)
+    if (campaign.guide_delivery_mode === 'external' && (campaign.external_guide_url || campaign.external_guide_file_url)) {
+      return { type: 'general_external' }
+    }
+
     // 일반 캠페인 AI 가이드
     if (campaign.ai_generated_guide) {
       return { type: 'general' }

@@ -2362,11 +2362,42 @@ const ApplicationsPage = () => {
                         </div>
                       )}
 
+                      {/* 일반 캠페인 외부 가이드 (planned/oliveyoung/4week_challenge 이외 캠페인) */}
+                      {!app.guide_group &&
+                       app.campaigns?.campaign_type !== 'planned' &&
+                       app.campaigns?.campaign_type !== 'oliveyoung' &&
+                       app.campaigns?.campaign_type !== '4week_challenge' &&
+                       app.campaigns?.guide_delivery_mode === 'external' &&
+                       (app.campaigns?.external_guide_url || app.campaigns?.external_guide_file_url) && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-purple-600" />
+                            <span className="text-xs font-semibold text-purple-900">촬영 가이드가 전달되었습니다</span>
+                          </div>
+                          <ExternalGuideViewer
+                            guideType={app.campaigns.external_guide_type}
+                            guideUrl={app.campaigns.external_guide_url}
+                            fileUrl={app.campaigns.external_guide_file_url}
+                            title={app.campaigns.external_guide_title}
+                            fileName={app.campaigns.external_guide_file_name}
+                          />
+                          {app.status === 'filming' && (
+                            <button
+                              onClick={() => handleVideoUpload(app)}
+                              className="w-full mt-2 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 flex items-center justify-center gap-1"
+                            >
+                              <Video size={12} /> 영상 업로드
+                            </button>
+                          )}
+                        </div>
+                      )}
+
                       {/* 일반 캠페인 - 가이드가 없는 경우 기본 버튼 (그룹 가이드가 없는 경우에만 표시) */}
                       {!app.guide_group &&
                        !app.personalized_guide &&
                        !app.campaigns?.oliveyoung_step1_guide_ai &&
                        !app.campaigns?.challenge_weekly_guides_ai &&
+                       !(app.campaigns?.guide_delivery_mode === 'external' && (app.campaigns?.external_guide_url || app.campaigns?.external_guide_file_url)) &&
                        app.campaigns?.ai_generated_guide && (
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
                           <div className="flex items-center gap-2 mb-2">
@@ -2405,7 +2436,8 @@ const ApplicationsPage = () => {
                        !app.personalized_guide &&
                        !app.campaigns?.oliveyoung_step1_guide_ai &&
                        !app.campaigns?.challenge_weekly_guides_ai &&
-                       !app.campaigns?.ai_generated_guide && (
+                       !app.campaigns?.ai_generated_guide &&
+                       !(app.campaigns?.guide_delivery_mode === 'external' && (app.campaigns?.external_guide_url || app.campaigns?.external_guide_file_url)) && (
                         <button
                           onClick={() => handleVideoUpload(app)}
                           className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors flex items-center justify-center gap-1"
