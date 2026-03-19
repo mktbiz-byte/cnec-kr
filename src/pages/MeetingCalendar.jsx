@@ -150,19 +150,19 @@ const MeetingCalendar = ({ slots = [], selectedSlots = [], onSelectSlot, onRemov
                 disabled={!isActive}
                 className={`aspect-square rounded-xl flex flex-col items-center justify-center text-sm relative transition-all ${
                   isSelected
-                    ? 'bg-purple-600 text-white font-bold shadow-md'
+                    ? 'bg-[#6C5CE7] text-white font-bold shadow-md'
                     : hasSelectedSlot
-                      ? 'bg-purple-100 text-purple-700 font-semibold'
+                      ? 'bg-[#F0EDFF] text-[#6C5CE7] font-semibold'
                       : isActive
-                        ? 'hover:bg-purple-50 text-gray-900 cursor-pointer font-medium'
+                        ? 'hover:bg-[#F8F7FF] text-gray-900 cursor-pointer font-medium'
                         : 'text-gray-300 cursor-not-allowed'
-                } ${dateInfo.isToday && !isSelected ? 'ring-2 ring-purple-300' : ''}`}
+                } ${dateInfo.isToday && !isSelected ? 'ring-2 ring-[#B4ADFF]' : ''}`}
               >
                 <span className={dayOfWeek === 0 && !isSelected ? 'text-red-400' : dayOfWeek === 6 && !isSelected ? 'text-blue-400' : ''}>
                   {dateInfo.day}
                 </span>
                 {isActive && !isSelected && (
-                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-0.5" />
+                  <div className="w-1.5 h-1.5 bg-[#6C5CE7] rounded-full mt-0.5" />
                 )}
               </button>
             )
@@ -174,7 +174,7 @@ const MeetingCalendar = ({ slots = [], selectedSlots = [], onSelectSlot, onRemov
       {selectedDate && slotsByDate[selectedDate] && (
         <div className="bg-white rounded-2xl shadow-sm p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Clock className="w-4 h-4 text-purple-600" />
+            <Clock className="w-4 h-4 text-[#6C5CE7]" />
             <h4 className="text-sm font-bold text-gray-900">
               {formatDisplayDate(selectedDate)} 가능 시간
             </h4>
@@ -192,10 +192,10 @@ const MeetingCalendar = ({ slots = [], selectedSlots = [], onSelectSlot, onRemov
                   disabled={disabled || selected}
                   className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
                     selected
-                      ? 'bg-purple-600 text-white cursor-default'
+                      ? 'bg-[#6C5CE7] text-white cursor-default'
                       : disabled
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-purple-50 text-purple-700 hover:bg-purple-100 active:bg-purple-200'
+                        : 'bg-[#F8F7FF] text-[#6C5CE7] hover:bg-[#F0EDFF] active:bg-[#E4E0FF]'
                   }`}
                 >
                   {slot.time}
@@ -213,8 +213,8 @@ const MeetingCalendar = ({ slots = [], selectedSlots = [], onSelectSlot, onRemov
 
       {/* 선택된 슬롯 목록 */}
       {selectedSlots.length > 0 && (
-        <div className="bg-purple-50 rounded-2xl p-4">
-          <h4 className="text-sm font-bold text-purple-900 mb-3">선택한 희망일</h4>
+        <div className="bg-[#F8F7FF] rounded-2xl p-4">
+          <h4 className="text-sm font-bold text-[#1A1A2E] mb-3">선택한 희망일</h4>
           <div className="space-y-2">
             {selectedSlots.map((slot, index) => (
               <div
@@ -224,9 +224,9 @@ const MeetingCalendar = ({ slots = [], selectedSlots = [], onSelectSlot, onRemov
                 <div className="flex items-center gap-3">
                   <span className={`text-xs font-bold px-2 py-1 rounded-lg ${
                     index === 0
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-[#6C5CE7] text-white'
                       : index === 1
-                        ? 'bg-purple-200 text-purple-700'
+                        ? 'bg-[#E4E0FF] text-[#6C5CE7]'
                         : 'bg-gray-200 text-gray-600'
                   }`}>
                     {getPriorityLabel(index)}
