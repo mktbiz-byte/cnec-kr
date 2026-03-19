@@ -470,10 +470,12 @@ const CampaignDetailPage = () => {
             </div>
           </div>
 
-          {/* 영상 톤/분위기 */}
+          {/* 톤/분위기 */}
           {campaign.story_tone_guide && (
             <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
-              <h4 className="font-bold text-purple-900 mb-2 text-sm">영상 톤/분위기</h4>
+              <h4 className="font-bold text-purple-900 mb-2 text-sm">
+                {campaign.story_type === 'multi_story' ? '사진 톤/분위기' : '영상 톤/분위기'}
+              </h4>
               <p className="text-sm text-purple-800 leading-relaxed whitespace-pre-line">
                 {campaign.story_tone_guide}
               </p>

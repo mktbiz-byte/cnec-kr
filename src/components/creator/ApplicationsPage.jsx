@@ -843,6 +843,8 @@ const ApplicationsPage = () => {
             if (!submissionMap[s.campaign_id]) submissionMap[s.campaign_id] = s
           })
 
+          // 기존 applications에 스토리 데이터 병합
+          const existingCampaignIds = new Set(applicationsData.map(a => a.campaign_id))
           applicationsData = applicationsData.map(app => {
             if (app.campaigns?.campaign_type === 'story_short') {
               return {
@@ -853,6 +855,51 @@ const ApplicationsPage = () => {
             }
             return app
           })
+
+          // applications 테이블에 없는 스토리 기획안 → 가상 application 생성
+          const orphanedProposals = (storyData.proposals || []).filter(
+            p => !existingCampaignIds.has(p.campaign_id)
+          )
+
+          if (orphanedProposals.length > 0) {
+            const orphanedCampaignIds = [...new Set(orphanedProposals.map(p => p.campaign_id))]
+            const { data: orphanedCampaigns } = await supabase
+              .from('campaigns')
+              .select('*')
+              .in('id', orphanedCampaignIds)
+
+            const orphanedCampaignMap = {}
+            ;(orphanedCampaigns || []).forEach(c => { orphanedCampaignMap[c.id] = c })
+
+            // story_proposal.status → application status 매핑
+            const mapProposalStatus = (proposalStatus) => {
+              switch (proposalStatus) {
+                case 'approved': return 'approved'
+                case 'rejected': return 'rejected'
+                case 'revision_requested': return 'filming'
+                case 'submitted': return 'video_submitted'
+                default: return 'pending' // pending
+              }
+            }
+
+            const syntheticApps = orphanedProposals.map(proposal => ({
+              id: `story_${proposal.id}`,
+              campaign_id: proposal.campaign_id,
+              user_id: proposal.creator_id,
+              status: mapProposalStatus(proposal.status),
+              created_at: proposal.created_at,
+              updated_at: proposal.updated_at,
+              campaigns: orphanedCampaignMap[proposal.campaign_id] || null,
+              story_proposal: proposal,
+              story_submission: submissionMap[proposal.campaign_id] || null,
+              video_submissions: [],
+              _is_story_only: true
+            }))
+
+            applicationsData = [...applicationsData, ...syntheticApps]
+            // 최신순 정렬 유지
+            applicationsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          }
         }
       } catch (storyErr) {
         console.error('스토리 상태 로드 오류:', storyErr)
