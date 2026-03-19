@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { usePCView } from '../../contexts/PCViewContext'
 import { database, supabase } from '../../lib/supabase'
 import {
-  ArrowLeft, CheckCircle, AlertCircle, Loader2, AlertTriangle,
+  ArrowLeft, CheckCircle, AlertCircle, Loader2,
   Gift, Calendar, Instagram, Info
 } from 'lucide-react'
 
@@ -27,8 +27,8 @@ const StoryApplyPage = () => {
     video_concept: '',
     tone_mood: '',
     description: '',
-    secondary_use_agreed: false,
-    no_edit_policy_agreed: false
+    secondary_use_agreed: true,
+    no_edit_policy_agreed: true
   })
 
   const toneMoods = ['밝은', '청량한', '친근한', '고급스러운', '감성적인', '에너지틱', '차분한']
@@ -87,8 +87,6 @@ const StoryApplyPage = () => {
     const errors = []
     if (!formData.video_concept.trim()) errors.push(campaign?.story_type === 'multi_story' ? '스토리 컨셉을 입력해주세요' : '영상 컨셉을 입력해주세요')
     if (!formData.description.trim()) errors.push('구성 설명을 입력해주세요')
-    if (!formData.secondary_use_agreed) errors.push('2차 활용 동의가 필요합니다')
-    if (!formData.no_edit_policy_agreed) errors.push('수정 불가 정책 동의가 필요합니다')
     return errors
   }
 
@@ -244,7 +242,7 @@ const StoryApplyPage = () => {
   }
 
   const reward = campaign?.creator_points_override || campaign?.reward_points || 0
-  const canSubmit = formData.secondary_use_agreed && formData.no_edit_policy_agreed && !submitting
+  const canSubmit = !submitting
 
   return (
     <div className="flex justify-center bg-gray-100 min-h-screen font-sans">
@@ -427,40 +425,6 @@ const StoryApplyPage = () => {
               />
             </div>
 
-            {/* 동의 체크박스 */}
-            <div className="space-y-3 pt-2">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.secondary_use_agreed}
-                  onChange={(e) => setFormData(prev => ({ ...prev, secondary_use_agreed: e.target.checked }))}
-                  className="w-5 h-5 rounded border-gray-300 text-rose-600 focus:ring-rose-500 mt-0.5 flex-shrink-0"
-                />
-                <div>
-                  <span className="text-sm font-medium text-gray-900">
-                    본 {campaign?.story_type === 'multi_story' ? '콘텐츠' : '영상'}의 2차 활용(광고 소재 등)에 동의합니다.
-                  </span>
-                  <span className="text-xs text-red-500 font-bold ml-1">(필수)</span>
-                  <p className="text-xs text-gray-500 mt-0.5">미동의 시 지원이 불가합니다.</p>
-                </div>
-              </label>
-
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.no_edit_policy_agreed}
-                  onChange={(e) => setFormData(prev => ({ ...prev, no_edit_policy_agreed: e.target.checked }))}
-                  className="w-5 h-5 rounded border-gray-300 text-rose-600 focus:ring-rose-500 mt-0.5 flex-shrink-0"
-                />
-                <div>
-                  <span className="text-sm font-medium text-gray-900">
-                    수정 불가 정책을 확인했습니다.
-                  </span>
-                  <span className="text-xs text-red-500 font-bold ml-1">(필수)</span>
-                  <p className="text-xs text-gray-500 mt-0.5">수정 요청 시 20,000원이 추가 과금됩니다.</p>
-                </div>
-              </label>
-            </div>
           </div>
         </div>
 

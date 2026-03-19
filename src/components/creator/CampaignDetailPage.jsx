@@ -505,28 +505,6 @@ const CampaignDetailPage = () => {
             </div>
           )}
 
-          {/* 주의사항 */}
-          <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200">
-            <h4 className="font-bold text-amber-900 mb-3 text-sm flex items-center gap-1.5">
-              <AlertTriangle size={14} className="text-amber-600" />
-              주의사항
-            </h4>
-            <ul className="space-y-2 text-sm text-amber-800">
-              <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>
-                <span>수정 불가 — 수정 시 20,000원 추가 과금</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>
-                <span>2차 활용 동의 필수 (지원 시 동의)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>
-                <span>광고코드 제출 불필요</span>
-              </li>
-            </ul>
-          </div>
-
           {/* 일정 정보 */}
           {campaign.application_deadline && (
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
