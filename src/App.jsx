@@ -108,7 +108,7 @@ const AppContent = () => {
         <Route path="/guide" element={<CreatorGuidePage />} />
         <Route path="/welcome" element={<WelcomeScreen />} />
 
-        {/* 소속 크리에이터 지원 + 미팅 예약 (공개 페이지 - 카카오 알림톡 링크) */}
+        {/* 크리에이터 지원 프로그램 + 상담 신청 (공개 페이지 - 카카오 알림톡 링크) */}
         <Route path="/creator-application" element={<CreatorApplication />} />
 
         {/* 크리에이터 지원서 (로그인 필요 - 기존 폼) */}

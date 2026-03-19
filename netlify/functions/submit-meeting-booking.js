@@ -76,7 +76,7 @@ exports.handler = async (event) => {
         headers,
         body: JSON.stringify({
           success: false,
-          error: '이미 대기 중인 신청이 있습니다. 담당자 확인 후 연락드리겠습니다.'
+          error: '이미 상담 신청을 해주셨어요! 담당자가 곧 연락드릴게요 :)'
         })
       }
     }
