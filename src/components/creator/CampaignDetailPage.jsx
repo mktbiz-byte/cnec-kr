@@ -388,10 +388,24 @@ const CampaignDetailPage = () => {
           <div className="bg-rose-50 rounded-2xl p-4 border border-rose-100">
             <h3 className="font-bold text-rose-900 mb-3 text-base">스토리 숏폼 캠페인</h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">영상 길이</span>
-                <span className="text-sm font-bold text-gray-900">최소 10초 이상</span>
-              </div>
+              {campaign.story_type && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">스토리 유형</span>
+                  <span className="text-sm font-bold text-gray-900">
+                    {campaign.story_type === 'single_story'
+                      ? '1장 (15초) · 영상 10초 이상 1개'
+                      : campaign.story_type === 'multi_story'
+                        ? '2~3장 연속 · 스토리 카드(사진형)'
+                        : campaign.story_type}
+                  </span>
+                </div>
+              )}
+              {(!campaign.story_type || campaign.story_type === 'single_story') && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">영상 길이</span>
+                  <span className="text-sm font-bold text-gray-900">최소 10초 이상</span>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">업로드 채널</span>
                 <span className="text-sm font-bold text-gray-900">인스타그램 스토리</span>

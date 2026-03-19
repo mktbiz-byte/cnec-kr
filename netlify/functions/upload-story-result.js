@@ -28,16 +28,46 @@ exports.handler = async (event) => {
       user_id,
       screenshot_url,
       clean_video_url,
+      screenshot_urls,
+      media_urls,
+      story_type,
       is_revision,
       revision_agreed
     } = body
 
+    const isMultiStory = story_type === 'multi_story'
+
     // 필수 필드 검증
-    if (!proposal_id || !campaign_id || !user_id || !screenshot_url || !clean_video_url) {
+    if (!proposal_id || !campaign_id || !user_id) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ success: false, error: '필수 항목을 모두 입력해주세요.' })
+      }
+    }
+
+    if (isMultiStory) {
+      if (!screenshot_urls || !Array.isArray(screenshot_urls) || screenshot_urls.length < 2) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ success: false, error: '스크린샷을 2장 이상 업로드해주세요.' })
+        }
+      }
+      if (!media_urls || !Array.isArray(media_urls) || media_urls.length < 2) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ success: false, error: '스토리 카드 이미지를 2장 이상 업로드해주세요.' })
+        }
+      }
+    } else {
+      if (!screenshot_url || !clean_video_url) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ success: false, error: '필수 항목을 모두 입력해주세요.' })
+        }
       }
     }
 
@@ -97,17 +127,26 @@ exports.handler = async (event) => {
       : 1
 
     // 제출물 INSERT
+    const insertData = {
+      proposal_id,
+      campaign_id,
+      creator_id: user_id,
+      status: 'submitted',
+      story_type: story_type || 'single_story',
+      created_at: new Date().toISOString()
+    }
+
+    if (isMultiStory) {
+      insertData.screenshot_urls = screenshot_urls
+      insertData.media_urls = media_urls
+    } else {
+      insertData.screenshot_url = screenshot_url
+      insertData.clean_video_url = clean_video_url
+    }
+
     const { data: submission, error: insertError } = await supabaseBiz
       .from('story_submissions')
-      .insert([{
-        proposal_id,
-        campaign_id,
-        creator_id: user_id,
-        screenshot_url,
-        clean_video_url,
-        status: 'submitted',
-        created_at: new Date().toISOString()
-      }])
+      .insert([insertData])
       .select()
       .single()
 
