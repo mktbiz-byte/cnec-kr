@@ -1860,6 +1860,28 @@ const ApplicationsPage = () => {
                         {app.story_proposal.status === 'revision_requested' && app.story_proposal.admin_note && (
                           <p className="text-xs text-amber-700 mt-1">관리자 메모: {app.story_proposal.admin_note}</p>
                         )}
+
+                        {/* 기획안 내용 */}
+                        <div className="mt-2 pt-2 border-t border-gray-200 space-y-1.5">
+                          {app.story_proposal.video_concept && (
+                            <div>
+                              <span className="text-[10px] text-gray-400 font-medium">컨셉</span>
+                              <p className="text-xs text-gray-800">{app.story_proposal.video_concept}</p>
+                            </div>
+                          )}
+                          {app.story_proposal.tone_mood && (
+                            <div>
+                              <span className="text-[10px] text-gray-400 font-medium">톤/분위기</span>
+                              <p className="text-xs text-gray-800">{app.story_proposal.tone_mood}</p>
+                            </div>
+                          )}
+                          {app.story_proposal.description && (
+                            <div>
+                              <span className="text-[10px] text-gray-400 font-medium">구성 설명</span>
+                              <p className="text-xs text-gray-800">{app.story_proposal.description}</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {/* 스토리 가이드 보기 버튼 */}
