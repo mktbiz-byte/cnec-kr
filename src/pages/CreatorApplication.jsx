@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  ShoppingBag, Coins, Star,
+  ShoppingBag, Coins, Star, Crown,
   Loader2, CheckCircle, AlertCircle,
-  Calendar, Send, Quote
+  Calendar, Send, Quote, Sparkles
 } from 'lucide-react'
 import MeetingCalendar from './MeetingCalendar'
 import cnecLogo from '../assets/cnec-logo-horizontal.png'
@@ -208,13 +208,23 @@ const CreatorApplication = () => {
 
       <div className="max-w-lg mx-auto px-4 py-8 pb-16">
         {/* 히어로 섹션 */}
-        <div className="mb-10 text-center">
-          <h1 className="text-2xl font-bold text-[#1A1A2E] mb-3 leading-snug">
-            크넥이 크리에이터님의<br />활동을 지원해드려요
-          </h1>
-          <p className="text-[#6B7280] leading-relaxed">
-            어떤 지원을 받을 수 있는지, 편하게 알아보세요 :)
-          </p>
+        <div className="mb-10">
+          <div className="bg-gradient-to-br from-[#6C5CE7] to-[#4A3DC0] rounded-2xl p-6 text-white text-center shadow-sm">
+            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Crown className="w-7 h-7 text-yellow-300" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2 leading-snug">
+              크넥이 크리에이터님을<br />만나고 싶어요!
+            </h1>
+            <p className="text-purple-100 leading-relaxed mb-4">
+              상위 크리에이터로 등록되면,<br />
+              더 많은 혜택과 기회가 기다리고 있어요
+            </p>
+            <div className="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-4 py-1.5 text-sm">
+              <Sparkles className="w-4 h-4 text-yellow-300" />
+              <span>지금 미팅 스케줄을 잡아보세요</span>
+            </div>
+          </div>
         </div>
 
         {/* 섹션 2: 혜택 카드 3개 */}
@@ -375,6 +385,19 @@ const CreatorApplication = () => {
             )}
           </div>
 
+          {/* 상위 크리에이터 유도 배너 */}
+          <div className="bg-gradient-to-r from-[#F8F7FF] to-[#F0EDFF] rounded-2xl p-4 border border-[#E4E0FF]">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#6C5CE7] rounded-full flex items-center justify-center flex-shrink-0">
+                <Crown className="w-5 h-5 text-yellow-300" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#1A1A2E]">상위 크리에이터로 등록하고 싶으시다면</p>
+                <p className="text-xs text-[#6B7280]">미팅 한 번이면 충분해요. 부담 없이 신청해 주세요!</p>
+              </div>
+            </div>
+          </div>
+
           {/* 제출 버튼 */}
           <button
             onClick={handleSubmit}
@@ -389,7 +412,7 @@ const CreatorApplication = () => {
             ) : (
               <>
                 <Send className="w-5 h-5" />
-                프로그램 안내 상담 신청
+                미팅 스케줄 잡기
               </>
             )}
           </button>
