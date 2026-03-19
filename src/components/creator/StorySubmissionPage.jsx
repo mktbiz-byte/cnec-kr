@@ -30,10 +30,14 @@ const StorySubmissionPage = () => {
   const [showRevisionModal, setShowRevisionModal] = useState(false)
   const [revisionAgreed, setRevisionAgreed] = useState(false)
 
-  // 업로드 폼
+  // 업로드 폼 (single_story)
   const [screenshotFile, setScreenshotFile] = useState(null)
   const [screenshotPreview, setScreenshotPreview] = useState(null)
   const [cleanVideoFile, setCleanVideoFile] = useState(null)
+
+  // 업로드 폼 (multi_story)
+  const [multiScreenshots, setMultiScreenshots] = useState([]) // [{file, preview}]
+  const [multiImages, setMultiImages] = useState([]) // [{file, preview}]
 
   useEffect(() => {
     if (!user) {
@@ -114,6 +118,54 @@ const StorySubmissionPage = () => {
     setError('')
   }
 
+  const isMultiStory = campaign?.story_type === 'multi_story'
+  const maxMultiFiles = 3
+  const minMultiFiles = 2
+
+  const handleMultiScreenshotSelect = (e) => {
+    const files = Array.from(e.target.files)
+    if (!files.length) return
+
+    const invalid = files.find(f => !f.type.startsWith('image/'))
+    if (invalid) { setError('이미지 파일만 업로드 가능합니다.'); return }
+    const tooLarge = files.find(f => f.size > 20 * 1024 * 1024)
+    if (tooLarge) { setError('이미지 크기는 20MB 이하여야 합니다.'); return }
+
+    const combined = [...multiScreenshots, ...files.map(f => ({ file: f, preview: URL.createObjectURL(f) }))]
+    if (combined.length > maxMultiFiles) {
+      setError(`스크린샷은 최대 ${maxMultiFiles}장까지 업로드 가능합니다.`)
+      return
+    }
+    setMultiScreenshots(combined)
+    setError('')
+  }
+
+  const removeMultiScreenshot = (idx) => {
+    setMultiScreenshots(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  const handleMultiImageSelect = (e) => {
+    const files = Array.from(e.target.files)
+    if (!files.length) return
+
+    const invalid = files.find(f => !f.type.startsWith('image/'))
+    if (invalid) { setError('이미지 파일만 업로드 가능합니다.'); return }
+    const tooLarge = files.find(f => f.size > 20 * 1024 * 1024)
+    if (tooLarge) { setError('이미지 크기는 20MB 이하여야 합니다.'); return }
+
+    const combined = [...multiImages, ...files.map(f => ({ file: f, preview: URL.createObjectURL(f) }))]
+    if (combined.length > maxMultiFiles) {
+      setError(`스토리 카드 이미지는 최대 ${maxMultiFiles}장까지 업로드 가능합니다.`)
+      return
+    }
+    setMultiImages(combined)
+    setError('')
+  }
+
+  const removeMultiImage = (idx) => {
+    setMultiImages(prev => prev.filter((_, i) => i !== idx))
+  }
+
   const uploadFile = async (file, bucket, folder) => {
     const fileExt = file.name.split('.').pop()
     const fileName = `${user.id}_${id}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
@@ -136,13 +188,26 @@ const StorySubmissionPage = () => {
   }
 
   const handleSubmit = async () => {
-    if (!screenshotFile && !existingSubmission?.screenshot_url) {
-      setError('스토리 스크린샷을 업로드해주세요.')
-      return
-    }
-    if (!cleanVideoFile && !existingSubmission?.clean_video_url) {
-      setError('클린본 영상을 업로드해주세요.')
-      return
+    if (isMultiStory) {
+      // multi_story 검증: 사진 2~3개 + 스크린샷 2~3개
+      if (multiImages.length < minMultiFiles) {
+        setError(`스토리 카드 이미지를 ${minMultiFiles}장 이상 업로드해주세요.`)
+        return
+      }
+      if (multiScreenshots.length < minMultiFiles) {
+        setError(`스토리 스크린샷을 ${minMultiFiles}장 이상 업로드해주세요.`)
+        return
+      }
+    } else {
+      // single_story 검증: 영상 1개 + 스크린샷 1개
+      if (!screenshotFile && !existingSubmission?.screenshot_url) {
+        setError('스토리 스크린샷을 업로드해주세요.')
+        return
+      }
+      if (!cleanVideoFile && !existingSubmission?.clean_video_url) {
+        setError('클린본 영상을 업로드해주세요.')
+        return
+      }
     }
 
     // 수정 제출인 경우
@@ -157,21 +222,54 @@ const StorySubmissionPage = () => {
       setUploading(true)
       setError('')
 
-      let screenshotUrl = existingSubmission?.screenshot_url || ''
-      let cleanVideoUrl = existingSubmission?.clean_video_url || ''
-
-      // 스크린샷 업로드
-      if (screenshotFile) {
-        setUploadProgress(prev => ({ ...prev, screenshot: 10 }))
-        screenshotUrl = await uploadFile(screenshotFile, 'campaign-videos', 'story-screenshots')
-        setUploadProgress(prev => ({ ...prev, screenshot: 100 }))
+      let submitBody = {
+        proposal_id: proposal.id,
+        campaign_id: id,
+        user_id: user.id,
+        story_type: campaign?.story_type || 'single_story',
+        is_revision: isRevision,
+        revision_agreed: isRevision ? true : false
       }
 
-      // 클린본 업로드
-      if (cleanVideoFile) {
+      if (isMultiStory) {
+        // multi_story: 이미지 2~3개 + 스크린샷 2~3개 업로드
+        setUploadProgress(prev => ({ ...prev, screenshot: 10 }))
+        const screenshotUrls = []
+        for (const item of multiScreenshots) {
+          const url = await uploadFile(item.file, 'campaign-videos', 'story-screenshots')
+          screenshotUrls.push(url)
+        }
+        setUploadProgress(prev => ({ ...prev, screenshot: 100 }))
+
         setUploadProgress(prev => ({ ...prev, video: 10 }))
-        cleanVideoUrl = await uploadFile(cleanVideoFile, 'campaign-videos', 'story-clean-videos')
+        const imageUrls = []
+        for (const item of multiImages) {
+          const url = await uploadFile(item.file, 'campaign-videos', 'story-cards')
+          imageUrls.push(url)
+        }
         setUploadProgress(prev => ({ ...prev, video: 100 }))
+
+        submitBody.screenshot_urls = screenshotUrls
+        submitBody.media_urls = imageUrls
+      } else {
+        // single_story: 영상 1개 + 스크린샷 1개
+        let screenshotUrl = existingSubmission?.screenshot_url || ''
+        let cleanVideoUrl = existingSubmission?.clean_video_url || ''
+
+        if (screenshotFile) {
+          setUploadProgress(prev => ({ ...prev, screenshot: 10 }))
+          screenshotUrl = await uploadFile(screenshotFile, 'campaign-videos', 'story-screenshots')
+          setUploadProgress(prev => ({ ...prev, screenshot: 100 }))
+        }
+
+        if (cleanVideoFile) {
+          setUploadProgress(prev => ({ ...prev, video: 10 }))
+          cleanVideoUrl = await uploadFile(cleanVideoFile, 'campaign-videos', 'story-clean-videos')
+          setUploadProgress(prev => ({ ...prev, video: 100 }))
+        }
+
+        submitBody.screenshot_url = screenshotUrl
+        submitBody.clean_video_url = cleanVideoUrl
       }
 
       setUploading(false)
@@ -180,15 +278,7 @@ const StorySubmissionPage = () => {
       const res = await fetch('/.netlify/functions/upload-story-result', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          proposal_id: proposal.id,
-          campaign_id: id,
-          user_id: user.id,
-          screenshot_url: screenshotUrl,
-          clean_video_url: cleanVideoUrl,
-          is_revision: isRevision,
-          revision_agreed: isRevision ? true : false
-        })
+        body: JSON.stringify(submitBody)
       })
 
       const data = await res.json()
@@ -426,96 +516,153 @@ const StorySubmissionPage = () => {
           <div className="p-4 space-y-5">
             <h3 className="text-lg font-bold text-gray-900">첨부파일 업로드</h3>
 
-            {/* 스크린샷 */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                스토리 스크린샷 <span className="text-red-500">*</span>
-              </label>
-              <p className="text-xs text-gray-500 mb-2">PNG/JPG 형식</p>
+            {isMultiStory ? (
+              <>
+                {/* multi_story: 스토리 카드 이미지 2~3장 */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    스토리 카드 이미지 ({minMultiFiles}~{maxMultiFiles}장) <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">PNG/JPG 형식, 각 20MB 이하</p>
 
-              {screenshotPreview ? (
-                <div className="relative w-full">
-                  <img
-                    src={screenshotPreview}
-                    alt="스크린샷 미리보기"
-                    className="w-full max-h-60 object-contain rounded-xl border border-gray-200"
-                  />
-                  <button
-                    onClick={() => {
-                      setScreenshotFile(null)
-                      setScreenshotPreview(null)
-                    }}
-                    className="absolute top-2 right-2 p-1 bg-black/50 rounded-full"
-                  >
-                    <X size={16} className="text-white" />
-                  </button>
+                  {multiImages.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mb-2">
+                      {multiImages.map((item, idx) => (
+                        <div key={idx} className="relative">
+                          <img src={item.preview} alt={`카드 ${idx + 1}`}
+                            className="w-full aspect-[9/16] object-cover rounded-lg border border-gray-200" />
+                          <button onClick={() => removeMultiImage(idx)}
+                            className="absolute top-1 right-1 p-0.5 bg-black/50 rounded-full">
+                            <X size={14} className="text-white" />
+                          </button>
+                          <span className="absolute bottom-1 left-1 text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded">
+                            {idx + 1}장
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {multiImages.length < maxMultiFiles && (
+                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 transition-colors">
+                      <Image size={28} className="text-gray-400 mb-1" />
+                      <span className="text-sm text-gray-500">이미지 추가 ({multiImages.length}/{maxMultiFiles})</span>
+                      <input type="file" accept="image/*" multiple onChange={handleMultiImageSelect} className="hidden" />
+                    </label>
+                  )}
                 </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 transition-colors">
-                  <Image size={32} className="text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-500">이미지 업로드</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleScreenshotSelect}
-                    className="hidden"
-                  />
-                </label>
-              )}
 
-              {uploading && uploadProgress.screenshot > 0 && uploadProgress.screenshot < 100 && (
-                <div className="mt-2 bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-rose-500 h-2 rounded-full transition-all"
-                    style={{ width: `${uploadProgress.screenshot}%` }}
-                  />
+                {/* multi_story: 스토리 스크린샷 2~3장 */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    스토리 캡처 스크린샷 ({minMultiFiles}~{maxMultiFiles}장) <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">PNG/JPG 형식, 각 스토리 캡처 1장씩</p>
+
+                  {multiScreenshots.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mb-2">
+                      {multiScreenshots.map((item, idx) => (
+                        <div key={idx} className="relative">
+                          <img src={item.preview} alt={`스크린샷 ${idx + 1}`}
+                            className="w-full aspect-[9/16] object-cover rounded-lg border border-gray-200" />
+                          <button onClick={() => removeMultiScreenshot(idx)}
+                            className="absolute top-1 right-1 p-0.5 bg-black/50 rounded-full">
+                            <X size={14} className="text-white" />
+                          </button>
+                          <span className="absolute bottom-1 left-1 text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded">
+                            {idx + 1}장
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {multiScreenshots.length < maxMultiFiles && (
+                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 transition-colors">
+                      <Image size={28} className="text-gray-400 mb-1" />
+                      <span className="text-sm text-gray-500">스크린샷 추가 ({multiScreenshots.length}/{maxMultiFiles})</span>
+                      <input type="file" accept="image/*" multiple onChange={handleMultiScreenshotSelect} className="hidden" />
+                    </label>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* 클린본 영상 */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                클린본 영상 <span className="text-red-500">*</span>
-              </label>
-              <p className="text-xs text-gray-500 mb-2">MP4 형식, 최대 100MB</p>
-
-              {cleanVideoFile ? (
-                <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 border border-gray-200">
-                  <Video size={24} className="text-rose-500 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{cleanVideoFile.name}</p>
-                    <p className="text-xs text-gray-500">{(cleanVideoFile.size / 1024 / 1024).toFixed(1)}MB</p>
+                {uploading && (uploadProgress.screenshot > 0 || uploadProgress.video > 0) && (
+                  <div className="mt-2 bg-gray-200 rounded-full h-2">
+                    <div className="bg-rose-500 h-2 rounded-full transition-all"
+                      style={{ width: `${Math.max(uploadProgress.screenshot, uploadProgress.video)}%` }} />
                   </div>
-                  <button
-                    onClick={() => setCleanVideoFile(null)}
-                    className="p-1 hover:bg-gray-200 rounded-full flex-shrink-0"
-                  >
-                    <X size={16} className="text-gray-500" />
-                  </button>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 transition-colors">
-                  <Video size={32} className="text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-500">동영상 업로드</span>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleVideoSelect}
-                    className="hidden"
-                  />
-                </label>
-              )}
+                )}
+              </>
+            ) : (
+              <>
+                {/* single_story: 스크린샷 1장 */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    스토리 스크린샷 <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">PNG/JPG 형식</p>
 
-              {uploading && uploadProgress.video > 0 && uploadProgress.video < 100 && (
-                <div className="mt-2 bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-rose-500 h-2 rounded-full transition-all"
-                    style={{ width: `${uploadProgress.video}%` }}
-                  />
+                  {screenshotPreview ? (
+                    <div className="relative w-full">
+                      <img src={screenshotPreview} alt="스크린샷 미리보기"
+                        className="w-full max-h-60 object-contain rounded-xl border border-gray-200" />
+                      <button onClick={() => { setScreenshotFile(null); setScreenshotPreview(null) }}
+                        className="absolute top-2 right-2 p-1 bg-black/50 rounded-full">
+                        <X size={16} className="text-white" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 transition-colors">
+                      <Image size={32} className="text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-500">이미지 업로드</span>
+                      <input type="file" accept="image/*" onChange={handleScreenshotSelect} className="hidden" />
+                    </label>
+                  )}
+
+                  {uploading && uploadProgress.screenshot > 0 && uploadProgress.screenshot < 100 && (
+                    <div className="mt-2 bg-gray-200 rounded-full h-2">
+                      <div className="bg-rose-500 h-2 rounded-full transition-all"
+                        style={{ width: `${uploadProgress.screenshot}%` }} />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+
+                {/* single_story: 클린본 영상 1개 */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    클린본 영상 <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">MP4 형식, 최대 100MB, 10초 이상</p>
+
+                  {cleanVideoFile ? (
+                    <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 border border-gray-200">
+                      <Video size={24} className="text-rose-500 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{cleanVideoFile.name}</p>
+                        <p className="text-xs text-gray-500">{(cleanVideoFile.size / 1024 / 1024).toFixed(1)}MB</p>
+                      </div>
+                      <button onClick={() => setCleanVideoFile(null)}
+                        className="p-1 hover:bg-gray-200 rounded-full flex-shrink-0">
+                        <X size={16} className="text-gray-500" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 transition-colors">
+                      <Video size={32} className="text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-500">동영상 업로드</span>
+                      <input type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
+                    </label>
+                  )}
+
+                  {uploading && uploadProgress.video > 0 && uploadProgress.video < 100 && (
+                    <div className="mt-2 bg-gray-200 rounded-full h-2">
+                      <div className="bg-rose-500 h-2 rounded-full transition-all"
+                        style={{ width: `${uploadProgress.video}%` }} />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
 
             {/* 안내 */}
             <div className="bg-gray-50 rounded-xl p-3 text-xs text-gray-500">
