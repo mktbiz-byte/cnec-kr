@@ -12,6 +12,7 @@ import {
   Crown, Sparkles, BookOpen, ShieldAlert, AlertTriangle, Lock
 } from 'lucide-react'
 import CampaignPolicyModal from './CampaignPolicyModal'
+import ExternalGuideViewer from '../common/ExternalGuideViewer'
 
 // 등급 설정
 const GRADE_CONFIG = {
@@ -668,7 +669,14 @@ const CreatorMyPage = () => {
     // 기획형 캠페인
     if (campaign.campaign_type === 'planned') {
       if (campaign.guide_delivery_mode === 'external' && (campaign.external_guide_url || campaign.external_guide_file_url)) {
-        return { type: 'planned_external' }
+        return {
+          type: 'planned_external',
+          guideType: campaign.external_guide_type,
+          guideUrl: campaign.external_guide_url,
+          fileUrl: campaign.external_guide_file_url,
+          title: campaign.external_guide_title,
+          fileName: campaign.external_guide_file_name,
+        }
       }
       if (app.personalized_guide) {
         return { type: 'planned_personalized' }
@@ -698,7 +706,14 @@ const CreatorMyPage = () => {
 
     // 일반 캠페인 외부 가이드 (planned가 아닌 경우에도 외부 가이드 지원)
     if (campaign.guide_delivery_mode === 'external' && (campaign.external_guide_url || campaign.external_guide_file_url)) {
-      return { type: 'general_external' }
+      return {
+        type: 'general_external',
+        guideType: campaign.external_guide_type,
+        guideUrl: campaign.external_guide_url,
+        fileUrl: campaign.external_guide_file_url,
+        title: campaign.external_guide_title,
+        fileName: campaign.external_guide_file_name,
+      }
     }
 
     // 일반 캠페인 AI 가이드
@@ -1237,8 +1252,25 @@ const CreatorMyPage = () => {
                         <p className="font-bold text-gray-900">{formatCurrency(app.campaigns?.creator_points_override || app.campaigns?.reward_points)}</p>
                       </div>
                     </div>
-                    {/* 촬영 가이드 버튼 - 선정 이후 상태에서 가이드가 있는 경우 표시 */}
-                    {guideInfo && (
+                    {/* 촬영 가이드 - 선정 이후 상태에서 가이드가 있는 경우 표시 */}
+                    {guideInfo && (guideInfo.type === 'planned_external' || guideInfo.type === 'general_external') && (
+                      <div className="mt-3">
+                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-purple-600" />
+                            <span className="text-xs font-semibold text-purple-900">촬영 가이드가 전달되었습니다</span>
+                          </div>
+                          <ExternalGuideViewer
+                            guideType={guideInfo.guideType}
+                            guideUrl={guideInfo.guideUrl}
+                            fileUrl={guideInfo.fileUrl}
+                            title={guideInfo.title}
+                            fileName={guideInfo.fileName}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {guideInfo && guideInfo.type !== 'planned_external' && guideInfo.type !== 'general_external' && (
                       <div className="mt-3">
                         <button
                           onClick={() => navigate('/my/applications')}
