@@ -114,6 +114,8 @@ const CampaignDetailPage = () => {
       case '4week_challenge': return '4주챌린지'
       case 'planned': return '기획형'
       case 'story_short': return '스토리 숏폼'
+      case 'threads_post': return '스레드'
+      case 'x_post': return 'X 포스트'
       default: return '기획형'
     }
   }
@@ -124,6 +126,8 @@ const CampaignDetailPage = () => {
       case '4week_challenge': return 'bg-violet-500 text-white'
       case 'planned': return 'bg-blue-500 text-white'
       case 'story_short': return 'bg-rose-500 text-white'
+      case 'threads_post': return 'bg-orange-500 text-white'
+      case 'x_post': return 'bg-gray-800 text-white'
       default: return 'bg-blue-500 text-white'
     }
   }
@@ -495,6 +499,104 @@ const CampaignDetailPage = () => {
             </div>
           )}
 
+          {/* 슬라이드별 콘텐츠 가이드 (스토리 보강) */}
+          {campaign.story_content_guide && (
+            <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+              <h4 className="font-bold text-amber-900 mb-3 text-sm flex items-center gap-1.5">
+                <Sparkles size={14} className="text-amber-600" />
+                슬라이드별 콘텐츠 가이드
+              </h4>
+              <div className="space-y-2.5">
+                {campaign.story_content_guide.slide_1_hook && (
+                  <div>
+                    <span className="text-xs font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">슬라이드 1 — Hook</span>
+                    <p className="text-sm text-amber-800 mt-1">{campaign.story_content_guide.slide_1_hook}</p>
+                  </div>
+                )}
+                {campaign.story_content_guide.slide_2_3_info && (
+                  <div>
+                    <span className="text-xs font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">슬라이드 2~3 — 정보</span>
+                    <p className="text-sm text-amber-800 mt-1">{campaign.story_content_guide.slide_2_3_info}</p>
+                  </div>
+                )}
+                {campaign.story_content_guide.slide_4_6_usage && (
+                  <div>
+                    <span className="text-xs font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">슬라이드 4~6 — 사용 과정</span>
+                    <p className="text-sm text-amber-800 mt-1">{campaign.story_content_guide.slide_4_6_usage}</p>
+                  </div>
+                )}
+                {campaign.story_content_guide.slide_7_8_interactive && (
+                  <div>
+                    <span className="text-xs font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">슬라이드 7~8 — 인터랙티브</span>
+                    <p className="text-sm text-amber-800 mt-1">{campaign.story_content_guide.slide_7_8_interactive}</p>
+                  </div>
+                )}
+                {campaign.story_content_guide.slide_9_10_cta && (
+                  <div>
+                    <span className="text-xs font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">슬라이드 9~10 — CTA</span>
+                    <p className="text-sm text-amber-800 mt-1">{campaign.story_content_guide.slide_9_10_cta}</p>
+                  </div>
+                )}
+                {campaign.story_content_guide.interactive_type && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-xs font-bold text-amber-700">필수 인터랙티브:</span>
+                    <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium">
+                      {campaign.story_content_guide.interactive_type === 'poll' ? '투표' :
+                       campaign.story_content_guide.interactive_type === 'quiz' ? '퀴즈' :
+                       campaign.story_content_guide.interactive_type === 'question' ? '질문' :
+                       campaign.story_content_guide.interactive_type === 'countdown' ? '카운트다운' :
+                       campaign.story_content_guide.interactive_type}
+                    </span>
+                  </div>
+                )}
+                {campaign.story_content_guide.recommended_slides && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-amber-700">권장 슬라이드:</span>
+                    <span className="text-sm text-amber-800">{campaign.story_content_guide.recommended_slides}개</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 크넥샵 연결 정보 */}
+          {(campaign.cnec_shop_utm_link || campaign.story_content_guide?.cnec_shop_link) && (
+            <div className="bg-green-50 rounded-2xl p-4 border border-green-100">
+              <h4 className="font-bold text-green-900 mb-2 text-sm flex items-center gap-1.5">
+                <ShoppingBag size={14} className="text-green-600" />
+                크넥샵 연결
+              </h4>
+              {campaign.story_content_guide?.cnec_shop_link && (
+                <p className="text-sm text-green-800 break-all">
+                  제품 링크: {campaign.story_content_guide.cnec_shop_link}
+                </p>
+              )}
+              {campaign.story_content_guide?.discount_code && (
+                <p className="text-sm text-green-800 mt-1">
+                  할인 코드: <span className="font-bold">{campaign.story_content_guide.discount_code}</span>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* 참고 콘텐츠 (레퍼런스 URL) */}
+          {campaign.reference_urls && Array.isArray(campaign.reference_urls) && campaign.reference_urls.length > 0 && (
+            <div className="bg-indigo-50 rounded-2xl p-4 border border-indigo-100">
+              <h4 className="font-bold text-indigo-900 mb-2 text-sm flex items-center gap-1.5">
+                <ExternalLink size={14} className="text-indigo-600" />
+                참고 콘텐츠
+              </h4>
+              <div className="space-y-1.5">
+                {campaign.reference_urls.map((url, idx) => (
+                  <a key={idx} href={url} target="_blank" rel="noopener noreferrer"
+                     className="block text-sm text-indigo-700 underline break-all hover:text-indigo-900">
+                    {url}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* 캠페인 설명 */}
           {campaign.description && (
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
@@ -851,6 +953,107 @@ const CampaignDetailPage = () => {
                 <p className="text-sm text-blue-800 leading-relaxed whitespace-pre-line">
                   {campaign.requirements}
                 </p>
+              </div>
+            </div>
+            <div className="h-2 bg-gray-100" />
+          </>
+        )}
+
+        {/* 텍스트 콘텐츠 가이드 (스레드/X 캠페인) */}
+        {(campaign.campaign_type === 'threads_post' || campaign.campaign_type === 'x_post') && campaign.text_content_guide && (
+          <>
+            <div className="p-4">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Sparkles size={18} className="text-orange-500" />
+                텍스트 콘텐츠 가이드
+              </h3>
+              <div className="space-y-3">
+                {campaign.text_content_guide.hook && (
+                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                    <span className="text-xs font-bold text-orange-700 bg-orange-100 px-2 py-0.5 rounded">Step 1 — 관심 유도 (Hook)</span>
+                    <p className="text-sm text-orange-800 mt-2 leading-relaxed">{campaign.text_content_guide.hook}</p>
+                  </div>
+                )}
+                {campaign.text_content_guide.value && (
+                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                    <span className="text-xs font-bold text-orange-700 bg-orange-100 px-2 py-0.5 rounded">Step 2 — 신뢰 구축 (Value)</span>
+                    <p className="text-sm text-orange-800 mt-2 leading-relaxed">{campaign.text_content_guide.value}</p>
+                  </div>
+                )}
+                {campaign.text_content_guide.offer && (
+                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                    <span className="text-xs font-bold text-orange-700 bg-orange-100 px-2 py-0.5 rounded">Step 3 — 전환 유도 (Offer)</span>
+                    <p className="text-sm text-orange-800 mt-2 leading-relaxed">{campaign.text_content_guide.offer}</p>
+                  </div>
+                )}
+                {campaign.text_content_guide.tone && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs font-bold text-gray-600">톤앤매너:</span>
+                    <span className="text-sm text-gray-800">{campaign.text_content_guide.tone}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* 필수 포함사항 */}
+              {campaign.text_content_guide.required_elements && (
+                <div className="mt-3 bg-blue-50 rounded-xl p-4 border border-blue-100">
+                  <h4 className="font-bold text-blue-900 mb-2 text-sm flex items-center gap-1.5">
+                    <Info size={14} className="text-blue-600" />
+                    필수 포함사항
+                  </h4>
+                  <div className="space-y-1.5">
+                    {campaign.text_content_guide.required_elements.map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <CheckCircle size={14} className="text-blue-500" />
+                        <span className="text-sm text-blue-800">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 광고 표시 */}
+              {campaign.text_content_guide.ad_disclosure && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs font-bold text-red-600">광고 표시:</span>
+                  <span className="text-sm font-bold text-red-700">{campaign.text_content_guide.ad_disclosure}</span>
+                </div>
+              )}
+
+              {/* 금지사항 */}
+              {campaign.text_content_guide.restrictions && campaign.text_content_guide.restrictions.length > 0 && (
+                <div className="mt-3 bg-red-50 rounded-xl p-4 border border-red-100">
+                  <h4 className="font-bold text-red-900 mb-2 text-sm flex items-center gap-1.5">
+                    <Ban size={14} className="text-red-600" />
+                    금지사항
+                  </h4>
+                  <div className="space-y-1">
+                    {campaign.text_content_guide.restrictions.map((item, idx) => (
+                      <p key={idx} className="text-sm text-red-800">• {item}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="h-2 bg-gray-100" />
+          </>
+        )}
+
+        {/* 참고 콘텐츠 (레퍼런스 URL) — 일반 캠페인 */}
+        {campaign.reference_urls && Array.isArray(campaign.reference_urls) && campaign.reference_urls.length > 0 && campaign.campaign_type !== 'story_short' && (
+          <>
+            <div className="p-4">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <ExternalLink size={18} className="text-indigo-500" />
+                참고 콘텐츠
+              </h3>
+              <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100 space-y-1.5">
+                {campaign.reference_urls.map((url, idx) => (
+                  <a key={idx} href={url} target="_blank" rel="noopener noreferrer"
+                     className="block text-sm text-indigo-700 underline break-all hover:text-indigo-900">
+                    {url}
+                  </a>
+                ))}
               </div>
             </div>
             <div className="h-2 bg-gray-100" />

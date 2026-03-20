@@ -27,6 +27,7 @@ import CampaignDetailPage from './components/creator/CampaignDetailPage';
 import CampaignApplyPage from './components/creator/CampaignApplyPage';
 import StoryApplyPage from './components/creator/StoryApplyPage';
 import StorySubmissionPage from './components/creator/StorySubmissionPage';
+import TextPostSubmitPage from './components/creator/TextPostSubmitPage';
 import CreatorApplicationPage from './components/creator/CreatorApplicationPage';
 import CreatorApplication from './pages/CreatorApplication';
 
@@ -101,6 +102,7 @@ const AppContent = () => {
         <Route path="/campaign/:id/apply" element={<CampaignApplyPage />} />
         <Route path="/campaign/:id/apply-story" element={<StoryApplyPage />} />
         <Route path="/campaign/:id/submit-story" element={<StorySubmissionPage />} />
+        <Route path="/campaign/:id/submit-text-post" element={<TextPostSubmitPage />} />
         <Route path="/my/grade" element={<GradeDetailPage />} />
         <Route path="/my/points" element={<PointsPage />} />
         <Route path="/my/applications" element={<ApplicationsPage />} />

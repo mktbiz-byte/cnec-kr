@@ -28,10 +28,24 @@ const StoryApplyPage = () => {
     tone_mood: '',
     description: '',
     secondary_use_agreed: false,
-    no_edit_policy_agreed: true
+    no_edit_policy_agreed: true,
+    slide_plan: {
+      slide_1_hook: '',
+      slide_2_3_info: '',
+      slide_4_6_usage: '',
+      slide_7_8_interactive: '',
+      slide_9_10_cta: ''
+    },
+    interactive_element: ''
   })
 
   const toneMoods = ['밝은', '청량한', '친근한', '고급스러운', '감성적인', '에너지틱', '차분한']
+  const interactiveTypes = [
+    { value: 'poll', label: '투표' },
+    { value: 'quiz', label: '퀴즈' },
+    { value: 'question', label: '질문' },
+    { value: 'countdown', label: '카운트다운' }
+  ]
 
   useEffect(() => {
     if (!user) {
@@ -59,6 +73,22 @@ const StoryApplyPage = () => {
         return
       }
       setCampaign(campaignData)
+
+      // story_content_guide가 있으면 slide_plan 기본값으로 미리 채움
+      if (campaignData.story_content_guide) {
+        const guide = campaignData.story_content_guide
+        setFormData(prev => ({
+          ...prev,
+          slide_plan: {
+            slide_1_hook: guide.slide_1_hook || '',
+            slide_2_3_info: guide.slide_2_3_info || '',
+            slide_4_6_usage: guide.slide_4_6_usage || '',
+            slide_7_8_interactive: guide.slide_7_8_interactive || '',
+            slide_9_10_cta: guide.slide_9_10_cta || ''
+          },
+          interactive_element: guide.interactive_type || ''
+        }))
+      }
 
       // 프로필 조회
       const profile = await database.userProfiles.get(user.id)
@@ -103,6 +133,9 @@ const StoryApplyPage = () => {
       setSubmitting(true)
       setError('')
 
+      // slide_plan에 내용이 있는지 확인
+      const hasSlideContent = Object.values(formData.slide_plan).some(v => v.trim())
+
       const res = await fetch('/.netlify/functions/apply-story-campaign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,7 +147,9 @@ const StoryApplyPage = () => {
           tone_mood: formData.tone_mood,
           description: formData.description,
           secondary_use_agreed: formData.secondary_use_agreed,
-          no_edit_policy_agreed: formData.no_edit_policy_agreed
+          no_edit_policy_agreed: formData.no_edit_policy_agreed,
+          slide_plan: hasSlideContent ? formData.slide_plan : null,
+          interactive_element: formData.interactive_element || null
         })
       })
 
@@ -425,6 +460,122 @@ const StoryApplyPage = () => {
                 rows={4}
               />
             </div>
+
+            {/* 슬라이드별 구성 계획 (스토리 보강) */}
+            {campaign?.story_content_guide && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-bold text-gray-900">슬라이드별 구성 계획</h4>
+                  <span className="text-xs text-gray-500">(캠페인 가이드 참고)</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">
+                    슬라이드 1 — Hook (결과 먼저!)
+                  </label>
+                  <textarea
+                    value={formData.slide_plan.slide_1_hook}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      slide_plan: { ...prev.slide_plan, slide_1_hook: e.target.value }
+                    }))}
+                    placeholder="비포앤애프터 결과 먼저 보여주기"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    rows={2}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">
+                    슬라이드 2~3 — 제품 정보
+                  </label>
+                  <textarea
+                    value={formData.slide_plan.slide_2_3_info}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      slide_plan: { ...prev.slide_plan, slide_2_3_info: e.target.value }
+                    }))}
+                    placeholder="제품 클로즈업 + 핵심 성분 설명"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    rows={2}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">
+                    슬라이드 4~6 — 사용 과정
+                  </label>
+                  <textarea
+                    value={formData.slide_plan.slide_4_6_usage}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      slide_plan: { ...prev.slide_plan, slide_4_6_usage: e.target.value }
+                    }))}
+                    placeholder="사용 과정 리얼 영상. 단점도 솔직하게"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    rows={2}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">
+                    슬라이드 7~8 — 인터랙티브
+                  </label>
+                  <textarea
+                    value={formData.slide_plan.slide_7_8_interactive}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      slide_plan: { ...prev.slide_plan, slide_7_8_interactive: e.target.value }
+                    }))}
+                    placeholder="인터랙티브 스티커 활용 계획"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    rows={2}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1">
+                    슬라이드 9~10 — CTA
+                  </label>
+                  <textarea
+                    value={formData.slide_plan.slide_9_10_cta}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      slide_plan: { ...prev.slide_plan, slide_9_10_cta: e.target.value }
+                    }))}
+                    placeholder="링크 스티커 → 크넥샵. 할인 코드 배치"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    rows={2}
+                  />
+                </div>
+
+                {/* 인터랙티브 스티커 유형 선택 */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    인터랙티브 스티커 유형
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {interactiveTypes.map(({ value, label }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setFormData(prev => ({
+                          ...prev,
+                          interactive_element: prev.interactive_element === value ? '' : value
+                        }))}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                          formData.interactive_element === value
+                            ? 'bg-rose-500 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 동의 체크박스 */}
             <div className="space-y-3 pt-2">

@@ -39,6 +39,13 @@ const StorySubmissionPage = () => {
   const [multiScreenshots, setMultiScreenshots] = useState([]) // [{file, preview}]
   const [multiImages, setMultiImages] = useState([]) // [{file, preview}]
 
+  // 스토리 보강 필드
+  const [slideCount, setSlideCount] = useState(0)
+  const [hasInteractiveSticker, setHasInteractiveSticker] = useState(false)
+  const [stickerScreenshotFile, setStickerScreenshotFile] = useState(null)
+  const [stickerScreenshotPreview, setStickerScreenshotPreview] = useState(null)
+  const [hasLinkSticker, setHasLinkSticker] = useState(false)
+
   useEffect(() => {
     if (!user) {
       navigate('/login', { state: { from: `/campaign/${id}/submit-story` } })
@@ -270,6 +277,23 @@ const StorySubmissionPage = () => {
 
         submitBody.screenshot_url = screenshotUrl
         submitBody.clean_video_url = cleanVideoUrl
+      }
+
+      // 스토리 보강 필드 추가
+      if (slideCount > 0) submitBody.slide_count = slideCount
+      submitBody.has_interactive_sticker = hasInteractiveSticker
+      if (hasInteractiveSticker && proposal?.interactive_element) {
+        submitBody.interactive_type = proposal.interactive_element
+      }
+      submitBody.has_link_sticker = hasLinkSticker
+      if (hasLinkSticker && campaign?.cnec_shop_utm_link) {
+        submitBody.link_sticker_url = campaign.cnec_shop_utm_link
+      }
+
+      // 인터랙티브 스티커 스크린샷 업로드
+      if (stickerScreenshotFile) {
+        const stickerUrl = await uploadFile(stickerScreenshotFile, 'campaign-videos', 'story-sticker-screenshots')
+        submitBody.sticker_screenshot_url = stickerUrl
       }
 
       setUploading(false)
@@ -662,6 +686,126 @@ const StorySubmissionPage = () => {
                   )}
                 </div>
               </>
+            )}
+
+            {/* 스토리 보강 필드 */}
+            {campaign?.story_content_guide && (
+              <div className="space-y-4 pt-2 border-t border-gray-100">
+                <h4 className="text-sm font-bold text-gray-900 pt-2">추가 정보</h4>
+
+                {/* 슬라이드 수 */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                    슬라이드 수
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={slideCount || ''}
+                    onChange={(e) => setSlideCount(parseInt(e.target.value) || 0)}
+                    placeholder="슬라이드 개수를 입력해주세요"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* 인터랙티브 스티커 */}
+                <div>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={hasInteractiveSticker}
+                      onChange={(e) => setHasInteractiveSticker(e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-rose-600 focus:ring-rose-500 flex-shrink-0"
+                    />
+                    <span className="text-sm font-medium text-gray-900">
+                      인터랙티브 스티커 포함 (투표/퀴즈/질문)
+                    </span>
+                  </label>
+
+                  {hasInteractiveSticker && (
+                    <div className="mt-3 ml-8">
+                      {proposal?.interactive_element && (
+                        <p className="text-xs text-rose-600 mb-2">
+                          선택한 유형: <span className="font-bold">
+                            {proposal.interactive_element === 'poll' ? '투표' :
+                             proposal.interactive_element === 'quiz' ? '퀴즈' :
+                             proposal.interactive_element === 'question' ? '질문' :
+                             proposal.interactive_element === 'countdown' ? '카운트다운' :
+                             proposal.interactive_element}
+                          </span>
+                        </p>
+                      )}
+                      <label className="block text-xs font-bold text-gray-600 mb-1.5">
+                        스티커 결과 스크린샷
+                      </label>
+                      {stickerScreenshotPreview ? (
+                        <div className="relative">
+                          <img src={stickerScreenshotPreview} alt="스티커 스크린샷"
+                               className="w-full max-h-40 object-contain rounded-xl border border-gray-200" />
+                          <button
+                            onClick={() => { setStickerScreenshotFile(null); setStickerScreenshotPreview(null) }}
+                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 hover:bg-rose-50 transition-colors">
+                          <Upload size={24} className="text-gray-400 mb-1" />
+                          <p className="text-xs text-gray-500">스티커 결과 캡처 업로드</p>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files[0]
+                              if (!file) return
+                              if (file.size > 20 * 1024 * 1024) { setError('20MB 이하만 가능'); return }
+                              setStickerScreenshotFile(file)
+                              setStickerScreenshotPreview(URL.createObjectURL(file))
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* 링크 스티커 */}
+                <div>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={hasLinkSticker}
+                      onChange={(e) => setHasLinkSticker(e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-rose-600 focus:ring-rose-500 flex-shrink-0"
+                    />
+                    <span className="text-sm font-medium text-gray-900">
+                      링크 스티커 포함 (크넥샵 연결)
+                    </span>
+                  </label>
+                  {hasLinkSticker && campaign?.cnec_shop_utm_link && (
+                    <div className="mt-2 ml-8 bg-green-50 rounded-lg p-2.5">
+                      <p className="text-xs text-green-700 break-all">
+                        링크: {campaign.cnec_shop_utm_link}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* 브랜드 태그 */}
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 rounded border-gray-300 text-rose-600 focus:ring-rose-500 flex-shrink-0"
+                    defaultChecked
+                  />
+                  <span className="text-sm font-medium text-gray-900">
+                    브랜드 태그 포함
+                  </span>
+                </label>
+              </div>
             )}
 
             {/* 안내 */}

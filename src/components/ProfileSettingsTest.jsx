@@ -339,6 +339,7 @@ const ProfileSettingsTest = () => {
     name: '', email: '', phone: '', age: '', bio: '', profile_image: '',
     postcode: '', address: '', detail_address: '',
     instagram_url: '', youtube_url: '', tiktok_url: '', blog_url: '',
+    threads_username: '', x_username: '',
     instagram_followers: '', youtube_subscribers: '', tiktok_followers: '',
     channel_name: '', followers: '', avg_views: '', target_audience: ''
   })
@@ -610,6 +611,7 @@ const ProfileSettingsTest = () => {
           detail_address: data.detail_address || '',
           instagram_url: data.instagram_url || '', youtube_url: data.youtube_url || '',
           tiktok_url: data.tiktok_url || '', blog_url: data.blog_url || '',
+          threads_username: data.threads_username || '', x_username: data.x_username || '',
           instagram_followers: data.instagram_followers != null ? String(data.instagram_followers) : '',
           youtube_subscribers: data.youtube_subscribers != null ? String(data.youtube_subscribers) : '',
           tiktok_followers: data.tiktok_followers != null ? String(data.tiktok_followers) : '',
@@ -708,6 +710,8 @@ const ProfileSettingsTest = () => {
         youtube_url: profile.youtube_url?.trim() || null,
         tiktok_url: profile.tiktok_url?.trim() || null,
         blog_url: profile.blog_url?.trim() || null,
+        threads_username: profile.threads_username?.trim() || null,
+        x_username: profile.x_username?.trim() || null,
         instagram_followers: profile.instagram_followers ? parseInt(profile.instagram_followers) : null,
         youtube_subscribers: profile.youtube_subscribers ? parseInt(profile.youtube_subscribers) : null,
         tiktok_followers: profile.tiktok_followers ? parseInt(profile.tiktok_followers) : null,
@@ -762,6 +766,24 @@ const ProfileSettingsTest = () => {
       console.log('[DEBUG] 저장할 age 값:', profileData.age)
 
       await database.userProfiles.upsert(profileData)
+
+      // BIZ DB featured_creators에 threads/x username 업데이트
+      if (profile.threads_username || profile.x_username) {
+        try {
+          await fetch('/.netlify/functions/update-creator-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: user.id,
+              threads_username: profile.threads_username?.trim() || null,
+              x_username: profile.x_username?.trim() || null
+            })
+          })
+        } catch (bizErr) {
+          console.error('BIZ 프로필 업데이트 오류:', bizErr)
+        }
+      }
+
       if (!silent) {
         setSuccess('프로필이 저장되었습니다!')
         setTimeout(() => setSuccess(''), 3000)
@@ -1348,6 +1370,38 @@ const ProfileSettingsTest = () => {
                     onChange={(e) => setProfile(prev => ({ ...prev, tiktok_followers: e.target.value }))}
                     className="col-span-2 px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
                     placeholder="팔로워"
+                  />
+                </div>
+              </div>
+
+              {/* 스레드 */}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-orange-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-lg">@</span>
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={profile.threads_username}
+                    onChange={(e) => setProfile(prev => ({ ...prev, threads_username: e.target.value }))}
+                    className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
+                    placeholder="스레드 @username"
+                  />
+                </div>
+              </div>
+
+              {/* X (구 트위터) */}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-lg">X</span>
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={profile.x_username}
+                    onChange={(e) => setProfile(prev => ({ ...prev, x_username: e.target.value }))}
+                    className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 border-2 border-transparent"
+                    placeholder="X @username"
                   />
                 </div>
               </div>
