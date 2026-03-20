@@ -32,7 +32,13 @@ exports.handler = async (event) => {
       media_urls,
       story_type,
       is_revision,
-      revision_agreed
+      revision_agreed,
+      slide_count,
+      has_interactive_sticker,
+      interactive_type,
+      sticker_screenshot_url,
+      has_link_sticker,
+      link_sticker_url
     } = body
 
     const isMultiStory = story_type === 'multi_story'
@@ -139,6 +145,14 @@ exports.handler = async (event) => {
       insertData.screenshot_url = screenshot_url
       insertData.clean_video_url = clean_video_url
     }
+
+    // 스토리 보강 필드
+    if (slide_count !== undefined) insertData.slide_count = slide_count
+    if (has_interactive_sticker !== undefined) insertData.has_interactive_sticker = has_interactive_sticker
+    if (interactive_type) insertData.interactive_type = interactive_type
+    if (sticker_screenshot_url) insertData.sticker_screenshot_url = sticker_screenshot_url
+    if (has_link_sticker !== undefined) insertData.has_link_sticker = has_link_sticker
+    if (link_sticker_url) insertData.link_sticker_url = link_sticker_url
 
     const { data: submission, error: insertError } = await supabaseBiz
       .from('story_submissions')

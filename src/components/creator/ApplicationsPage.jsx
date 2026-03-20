@@ -905,6 +905,30 @@ const ApplicationsPage = () => {
         console.error('스토리 상태 로드 오류:', storyErr)
       }
 
+      // 스레드/X 텍스트 제출물 상태 로드 (BIZ DB)
+      try {
+        const textRes = await fetch(`/.netlify/functions/get-my-text-status?user_id=${user.id}`)
+        const textData = await textRes.json()
+        if (textData.success && textData.submissions) {
+          const textMap = {}
+          textData.submissions.forEach(s => {
+            if (!textMap[s.campaign_id]) textMap[s.campaign_id] = s
+          })
+
+          applicationsData = applicationsData.map(app => {
+            if (app.campaigns?.campaign_type === 'threads_post' || app.campaigns?.campaign_type === 'x_post') {
+              return {
+                ...app,
+                text_submission: textMap[app.campaign_id] || null
+              }
+            }
+            return app
+          })
+        }
+      } catch (textErr) {
+        console.error('텍스트 제출물 상태 로드 오류:', textErr)
+      }
+
       setApplications(applicationsData)
 
       // 카운트 계산
@@ -1937,8 +1961,55 @@ const ApplicationsPage = () => {
                     </div>
                   )}
 
+                  {/* 스레드/X 포스트 제출 상태 */}
+                  {(app.campaigns?.campaign_type === 'threads_post' || app.campaigns?.campaign_type === 'x_post') && ['approved', 'selected', 'virtual_selected'].includes(app.status) && (
+                    <div className="mt-3 space-y-2">
+                      {app.text_submission ? (
+                        <div className={`rounded-xl p-3 border ${
+                          app.text_submission.status === 'approved' ? 'bg-green-50 border-green-200' :
+                          app.text_submission.status === 'rejected' ? 'bg-red-50 border-red-200' :
+                          app.text_submission.status === 'revision_requested' ? 'bg-amber-50 border-amber-200' :
+                          'bg-blue-50 border-blue-200'
+                        }`}>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 size={14} className={
+                              app.text_submission.status === 'approved' ? 'text-green-600' :
+                              app.text_submission.status === 'rejected' ? 'text-red-600' :
+                              'text-blue-600'
+                            } />
+                            <span className="text-xs font-semibold text-gray-700">
+                              {app.campaigns?.campaign_type === 'threads_post' ? '스레드' : 'X'} 포스트 제출됨
+                            </span>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ml-auto ${
+                              app.text_submission.status === 'approved' ? 'bg-green-100 text-green-700' :
+                              app.text_submission.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                              app.text_submission.status === 'revision_requested' ? 'bg-amber-100 text-amber-700' :
+                              'bg-blue-100 text-blue-700'
+                            }`}>
+                              {app.text_submission.status === 'pending' && '검수 중'}
+                              {app.text_submission.status === 'approved' && '승인됨'}
+                              {app.text_submission.status === 'rejected' && '반려됨'}
+                              {app.text_submission.status === 'revision_requested' && '수정 요청'}
+                            </span>
+                          </div>
+                          {app.text_submission.status === 'rejected' && app.text_submission.admin_note && (
+                            <p className="text-xs text-red-700 mt-1.5">반려 사유: {app.text_submission.admin_note}</p>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => navigate(`/campaign/${app.campaign_id}/submit-text-post`)}
+                          className="w-full py-2.5 bg-orange-600 text-white rounded-lg text-xs font-bold hover:bg-orange-700 flex items-center justify-center gap-1"
+                        >
+                          <Upload size={12} />
+                          {app.campaigns?.campaign_type === 'threads_post' ? '스레드' : 'X'} 포스트 제출하기
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   {/* SNS 업로드 전 확인 경고 배너 - 선정~진행중 상태 (스토리 숏폼 제외) */}
-                  {app.campaigns?.campaign_type !== 'story_short' && ['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
+                  {app.campaigns?.campaign_type !== 'story_short' && app.campaigns?.campaign_type !== 'threads_post' && app.campaigns?.campaign_type !== 'x_post' && ['approved', 'selected', 'virtual_selected', 'filming', 'video_submitted'].includes(app.status) && (
                     <div className="mt-3 bg-amber-50 border border-amber-300 rounded-xl p-3">
                       <div className="flex items-start gap-2">
                         <AlertTriangle size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />

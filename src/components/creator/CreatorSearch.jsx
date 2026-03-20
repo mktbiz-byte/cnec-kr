@@ -39,7 +39,9 @@ const CreatorSearch = ({ onCampaignClick }) => {
     { id: 'planned', label: '기획형' },
     { id: 'oliveyoung', label: '올영세일' },
     { id: '4week_challenge', label: '4주챌린지' },
-    { id: 'story_short', label: '스토리숏폼' }
+    { id: 'story_short', label: '스토리숏폼' },
+    { id: 'threads_post', label: '스레드' },
+    { id: 'x_post', label: 'X 포스트' }
   ]
 
   // 찜목록 로드
@@ -276,6 +278,8 @@ const CreatorSearch = ({ onCampaignClick }) => {
       case 'planned': return '기획형'
       case 'jasaMall': return '자사몰'
       case 'story_short': return '스토리 숏폼'
+      case 'threads_post': return '스레드'
+      case 'x_post': return 'X 포스트'
       default: return '기획형'
     }
   }
@@ -287,6 +291,8 @@ const CreatorSearch = ({ onCampaignClick }) => {
       case 'planned': return 'bg-blue-500 text-white'
       case 'jasaMall': return 'bg-cyan-500 text-white'
       case 'story_short': return 'bg-rose-500 text-white'
+      case 'threads_post': return 'bg-orange-500 text-white'
+      case 'x_post': return 'bg-gray-800 text-white'
       default: return 'bg-blue-500 text-white'
     }
   }

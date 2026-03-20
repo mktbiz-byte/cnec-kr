@@ -25,18 +25,19 @@ exports.handler = async (event) => {
     const {
       campaign_id,
       user_id,
-      creator_name,
-      video_concept,
-      tone_mood,
-      description,
-      secondary_use_agreed,
-      no_edit_policy_agreed,
-      slide_plan,
-      interactive_element
+      platform,
+      post_url,
+      post_text,
+      screenshot_url,
+      has_product_image,
+      has_brand_tag,
+      has_ad_disclosure,
+      has_profile_link,
+      posted_at
     } = body
 
     // 필수 필드 검증
-    if (!campaign_id || !user_id || !video_concept || !description) {
+    if (!campaign_id || !user_id || !post_url || !platform) {
       return {
         statusCode: 400,
         headers,
@@ -44,12 +45,12 @@ exports.handler = async (event) => {
       }
     }
 
-    // 2차 활용 동의 필수 검증
-    if (!secondary_use_agreed) {
+    // 플랫폼 검증
+    if (!['threads', 'x'].includes(platform)) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: '2차 활용 동의가 필요합니다.' })
+        body: JSON.stringify({ success: false, error: '유효하지 않은 플랫폼입니다.' })
       }
     }
 
@@ -59,9 +60,9 @@ exports.handler = async (event) => {
 
     const supabaseBiz = createClient(supabaseUrl, supabaseKey)
 
-    // 중복 지원 확인
+    // 중복 제출 확인
     const { data: existing } = await supabaseBiz
-      .from('story_proposals')
+      .from('text_submissions')
       .select('id, status')
       .eq('campaign_id', campaign_id)
       .eq('creator_id', user_id)
@@ -73,35 +74,31 @@ exports.handler = async (event) => {
         headers,
         body: JSON.stringify({
           success: false,
-          error: '이미 기획안을 제출한 캠페인입니다.',
-          proposal: existing
+          error: '이미 포스트를 제출한 캠페인입니다.',
+          submission: existing
         })
       }
     }
 
-    // 기획안 INSERT
-    const insertData = {
-      campaign_id,
-      creator_id: user_id,
-      video_concept,
-      tone_mood: tone_mood || null,
-      description,
-      secondary_use_agreed: true,
-      status: 'pending',
-      created_at: new Date().toISOString()
-    }
-
-    // 슬라이드 계획 (스토리 보강)
-    if (slide_plan) {
-      insertData.slide_plan = slide_plan
-    }
-    if (interactive_element) {
-      insertData.interactive_element = interactive_element
-    }
-
-    const { data: proposal, error: insertError } = await supabaseBiz
-      .from('story_proposals')
-      .insert([insertData])
+    // 제출물 INSERT
+    const { data: submission, error: insertError } = await supabaseBiz
+      .from('text_submissions')
+      .insert([{
+        campaign_id,
+        creator_id: user_id,
+        platform,
+        post_url,
+        post_text: post_text || null,
+        screenshot_url: screenshot_url || null,
+        has_product_image: has_product_image || false,
+        has_brand_tag: has_brand_tag || false,
+        has_ad_disclosure: has_ad_disclosure || false,
+        has_profile_link: has_profile_link || false,
+        status: 'pending',
+        posted_at: posted_at || new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
       .select()
       .single()
 
@@ -112,13 +109,13 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: true,
-        message: '기획안이 제출되었습니다. 승인 후 촬영을 진행해주세요.',
-        proposal
+        message: '포스트가 제출되었습니다. 검수 후 승인됩니다.',
+        submission
       })
     }
 
   } catch (error) {
-    console.error('apply-story-campaign error:', error)
+    console.error('submit-text-post error:', error)
     return {
       statusCode: 500,
       headers,
