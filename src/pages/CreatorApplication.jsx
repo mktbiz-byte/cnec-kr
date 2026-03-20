@@ -57,17 +57,24 @@ const CreatorApplication = () => {
   const [reviews, setReviews] = useState([])
   const [loadingReviews, setLoadingReviews] = useState(true)
 
+  const [slotError, setSlotError] = useState(false)
+
   // 슬롯 조회
   const fetchSlots = useCallback(async () => {
     try {
       setLoadingSlots(true)
+      setSlotError(false)
       const res = await fetch('/.netlify/functions/get-available-slots')
       const data = await res.json()
       if (data.success) {
         setAvailableSlots(data.slots || [])
+      } else {
+        console.error('슬롯 조회 실패:', data.error)
+        setSlotError(true)
       }
     } catch (err) {
       console.error('슬롯 조회 오류:', err)
+      setSlotError(true)
     } finally {
       setLoadingSlots(false)
     }
@@ -367,6 +374,18 @@ const CreatorApplication = () => {
               <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-[#6C5CE7] mb-2" />
                 <p className="text-sm text-[#6B7280]">가능한 일정을 불러오는 중...</p>
+              </div>
+            ) : slotError ? (
+              <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+                <AlertCircle className="w-10 h-10 text-red-300 mx-auto mb-2" />
+                <p className="text-sm text-[#6B7280]">일정을 불러오는 중 문제가 발생했어요.</p>
+                <button
+                  type="button"
+                  onClick={fetchSlots}
+                  className="mt-3 text-sm text-[#6C5CE7] font-medium hover:underline"
+                >
+                  다시 시도하기
+                </button>
               </div>
             ) : availableSlots.length === 0 ? (
               <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
