@@ -33,7 +33,7 @@ exports.handler = async (event) => {
 
     // BIZ DB 접속
     const supabaseUrl = process.env.VITE_SUPABASE_BIZ_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_ROLE_KEY
 
     const supabaseBiz = createClient(supabaseUrl, supabaseKey)
 
