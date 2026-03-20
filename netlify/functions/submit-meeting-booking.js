@@ -21,8 +21,8 @@ exports.handler = async (event) => {
   }
 
   try {
-    const supabaseUrl = process.env.VITE_SUPABASE_BIZ_URL
-    const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_ROLE_KEY
+    const supabaseUrl = process.env.SUPABASE_BIZ_URL
+    const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_KEY
 
     if (!supabaseUrl || !supabaseKey) {
       console.error('submit-meeting-booking: Missing env vars', {
@@ -32,7 +32,7 @@ exports.handler = async (event) => {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ success: false, error: 'Server configuration error: missing BIZ DB credentials' })
+        body: JSON.stringify({ success: false, error: 'Server configuration error: missing SUPABASE_BIZ_URL or SUPABASE_BIZ_SERVICE_KEY' })
       }
     }
 
