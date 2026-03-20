@@ -2,7 +2,7 @@ const { createClient } = require('@supabase/supabase-js')
 
 // Supabase Admin Client (service role key required)
 const supabaseAdmin = createClient(
-  process.env.VITE_SUPABASE_URL || 'https://vluqhvuhykncicgvkosd.supabase.co',
+  process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY // This must be set in Netlify environment variables
 )
 
