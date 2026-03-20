@@ -17,10 +17,11 @@ React 19 + Vite 6 + Tailwind CSS 4 + shadcn/ui + Supabase + Netlify
 | DB | URL | KEY |
 |----|-----|-----|
 | 자체 (Korea) | `VITE_SUPABASE_URL` | `SUPABASE_SERVICE_ROLE_KEY` |
-| BIZ 접근 시 | `VITE_SUPABASE_BIZ_URL` | `SUPABASE_BIZ_SERVICE_ROLE_KEY` |
+| BIZ 접근 시 | `SUPABASE_BIZ_URL` | `SUPABASE_BIZ_SERVICE_KEY` |
 
 **절대 사용 금지:**
-- `SUPABASE_BIZ_SERVICE_KEY` → `SUPABASE_BIZ_SERVICE_ROLE_KEY` 사용
+- `VITE_SUPABASE_BIZ_URL` → `SUPABASE_BIZ_URL` 사용 (Netlify 등록명 기준)
+- `SUPABASE_BIZ_SERVICE_ROLE_KEY` → `SUPABASE_BIZ_SERVICE_KEY` 사용 (Netlify 등록명 기준)
 - `SUPABASE_BIZ_ANON_KEY` → 서버에서 anon key 사용 금지
 - `SUPABASE_URL` (VITE_ prefix 없는 레거시)
 - 폴백 체인 (`A || B`) 금지 — 표준 변수 하나만 사용
@@ -59,8 +60,8 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 서버 함수에서 BIZ DB 접근 시:
 ```javascript
-const supabaseUrl = process.env.VITE_SUPABASE_BIZ_URL
-const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_ROLE_KEY
+const supabaseUrl = process.env.SUPABASE_BIZ_URL
+const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_KEY
 ```
 
 폴백 체인 사용 금지.
