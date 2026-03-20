@@ -47,15 +47,13 @@ exports.handler = async (event, context) => {
 
     const token = authHeader.replace('Bearer ', '')
 
-    // 환경변수 확인 (VITE_ 접두사와 일반 변수 모두 지원)
+    // 환경변수 확인
     const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-    if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+    if (!supabaseUrl || !supabaseServiceKey) {
       console.error('Supabase 환경변수 누락:', {
         url: !!supabaseUrl,
-        anon: !!supabaseAnonKey,
         service: !!supabaseServiceKey
       })
       return {
@@ -65,8 +63,8 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // 일반 클라이언트로 토큰 검증
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+    // Service Role Key로 토큰 검증
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
 
     if (authError || !user) {
