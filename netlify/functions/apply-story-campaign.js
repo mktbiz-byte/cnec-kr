@@ -52,12 +52,8 @@ exports.handler = async (event) => {
     }
 
     // BIZ DB 접속
-    const supabaseUrl = process.env.SUPABASE_BIZ_URL
-      || process.env.VITE_SUPABASE_BIZ_URL
-      || 'https://hbymozdhjseqebpomjsp.supabase.co'
-    const supabaseKey = process.env.SUPABASE_BIZ_SERVICE_KEY
-      || process.env.SUPABASE_BIZ_ANON_KEY
-      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhieW1vemRoanNlcWVicG9tanNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2NzA5NTgsImV4cCI6MjA3NjI0Njk1OH0.7th9Tz7oyHKqp03M68k1G0WqLwCSYTnoY9ECgy3pSzE'
+    const supabaseUrl = process.env.VITE_SUPABASE_BIZ_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     const supabaseBiz = createClient(supabaseUrl, supabaseKey)
 

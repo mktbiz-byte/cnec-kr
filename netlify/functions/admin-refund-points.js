@@ -35,7 +35,7 @@ exports.handler = async (event) => {
 
     // 서비스 역할로 Supabase 클라이언트 생성 (RLS 우회)
     const supabaseAdmin = createClient(
-      process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL,
+      process.env.VITE_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY,
       {
         auth: {
