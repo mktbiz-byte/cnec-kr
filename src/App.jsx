@@ -66,6 +66,7 @@ import CampaignReportEnhanced from './components/admin/CampaignReportEnhanced';
 import EmailTemplateManager from './components/admin/EmailTemplateManager';
 import UserApprovalManagerEnhanced from './components/admin/UserApprovalManagerEnhanced';
 import AdminWithdrawals from './components/admin/AdminWithdrawals';
+import AdminDepositTaxInvoice from './components/admin/AdminDepositTaxInvoice';
 import SystemSettings from './components/admin/SystemSettings';
 import EmailSettings from './components/admin/EmailSettings';
 
@@ -161,6 +162,7 @@ const AppContent = () => {
         <Route path="/email-templates" element={<ProtectedRoute requireAdmin={true}><EmailTemplateManager /></ProtectedRoute>} />
         <Route path="/user-approval" element={<ProtectedRoute requireAdmin={true}><UserApprovalManagerEnhanced /></ProtectedRoute>} />
         <Route path="/withdrawals-manage" element={<ProtectedRoute requireAdmin={true}><AdminWithdrawals /></ProtectedRoute>} />
+        <Route path="/deposit-tax-manage" element={<ProtectedRoute requireAdmin={true}><AdminDepositTaxInvoice /></ProtectedRoute>} />
         <Route path="/system-settings" element={<ProtectedRoute requireAdmin={true}><SystemSettings /></ProtectedRoute>} />
         <Route path="/email-settings" element={<ProtectedRoute requireAdmin={true}><EmailSettings /></ProtectedRoute>} />
       </Routes>
