@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { 
+import {
   Home,
-  Award, 
-  FileText, 
-  Users, 
-  CreditCard, 
-  Settings, 
+  Award,
+  FileText,
+  Users,
+  CreditCard,
+  Receipt,
+  Settings,
   Mail,
   BarChart3,
   Menu,
@@ -29,6 +30,7 @@ const AdminNavigation = () => {
       snsUploads: 'SNS 업로드',
       users: '사용자 승인',
       withdrawals: '출금 관리',
+      depositTax: '입금/세금계산서',
       emailTemplates: '이메일 템플릿',
       statistics: '통계 분석',
       settings: '시스템 설정'
@@ -41,6 +43,7 @@ const AdminNavigation = () => {
       snsUploads: 'SNS 업로드',
       users: '사용자 승인',
       withdrawals: '출금 관리',
+      depositTax: '入金/税金計算書',
       emailTemplates: '이메일 템플릿',
       statistics: '統計分析',
       settings: 'システム설정'
@@ -86,6 +89,11 @@ const AdminNavigation = () => {
       path: '/withdrawals-manage',
       label: t.withdrawals,
       icon: CreditCard
+    },
+    {
+      path: '/deposit-tax-manage',
+      label: t.depositTax,
+      icon: Receipt
     },
     {
       path: '/email-templates',
