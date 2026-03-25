@@ -2097,8 +2097,15 @@ const ApplicationsPage = () => {
                         )
                       })()}
 
-                      {/* 기획형 캠페인 가이드 (그룹 가이드가 없는 경우에만 표시) */}
-                      {!app.guide_group && app.campaigns?.campaign_type === 'planned' && (
+                      {/* 기획형 캠페인 가이드 (그룹 가이드가 렌더링되지 않은 경우 표시) */}
+                      {app.campaigns?.campaign_type === 'planned' && (() => {
+                        if (!app.guide_group) return true;
+                        // guide_group이 있지만 guide_group_data에 해당 그룹 데이터가 없으면 fallback
+                        let gd = app.campaigns?.guide_group_data;
+                        if (!gd) return true;
+                        if (typeof gd === 'string') try { gd = JSON.parse(gd); } catch(e) { return true; }
+                        return !gd[app.guide_group];
+                      })() && (
                         <>
                           {/* 외부 가이드 모드 */}
                           {app.campaigns?.guide_delivery_mode === 'external' && (app.campaigns?.external_guide_url || app.campaigns?.external_guide_file_url) && (
