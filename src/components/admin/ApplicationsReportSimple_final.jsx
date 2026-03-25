@@ -351,6 +351,15 @@ const ApplicationsReportSimple = () => {
         updated_at: new Date().toISOString()
       }
 
+      // 가이드 URL이 입력되면 status를 filming으로 변경 (pending/approved/selected/virtual_selected 상태일 때)
+      if (formData.google_slides_url.trim()) {
+        const currentStatus = selectedApplication.status
+        if (['pending', 'approved', 'selected', 'virtual_selected'].includes(currentStatus)) {
+          updateData.status = 'filming'
+          updateData.guide_delivered_at = new Date().toISOString()
+        }
+      }
+
       await database.applications.update(selectedApplication.id, updateData)
       
       console.log('드라이브 정보 저장 완료')

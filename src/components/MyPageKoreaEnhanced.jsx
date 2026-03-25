@@ -1318,19 +1318,26 @@ const MyPageKoreaEnhanced = () => {
                                   app.personalized_guide.trim() !== '' &&
                                   app.personalized_guide !== 'null' &&
                                   app.personalized_guide.length > 10
-                                
+
+                                // google_slides_url로 전달된 가이드도 유효한 가이드로 인식
+                                const hasGuideUrl = app.google_slides_url &&
+                                  typeof app.google_slides_url === 'string' &&
+                                  app.google_slides_url.trim() !== '' &&
+                                  app.google_slides_url.startsWith('http')
+
+                                const hasAnyGuide = hasValidGuide || hasGuideUrl
+
                                 console.log('Planning campaign button check:', {
                                   campaign: app.campaigns?.title,
                                   campaignType: app.campaigns?.campaign_type,
                                   status: app.status,
                                   hasGuide: !!app.personalized_guide,
-                                  guideType: typeof app.personalized_guide,
-                                  guideLength: app.personalized_guide?.length,
-                                  hasValidGuide: hasValidGuide,
-                                  shouldShow: app.campaigns?.campaign_type === 'planned' && hasValidGuide && (app.status === 'filming' || app.status === 'video_submitted')
+                                  hasGuideUrl: !!app.google_slides_url,
+                                  hasAnyGuide: hasAnyGuide,
+                                  shouldShow: app.campaigns?.campaign_type === 'planned' && hasAnyGuide && (app.status === 'filming' || app.status === 'video_submitted')
                                 })
-                                // 기획형 캠페인: personalized_guide 사용, filming 상태면 가이드 전달된 것으로 간주
-                                return app.campaigns?.campaign_type === 'planned' && hasValidGuide && (app.status === 'filming' || app.status === 'video_submitted')
+                                // 기획형 캠페인: personalized_guide 또는 google_slides_url 사용, filming 상태면 가이드 전달된 것으로 간주
+                                return app.campaigns?.campaign_type === 'planned' && hasAnyGuide && (app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
@@ -1343,6 +1350,11 @@ const MyPageKoreaEnhanced = () => {
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() => {
+                                        // google_slides_url이 있으면 외부 링크로 열기
+                                        if (app.google_slides_url && app.google_slides_url.startsWith('http')) {
+                                          window.open(app.google_slides_url, '_blank')
+                                          return
+                                        }
                                         console.log('Guide data:', app.personalized_guide)
                                         if (!app.personalized_guide) {
                                           alert('아직 가이드가 생성되지 않았습니다. 기업에서 가이드를 전달할 때까지 기다려주세요.')
