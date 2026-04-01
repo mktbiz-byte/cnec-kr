@@ -698,11 +698,37 @@ const ApplicationsPage = () => {
 
           {/* 4주 챌린지 가이드 확장 렌더링 */}
           {selectedGuide.type === '4week_challenge' && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <FourWeekGuideViewer
-                guides={selectedGuide.campaigns?.challenge_weekly_guides_ai}
-                commonMessage={selectedGuide.additional_message}
-              />
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+              {/* 외부 가이드 (PDF 등) */}
+              {(selectedGuide.campaigns?.week1_guide_mode === 'external' || selectedGuide.campaigns?.week2_guide_mode === 'external' || selectedGuide.campaigns?.week3_guide_mode === 'external' || selectedGuide.campaigns?.week4_guide_mode === 'external') && (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map(week => {
+                    const mode = selectedGuide.campaigns?.[`week${week}_guide_mode`]
+                    const url = selectedGuide.campaigns?.[`week${week}_external_url`]
+                    const fileUrl = selectedGuide.campaigns?.[`week${week}_external_file_url`]
+                    if (mode !== 'external' || (!url && !fileUrl)) return null
+                    return (
+                      <div key={week}>
+                        <p className="text-sm font-semibold text-indigo-800 mb-2">{week}주차</p>
+                        <ExternalGuideViewer
+                          guideType={selectedGuide.campaigns[`week${week}_external_type`]}
+                          guideUrl={url}
+                          fileUrl={fileUrl}
+                          title={selectedGuide.campaigns[`week${week}_external_title`]}
+                          fileName={selectedGuide.campaigns[`week${week}_external_file_name`]}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              {/* AI 가이드 */}
+              {selectedGuide.campaigns?.challenge_weekly_guides_ai && (
+                <FourWeekGuideViewer
+                  guides={selectedGuide.campaigns.challenge_weekly_guides_ai}
+                  commonMessage={selectedGuide.additional_message}
+                />
+              )}
             </div>
           )}
         </div>
@@ -2275,92 +2301,27 @@ const ApplicationsPage = () => {
                       )}
 
                       {/* 4주 챌린지 캠페인 가이드 (그룹 가이드가 없는 경우에만 표시) */}
-                      {!app.guide_group && app.campaigns?.campaign_type === '4week_challenge' && (
-                        <>
-                          {/* 외부 가이드 모드 - week별로 표시 */}
-                          {(app.campaigns?.week1_guide_mode === 'external' || app.campaigns?.week2_guide_mode === 'external' || app.campaigns?.week3_guide_mode === 'external' || app.campaigns?.week4_guide_mode === 'external') && (
-                            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 space-y-3">
-                              <div className="flex items-center gap-2">
-                                <BookOpen size={14} className="text-indigo-600" />
-                                <span className="text-xs font-semibold text-indigo-900">4주 챌린지 가이드</span>
-                              </div>
-                              {/* Week 1 외부 가이드 */}
-                              {app.campaigns?.week1_guide_mode === 'external' && (app.campaigns?.week1_external_url || app.campaigns?.week1_external_file_url) && (
-                                <div>
-                                  <p className="text-xs font-medium text-indigo-800 mb-2">1주차</p>
-                                  <ExternalGuideViewer
-                                    guideType={app.campaigns.week1_external_type}
-                                    guideUrl={app.campaigns.week1_external_url}
-                                    fileUrl={app.campaigns.week1_external_file_url}
-                                    title={app.campaigns.week1_external_title}
-                                    fileName={app.campaigns.week1_external_file_name}
-                                  />
-                                </div>
-                              )}
-                              {/* Week 2 외부 가이드 */}
-                              {app.campaigns?.week2_guide_mode === 'external' && (app.campaigns?.week2_external_url || app.campaigns?.week2_external_file_url) && (
-                                <div>
-                                  <p className="text-xs font-medium text-indigo-800 mb-2">2주차</p>
-                                  <ExternalGuideViewer
-                                    guideType={app.campaigns.week2_external_type}
-                                    guideUrl={app.campaigns.week2_external_url}
-                                    fileUrl={app.campaigns.week2_external_file_url}
-                                    title={app.campaigns.week2_external_title}
-                                    fileName={app.campaigns.week2_external_file_name}
-                                  />
-                                </div>
-                              )}
-                              {/* Week 3 외부 가이드 */}
-                              {app.campaigns?.week3_guide_mode === 'external' && (app.campaigns?.week3_external_url || app.campaigns?.week3_external_file_url) && (
-                                <div>
-                                  <p className="text-xs font-medium text-indigo-800 mb-2">3주차</p>
-                                  <ExternalGuideViewer
-                                    guideType={app.campaigns.week3_external_type}
-                                    guideUrl={app.campaigns.week3_external_url}
-                                    fileUrl={app.campaigns.week3_external_file_url}
-                                    title={app.campaigns.week3_external_title}
-                                    fileName={app.campaigns.week3_external_file_name}
-                                  />
-                                </div>
-                              )}
-                              {/* Week 4 외부 가이드 */}
-                              {app.campaigns?.week4_guide_mode === 'external' && (app.campaigns?.week4_external_url || app.campaigns?.week4_external_file_url) && (
-                                <div>
-                                  <p className="text-xs font-medium text-indigo-800 mb-2">4주차</p>
-                                  <ExternalGuideViewer
-                                    guideType={app.campaigns.week4_external_type}
-                                    guideUrl={app.campaigns.week4_external_url}
-                                    fileUrl={app.campaigns.week4_external_file_url}
-                                    title={app.campaigns.week4_external_title}
-                                    fileName={app.campaigns.week4_external_file_name}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          {/* AI 가이드 모드 (기존) */}
-                          {app.campaigns?.week1_guide_mode !== 'external' && app.campaigns?.week2_guide_mode !== 'external' && app.campaigns?.week3_guide_mode !== 'external' && app.campaigns?.week4_guide_mode !== 'external' && app.campaigns?.challenge_weekly_guides_ai && (
-                            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <BookOpen size={14} className="text-indigo-600" />
-                                <span className="text-xs font-semibold text-indigo-900">4주 챌린지 가이드</span>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setSelectedGuide({
-                                    type: '4week_challenge',
-                                    campaigns: app.campaigns,
-                                    additional_message: app.additional_message
-                                  })
-                                  setShowGuideModal(true)
-                                }}
-                                className="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center justify-center gap-1"
-                              >
-                                <Eye size={12} /> 가이드 보기
-                              </button>
-                            </div>
-                          )}
-                        </>
+                      {!app.guide_group && app.campaigns?.campaign_type === '4week_challenge' &&
+                       (app.campaigns?.challenge_weekly_guides_ai || app.campaigns?.week1_guide_mode === 'external' || app.campaigns?.week2_guide_mode === 'external' || app.campaigns?.week3_guide_mode === 'external' || app.campaigns?.week4_guide_mode === 'external') && (
+                        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen size={14} className="text-indigo-600" />
+                            <span className="text-xs font-semibold text-indigo-900">4주 챌린지 가이드</span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setSelectedGuide({
+                                type: '4week_challenge',
+                                campaigns: app.campaigns,
+                                additional_message: app.additional_message
+                              })
+                              setShowGuideModal(true)
+                            }}
+                            className="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center justify-center gap-1"
+                          >
+                            <Eye size={12} /> 가이드 보기
+                          </button>
+                        </div>
                       )}
 
                       {/* 4주 챌린지: completed/paid 상태에서도 항상 수정 가능 */}
@@ -2823,12 +2784,70 @@ const ApplicationsPage = () => {
               )}
 
               {/* 4주 챌린지 가이드 내용 */}
-              {selectedGuide.type === '4week_challenge' && selectedGuide.campaigns?.challenge_weekly_guides_ai && (
-                <FourWeekGuideViewer
-                  guides={selectedGuide.campaigns.challenge_weekly_guides_ai}
-                  basicGuides={selectedGuide.campaigns.challenge_weekly_guides}
-                  commonMessage={selectedGuide.additional_message}
-                />
+              {selectedGuide.type === '4week_challenge' && (
+                <>
+                  {/* 외부 가이드 (PDF 등) */}
+                  {(selectedGuide.campaigns?.week1_guide_mode === 'external' || selectedGuide.campaigns?.week2_guide_mode === 'external' || selectedGuide.campaigns?.week3_guide_mode === 'external' || selectedGuide.campaigns?.week4_guide_mode === 'external') && (
+                    <div className="space-y-3">
+                      {selectedGuide.campaigns?.week1_guide_mode === 'external' && (selectedGuide.campaigns?.week1_external_url || selectedGuide.campaigns?.week1_external_file_url) && (
+                        <div>
+                          <p className="text-sm font-semibold text-indigo-800 mb-2">1주차</p>
+                          <ExternalGuideViewer
+                            guideType={selectedGuide.campaigns.week1_external_type}
+                            guideUrl={selectedGuide.campaigns.week1_external_url}
+                            fileUrl={selectedGuide.campaigns.week1_external_file_url}
+                            title={selectedGuide.campaigns.week1_external_title}
+                            fileName={selectedGuide.campaigns.week1_external_file_name}
+                          />
+                        </div>
+                      )}
+                      {selectedGuide.campaigns?.week2_guide_mode === 'external' && (selectedGuide.campaigns?.week2_external_url || selectedGuide.campaigns?.week2_external_file_url) && (
+                        <div>
+                          <p className="text-sm font-semibold text-indigo-800 mb-2">2주차</p>
+                          <ExternalGuideViewer
+                            guideType={selectedGuide.campaigns.week2_external_type}
+                            guideUrl={selectedGuide.campaigns.week2_external_url}
+                            fileUrl={selectedGuide.campaigns.week2_external_file_url}
+                            title={selectedGuide.campaigns.week2_external_title}
+                            fileName={selectedGuide.campaigns.week2_external_file_name}
+                          />
+                        </div>
+                      )}
+                      {selectedGuide.campaigns?.week3_guide_mode === 'external' && (selectedGuide.campaigns?.week3_external_url || selectedGuide.campaigns?.week3_external_file_url) && (
+                        <div>
+                          <p className="text-sm font-semibold text-indigo-800 mb-2">3주차</p>
+                          <ExternalGuideViewer
+                            guideType={selectedGuide.campaigns.week3_external_type}
+                            guideUrl={selectedGuide.campaigns.week3_external_url}
+                            fileUrl={selectedGuide.campaigns.week3_external_file_url}
+                            title={selectedGuide.campaigns.week3_external_title}
+                            fileName={selectedGuide.campaigns.week3_external_file_name}
+                          />
+                        </div>
+                      )}
+                      {selectedGuide.campaigns?.week4_guide_mode === 'external' && (selectedGuide.campaigns?.week4_external_url || selectedGuide.campaigns?.week4_external_file_url) && (
+                        <div>
+                          <p className="text-sm font-semibold text-indigo-800 mb-2">4주차</p>
+                          <ExternalGuideViewer
+                            guideType={selectedGuide.campaigns.week4_external_type}
+                            guideUrl={selectedGuide.campaigns.week4_external_url}
+                            fileUrl={selectedGuide.campaigns.week4_external_file_url}
+                            title={selectedGuide.campaigns.week4_external_title}
+                            fileName={selectedGuide.campaigns.week4_external_file_name}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {/* AI 가이드 */}
+                  {selectedGuide.campaigns?.challenge_weekly_guides_ai && (
+                    <FourWeekGuideViewer
+                      guides={selectedGuide.campaigns.challenge_weekly_guides_ai}
+                      basicGuides={selectedGuide.campaigns.challenge_weekly_guides}
+                      commonMessage={selectedGuide.additional_message}
+                    />
+                  )}
+                </>
               )}
 
               {/* 일반 가이드 내용 - ai_generated_guide JSONB 구조 */}
