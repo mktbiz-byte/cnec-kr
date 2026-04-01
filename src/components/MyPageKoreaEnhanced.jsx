@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import VideoReferencesSection from './VideoReferencesSection'
 import OliveYoungGuideViewer from './OliveYoungGuideViewer'
 import FourWeekGuideViewer from './FourWeekGuideViewer'
+import ExternalGuideViewer from './common/ExternalGuideViewer'
 import { useAuth } from '../contexts/AuthContext'
 import { database, supabase } from '../lib/supabase'
 import {
@@ -370,7 +371,7 @@ const MyPageKoreaEnhanced = () => {
         if (campaignIds.length > 0) {
           const { data: campaignsData } = await supabase
             .from('campaigns')
-            .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, is_oliveyoung_sale, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, oliveyoung_step1_guide, oliveyoung_step2_guide, oliveyoung_step3_guide, step1_guide_mode, step2_guide_mode, step3_guide_mode, challenge_weekly_guides, challenge_weekly_guides_ai')
+            .select('id, title, brand, image_url, reward_points, creator_points_override, recruitment_deadline, application_deadline, content_submission_deadline, campaign_type, is_oliveyoung_sale, start_date, end_date, step1_deadline, step2_deadline, step3_deadline, week1_deadline, week2_deadline, week3_deadline, week4_deadline, oliveyoung_step1_guide_ai, oliveyoung_step2_guide_ai, oliveyoung_step3_guide_ai, oliveyoung_step1_guide, oliveyoung_step2_guide, oliveyoung_step3_guide, step1_guide_mode, step2_guide_mode, step3_guide_mode, challenge_weekly_guides, challenge_weekly_guides_ai, week1_guide_mode, week2_guide_mode, week3_guide_mode, week4_guide_mode, week1_external_url, week1_external_file_url, week1_external_type, week1_external_title, week1_external_file_name, week2_external_url, week2_external_file_url, week2_external_type, week2_external_title, week2_external_file_name, week3_external_url, week3_external_file_url, week3_external_type, week3_external_title, week3_external_file_name, week4_external_url, week4_external_file_url, week4_external_type, week4_external_title, week4_external_file_name')
             .in('id', campaignIds)
 
           // 비디오 제출 내역 조회 (모든 필드 포함)
@@ -1445,8 +1446,11 @@ const MyPageKoreaEnhanced = () => {
 
                               {/* 가이드 확인 배너 - 4주 챌린지 */}
                               {(() => {
-                                // 4주 챌린지 캠페인: challenge_weekly_guides_ai 사용, selected 이상 상태면 가이드 표시
-                                const has4WeekGuide = app.campaigns?.challenge_weekly_guides_ai
+                                // 4주 챌린지 캠페인: AI 가이드 또는 외부 PDF 가이드가 있으면 표시
+                                const hasAiGuide = app.campaigns?.challenge_weekly_guides_ai
+                                const hasExternalWeeks = app.campaigns?.week1_guide_mode === 'external' || app.campaigns?.week2_guide_mode === 'external' ||
+                                                         app.campaigns?.week3_guide_mode === 'external' || app.campaigns?.week4_guide_mode === 'external'
+                                const has4WeekGuide = hasAiGuide || hasExternalWeeks
                                 return app.campaigns?.campaign_type === '4week_challenge' && has4WeekGuide && (app.status === 'selected' || app.status === 'filming' || app.status === 'video_submitted')
                               })() && (
                                 <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
@@ -1870,24 +1874,79 @@ const MyPageKoreaEnhanced = () => {
 
                 // 4주 챌린지 캠페인
                 if (campaignType === '4week_challenge') {
-                  // Use custom_guide (delivered guides) if available, otherwise fallback to campaign guides
                   const customGuide = selectedGuide.custom_guide
                   const weeklyGuides = customGuide || campaign.challenge_weekly_guides_ai
                   const basicGuides = campaign.challenge_weekly_guides
+                  const hasExternalWeeks = campaign.week1_guide_mode === 'external' || campaign.week2_guide_mode === 'external' ||
+                                           campaign.week3_guide_mode === 'external' || campaign.week4_guide_mode === 'external'
 
                   return (
-                    <div>
+                    <div className="space-y-4">
+                      {/* 외부 가이드 (PDF 등) */}
+                      {hasExternalWeeks && (
+                        <div className="space-y-3">
+                          {campaign.week1_guide_mode === 'external' && (campaign.week1_external_url || campaign.week1_external_file_url) && (
+                            <div>
+                              <p className="text-sm font-semibold text-indigo-800 mb-2">1주차</p>
+                              <ExternalGuideViewer
+                                guideType={campaign.week1_external_type}
+                                guideUrl={campaign.week1_external_url}
+                                fileUrl={campaign.week1_external_file_url}
+                                title={campaign.week1_external_title}
+                                fileName={campaign.week1_external_file_name}
+                              />
+                            </div>
+                          )}
+                          {campaign.week2_guide_mode === 'external' && (campaign.week2_external_url || campaign.week2_external_file_url) && (
+                            <div>
+                              <p className="text-sm font-semibold text-indigo-800 mb-2">2주차</p>
+                              <ExternalGuideViewer
+                                guideType={campaign.week2_external_type}
+                                guideUrl={campaign.week2_external_url}
+                                fileUrl={campaign.week2_external_file_url}
+                                title={campaign.week2_external_title}
+                                fileName={campaign.week2_external_file_name}
+                              />
+                            </div>
+                          )}
+                          {campaign.week3_guide_mode === 'external' && (campaign.week3_external_url || campaign.week3_external_file_url) && (
+                            <div>
+                              <p className="text-sm font-semibold text-indigo-800 mb-2">3주차</p>
+                              <ExternalGuideViewer
+                                guideType={campaign.week3_external_type}
+                                guideUrl={campaign.week3_external_url}
+                                fileUrl={campaign.week3_external_file_url}
+                                title={campaign.week3_external_title}
+                                fileName={campaign.week3_external_file_name}
+                              />
+                            </div>
+                          )}
+                          {campaign.week4_guide_mode === 'external' && (campaign.week4_external_url || campaign.week4_external_file_url) && (
+                            <div>
+                              <p className="text-sm font-semibold text-indigo-800 mb-2">4주차</p>
+                              <ExternalGuideViewer
+                                guideType={campaign.week4_external_type}
+                                guideUrl={campaign.week4_external_url}
+                                fileUrl={campaign.week4_external_file_url}
+                                title={campaign.week4_external_title}
+                                fileName={campaign.week4_external_file_name}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {/* AI 가이드 */}
                       {weeklyGuides ? (
-                        <FourWeekGuideViewer 
+                        <FourWeekGuideViewer
                           guides={weeklyGuides}
                           basicGuides={basicGuides}
                           commonMessage={selectedGuide.additional_message}
                         />
-                      ) : (
+                      ) : !hasExternalWeeks ? (
                         <div className="text-center py-8 text-gray-500">
                           아직 가이드가 생성되지 않았습니다.
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   )
                 }
